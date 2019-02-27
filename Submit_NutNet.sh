@@ -20,10 +20,10 @@
 
 module load R/3.4.3-1
 
-output_dir=/work/$USER/SeedAdd/$JOB_ID
+output_dir=/work/$USER/$JOB_NAME/$JOB_ID
 mkdir -p $output_dir
 
 Rscript \
-  Price_Open_C.R \
-  /data/idiv_chase/emmala/SeedAdd/input/input-$SGE_TASK_ID.rds \
+  nutnet_price_total.R \
+  /data/idiv_chase/emmala/NutNet/input/input-$SGE_TASK_ID.rds \
   $output_dir/output-$SGE_TASK_ID.rds
