@@ -18,8 +18,9 @@
 
 module load R/3.4.3-1
 
-prefix=$1
-output_dir=/work/$USER/$JOB_NAME/$JOB_ID
+experiment=$1
+prefix=$2
+output_dir=/work/$USER/$JOB_NAME/$experiment/$JOB_ID
 mkdir -p $output_dir
 
 Rscript \
