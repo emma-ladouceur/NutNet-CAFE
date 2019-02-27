@@ -11,19 +11,18 @@
 
 #$ -binding linear:1
 
-#$ -t 1-2
-
-#$ -m beas
+#$ -m a
 #$ -M emma.ladouceur@ufz.de
 
 #$ -cwd
 
 module load R/3.4.3-1
 
+prefix=$1
 output_dir=/work/$USER/$JOB_NAME/$JOB_ID
 mkdir -p $output_dir
 
 Rscript \
   nutnet_price_total.R \
-  /data/idiv_chase/emmala/NutNet/input/input-$SGE_TASK_ID.rds \
+  /data/idiv_chase/emmala/NutNet/input/${prefix}_$SGE_TASK_ID.rds \
   $output_dir/output-$SGE_TASK_ID.rds
