@@ -162,7 +162,7 @@ r1<-ggplot() +
             aes(x = year_trt, y = Estimate),
             size = 1.5) +
   labs(x = 'Years',
-       y = 'Species richness', title= 'a) Richness') +
+       y = 'Species richness', title= 'a) Plot Richness') +
   #scale_colour_manual(values = c("#FA6B09FF", "#EE0011FF" , "#EC579AFF", "#15983DFF", "#149BEDFF", "#A1C720FF","#0C5BB0FF", "#8F2F8BFF", "#F9B90AFF", "#16A08CFF" ,"#6A7F93FF","#9A703EFF" ))+
   theme_bw()+ theme(legend.position="none")
 
@@ -264,7 +264,7 @@ b1<-ggplot() +
             aes(x = year_trt, y = Estimate),
             size = 1.5) +
   labs(x = 'Years',
-       y = 'Biomass', title= 'b) Biomass') +
+       y = 'Biomass', title= 'b) Plot Biomass') +
   #scale_colour_manual(values = c("#FA6B09FF", "#EE0011FF" , "#EC579AFF", "#15983DFF", "#149BEDFF", "#A1C720FF","#0C5BB0FF", "#8F2F8BFF", "#F9B90AFF", "#16A08CFF" ,"#6A7F93FF","#9A703EFF" ))+
   theme_bw()+ theme(legend.position="none")
 
@@ -373,7 +373,7 @@ r1<-ggplot() +
 
 
 
-#plot biomass
+#site biomass
 
 
 summary(site.bm.m)

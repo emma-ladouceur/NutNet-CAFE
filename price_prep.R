@@ -17,13 +17,15 @@ plot <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_c
 
 sp$year_trt<-as.factor(sp$year_trt)
 levels(sp$year_trt)
+levels(sp$site_code)
 sp2<-group_by(sp, site_code,year_trt)
-
+View(sp2)
 
 all<-unite_(sp2, "site.year.id", c("site_code","year_trt"), remove=FALSE)
 all<-unite_(all, "trt_year", c("trt","year_trt"), remove=FALSE)
 all<-unite_(all, "site_trt_year", c("site_code","trt","year_trt"), remove=FALSE)
 View(all)
+levels(all$site_code)
 native<-all[all$local_provenance %in% c('NAT'),]
 introduced<-all[all$local_provenance %in% c('INT'),]
 
@@ -140,7 +142,7 @@ nn.dist<-distinct(all,site.year.id)
 View(nn.dist)
 azi.cn_2$site.year.id<-as.factor(as.character(azi.cn_2$site.year.id))
 levels(azi.cn_2$site.year.id)
-View(azi.cn_2)
+View(azi.cn_5)
 colnames(azi.cn_2)
 
 group.vars <- c('site_code','plot','block')
@@ -156,6 +158,10 @@ pp<-res
 pp<-group.columns(pp,gps=c(group.vars,treat.vars), drop=T)
 
 View(pp)
+
+
+
+
 
 
 #mess around
