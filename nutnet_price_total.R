@@ -28,7 +28,7 @@ output <- cli$args[2]
 
 table <- readRDS(input)
 
-group.vars <- c('site_code','plot','block')
+group.vars <- c('site.year.id','plot','block')
 treat.vars<-c('trt_year')
 
 grouped.data <- table %>% group_by_(.dots=c(group.vars,treat.vars))

@@ -52,13 +52,14 @@ for (i in 1:length(usindex)){
   
   for(j in 2:length(uindex_small)) {
     subs2<-which(yindex[subs]%in%c(uindex_small[j], "0"))
-    
+  
     all_lst[[n]]<-all[subs[subs2],]
     names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
     n<-n+1
   }
   print(i/length(usindex))
 }
+
 
 
 folder = "output_all"
