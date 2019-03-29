@@ -271,6 +271,18 @@ summary(sl.trt_fitted3)
 summary(sl.trt_coef3)
 
 
+library("scales")
+reverselog_trans <- function(base = exp(1)) {
+  trans <- function(x) -log(x, base)
+  inv <- function(x) base^(-x)
+  trans_new(paste0("reverselog-", format(base)), trans, inv, 
+            log_breaks(base = base), 
+            domain = c(1e-100, Inf))
+}
+
+
+
+
 View(sl.trt_fitted3)
 sl.trtm<-ggplot() +
   # data
@@ -298,7 +310,7 @@ sl.trtm<-ggplot() +
   geom_line(data = sl.trt_fitted.npk,
             aes(x = year.y, y = Estimate),
             size = 1.5) +
-  scale_y_continuous(trans = 'log', breaks=c(8,64,512,1024,2048,4096)) +
+  scale_y_continuous(trans = reverselog_trans(), breaks=c(0,4,8,64,512,1024,2048,4096)) +
   labs(x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in EF due to SL') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
