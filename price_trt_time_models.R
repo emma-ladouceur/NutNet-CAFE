@@ -1,0 +1,937 @@
+
+
+rm(list=ls())
+
+library(ggplot2)
+library(tidyverse)
+library(brms)
+library(gridExtra)
+library(grid)
+library(bayesplot)
+library(priceTools)
+
+sp <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+View(p.all)
+levels(p.all3$trt_year)
+
+p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
+
+p.all$f.year.y<-as.factor(p.all$year.y)
+p.all$plot<-as.factor(p.all$plot)
+p.all$site_code<-as.factor(p.all$site_code)
+
+dat<-distinct(plot, site_code, continent,habitat)
+p.dat<-inner_join(p.all,dat)
+
+nrow(p.dat)
+p.dat2<-p.dat[complete.cases(p.dat), ]
+nrow(p.dat2)
+
+
+p.dat3<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
+nrow(p.dat3)
+
+View(p.dat3)
+
+colnames(p.dat3)
+head(p.dat3)
+summary(p.dat3)
+View(p.dat3)
+
+#write.csv(p.all4,"~/Desktop/pricel.csv")
+
+p.dat3$year.y.m<-p.dat3$year.y-mean(p.dat3$year.y)
+
+p.dat3$SL.p<-abs(p.dat3$SL)
+p.dat3$SL.p.log1<-log1p(p.dat3$SL.p)
+p.dat3$SG.log1<-log1p(p.dat3$SG)
+p.dat3$CDE.log<-log1p(p.dat3$CDE)
+
+#try shanes funky custom transformation for cde
+p.dat3$CDE.t<- sign(p.dat3$CDE)*sqrt(abs(p.dat3$CDE))
+
+
+par(mfrow=c(1,1))
+hist(p.dat3$CDE.t, breaks=40, main="CDE Funky Transformed", xlab= "CDE FT")
+
+
+#histograms of sl & sg
+par(mfrow=c(2,3))
+hist(p.dat3$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
+hist(p.dat3$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
+hist(p.dat3$CDE, breaks=40, main="CDE", xlab= "CDE")
+
+hist(p.dat3$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
+hist(p.dat3$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
+hist(p.dat3$CDE.t, breaks=40, main="CDE t", xlab= "CDE t")
+
+
+# s loss, gain and change metrics
+p.dat3$s.loss <- -1*(p.dat3$x.rich - p.dat3$c.rich)
+p.dat3$s.gain <- p.dat3$y.rich - p.dat3$c.rich
+p.dat3$s.change <- p.dat3$y.rich - p.dat3$x.rich
+
+
+p.dat3$s.loss.log <- sign(p.dat3$s.loss)*log1p(abs(p.dat3$s.loss))
+p.dat3$s.gain.log<-log1p(p.dat3$s.gain)
+
+par(mfrow=c(2,2))
+hist(p.dat3$s.loss,breaks =10, main="Species Loss", xlab= "Species Loss")
+hist(p.dat3$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
+hist(p.dat3$s.loss.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
+hist(p.dat3$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
+
+
+p.dat3$site_code<-as.factor(p.dat3$site_code)
+p.dat3$site.year.id<-as.factor(p.dat3$site.year.id)
+
+#try out models on a sample of data?
+#levels(p.dat3$site_code)
+#samp<-p.dat3[p.dat3$site_code %in% c('arch.us'),]
+
+colnames(p.dat3) 
+
+sl.trt <- brm(SL.p ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
+            data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
+
+
+sg.trt <- brm(SG ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
+            data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
+
+
+CDE.trt <- brm(CDE ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
+             data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
+
+
+
+setwd('~/Dropbox/Projects/NutNet/Model_fits/')
+save(sl.trt,sg.trt,CDE.trt,file = 'price_trt_time.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_time.Rdata')
+
+
+
+summary(CDE.c)
+
+summary(sg.c)
+
+summary(sl.trt)
+
+color_scheme_set("purple")
+plot(sl.trt)
+pp_check(sl.trt)+ scale_x_continuous(trans="log") +theme_bw()
+
+plot(sg.trt)
+pp_check(sg.trt)+ scale_x_continuous(trans="log")+theme_bw()
+
+plot(CDE.trt)
+pp_check(CDE.trt)
+
+
+
+
+levels(p.dat3$f.year.y)
+#residuals
+sl.trtm1<-residuals(sl.trt)
+sl.trtm1<-as.data.frame(sl.trtm1)
+View(sl.trtm1)
+nrow(sl.trtm1)
+nrow(p.dat3)
+p.dat4<-p.dat3[complete.cases(p.dat3$SL.p), ]
+nrow(p.dat4)
+sl.trt.plot<-cbind(p.dat4,sl.trtm1$Estimate)
+sl.trt.plot2<-inner_join(sl.trt.plot,dat)
+
+
+
+par(mfrow=c(3,2))
+with(sl.trt.plot2, plot(continent, sl.trtm1$Estimate))
+with(sl.trt.plot2, plot(habitat, sl.trtm1$Estimate))
+with(sl.trt.plot2, plot(site_code, sl.trtm1$Estimate))
+with(sl.trt.plot2, plot(block, sl.trtm1$Estimate))
+with(sl.trt.plot2, plot(plot, sl.trtm1$Estimate))
+with(sl.trt.plot2, plot(year.y, sl.trtm1$Estimate))
+
+# #------plot richness model all sp----------------
+# fixed effects
+sl.trt_fitted <- cbind(sl.trt$data,
+                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                     fitted(sl.trt, re_formula = NA)) %>% 
+  as_tibble()
+
+View(sl.trt_fitted)
+p.dat5<-distinct(p.dat3,site_code, year.y,year.y.m, SL,SL.p)
+sl.trt_fitted2<-inner_join(sl.trt_fitted,p.dat5)
+sl.trt_fitted3<-inner_join(sl.trt_fitted2,dat)
+View(sl.trt_fitted3)
+
+sl.trt_fitted.npk<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('NPK'),]
+sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
+
+#either subset NPK and/or have two seperate lines for NPK and control
+
+
+
+# fixed effect coefficients -coefficient plot
+sl.trt_fixef <- fixef(sl.trt)
+
+# coefficients for experiment-level (random) effects
+sl.trt_coef
+sl.trt_coef <- coef(sl.trt)
+View(sl.trt_coef)
+
+sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>% 
+                           as_tibble() %>% 
+                           mutate(Intercept = Estimate,
+                                  Intercept_lower = Q2.5,
+                                  Intercept_upper = Q97.5,
+                                  site_code = rownames(sl.trt_coef$site_code[,,'Intercept'])) %>% 
+                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                         sl.trt_coef$site_code[,,'year.y.m'] %>% 
+                           as_tibble() %>% 
+                           mutate(Slope = Estimate,
+                                  Slope_lower = Q2.5,
+                                  Slope_upper = Q97.5) %>% 
+                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(p.dat3 %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y),
+                         cxmin = min(year.y.m),
+                         cxmax = max(year.y.m)),
+             by = 'site_code')
+
+
+
+dat<-distinct(p.dat3, site_code, continent,habitat)
+
+sl.trt_coef3<-inner_join(sl.trt_coef2,dat)
+View(sl.trt_coef3)
+
+
+#convert to negative
+#sl.trt_coef3$Intercept<-log(sl.trt_coef3$Intercept)
+#sl.trt_coef3$Intercept_upper<-log(sl.trt_coef3$Intercept_upper)
+#sl.trt_coef3$Intercept_lower<-log(sl.trt_coef3$Intercept_lower)
+#sl.trt_coef3$sl.trtope<-log(sl.trt_coef3$sl.trtope)
+#sl.trt_coef3$sl.trtope_upper<-log(sl.trt_coef3$sl.trtope_upper)
+#sl.trt_coef3$sl.trtope_lower<-log(sl.trt_coef3$sl.trtope_lower)
+
+
+sl.trt_coef3$Intercept.n<-(sl.trt_coef3$Intercept * -1)
+sl.trt_coef3$Intercept_upper.n<-(sl.trt_coef3$Intercept_upper * -1)
+sl.trt_coef3$Intercept_lower.n<-(sl.trt_coef3$Intercept_lower * -1)
+sl.trt_coef3$sl.trtope.n<-(sl.trt_coef3$sl.trtope * -1)
+sl.trt_coef3$sl.trtope_upper.n<-(sl.trt_coef3$sl.trtope_upper * -1)
+sl.trt_coef3$sl.trtope_lower.n<-(sl.trt_coef3$sl.trtope_lower * -1)
+
+sl.trt_coef3$Intercept.log<-log(sl.trt_coef3$Intercept)
+sl.trt_coef3$sl.trtope.log<-log(sl.trt_coef3$sl.trtope)
+sl.trt_coef3$Intercept.log.n<-(sl.trt_coef3$Intercept.log * -1)
+sl.trt_coef3$sl.trtope.log.n<-(sl.trt_coef3$sl.trtope.log * -1)
+
+View(sl.trt_coef3)
+View(p.dat3)
+dat2<-distinct(p.dat3, site_code,year.y, year.y.m)
+View(dat2)
+
+
+View(sl.trt_fitted2)
+View(dat2)
+#neg
+sl.trt_fitted2$sl.trt.n<-(sl.trt_fitted2$sl.trt.p * -1)
+sl.trt_fitted2$Estimate.n<-(sl.trt_fitted2$Estimate * -1)
+sl.trt_fitted2$Est.Error.n<-(sl.trt_fitted2$Est.Error * -1)
+sl.trt_fitted2$Q2.5.n<-(sl.trt_fitted2$Q2.5 * -1)
+sl.trt_fitted2$Q97.5.n<-(sl.trt_fitted2$Q97.5 * -1)
+
+
+View(p.dat3)
+sl.trt_fitted2$year.y.f<-as.factor(sl.trt_fitted2$year.y)
+levels(sl.trt_fitted2$year.y.f)
+
+
+View(sl.trt_fitted2)
+View(p.dat3)
+dat<-distinct(plot,site_code,continent)
+nrow(sl.trtdat)
+nrow(sl.trt_fitted2)
+
+#sl.trt_fitted2<-inner_join(sl.trt_fitted,dat)
+
+View(sl.trt_fitted3)
+View(sl.trt_coef3)
+
+summary(sl.trt_fitted3)
+summary(sl.trt_coef3)
+
+
+View(sl.trt_fitted3)
+sl.trtm<-ggplot() +
+  # data
+  geom_point(data = sl.trt_fitted.npk,
+             aes(x = year.y, y = SL.p,
+                 colour = continent, alpha=0.02),
+             size = 1.2) +
+  geom_jitter(data=sl.trt_fitted.npk,
+              aes(x = year.y, y = SL.p,
+                  colour = continent), height=0.25,width = 0.25)+
+  # experiment (random) effects
+  geom_segment(data = sl.trt_coef3,
+               aes(x = xmin, 
+                   xend = xmax,
+                   y = exp(Intercept + Slope * cxmin),
+                   yend = exp(Intercept + Slope * cxmax),
+                   group = site_code,
+                   colour = continent),
+               size = .7) +
+  # uncertainy in fixed effect
+  geom_ribbon(data = sl.trt_fitted.npk,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = sl.trt_fitted.npk,
+            aes(x = year.y, y = Estimate),
+            size = 1.5) +
+  scale_y_continuous(trans = 'log', breaks=c(8,64,512,1024,2048,4096)) +
+  labs(x = 'Years',
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in EF due to SL') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  theme_bw()+ theme(legend.position="bottom")
+
+sl.trtm
+
+
+
+
+# #########################################GAINS ####################################################
+
+
+color_scheme_set("purple")
+pp_check(sg.trt)
+pp_check(sg.trt, type = "hist")
+#marginal effects
+marginal_effects(sg.trt, surface = TRUE)
+marginal_smooths(sg.trt)
+
+
+summary(sg.trt)
+#residuals
+sg.trtm1<-residuals(sg.trt)
+sg.trtm1<-as.data.frame(sg.trtm1)
+nrow(sg.trtm1)
+nrow(p.dat3)
+sg.trt.plot<-cbind(p.dat3,sg.trtm1$Estimate)
+sg.trt.plot2<-inner_join(sg.trt.plot,dat)
+
+par(mfrow=c(3,2))
+with(sg.trt.plot2, plot(continent, sg.trtm1$Estimate))
+with(sg.trt.plot2, plot(habitat, sg.trtm1$Estimate))
+with(sg.trt.plot, plot(site_code, sg.trtm1$Estimate))
+with(sg.trt.plot2, plot(block, sg.trtm1$Estimate))
+with(sg.trt.plot2, plot(plot, sg.trtm1$Estimate))
+with(sg.trt.plot2, plot(f.year.y, sg.trtm1$Estimate))
+
+
+# #------plot richness model all sp----------------
+# fixed effects
+sg.trt_fitted <- cbind(sg.trt$data,
+                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                     fitted(sg.trt, re_formula = NA)) %>% 
+  as_tibble() 
+as.data.frame(sg.trt_fitted)
+p.dat4<-distinct(p.dat3,site_code, year.y, year.y.m, SG)
+sg.trt_fitted2<-inner_join(sg.trt_fitted,dat)
+View(sg.trt_fitted2)
+
+sg.trt_fitted.npk<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('NPK'),]
+sg.trt_fitted.ctl<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('Control'),]
+
+
+View(p.dat3)
+View(sg.trt_fitted2)
+
+
+# fixed effect coefficients (I want these for the coefficient plot)
+sg.trt_fixef <- fixef(sg.trt)
+
+# coefficients for experiment-level (random) effects
+sg.trt_coef <- coef(sg.trt)
+sg.trt_coef 
+sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>% 
+                           as_tibble() %>% 
+                           mutate(Intercept = Estimate,
+                                  Intercept_lower = Q2.5,
+                                  Intercept_upper = Q97.5,
+                                  site_code = rownames(sg.trt_coef$site_code[,,'Intercept'])) %>% 
+                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                         sg.trt_coef$site_code[,,'year.y.m'] %>% 
+                           as_tibble() %>% 
+                           mutate(Slope = Estimate,
+                                  Slope_lower = Q2.5,
+                                  Slope_upper = Q97.5) %>% 
+                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(p.dat3 %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y),
+                         cxmin = min(year.y.m),
+                         cxmax = max(year.y.m)),
+             by = 'site_code')
+
+
+View(sg.trt_coef3)
+
+View(sg.trt_fitted2)
+
+dat<-distinct(plot, site_code, continent,habitat)
+
+sg.trt_coef3<-full_join(sg.trt_coef2,dat)
+sg.trt_fitted3<-inner_join(sg.trt_fitted2,dat2)
+
+View(sg.trt_coef3)
+sg.trt_coef4<-sg.trt_coef3[complete.cases(sg.trt_coef3), ]
+nrow(sg.trt_coef4)
+View(sg.trt_coef4)
+
+
+summary(sg.trt_fitted3)
+summary(sg.trt_coef3)
+
+#gai
+sg.trtm<-ggplot() +
+  # data
+  geom_point(data = sg.trt_fitted.npk,
+             aes(x = year.y, y = SG,
+                 colour = continent, alpha=0.2),
+             size = 1.2) +
+  geom_jitter(data=sg.trt_fitted.npk,
+              aes(x = year.y, y = SG,
+                  colour = continent), height=0.25,width = 0.25)+
+  # experiment (random) effects
+  geom_segment(data = sg.trt_coef3,
+               aes(x = xmin, 
+                   xend = xmax,
+                   y = exp(Intercept + Slope * cxmin),
+                   yend = exp(Intercept + Slope * cxmax),
+                   group = site_code,
+                   colour = continent),
+               size = .7) +
+  # uncertainy in fixed effect
+  geom_ribbon(data = sg.trt_fitted.npk,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = sg.trt_fitted.npk,
+            aes(x = year.y, y = Estimate),
+            size = 1.5) +
+  scale_y_continuous(trans = 'log', breaks=c(8,64,512,1024,2048,4096)) +
+  labs(x = 'Years',
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b) Change in EF due to SG') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  theme_bw()+ theme(legend.position="bottom")
+
+sg.trtm
+
+
+
+########################################################################################################################
+#####################################CDE model###################################################################################
+########################################################################################################################
+
+summary(CDE.trt)
+color_scheme_set("purple")
+pairs(CDE.trt)
+
+# inspection of chain diagnostic
+plot(CDE.trt)  
+
+
+pp_check(CDE.trt)
+
+pp_check(CDE.trt, type = "hist")
+#marginal effects
+marginal_effects(CDE.trt, surface = TRUE)
+marginal_smooths(CDE.trt)
+
+
+
+#residuals
+cm1<-residuals(CDE.trt)
+cm1<-as.data.frame(cm1)
+nrow(cm1)
+nrow(p.dat3)
+#p.dat4<-p.dat3[complete.cases(p.dat3$CDE), ]
+cde.plot<-cbind(p.dat3,cm1$Estimate)
+cde.plot2<-inner_join(cde.plot,dat)
+
+par(mfrow=c(3,2))
+with(cde.plot2, plot(continent, cm1$Estimate))
+with(cde.plot2, plot(habitat, cm1$Estimate))
+with(cde.plot, plot(site_code, cm1$Estimate))
+with(cde.plot2, plot(block, cm1$Estimate))
+with(cde.plot2, plot(plot, cm1$Estimate))
+with(cde.plot2, plot(f.year.y, cm1$Estimate))
+
+
+# #------plot richness model all sp----------------
+# fixed effects
+cde_fitted <- cbind(CDE.trt$data,
+                    # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                    fitted(CDE.trt, re_formula = NA)) %>% 
+  as_tibble() 
+as.data.frame(cde_fitted)
+
+p.dat4<-distinct(p.dat3,site_code, year.y, continent)
+#cde_fitted2<-inner_join(cde_fitted,p.all5,  by = c('site_code', 'year.y'))
+
+
+View(cde_fitted)
+# fixed effect coefficients (I want these for the coefficient plot)
+cde_fixef <- fixef(CDE.trt)
+
+# coefficients for experiment-level (random) effects
+cde_coef <- coef(CDE.trt)
+
+cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>% 
+                          as_tibble() %>% 
+                          mutate(Intercept = Estimate,
+                                 Intercept_lower = Q2.5,
+                                 Intercept_upper = Q97.5,
+                                 site_code = rownames(cde_coef$site_code[,,'Intercept'])) %>% 
+                          select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                        cde_coef$site_code[,,'year.y.m'] %>% 
+                          as_tibble() %>% 
+                          mutate(Slope = Estimate,
+                                 Slope_lower = Q2.5,
+                                 Slope_upper = Q97.5) %>% 
+                          select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(p.dat3 %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y),
+                         cxmin = min(year.y.m),
+                         cxmax = max(year.y.m)),
+             by = 'site_code')
+
+
+View(cde_coef2)
+
+View(cde_fitted)
+
+
+cde_coef3<-full_join(cde_coef2,dat)
+cde_fitted2<-full_join(cde_fitted,dat)
+cde_fitted3<-full_join(cde_fitted2,dat2)
+
+cde_fitted.npk<-cde_fitted3[cde_fitted3$trt.y %in% c('NPK'),]
+cde_fitted.ctl<-cde_fitted3[cde_fitted3$trt.y %in% c('Control'),]
+
+
+
+library(scales)
+sign_sqrt <- scales::trans_new('sign_sqrt',
+                               transform = function(x) {sign(x) * sqrt(abs(x))},
+                               inverse = function(x){sign(x) * abs(x)^2})
+
+
+View(cde_fitted3)
+#cde
+cdem<-ggplot() +
+  # data
+  geom_point(data = cde_fitted.npk,
+             aes(x = year.y, y = CDE,
+                 colour = continent, alpha=0.2),
+             size = 1.2) +
+  geom_jitter(data=cde_fitted.npk,
+              aes(x = year.y, y = CDE,
+                  colour = continent), height=0.25,width = 0.25)+
+  #experiment (random) effects
+  geom_segment(data = cde_coef3,
+               aes(x = xmin, 
+                   xend = xmax,
+                   y = Intercept + Slope * cxmin,
+                   yend = Intercept + Slope * cxmax,
+                   group = site_code,
+                   colour = continent),
+               size = .7) +
+  # uncertainy in fixed effect
+  geom_ribbon(data = cde_fitted.npk,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = cde_fitted.npk,
+            aes(x = year.y, y = Estimate),
+            size = 1.5) +
+  scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
+  ) +
+  labs(x = 'Years',
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'c) EF Change in Persistent Species') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  theme_bw()+ theme(legend.position="bottom")
+
+cdem
+
+
+grid_arrange_shared_legend(sl.trtm,sg.trtm,cdem,nrow=1)
+
+
+
+
+
+#coefs
+
+
+sl.trt_fixef2<-as.data.frame(sl.trt_fixef)
+sg.trt_fixef2<-as.data.frame(sg.trt_fixef)
+cde_fixef2<-as.data.frame(cde_fixef)
+View(sl.trt_fixef2)
+
+sl.trt_coef4<-sl.trt_coef3[complete.cases(sl.trt_coef3), ]
+sg.trt_coef4<-sg.trt_coef3[complete.cases(sg.trt_coef3), ]
+cde_coef4<-cde_coef3[complete.cases(cde_coef3), ]
+
+View(sl.trt_coef4)
+View(sl.trt_fixef2)
+sl.trt_fixef2$Estimate.n<-(sl.trt_fixef2$Estimate * -1)
+sl.trt_fixef2$Est.Error.n<-(sl.trt_fixef2$Est.Error * -1)
+sl.trt_fixef2$Q2.5.n<-(sl.trt_fixef2$Q2.5 * -1)
+sl.trt_fixef2$Q97.5.n<-(sl.trt_fixef2$Q97.5 * -1)
+
+View(sl.trt_coef4)
+
+sl.trtm2<-ggplot() + 
+  geom_point(data = sl.trt_coef4, aes(x =reorder(site_code,Slope), y = Slope, colour = continent),size = 2) +
+  geom_errorbar(data = sl.trt_coef4, aes(x = reorder(site_code,Slope),ymin = Slope_lower,
+                                       ymax = Slope_upper,colour = continent),
+                width = 0, size = 0.7) + 
+  #facet_wrap(Model~.)+
+  facet_grid(continent~., scales= 'free', space='free')+
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = sl.trt_fixef2,
+             aes(yintercept = Estimate[3]), size = 1.2) +
+  geom_rect(data = sl.trt_fixef2,
+            aes(xmin = -Inf, xmax = Inf,
+                ymin = Q2.5[3], ymax = Q97.5[3]),
+            alpha = 0.3) +
+  ylim(-0.45,1.2) +
+  labs(x = 'site_code',
+       y = 'Slope') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
+  coord_flip() + 
+  labs(x = 'Site',
+       y = 'Slope', title= 'a) EF: SL') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+
+sl.trtm2
+
+sl.trt_coef4$Slope.sl<-sl.trt_coef4$Slope
+sl.trt.Slope<-select(sl.trt_coef4,site_code,Slope.sl)
+sg.trt_coef5<-inner_join(sg.trt_coef4,sl.trt.Slope)
+is.numeric(sg.trt_coef5$Slope.sl)
+
+
+View(sg.trt_coef3)
+sg.trtm2<-ggplot() + 
+  geom_point(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl), y = Slope,colour = continent),size = 2) +
+  geom_errorbar(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl),ymin = Slope_lower,
+                                       ymax = Slope_upper,colour = continent),
+                width = 0, size = 0.7) + 
+  facet_wrap(Model~.)+
+  facet_grid(continent~., scales= 'free', space='free')+
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = sg.trt_fixef2,
+             aes(yintercept = Estimate[3]), size = 1.2) +
+  geom_rect(data = sg.trt_fixef2,
+            aes(xmin = -Inf, xmax = Inf,
+                ymin = Q2.5[3], ymax = Q97.5[3]),
+            alpha = 0.3) +
+  ylim(-0.45,1.2) +
+  labs(x = 'site_code',
+       y = 'Slope') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
+  coord_flip() + 
+  labs(x = 'Site',
+       y = 'Slope', title= 'b) EF : SG') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   axis.title.y = element_blank(),axis.text.y = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+sg.trtm2
+
+
+#sl.trt_coef4$Slope.sl<-sl.trt_coef4$Slope
+#sl.trt.Slope<-select(sl.trt_coef4,site_code,Slope.sl)
+cde_coef5<-inner_join(cde_coef4,sl.trt.Slope)
+is.numeric(sg.trt_coef5$Slope.sl)
+
+cde_fixef2
+cdem2<-ggplot() + 
+  geom_point(data = cde_coef5, aes(x = reorder(site_code,Slope.sl), y = Slope,colour = continent),size = 2) +
+  geom_errorbar(data = cde_coef5, aes(x = reorder(site_code,Slope.sl),ymin = Slope_lower,
+                                      ymax = Slope_upper,colour = continent),
+                width = 0, size = 0.7) + 
+  facet_wrap(Model~.)+
+  facet_grid(continent~., scales= 'free', space='free')+
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = cde_fixef2,
+             aes(yintercept = Estimate[3]), size = 1.2) +
+  geom_rect(data = cde_fixef2,
+            aes(xmin = -Inf, xmax = Inf,
+                ymin = Q2.5[3], ymax = Q97.5[3]),
+            alpha = 0.3) +
+  ylim(-100,100) +
+  labs(x = 'site_code',
+       y = 'Slope') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
+  coord_flip() + 
+  labs(x = 'Site',
+       y = 'Slope', title= 'c) EF: Persistent Species') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   axis.title.y = element_blank(),axis.text.y = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+
+grid_arrange_shared_legend(sl.trtm2,sg.trtm2,cdem2,nrow=1)
+#sl.trtm,sg.trtm,cdem,
+grid_arrange_shared_legend(sl.trtm,sg.trtm,cdem,sl.trtm2,sg.trtm2,cdem2,ncol=3,nrow=2)
+
+
+
+
+
+
+View(sl.c_coef3)
+View(sg.c_coef3)
+colnames(sl.c_coef3)
+colnames(sg.c_coef3)
+sl.c_coef4<-sl.c_coef3[,c(-1,-2,-3)]
+sg.c_coef4<-sg.c_coef3[,c(-1,-2,-3)]
+colnames(sl.c_coef4)
+colnames(sg.c_coef4)
+sl.c_coef5<-sl.c_coef4[,c(-9,-10,-11,-12,-13,-14,-15,-16,-17,-18)]
+names(sl.c_coef4) <- c("site_code","sl.c.Slope","sl.c.Slope_lower","sl.c.Slope_upper","xmin","xmax","cxmin","cxmax","continent","habitat")
+names(sg.c_coef4) <- c("site_code","sg.c.Slope","sg.c.Slope_lower","sg.c.Slope_upper","xmin","xmax","cxmin","cxmax","continent","habitat")
+delta.coefs<-bind_cols(sl.c_coef4,sg.c_coef4)
+View(delta.coefs)
+
+#By Experiment
+#theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
+ggplot(data=delta.coefs, aes(x=sl.c.sl.cope, y=sg.c.sl.cope,color=continent)) +
+  geom_point(size=2) +
+  #geom_jitter(height=0.45,width = 0.45)+
+  facet_grid(continent~., scales= 'free', space='free')+
+  geom_errorbar(aes(ymin = sg.c.sl.cope_lower, ymax = sg.c.sl.cope_upper,colour = continent), width = 0, size = 0.75,alpha=0.5) +
+  geom_errorbarh(aes(xmin = sl.c.sl.cope_lower, xmax = sl.c.sl.cope_upper,colour = continent), width = 0, size = 0.75,alpha=0.5) +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  labs(x = 'sl.c sl.cope',
+       y = 'sg.c sl.cope') +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+
+
+
+
+
+ps.sl.c<-as.data.frame(posterior_samples(sl.c))
+ps.sg.c<-as.data.frame(posterior_samples(sg.c))
+ps.cde<-as.data.frame(posterior_samples(CDE.c))
+
+View(ps.sl.c)
+
+
+devtools::install_github("mvuorre/brmstools")
+library(brmstools)
+forest(sl.c)
+
+
+
+
+# MULTIVARIATE MODEL
+
+summary(multi_sg.c.sl.c)
+
+color_scheme_set("purple")
+pp_check(multi_sg.c.sl.c, resp = 'sl.clog')
+pp_check(multi_sg.c.sl.c, resp = 'sg.clog')
+
+plot(multi_sg.c.sl.c)
+
+
+m1<-residuals(multi_sg.c.sl.c)
+head(m1)
+nrow(m1)
+nrow(m2)
+nrow(p.all4)
+p.all5 <- p.all4[!(is.na(p.all4$sl.c)),]
+p.all6 <- p.all5[!(is.na(p.all5$sg.c)),]
+nrow(p.all6)
+plot <- cbind(p.all6,m1)
+m1<-as.data.frame(m1)
+levels(plot$site_code)
+
+
+par(mfrow=c(2,2))
+with(plot, plot(site_code, m1$Estimate.sl.c))
+with(plot, plot(block, m1$Estimate.sl.c))
+with(plot, plot(plot, m1$Estimate.sl.c))
+with(plot, plot(f.year.y, m1$Estimate.sl.c))
+
+par(mfrow=c(2,2))
+with(plot, plot(site_code, m1$Estimate.sg.c))
+with(plot, plot(block, m1$Estimate.sg.c))
+with(plot, plot(plot, m1$Estimate.sg.c))
+with(plot, plot(f.year.y, m1$Estimate.sg.c))
+
+
+mm_fitted <- cbind(multi_sg.c.sl.c$data,
+                   # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                   fitted(multi_sg.c.sl.c, re_formula = NA)) %>% 
+  as_tibble() 
+
+dat2<-distinct(p.all6, site.year.id,site_code)
+View(dat2)
+dat3<-inner_join(dat2,dat,by='site_code')
+View(dat3)
+mm_fitted2<-inner_join(mm_fitted, dat3, by='site.year.id')
+
+View(p.all6)
+View(mm_fitted)
+
+
+# fixed effect coefficients (I want these for the coefficient plot)
+mm_fixef <- fixef(multi_sg.c.sl.c)
+View(mm_fixef)
+
+
+# coefficients for experiment-level (random) effects
+mm_coef <- coef(multi_sg.c.sl.c)
+View(mm_coef)
+mm_coef
+mm_coef.sl.c <-  bind_cols(mm_coef$site.year.id[,,'sl.c_Intercept'] %>% 
+                             as_tibble() %>% 
+                             mutate(Intercept = Estimate,
+                                    Intercept_lower = Q2.5,
+                                    Intercept_upper = Q97.5,
+                                    site.year.id = rownames(mm_coef$site.year.id[,,'sl.c_Intercept'])) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           mm_coef$site.year.id[,,'sl.c_year.y'] %>% 
+                             as_tibble() %>% 
+                             mutate(sl.cope = Estimate,
+                                    sl.cope_lower = Q2.5,
+                                    sl.cope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(p.all6 %>% 
+               group_by(site.year.id) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y)),
+             by = 'site.year.id') 
+
+
+View(mm_coef.sl.c)
+
+
+mm_coef.sg.c <-  bind_cols(mm_coef$site.year.id[,,'sg.c_Intercept'] %>% 
+                             as_tibble() %>% 
+                             mutate(Intercept = Estimate,
+                                    Intercept_lower = Q2.5,
+                                    Intercept_upper = Q97.5,
+                                    site.year.id = rownames(mm_coef$site.year.id[,,'sg.c_Intercept'])) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           mm_coef$site.year.id[,,'sg.c_year.y'] %>% 
+                             as_tibble() %>% 
+                             mutate(sl.cope = Estimate,
+                                    sl.cope_lower = Q2.5,
+                                    sl.cope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(p.all6 %>% 
+               group_by(site.year.id) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y)),
+             by = 'site.year.id')
+
+
+
+mm_coef.sl.c2<-full_join(mm_coef.sl.c,dat3)
+
+mm_coef.sg.c2<-full_join(mm_coef.sg.c,dat3)
+
+colnames(mm_fitted2)
+View(mm_coef.sl.c2)
+
+#loss
+ggplot() +
+  # data
+  geom_point(data = mm_fitted2,
+             aes(x = year.y, y = sl.c,
+                 colour = continent, alpha=0.5),
+             size = 1.2) +
+  geom_jitter(data=mm_fitted2,
+              aes(x = year.y, y = sl.c,
+                  colour = continent), height=0.45,width = 0.45)+
+  # experiment (random) effects
+  geom_segment(data = mm_coef.sl.c2,
+               aes(x = xmin, 
+                   xend = xmax,
+                   y = Intercept + sl.cope * xmin,
+                   yend = Intercept + sl.cope * xmax,
+                   group = site_code,
+                   colour = continent),
+               size = .7) +
+  # uncertainy in fixed effect
+  geom_ribbon(data = mm_fitted2,
+              aes(x = year.y, ymin = Q2.5.sl.c, ymax = Q97.5.sl.c),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = mm_fitted2,
+            aes(x = year.y, y = Estimate.sl.c),
+            size = 1.5) +
+  #scale_y_continuous(trans = 'log10') +
+  labs(x = 'Years',
+       y = 'Function Loss due to Species Loss', title= 'a) Species Loss') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  theme_bw()+ theme(legend.position="bottom")
+
+#gain
+ggplot() +
+  # data
+  geom_point(data = mm_fitted2,
+             aes(x = year.y, y = sg.c,
+                 colour = continent, alpha=0.5),
+             size = 1.2) +
+  geom_jitter(data=mm_fitted2,
+              aes(x = year.y, y = sg.c,
+                  colour = continent), height=0.45,width = 0.45)+
+  # experiment (random) effects
+  geom_segment(data = mm_coef.sg.c2,
+               aes(x = xmin, 
+                   xend = xmax,
+                   y = Intercept + sl.cope * xmin,
+                   yend = Intercept + sl.cope * xmax,
+                   group = site_code,
+                   colour = continent),
+               size = .7) +
+  # uncertainy in fixed effect
+  geom_ribbon(data = mm_fitted2,
+              aes(x = year.y, ymin = Q2.5.sg.c, ymax = Q97.5.sg.c),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = mm_fitted2,
+            aes(x = year.y, y = Estimate.sg.c),
+            size = 1.5) +
+  #scale_y_continuous(trans = 'log10') +
+  labs(x = 'Years',
+       y = 'Function Loss due to Species Gain', title= 'b) Species Gain') +
+  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  theme_bw()+ theme(legend.position="bottom")
+

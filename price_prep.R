@@ -26,6 +26,7 @@ all<-unite_(all, "trt_year", c("trt","year_trt"), remove=FALSE)
 all<-unite_(all, "site_trt_year", c("site_code","trt","year_trt"), remove=FALSE)
 View(all)
 levels(all$site_code)
+colnames(all)
 native<-all[all$local_provenance %in% c('NAT'),]
 introduced<-all[all$local_provenance %in% c('INT'),]
 
@@ -96,7 +97,7 @@ for (i in 1:length(nusindex)){
 }
 
 
-
+View(n_lst)
 folder = "output_native"
 #input RDS files for cluster, price analysis
 mapply(saveRDS, n_lst, file=paste0(folder, "/",names(n_lst), '.rds'))
@@ -127,6 +128,8 @@ for (i in 1:length(iusindex)){
   print(i/length(iusindex))
 }
 
+
+
 View(i_lst)
 
 folder = "output_introduced"
@@ -146,7 +149,7 @@ levels(azi.cn_2$site.year.id)
 View(azi.cn_5)
 colnames(azi.cn_2)
 
-group.vars <- c('site_code','plot','block')
+group.vars <- c('site.year.id','plot','block')
 treat.vars<-c('trt_year')
 
 grouped.data <- azi.cn_2 %>% group_by_(.dots=c(group.vars,treat.vars))
@@ -163,66 +166,5 @@ View(pp)
 
 
 
-
-
-#mess around
-
-index<-paste(all$site_name, all$site.year.id)
-sindex<-as.character(all$site_code)
-yindex<-as.character(all$year_trt)
-uindex<-sort(unique(index))
-usindex<-sort(unique(sindex))
-uyindex<-sort(unique(yindex))
-uindex_small<-sort(unique(all$year_trt))
-
-bde<-subset(all, site_code== "bayr.de")
-View(bde)
-?subset
-#second solution
-
-all_lst<-NULL
-n<-1
-for (i in 1:length(usindex)){
-  subs<-which(sindex==usindex[i])
-  uindex_small<-sort(unique(all[subs,]$year_trt))
-                        
-                        for(j in 2:length(uindex_small)) {
-                          subs2<-which(yindex[subs]%in%c(uindex_small[j], "0"))
-                          
-                          all_lst[[n]]<-all[subs[subs2],]
-                          names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
-                          n<-n+1
-                        }
-                        print(i/length(usindex))
-}
-
-
-
-
-
-View(all_lst)
-list2env(all_lst, envir= .GlobalEnv) #split the list into separate dataframes
-nn.dist<-distinct(all,site.year.id)
-View(nn.dist)
-bayr.de_NA$site.year.id<-as.factor(as.character(bayr.de_NA$site.year.id))
-levels(bayr.de_NA$site.year.id)
-View(bayr.de_NA)
-
-
-#old 
-all_lst<-NULL
-n<-1
-for (i in 1:length(usindex)){
-  subs<-which(sindex==usindex[i])
-  
-  for(j in 2:length(uyindex)) {
-    subs2<-which(yindex[subs]%in%c(uyindex[j], "0"))
-    
-    all_lst[[n]]<-all[subs[subs2],]
-    names(all_lst)[n]<-paste(usindex[i], uyindex[j], sep="_")
-    n<-n+1
-  }
-  print(i/length(usindex))
-}
 
 

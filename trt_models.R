@@ -3,12 +3,11 @@ library(tidyverse)
 library(brms)
 library(gridExtra)
 library(grid)
-
+library(priceTools)
 sp <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 plot <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-year.three<-plot[plot$year_trt %in% c('0','3'),]
 
 #plot<-p[p$trt %in% c('NPK'),]
 
@@ -39,6 +38,8 @@ NPK.zero$treat<-'Control'
 tplot<-bind_rows(Control.three,NPK.three,Control.zero,NPK.zero)
 summary(tplot)
 tplot$treat<-as.factor(as.character(tplot$treat))
+levels(tplot$treat)
+View(tplot)
 
 p2 <- plot[!(is.na(p$live_mass)),]
 View(p2)
@@ -67,7 +68,7 @@ tplot.bm.trt.m <- brm(live_mass ~  treat + (treat | site_code/block/plot),
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 save(plot.rich.trt.m,plot.bm.trt.m,tplot.rich.trt.m,tplot.bm.trt.m,file = 'plot.nutnet.trt.models.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.trt.models.Rdata')
+load('/Users/el50nico/Desktop/Academic/R code/NutNet/plot.nutnet.trt.models.Rdata')
 
 
 summary(plot.rich.trt.m)
@@ -243,7 +244,7 @@ tr1<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_x_discrete(labels=c("Control","NPK"))+
   labs(x = 'Treatment',
-       y = 'Intercept', title= 'a) Plot Richness') +
+       y = 'Estimate', title= 'a) Plot Richness') +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 
@@ -274,7 +275,7 @@ tb1<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_x_discrete(labels=c("Control","NPK"))+
   labs(x = 'Treatment',
-       y = 'Intercept', title= 'a) Plot Biomass') +
+       y = 'Estimate', title= 'a) Plot Biomass') +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 
@@ -288,6 +289,256 @@ tplot.bm.trt_fitted <- cbind(tplot.bm.trt.m$data,
 
 
 grid.arrange(tr1,tb1,nrow=1)
+
+
+
+p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all2<-p.all[p.all$trt.x %in% c('NPK'),]
+p.all3<-p.all2[p.all2$trt.y %in% c('NPK'),]
+levels(p.all3$trt_year)
+View(p.all3)
+p.all4<-separate(p.all3,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
+
+p.all4$f.year.y<-as.factor(p.all4$year.y)
+p.all4$plot<-as.factor(p.all4$plot)
+p.all4$site_code<-as.factor(p.all4$site_code)
+p.all2<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
+list1<-distinct(p,site_code,site_name)
+p.all3<-inner_join(p.all2,list1,by="site_code")
+
+View(p.all3)
+colnames(p.all3)
+
+
+
+p.all4<-p.all3 %>% filter(year.y != "0" )
+
+p.all4<-p.all4[p.all4$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
+
+#take max value of year.y??
+
+#max values only
+npk4<-npk3 %>% group_by(site_code) %>% top_n(1, year.y)
+View(npk4)
+
+
+
+
+#price
+
+p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+p.all$trt_year<-as.factor(as.character(p.all$trt_year))
+
+p.all2 <- p.all[p.all$trt_year %in% c('Control_0 NPK_0', 'NPK_0 NPK_3', 'Control_0 Control_3'),]
+
+Control.three<-p.all2[p.all2$trt_year %in% c('Control_0 Control_3'),]
+NPK.three<-p.all2[p.all2$trt_year %in% c('NPK_0 NPK_3'),]
+Control.zero<-p.all2[p.all2$trt_year %in% c('Control_0 NPK_0'),]
+
+Control.three$treat<-'No NPK'
+NPK.three$treat<-'NPK'
+Control.zero$treat<-'Control'
+
+
+price.tplot<-bind_rows(Control.three,NPK.three,Control.zero)
+colnames(price.tplot)
+
+#models
+#multi
+multi_sg.sl <- brm(cbind(SL, SG) ~  treat + (treat | p | site.year.id), 
+               data = price.tplot, cores = 4, chains = 4)
+
+#univariate
+SL.trt.m <- brm(SL ~   treat + (treat | site.year.id/block/plot/site.year.id.y), 
+                data = price.tplot, cores = 4, chains = 4)
+
+SG.trt.m <- brm(SG ~   treat + (treat | site.year.id/block/plot/site.year.id.y), 
+                 data = price.tplot, cores = 4, chains = 4)
+
+CDE.trt.m <- brm(CDE ~   treat + (treat | site.year.id/block/plot/site.year.id.y), 
+                       data = price.tplot, cores = 4, chains = 4)
+
+setwd('~/Dropbox/Projects/NutNet/Model_fits/')
+save(multi_sg.sl,CDE.trt.m,file = 'price.trt.year.three.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/price.trt.year.three.Rdata')
+
+NPK.three<-NPK.three[complete.cases(NPK.three), ]
+View(NPK.three)
+theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
+leap.zig(NPK.three,type='cafe',xlim=c(0,15),ylim=c(0,700),standardize = FALSE,raw.points = FALSE)+ 
+  annotate("text", x = mean(NPK.three$x.rich), y = mean(NPK.three$x.func), 
+           label = "*",size=8)+ggtitle('NPK 0 vs NPK 3')+theme_classic()
+
+
+summary(CDE.trt.m)
+
+
+# inspection of chain diagnostic
+plot(CDE.trt.m)# looks ok
+
+
+# predicted values vs observed: not great, but not too bad (there is a skew-normal distribution
+# that is in the brms package - I will see if that improves this later)
+pp_check(CDE.trt.m)
+
+#residuals
+cdem1<-residuals(CDE.trt.m)
+cdem1<-as.data.frame(cdem1)
+nrow(cdem1)
+nrow(price.tplot)
+cde.plot<-cbind(price.tplot,cdem1$Estimate)
+View(cde.plot)
+
+head(rtr.plot)
+par(mfrow=c(1,3))
+#with(rtr.plot, plot(continent, rtrtm1$Estimate))
+#with(rtr.plot, plot(habitat, rtrtm1$Estimate))
+with(cde.plot, plot(site.year.id, cdem1$Estimate))
+with(cde.plot, plot(block, cdem1$Estimate))
+with(cde.plot, plot(plot, cdem1$Estimate))
+
+
+# #------plot richness model all sp----------------
+# fixed effects
+CDE.trt.m_fitted <- cbind(CDE.trt.m$data,
+                               # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                               fitted(CDE.trt.m, re_formula = NA)) %>% 
+  as_tibble() 
+
+# fixed effect coefficients (I want these for the coefficient plot)
+CDE.trt.m_fixef <- fixef(CDE.trt.m)
+CDE.trt.m_fixef<-as.data.frame(CDE.trt.m_fixef)
+View(CDE.trt.m_fixef)
+
+CDE.trt.m_coef <- coef(CDE.trt.m)
+plot.rich_coef2 <-  bind_cols(tplot.rich_coef$site_code[,,'Intercept'] %>% 
+                                as_tibble() %>% 
+                                mutate(Intercept = Estimate,
+                                       Intercept_lower = Q2.5,
+                                       Intercept_upper = Q97.5,
+                                       site_code = rownames(plot.rich_coef$site_code[,,'Intercept'])) %>% 
+                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5))
+
+plot.rich_coef3 <-  bind_cols(tplot.rich_coef$site_code[,,'treatNPK'] %>% 
+                                as_tibble() %>% 
+                                mutate(Slope = Estimate,
+                                       Slope_lower = Q2.5,
+                                       Slope_upper = Q97.5) %>% 
+                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(tplot %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year_trt),
+                         xmax = max(year_trt)),
+             by = 'site_code')
+
+plot.rich_coef4<-bind_cols(plot.rich_coef2,plot.rich_coef3)
+
+
+View(CDE.trt.m_fixef)
+library(data.table)
+CDE.trt.m_fixef2<-setDT(CDE.trt.m_fixef, keep.rownames = TRUE)[]
+View(CDE.trt.m_fixef3)
+CDE.trt.m_fixef3<-CDE.trt.m_fixef2[-c(1), ] 
+CDE.trt.m_fixef3$Model<-"CDE"
+
+
+cde<-ggplot() + 
+  geom_point(data = CDE.trt.m_fixef3, aes(x = rn, y = Estimate),size = 2) +
+  geom_errorbar(data = CDE.trt.m_fixef3, aes(x = rn,ymin = Q2.5,
+                                                  ymax = Q97.5),
+                width = 0, size = 0.7) + 
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_x_discrete(labels=c("Control","NPK"))+
+  labs(x = 'Treatment',
+       y = 'Estimate', title= 'c) Change in Function of Persistent Species') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+
+
+
+
+#multi
+
+m1<-residuals(multi_sg.sl)
+m1
+nrow(m1)
+nrow(price.tplot)
+price.tplot2<-price.tplot[complete.cases(price.tplot), ]
+nrow(price.tplot2)
+plot <- cbind(price.tplot2,
+              residual_m1_SL = m1[,,'SL'][,'Estimate'],
+              residual_m1_SG = m1[,,'SG'][,'Estimate'])
+
+colnames(plot)
+par(mfrow=c(1,3))
+with(plot, plot(site.year.id, residual_m1_SL))
+with(plot, plot(block, residual_m1_SL))
+with(plot, plot(plot, residual_m1_SL))
+#with(plot, plot(fyr.trt, residual_m1_SL))
+
+par(mfrow=c(1,3))
+with(plot, plot(site.year.id, residual_m1_SG))
+with(plot, plot(block, residual_m1_SG))
+with(plot, plot(plot, residual_m1_SG))
+
+
+mm_fitted <- cbind(multi_sg.sl$data,
+                   # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                   fitted(multi_sg.sl, re_formula = NA)) %>% 
+  as_tibble() 
+  # get the seed.rich values for plotting
+  #inner_join(plot %>% distinct(Experiment, seed.rich, seed.rich.m, biomass.plot),
+        #     by = c('Experiment', 'seed.rich.m')) 
+
+# fixed effect coefficients (I want these for the coefficient plot)
+mm_fixef <- fixef(multi_sg.sl)
+View(mm_fixef)
+
+
+mm_fixef2<-as.data.frame(mm_fixef)
+mm_fixef3<-setDT(mm_fixef2, keep.rownames = TRUE)[]
+View(mm_fixef3)
+
+mm_SL_fixef<- mm_fixef3[mm_fixef3$rn %in% c('SL_Intercept', 'SL_treatNoNPK', 'SL_treatNPK'),]
+mm_SL_fixef$Model<-"SL"
+
+mm_SG_fixef<- mm_fixef3[mm_fixef3$rn %in% c('SG_Intercept', 'SG_treatNoNPK', 'SG_treatNPK'),]
+mm_SG_fixef$Model<-"SG"
+
+mm_SL_fixef2<-mm_SL_fixef[-c(1), ] 
+mm_SG_fixef2<-mm_SG_fixef[-c(1), ] 
+
+
+sl<-ggplot() + 
+  geom_point(data = mm_SL_fixef2, aes(x = rn, y = Estimate),size = 2) +
+  geom_errorbar(data = mm_SL_fixef2, aes(x = rn,ymin = Q2.5,
+                                             ymax = Q97.5),
+                width = 0, size = 0.7) + 
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_x_discrete(labels=c("Control","NPK"))+
+  labs(x = 'Treatment',
+       y = 'Estimate', title= 'a) EF as affected by SL') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+
+
+
+sg<-ggplot() + 
+  geom_point(data = mm_SG_fixef2, aes(x = rn, y = Estimate),size = 2) +
+  geom_errorbar(data = mm_SG_fixef2, aes(x = rn,ymin = Q2.5,
+                                         ymax = Q97.5),
+                width = 0, size = 0.7) + 
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_x_discrete(labels=c("Control","NPK"))+
+  labs(x = 'Treatment',
+       y = 'Estimate', title= 'b) EF as affected by SG') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+
+grid.arrange(tr1,tb1,sl,sg,cde,nrow=2)
+
 
 
 
