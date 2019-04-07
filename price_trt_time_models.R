@@ -92,13 +92,14 @@ p.dat3$site.year.id<-as.factor(p.dat3$site.year.id)
 
 #try out models on a sample of data?
 #levels(p.dat3$site_code)
-#samp<-p.dat3[p.dat3$site_code %in% c('arch.us'),]
+#samp<-p.dat3[p.dat3$site_code %in% c('arch.us','azi.cn'),]
 
 colnames(p.dat3) 
 
-sl.trt <- brm(SL.p ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
+sl.trt <- brm(SL.p ~  trt.y * year.y.m + ( year.y.m |  site_code/site.year.id), 
             data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
 
+#, control = list(adapt_delta = 0.999, max_treedepth = 15))
 
 sg.trt <- brm(SG ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
             data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
@@ -107,29 +108,44 @@ sg.trt <- brm(SG ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id),
 CDE.trt <- brm(CDE ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
              data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
 
+#treat interaction
+sl.trt.i <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+              data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4)
+
+#, control = list(adapt_delta = 0.999, max_treedepth = 15)
+
+sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+              data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4)
+
+
+CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+               data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
 
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
+
 save(sl.trt,sg.trt,CDE.trt,file = 'price_trt_time.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_time.Rdata')
 
+save(sl.trt.i,sg.trt.i,CDE.trt.i,file = 'price_trt_interact_time.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 
 
-summary(CDE.c)
+summary(CDE.trt.i)
 
-summary(sg.c)
+summary(sg.trt.i)
 
-summary(sl.trt)
+summary(sl.trt.i)
 
 color_scheme_set("purple")
-plot(sl.trt)
-pp_check(sl.trt)+ scale_x_continuous(trans="log") +theme_bw()
+plot(sl.trt.i)
+pp_check(sl.trt.i)+ scale_x_continuous(trans="log") +theme_bw()
 
-plot(sg.trt)
-pp_check(sg.trt)+ scale_x_continuous(trans="log")+theme_bw()
+plot(sg.trt.i)
+pp_check(sg.trt.i)+ scale_x_continuous(trans="log")+theme_bw()
 
-plot(CDE.trt)
-pp_check(CDE.trt)
+plot(CDE.trt.i)
+pp_check(CDE.trt.i)
 
 
 
@@ -193,10 +209,22 @@ sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>%
                            select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
                          sl.trt_coef$site_code[,,'year.y.m'] %>% 
                            as_tibble() %>% 
-                           mutate(Slope = Estimate,
-                                  Slope_lower = Q2.5,
-                                  Slope_upper = Q97.5) %>% 
-                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+                           mutate(ISlope = Estimate,
+                                  ISlope_lower = Q2.5,
+                                  ISlope_upper = Q97.5) %>% 
+                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt_coef$site_code[,,'trt.yNPK'] %>% 
+  as_tibble() %>% 
+  mutate(TE = Estimate,
+         TE_lower = Q2.5,
+         TE_upper = Q97.5) %>% 
+  select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt_coef$site_code[,,'trt.yNPK:year.y.m'] %>% 
+    as_tibble() %>% 
+    mutate(TESlope = Estimate,
+           TESlope_lower = Q2.5,
+           TESlope_upper = Q97.5) %>% 
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
   inner_join(p.dat3 %>% 
                group_by(site_code) %>% 
@@ -240,6 +268,7 @@ View(p.dat3)
 dat2<-distinct(p.dat3, site_code,year.y, year.y.m)
 View(dat2)
 
+nrow(sl.trt_fitted2)
 
 View(sl.trt_fitted2)
 View(dat2)
@@ -281,9 +310,10 @@ reverselog_trans <- function(base = exp(1)) {
 }
 
 
+View(sl.trt_fitted.ctl)
+View(sl.trt_fitted.npk)
+View(sl.trt_coef3)
 
-
-View(sl.trt_fitted3)
 sl.trtm<-ggplot() +
   # data
   geom_point(data = sl.trt_fitted.npk,
@@ -297,8 +327,8 @@ sl.trtm<-ggplot() +
   geom_segment(data = sl.trt_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + Slope * cxmin),
-                   yend = exp(Intercept + Slope * cxmax),
+                   y = exp(Intercept + ISlope + (TE+TESlope) * cxmin),
+                   yend = exp(Intercept + ISlope + (TE+TESlope) * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -310,11 +340,19 @@ sl.trtm<-ggplot() +
   geom_line(data = sl.trt_fitted.npk,
             aes(x = year.y, y = Estimate),
             size = 1.5) +
+  geom_ribbon(data = sl.trt_fitted.ctl,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = sl.trt_fitted.ctl,
+            aes(x = year.y, y = Estimate),
+            size = 1.5,  linetype= "dashed") +
   scale_y_continuous(trans = reverselog_trans(), breaks=c(0,4,8,64,512,1024,2048,4096)) +
   labs(x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in EF due to SL') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
-  theme_bw()+ theme(legend.position="bottom")
+  theme_bw()+ theme(legend.position="bottom") 
+
 
 sl.trtm
 
@@ -352,14 +390,15 @@ with(sg.trt.plot2, plot(f.year.y, sg.trtm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-sg.trt_fitted <- cbind(sg.trt$data,
+sg.trt_fitted <- cbind(sg.trt.i$data,
                      # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                     fitted(sg.trt, re_formula = NA)) %>% 
+                     fitted(sg.trt.i, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(sg.trt_fitted)
 p.dat4<-distinct(p.dat3,site_code, year.y, year.y.m, SG)
 sg.trt_fitted2<-inner_join(sg.trt_fitted,dat)
 View(sg.trt_fitted2)
+sg.trt_fitted3<-inner_join(sg.trt_fitted2,dat2)
 
 sg.trt_fitted.npk<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('NPK'),]
 sg.trt_fitted.ctl<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('Control'),]
@@ -370,24 +409,36 @@ View(sg.trt_fitted2)
 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-sg.trt_fixef <- fixef(sg.trt)
+sg.trt_fixef <- fixef(sg.trt.i)
 
 # coefficients for experiment-level (random) effects
-sg.trt_coef <- coef(sg.trt)
+sg.trt_coef <- coef(sg.trt.i)
 sg.trt_coef 
 sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>% 
-                           as_tibble() %>% 
-                           mutate(Intercept = Estimate,
-                                  Intercept_lower = Q2.5,
-                                  Intercept_upper = Q97.5,
-                                  site_code = rownames(sg.trt_coef$site_code[,,'Intercept'])) %>% 
-                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                         sg.trt_coef$site_code[,,'year.y.m'] %>% 
-                           as_tibble() %>% 
-                           mutate(Slope = Estimate,
-                                  Slope_lower = Q2.5,
-                                  Slope_upper = Q97.5) %>% 
-                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+                             as_tibble() %>% 
+                             mutate(Intercept = Estimate,
+                                    Intercept_lower = Q2.5,
+                                    Intercept_upper = Q97.5,
+                                    site_code = rownames(sg.trt_coef$site_code[,,'Intercept'])) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           sg.trt_coef$site_code[,,'year.y.m'] %>% 
+                             as_tibble() %>% 
+                             mutate(ISlope = Estimate,
+                                    ISlope_lower = Q2.5,
+                                    ISlope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           sg.trt_coef$site_code[,,'trt.yNPK'] %>% 
+                             as_tibble() %>% 
+                             mutate(TE = Estimate,
+                                    TE_lower = Q2.5,
+                                    TE_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           sg.trt_coef$site_code[,,'trt.yNPK:year.y.m'] %>% 
+                             as_tibble() %>% 
+                             mutate(TESlope = Estimate,
+                                    TESlope_lower = Q2.5,
+                                    TESlope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
   inner_join(p.dat3 %>% 
                group_by(site_code) %>% 
@@ -405,7 +456,6 @@ View(sg.trt_fitted2)
 dat<-distinct(plot, site_code, continent,habitat)
 
 sg.trt_coef3<-full_join(sg.trt_coef2,dat)
-sg.trt_fitted3<-inner_join(sg.trt_fitted2,dat2)
 
 View(sg.trt_coef3)
 sg.trt_coef4<-sg.trt_coef3[complete.cases(sg.trt_coef3), ]
@@ -430,8 +480,8 @@ sg.trtm<-ggplot() +
   geom_segment(data = sg.trt_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + Slope * cxmin),
-                   yend = exp(Intercept + Slope * cxmax),
+                   y = exp(Intercept + ISlope + (TE+TESlope) *  cxmin),
+                   yend = exp(Intercept + ISlope + (TE+TESlope)  * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -443,6 +493,13 @@ sg.trtm<-ggplot() +
   geom_line(data = sg.trt_fitted.npk,
             aes(x = year.y, y = Estimate),
             size = 1.5) +
+  geom_ribbon(data = sg.trt_fitted.ctl,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = sg.trt_fitted.ctl,
+            aes(x = year.y, y = Estimate),
+            size = 1.5,  linetype= "dashed") +
   scale_y_continuous(trans = 'log', breaks=c(8,64,512,1024,2048,4096)) +
   labs(x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b) Change in EF due to SG') +
@@ -494,9 +551,9 @@ with(cde.plot2, plot(f.year.y, cm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-cde_fitted <- cbind(CDE.trt$data,
+cde_fitted <- cbind(CDE.trt.i$data,
                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                    fitted(CDE.trt, re_formula = NA)) %>% 
+                    fitted(CDE.trt.i, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(cde_fitted)
 
@@ -506,24 +563,36 @@ p.dat4<-distinct(p.dat3,site_code, year.y, continent)
 
 View(cde_fitted)
 # fixed effect coefficients (I want these for the coefficient plot)
-cde_fixef <- fixef(CDE.trt)
+cde_fixef <- fixef(CDE.trt.i)
 
 # coefficients for experiment-level (random) effects
-cde_coef <- coef(CDE.trt)
+cde_coef <- coef(CDE.trt.i)
 
 cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>% 
-                          as_tibble() %>% 
-                          mutate(Intercept = Estimate,
-                                 Intercept_lower = Q2.5,
-                                 Intercept_upper = Q97.5,
-                                 site_code = rownames(cde_coef$site_code[,,'Intercept'])) %>% 
-                          select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                        cde_coef$site_code[,,'year.y.m'] %>% 
-                          as_tibble() %>% 
-                          mutate(Slope = Estimate,
-                                 Slope_lower = Q2.5,
-                                 Slope_upper = Q97.5) %>% 
-                          select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+                             as_tibble() %>% 
+                             mutate(Intercept = Estimate,
+                                    Intercept_lower = Q2.5,
+                                    Intercept_upper = Q97.5,
+                                    site_code = rownames(cde_coef$site_code[,,'Intercept'])) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           cde_coef$site_code[,,'year.y.m'] %>% 
+                             as_tibble() %>% 
+                             mutate(ISlope = Estimate,
+                                    ISlope_lower = Q2.5,
+                                    ISlope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           cde_coef$site_code[,,'trt.yNPK'] %>% 
+                             as_tibble() %>% 
+                             mutate(TE = Estimate,
+                                    TE_lower = Q2.5,
+                                    TE_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           cde_coef$site_code[,,'trt.yNPK:year.y.m'] %>% 
+                             as_tibble() %>% 
+                             mutate(TESlope = Estimate,
+                                    TESlope_lower = Q2.5,
+                                    TESlope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
   inner_join(p.dat3 %>% 
                group_by(site_code) %>% 
@@ -554,7 +623,7 @@ sign_sqrt <- scales::trans_new('sign_sqrt',
                                inverse = function(x){sign(x) * abs(x)^2})
 
 
-View(cde_fitted3)
+View(cde_fitted.npk)
 #cde
 cdem<-ggplot() +
   # data
@@ -569,8 +638,8 @@ cdem<-ggplot() +
   geom_segment(data = cde_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = Intercept + Slope * cxmin,
-                   yend = Intercept + Slope * cxmax,
+                   y = (Intercept + ISlope + (TE+TESlope)  * cxmin),
+                   yend = (Intercept + ISlope + (TE+TESlope)  * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -582,6 +651,13 @@ cdem<-ggplot() +
   geom_line(data = cde_fitted.npk,
             aes(x = year.y, y = Estimate),
             size = 1.5) +
+  geom_ribbon(data = cde_fitted.ctl,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = cde_fitted.ctl,
+            aes(x = year.y, y = Estimate),
+            size = 1.5,  linetype= "dashed") +
   scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
   ) +
   labs(x = 'Years',
@@ -611,63 +687,65 @@ sg.trt_coef4<-sg.trt_coef3[complete.cases(sg.trt_coef3), ]
 cde_coef4<-cde_coef3[complete.cases(cde_coef3), ]
 
 View(sl.trt_coef4)
-View(sl.trt_fixef2)
+
 sl.trt_fixef2$Estimate.n<-(sl.trt_fixef2$Estimate * -1)
 sl.trt_fixef2$Est.Error.n<-(sl.trt_fixef2$Est.Error * -1)
 sl.trt_fixef2$Q2.5.n<-(sl.trt_fixef2$Q2.5 * -1)
 sl.trt_fixef2$Q97.5.n<-(sl.trt_fixef2$Q97.5 * -1)
 
 View(sl.trt_coef4)
-
+View(sl.trt_fixef2)
 sl.trtm2<-ggplot() + 
-  geom_point(data = sl.trt_coef4, aes(x =reorder(site_code,Slope), y = Slope, colour = continent),size = 2) +
-  geom_errorbar(data = sl.trt_coef4, aes(x = reorder(site_code,Slope),ymin = Slope_lower,
-                                       ymax = Slope_upper,colour = continent),
+  geom_point(data = sl.trt_coef4, aes(x =reorder(site_code,TESlope), y = TESlope, colour = continent),size = 2) +
+  geom_errorbar(data = sl.trt_coef4, aes(x = reorder(site_code,TESlope),ymin = TESlope_lower,
+                                       ymax = TESlope_upper,colour = continent),
                 width = 0, size = 0.7) + 
   #facet_wrap(Model~.)+
   facet_grid(continent~., scales= 'free', space='free')+
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = sl.trt_fixef2,
-             aes(yintercept = Estimate[3]), size = 1.2) +
+             aes(yintercept = Estimate[4]), size = 1.2) +
   geom_rect(data = sl.trt_fixef2,
             aes(xmin = -Inf, xmax = Inf,
-                ymin = Q2.5[3], ymax = Q97.5[3]),
+                ymin = Q2.5[4], ymax = Q97.5[4]),
             alpha = 0.3) +
-  ylim(-0.45,1.2) +
+  ylim(-0.2,0.4) +
   labs(x = 'site_code',
        y = 'Slope') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
   coord_flip() + 
   labs(x = 'Site',
        y = 'Slope', title= 'a) EF: SL') +
+  scale_y_continuous(trans = reverse_trans()) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                    strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 
 sl.trtm2
 
-sl.trt_coef4$Slope.sl<-sl.trt_coef4$Slope
+sl.trt_coef4$Slope.sl<-sl.trt_coef4$TESlope
 sl.trt.Slope<-select(sl.trt_coef4,site_code,Slope.sl)
 sg.trt_coef5<-inner_join(sg.trt_coef4,sl.trt.Slope)
 is.numeric(sg.trt_coef5$Slope.sl)
 
 
-View(sg.trt_coef3)
+View(sg.trt_coef5)
+View(sg.trt_fixef2)
 sg.trtm2<-ggplot() + 
-  geom_point(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl), y = Slope,colour = continent),size = 2) +
-  geom_errorbar(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl),ymin = Slope_lower,
-                                       ymax = Slope_upper,colour = continent),
+  geom_point(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl), y = TESlope,colour = continent),size = 2) +
+  geom_errorbar(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl),ymin = TESlope_lower,
+                                       ymax = TESlope_upper,colour = continent),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
   facet_grid(continent~., scales= 'free', space='free')+
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = sg.trt_fixef2,
-             aes(yintercept = Estimate[3]), size = 1.2) +
+             aes(yintercept = Estimate[4]), size = 1.2) +
   geom_rect(data = sg.trt_fixef2,
             aes(xmin = -Inf, xmax = Inf,
-                ymin = Q2.5[3], ymax = Q97.5[3]),
+                ymin = Q2.5[4], ymax = Q97.5[4]),
             alpha = 0.3) +
-  ylim(-0.45,1.2) +
+  ylim(-0.2,0.4) +
   labs(x = 'site_code',
        y = 'Slope') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
@@ -687,20 +765,20 @@ is.numeric(sg.trt_coef5$Slope.sl)
 
 cde_fixef2
 cdem2<-ggplot() + 
-  geom_point(data = cde_coef5, aes(x = reorder(site_code,Slope.sl), y = Slope,colour = continent),size = 2) +
-  geom_errorbar(data = cde_coef5, aes(x = reorder(site_code,Slope.sl),ymin = Slope_lower,
-                                      ymax = Slope_upper,colour = continent),
+  geom_point(data = cde_coef5, aes(x = reorder(site_code,Slope.sl), y = TESlope,colour = continent),size = 2) +
+  geom_errorbar(data = cde_coef5, aes(x = reorder(site_code,Slope.sl),ymin = TESlope_lower,
+                                      ymax = TESlope_upper,colour = continent),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
   facet_grid(continent~., scales= 'free', space='free')+
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = cde_fixef2,
-             aes(yintercept = Estimate[3]), size = 1.2) +
+             aes(yintercept = Estimate[4]), size = 1.2) +
   geom_rect(data = cde_fixef2,
             aes(xmin = -Inf, xmax = Inf,
-                ymin = Q2.5[3], ymax = Q97.5[3]),
+                ymin = Q2.5[4], ymax = Q97.5[4]),
             alpha = 0.3) +
-  ylim(-100,100) +
+  #ylim(-100,100) +
   labs(x = 'site_code',
        y = 'Slope') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
@@ -711,6 +789,7 @@ cdem2<-ggplot() +
                    axis.title.y = element_blank(),axis.text.y = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
+cdem2
 
 grid_arrange_shared_legend(sl.trtm2,sg.trtm2,cdem2,nrow=1)
 #sl.trtm,sg.trtm,cdem,

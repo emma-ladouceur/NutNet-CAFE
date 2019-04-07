@@ -14,9 +14,9 @@ p <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc
 dat2<-distinct(p, continent, site_code, year_trt)
 View(dat2)
 
-plot<-p[p$trt %in% c('NPK'),]
+#plot<-p[p$trt %in% c('NPK'),]
 #or
-#plot<-p[p$trt %in% c('NPK', 'Control'),]
+plot<-p[p$trt %in% c('NPK', 'Control'),]
 nrow(plot)
 
 colnames(plot)
@@ -34,9 +34,12 @@ plot$log.live.mass<-log(plot$live_mass)
 plot$log.year.trt<-log(plot$year_trt + 1)
 
 
-par(mfrow=c(1,2))
+par(mfrow=c(2,2))
 hist(plot$rich,breaks =40, main="rich", xlab= "rich")
 hist(plot$live_mass, breaks=40, main="bm", xlab= "bm")
+
+hist(plot$log.rich,breaks =40, main="rich", xlab= "rich")
+hist(plot$log.live.mass, breaks=40, main="bm", xlab= "bm")
 
 #native<-sp[sp$local_provenance %in% c('NAT'),]
 #introduced<-sp[sp$local_provenance %in% c('INT'),]
@@ -52,16 +55,17 @@ head(plot2)
 
 #plot all
 plot.rich.m <- brm(rich ~  year_trt + (year_trt | site_code), 
-data = plot, family = poisson() ,  cores = 4, chains = 4)
+                   data = plot, family = poisson() ,  cores = 4, chains = 4)
 
-# | trunc(lb = 0)
-# control = list(adapt_delta = 0.999, max_treedepth = 15)
-# block/plot
-# iter = 3000
+plot.rich.im <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
+                   data = plot,   cores = 4, chains = 4)
 
 
 plot.bm.m <- brm(live_mass ~ year_trt + (year_trt | site_code), 
-                   data = plot, family = lognormal() , cores = 4, chains = 4)
+                 data = plot, family = lognormal() , cores = 4, chains = 4)
+
+plot.bm.im <- brm(log.live.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+                   data = plot , cores = 4, chains = 4)
 
 
 
@@ -69,24 +73,25 @@ setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 save(plot.rich.m,plot.bm.m,file = 'plot.nutnet.models.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.models.Rdata')
 
+save(plot.rich.im,plot.bm.im,file = 'plot.nutnet.i.models.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
 
-
-summary(plot.rich.m)
+summary(plot.rich.im)
 
 
 # inspection of chain diagnostic
-plot(plot.rich.m)
+plot(plot.rich.im)
 
 
 # predicted values vs observed: not great, but not too bad (there is a skew-normal distribution
 # that is in the brms package - I will see if that improves this later)
 color_scheme_set("purple")
-pp_check(plot.rich.m)
+pp_check(plot.rich.im)
 
 
 
 #residuals
-m1<-residuals(plot.rich.m)
+m1<-residuals(plot.rich.im)
 m1<-as.data.frame(m1)
 nrow(m1)
 nrow(plot)
@@ -106,9 +111,9 @@ with(rr.plot, plot(f.year_trt, m1$Estimate))
 # #------plot richness model all sp----------------
 # fixed effects
 
-plot.rich_fitted <- cbind(plot.rich.m$data,
+plot.rich_fitted <- cbind(plot.rich.im$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(plot.rich.m, re_formula = NA)) %>% 
+                        fitted(plot.rich.im, re_formula = NA)) %>% 
   as_tibble() 
 #%>% 
   # get the seed.rich values for plotting
@@ -118,24 +123,25 @@ plot.rich_fitted <- cbind(plot.rich.m$data,
 
 View(plot.rich_fitted)
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.rich_fixef <- fixef(plot.rich.m)
+plot.rich_fixef <- fixef(plot.rich.im)
 
 # coefficients for experiment-level (random) effects
-plot.rich_coeff <- coef(plot.rich.m)
+plot.rich_coeff <- coef(plot.rich.im)
 
 plot.rich_coef<-as.data.frame(plot.rich_coeff$site_code)
 #names(plot.rich_coef) <- gsub(":", ".", names(plot.rich_coef), fixed = TRUE)
-
+plot.rich_coef %>% head
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef %>% 
                                 as_tibble() %>% 
-                                mutate(Intercept = Estimate.Intercept,
-                                       Intercept_lower = Q2.5.Intercept,
-                                       Intercept_upper = Q97.5.Intercept,
-                                       Slope = Estimate.year_trt ,
-                                       Slope_lower =Q2.5.year_trt ,
-                                       Slope_upper = Q97.5.year_trt,
-                                       site_code = rownames(plot.rich_coef)) %>% 
+                                mutate(
+                                 # Estimate.trtNPK.year_trt = "Estimate.trtNPK:year_trt",
+                                  #trtNPK.year_trt_lower = "Q2.5.trtNPK:year_trt",
+                                  #trtNPK.year_trt_upper = "Q97.5.trtNPK:year_trt",
+                                   #    Slope = Estimate.year_trt ,
+                                    #   Slope_lower =Q2.5.year_trt ,
+                                     #  Slope_upper = Q97.5.year_trt,
+                                      site_code = rownames(plot.rich_coef)) %>% 
                                 as_tibble() %>%
                           # join with min and max of the x-values
   inner_join(plot %>% 
@@ -144,66 +150,92 @@ plot.rich_coef2 <-  bind_cols(plot.rich_coef %>%
                          xmax = max(year_trt)),
              by = 'site_code'))
 
+colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Estimate.trtNPK:year_trt"] <- "Estimate.trtNPK.year_trt"
+colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q2.5.trtNPK:year_trt"] <- "Q2.5.trtNPK.year_trt"
+colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q97.5.trtNPK:year_trt"] <- "Q97.5.trtNPK.year_trt"
+
+
+
+
 View(plot.rich_coef3)
-View(plot.rich_fitted2)
+
 dat<-distinct(plot, site_code, continent,habitat)
 plot.rich_coef3<-full_join(plot.rich_coef2,dat)
-colnames(plot.rich_coef2)
 
+View(plot.rich_fitted)
 plot.rich_fitted2<-full_join(plot.rich_fitted,dat)
+plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
+plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
+View(plot.rich_fitted2)
 
+colnames(plot.rich_coef3)
+View(plot.rich_fitted2)
+
+plot.rich_fixef
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
 r1<-ggplot() +
   # data
-  geom_point(data = plot.rich_fitted2,
+  geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich,
                  colour = continent, alpha=0.5),
              size = 1.2) +
-  #geom_jitter(data=plot.rich_fitted2,
-   #           aes(x = year_trt, y = rich,
-    #          colour = continent), height=0.45,width = 0.45)+
+  geom_jitter(data=plot.rich_fitted.npk,
+           aes(x = year_trt, y = rich,
+             colour = continent), height=0.25,width = 0.25)+
   # experiment (random) effects
   geom_segment(data = plot.rich_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + Slope * xmin),
-                   yend = exp(Intercept + Slope * xmax),
+                   y = exp(Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmin),
+                   yend = exp(Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
   # uncertainy in fixed effect
-  geom_ribbon(data = plot.rich_fitted2,
+  geom_ribbon(data = plot.rich_fitted.npk,
               aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.3) +
   # fixed effect
-  geom_line(data = plot.rich_fitted2,
+  geom_line(data = plot.rich_fitted.npk,
             aes(x = year_trt, y = Estimate),
             size = 1.5) +
+  geom_ribbon(data = plot.rich_fitted.ctl,
+              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.3) +
+  # fixed effect
+  geom_line(data = plot.rich_fitted.ctl,
+            aes(x = year_trt, y = Estimate),
+            size = 1.5,linetype= "dashed") +
   #scale_y_continuous(trans = 'log10') +
+  # # sanity check
+  # geom_abline(data = plot.rich_fixef2,
+  #             aes(intercept = plot.rich_fixef2['Intercept','Estimate'],
+  #                 slope = plot.rich_fixef2['year_trt', 'Estimate']),
+  #             colour = 'pink') +
   labs(x = 'Years',
        y = 'Species richness', title= 'a) Plot Richness') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   theme_bw()#+ theme(legend.position="bottom")
-
+r1
 
 
 #plot biomass
 
 
-summary(plot.bm.m)
+summary(plot.bm.im)
 
 
 # inspection of chain diagnostic
-plot(plot.bm.m)  
+plot(plot.bm.im)  
 
 
 # predicted values vs observed: not great, but not too bad (there is a skew-normal distribution
 # that is in the brms package - I will see if that improves this later)
-pp_check(plot.bm.m)
+pp_check(plot.bm.im)
 
 
 #residuals
-bm1<-residuals(plot.bm.m)
+bm1<-residuals(plot.bm.im)
 bm1<-as.data.frame(bm1)
 nrow(bm1)
 nrow(plot)
@@ -222,30 +254,43 @@ with(rb.plot, plot(f.year_trt, bm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-plot.bm_fitted <- cbind(plot.bm.m$data,
+plot.bm_fitted <- cbind(plot.bm.im$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(plot.bm.m, re_formula = NA)) %>% 
+                          fitted(plot.bm.im, re_formula = NA)) %>% 
   as_tibble() 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(plot.bm.m)
+plot.bm_fixef <- fixef(plot.bm.im)
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(plot.bm.m)
+plot.bm_coef <- coef(plot.bm.im)
 plot.bm_coef 
+
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
-                                as_tibble() %>% 
-                                mutate(Intercept = Estimate,
-                                       Intercept_lower = Q2.5,
-                                       Intercept_upper = Q97.5,
-                                       site_code = rownames(plot.bm_coef$site_code[,,'Intercept'])) %>% 
-                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                              plot.bm_coef$site_code[,,'year_trt'] %>% 
-                                as_tibble() %>% 
-                                mutate(Slope = Estimate,
-                                       Slope_lower = Q2.5,
-                                       Slope_upper = Q97.5) %>% 
-                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+                             as_tibble() %>% 
+                             mutate(Intercept = Estimate,
+                                    Intercept_lower = Q2.5,
+                                    Intercept_upper = Q97.5,
+                                    site_code = rownames(plot.bm_coef$site_code[,,'Intercept'])) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           plot.bm_coef$site_code[,,'year_trt'] %>% 
+                             as_tibble() %>% 
+                             mutate(ISlope = Estimate,
+                                    ISlope_lower = Q2.5,
+                                    ISlope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           plot.bm_coef$site_code[,,'trtNPK'] %>% 
+                             as_tibble() %>% 
+                             mutate(TE = Estimate,
+                                    TE_lower = Q2.5,
+                                    TE_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           plot.bm_coef$site_code[,,'trtNPK:year_trt'] %>% 
+                             as_tibble() %>% 
+                             mutate(TESlope = Estimate,
+                                    TESlope_lower = Q2.5,
+                                    TESlope_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
   inner_join(plot %>% 
                group_by(site_code) %>% 
@@ -253,48 +298,66 @@ plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>%
                          xmax = max(year_trt)),
              by = 'site_code')
 
+
 View(plot.bm_coef2)
 
-View(plot.bm_fitted2)
+
 
 #dat<-distinct(plot, site_code, continent,habitat)
 
 plot.bm_coef3<-full_join(plot.bm_coef2,dat)
 
-plot.bm_fitted2<-full_join(plot.bm_fitted,dat)
+View(plot.bm_coef3)
+View(plot.bm_fitted)
+plot.bm_fitted2<-full_join(plot.bm_fitted,dat2)
+View(plot.bm_fitted2)
+View(plot)
+dat2<-distinct(plot,habitat, continent,site_code, year_trt,block, plot,log.live.mass,live_mass)
 
+plot.bm_fitted.npk<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('NPK'),]
+plot.bm_fitted.ctl<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('Control'),]
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
 b1<-ggplot() +
   # data
-  geom_point(data = plot.bm_fitted2,
+  geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = live_mass,
                  colour = continent),
              size = 1.2,alpha=0.5) +
-  #geom_jitter(data=plot.bm_fitted2,
-   #           aes(x = year_trt, y = live_mass,
-   #               colour = continent), height=0.45,width = 0.45)+
-  # experiment (random) effects
+  geom_jitter(data=plot.bm_fitted.npk,
+              aes(x = year_trt, y = live_mass,
+                colour = continent), height=0.25,width = 0.25)+
+   #experiment (random) effects
   geom_segment(data = plot.bm_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + Slope * xmin),
-                   yend = exp(Intercept + Slope * xmax),
+                   y = exp(Intercept + ISlope + (TE+TESlope) * xmin),
+                   yend = exp(Intercept + ISlope + (TE+TESlope) * xmax),
                    group = site_code,
                    colour = continent),
                size = 0.7) +
   # uncertainy in fixed effect
-  geom_ribbon(data = plot.bm_fitted,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+  geom_ribbon(data = plot.bm_fitted.npk,
+              aes(x = year_trt, ymin = exp(Q2.5), ymax = exp(Q97.5)),
               alpha = 0.3) +
   # fixed effect
-  geom_line(data = plot.bm_fitted,
-            aes(x = year_trt, y = Estimate),
+  geom_line(data = plot.bm_fitted.npk,
+            aes(x = year_trt, y = exp(Estimate)),
             size = 1.5) +
+    geom_ribbon(data = plot.bm_fitted.ctl,
+                aes(x = year_trt, ymin = exp(Q2.5), ymax = exp(Q97.5)),
+                alpha = 0.3) +
+    # fixed effect
+    geom_line(data = plot.bm_fitted.ctl,
+              aes(x = year_trt, y = exp(Estimate)),
+              size = 1.5,linetype= "dashed") +
+  scale_y_continuous(trans = 'log', breaks = c(8, 64, 512, 1024, 2048, 4096)) +
   labs(x = 'Years',
        y = expression(paste('Biomass (g/',m^2, ')')), title= 'b) Plot Biomass') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
   theme_bw()#+ theme(legend.position="bottom")
+  
+b1
 
 
 grid_arrange_shared_legend(r1,b1,nrow=1)
@@ -313,8 +376,8 @@ colnames(plot.bm_coef2)
 #biomass_exp_coef3<-biomass_exp_coef2[,c(-10,-11)]
 plot.rich_coef2$Model<-'_Richness'
 plot.bm_coef2$Model<-'Biomass'
-coef.all<-bind_rows(plot.rich_coef2,plot.bm_coef2)
-coef.all<-inner_join(coef.all,dat)
+coef.all<-bind_rows(plot.rich_coef3,plot.bm_coef3)
+coef.all<-inner_join(coef.all,dat2)
 View(coef.all)
 
 #fixed
@@ -370,21 +433,22 @@ is.numeric(plot.rich_coef3$Slope)
 
 View(plot.rich_fixef2)
 View(plot.rich_coef3)
+colnames(plot.rich_coef3)
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
 r2<-ggplot() + 
-  geom_point(data = plot.rich_coef3, aes(x = reorder(site_code,Slope), y = Slope,colour = continent),size = 2) +
-  geom_errorbar(data = plot.rich_coef3, aes(x = reorder(site_code,Slope),ymin = Slope_lower,
-                                      ymax = Slope_upper,colour = continent),
+  geom_point(data = plot.rich_coef3, aes(x = reorder(site_code,Estimate.trtNPK.year_trt), y = Estimate.trtNPK.year_trt,colour = continent),size = 2) +
+  geom_errorbar(data = plot.rich_coef3, aes(x = reorder(site_code,Estimate.trtNPK.year_trt),ymin = Q2.5.trtNPK.year_trt,
+                                      ymax = Q97.5.trtNPK.year_trt,colour = continent),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
   facet_grid(continent~., scales= 'free', space='free')+
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = plot.rich_fixef2,
-             aes(yintercept = Estimate[2]), size = 1.2) +
+             aes(yintercept = Estimate[4]), size = 1.2) +
   geom_rect(data = plot.rich_fixef2,
             aes(xmin = -Inf, xmax = Inf,
-                ymin = Q2.5[2], ymax = Q97.5[2]),
+                ymin = Q2.5[4], ymax = Q97.5[4]),
             alpha = 0.3) +
   ylim(-0.3, 0.3) +
   labs(x = 'Site',
@@ -402,7 +466,7 @@ View(plot)
 
 plot.bm_coef3<-full_join(plot.bm_coef2,dat)
 View(plot.bm_coef3)
-plot.rich_coef3$slope.rich<-plot.rich_coef3$Slope
+plot.rich_coef3$slope.rich<-plot.rich_coef3$Estimate.trtNPK.year_trt
 View(plot.rich_coef3)
 rich.slope<-select(plot.rich_coef3,site_code,slope.rich)
 plot.bm_coef4<-inner_join(plot.bm_coef3,rich.slope)
@@ -410,22 +474,23 @@ is.numeric(plot.bm_coef3$slope.rich)
 plot.bm_coef3$site_code <- reorder(plot.bm_coef3$site_code, plot.bm_coef3$slope.rich)
 
 View(fixef_b)
-View(plot.bm_coef3)
+View(plot.bm_coef4)
+colnames(plot.bm_coef4)
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
 b2<-ggplot() + 
-  geom_point(data = plot.bm_coef4, aes(x = reorder(site_code, slope.rich), y = Slope, colour = continent),size = 2) +
-  geom_errorbar(data = plot.bm_coef4, aes(x = reorder(site_code, slope.rich),ymin = Slope_lower,
-                                            ymax = Slope_upper,colour = continent),
+  geom_point(data = plot.bm_coef4, aes(x = reorder(site_code, slope.rich), y = TESlope, colour = continent),size = 2) +
+  geom_errorbar(data = plot.bm_coef4, aes(x = reorder(site_code, slope.rich),ymin = TESlope_lower,
+                                            ymax = TESlope_upper,colour = continent),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
   facet_grid(continent~., scales= 'free', space='free')+
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = filter(fixef_b,),
-             aes(yintercept = Estimate[2]), size = 1.2) +
+             aes(yintercept = Estimate[4]), size = 1.2) +
   geom_rect(data = filter(fixef_b, ),
             aes(xmin = -Inf, xmax = Inf,
-                ymin = Q2.5[2], ymax = Q97.5[2]),
+                ymin = Q2.5[4], ymax = Q97.5[4]),
             alpha = 0.3) +
   ylim(-0.3, 0.3) +
   labs(x = 'Site',
@@ -438,7 +503,11 @@ b2<-ggplot() +
                    axis.title.y = element_blank(),axis.text.y = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
+b2
+
 grid_arrange_shared_legend(r2,b2,nrow=1)
+
+grid_arrange_shared_legend(r1,b1,r2,b2,nrow=2,ncol=2)
 
 
 #delta
