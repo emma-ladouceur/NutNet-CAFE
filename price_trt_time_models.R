@@ -128,6 +128,8 @@ CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.y
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 
+#shanes
+setwd('~/Dropbox/NutNet/Model_fits/')
 save(sl.trt,sg.trt,CDE.trt,file = 'price_trt_time.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_time.Rdata')
 
