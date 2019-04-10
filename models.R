@@ -74,11 +74,16 @@ plot.bm.im <- brm(log.live.mass ~ trt * year_trt + (trt * year_trt | site_code/b
 
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
+
 save(plot.rich.m,plot.bm.m,file = 'plot.nutnet.models.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.models.Rdata')
+#shane
+load('~/Dropbox/NutNet/Model_fits/plot.nutnet.models.Rdata')
 
 save(plot.rich.im,plot.bm.im,file = 'plot.nutnet.i.models.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
+#shane
+load('~/Dropbox/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
 
 summary(plot.rich.im)
 

@@ -133,9 +133,13 @@ setwd('~/Dropbox/NutNet/Model_fits/')
 save(sl.trt,sg.trt,CDE.trt,file = 'price_trt_time.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_time.Rdata')
 
+#shane
+load('~/Dropbox/NutNet/Model_fits/price_trt_time.Rdata')
+
 save(sl.trt.i,sg.trt.i,CDE.trt.i,file = 'price_trt_interact_time.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
-
+#shane
+load('~/Dropbox/NutNet/Model_fits/price_trt_interact_time.Rdata')
 
 summary(CDE.trt.i)
 

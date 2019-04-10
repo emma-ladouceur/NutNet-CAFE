@@ -50,8 +50,18 @@ load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
 # model name sl.trt.i,sg.trt.i,CDE.trt.i
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 
+#shane
+#model names plot.rich.im,plot.bm.im,
+load('~/Dropbox/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
+# model name sl.trt.i,sg.trt.i,CDE.trt.i
+load('~/Dropbox/NutNet/Model_fits/price_trt_interact_time.Rdata')
+
+
 # get the metadata (I want to group the posteriors)
 dat <- read.csv('~/Dropbox/Projects/NutNet/Data/price_models.csv', sep=',') %>% 
+  as_tibble() 
+#shane
+dat <- read.csv('~/Dropbox/NutNet/Data/price_models.csv', sep=',') %>% 
   as_tibble() 
 
 meta<-distinct(dat,site_code, continent, habitat)
