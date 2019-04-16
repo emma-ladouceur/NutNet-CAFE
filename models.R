@@ -17,6 +17,10 @@ p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",n
 
 dat2<-distinct(p, continent, site_code, year_trt)
 View(dat2)
+colnames(plot)
+dat2<-distinct(plot, site_code,site_name, country, continent,habitat, latitude, longitude,elevation, experiment_type)
+View(dat2)
+write.csv(dat2,"~/Dropbox/Projects/NutNet/Data/nutnet_distinct.csv")
 
 #plot<-p[p$trt %in% c('NPK'),]
 #or
@@ -75,13 +79,15 @@ plot.bm.im <- brm(log.live.mass ~ trt * year_trt + (trt * year_trt | site_code/b
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 
-save(plot.rich.m,plot.bm.m,file = 'plot.nutnet.models.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.models.Rdata')
-#shane
-load('~/Dropbox/NutNet/Model_fits/plot.nutnet.models.Rdata')
+#save(plot.rich.m,plot.bm.m,file = 'plot.nutnet.models.Rdata')
+#load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.models.Rdata')
+
 
 save(plot.rich.im,plot.bm.im,file = 'plot.nutnet.i.models.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
+#em
+load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
+
 #shane
 load('~/Dropbox/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
 
@@ -340,8 +346,8 @@ b1<-ggplot() +
   geom_segment(data = plot.bm_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + ISlope + (TE+TESlope) * xmin),
-                   yend = exp(Intercept + ISlope + (TE+TESlope) * xmax),
+                   y = exp(Intercept + TE  + (ISlope+TESlope) * xmin),
+                   yend = exp(Intercept + TE + (ISlope+TESlope) * xmax),
                    group = site_code,
                    colour = continent),
                size = 0.7) +
@@ -484,6 +490,7 @@ plot.bm_coef3$site_code <- reorder(plot.bm_coef3$site_code, plot.bm_coef3$slope.
 
 View(fixef_b)
 View(plot.bm_coef4)
+summary(plot.bm_coef4)
 colnames(plot.bm_coef4)
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))

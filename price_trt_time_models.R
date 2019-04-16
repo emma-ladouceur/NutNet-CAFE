@@ -128,15 +128,16 @@ CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.y
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 
-#shanes
+
 setwd('~/Dropbox/NutNet/Model_fits/')
 save(sl.trt,sg.trt,CDE.trt,file = 'price_trt_time.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_time.Rdata')
 
-#shane
+
 load('~/Dropbox/NutNet/Model_fits/price_trt_time.Rdata')
 
 save(sl.trt.i,sg.trt.i,CDE.trt.i,file = 'price_trt_interact_time.Rdata')
+#emma
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 #shane
 load('~/Dropbox/NutNet/Model_fits/price_trt_interact_time.Rdata')
@@ -337,8 +338,8 @@ sl.trtm<-ggplot() +
   geom_segment(data = sl.trt_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + ISlope + (TE+TESlope) * cxmin),
-                   yend = exp(Intercept + ISlope + (TE+TESlope) * cxmax),
+                   y = exp(Intercept + TE  + (ISlope+TESlope) * cxmin),
+                   yend = exp(Intercept + TE + (ISlope+TESlope) * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -359,7 +360,7 @@ sl.trtm<-ggplot() +
             size = 1.5,  linetype= "dashed") +
   scale_y_continuous(trans = reverselog_trans(), breaks=c(0,4,8,64,512,1024,2048,4096)) +
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in EF due to SL') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in Biomass due to SL') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   theme_bw()+ theme(legend.position="bottom") 
 
@@ -400,6 +401,7 @@ with(sg.trt.plot2, plot(f.year.y, sg.trtm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
+
 sg.trt_fitted <- cbind(sg.trt.i$data,
                      # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
                      fitted(sg.trt.i, re_formula = NA)) %>% 
@@ -490,8 +492,8 @@ sg.trtm<-ggplot() +
   geom_segment(data = sg.trt_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + ISlope + (TE+TESlope) *  cxmin),
-                   yend = exp(Intercept + ISlope + (TE+TESlope)  * cxmax),
+                   y = exp(Intercept + TE + (ISlope+TESlope) *  cxmin),
+                   yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -512,7 +514,7 @@ sg.trtm<-ggplot() +
             size = 1.5,  linetype= "dashed") +
   scale_y_continuous(trans = 'log', breaks=c(8,64,512,1024,2048,4096)) +
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b) Change in EF due to SG') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b) Change in Biomass due to SG') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   theme_bw()+ theme(legend.position="bottom")
 
@@ -648,8 +650,8 @@ cdem<-ggplot() +
   geom_segment(data = cde_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = (Intercept + ISlope + (TE+TESlope)  * cxmin),
-                   yend = (Intercept + ISlope + (TE+TESlope)  * cxmax),
+                   y = (Intercept + TE + (ISlope+TESlope)  * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -671,7 +673,7 @@ cdem<-ggplot() +
   scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
   ) +
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'c) EF Change in Persistent Species') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'c) Biomass Change in Persistent Species') +
   scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   theme_bw()+ theme(legend.position="bottom")
 

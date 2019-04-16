@@ -279,8 +279,8 @@ s.loss.im<-ggplot() +
   geom_segment(data = s.loss.i_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + ISlope + (TE+TESlope) *  cxmin),
-                   yend = exp(Intercept + ISlope + (TE+TESlope)  * cxmax),
+                   y = exp(Intercept + TE + (ISlope+TESlope) *  cxmin),
+                   yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -426,8 +426,8 @@ s.gain.im<-ggplot() +
   geom_segment(data = s.gain.i_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + ISlope + (TE+TESlope) * cxmin),
-                   yend = exp(Intercept + ISlope + (TE+TESlope)  * cxmax),
+                   y = exp(Intercept + TE + (ISlope+TESlope) * cxmin),
+                   yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -590,8 +590,8 @@ s.change.im<-ggplot() +
   geom_segment(data = s.change.i_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = (Intercept + ISlope + (TE+TESlope) * cxmin),
-                   yend = (Intercept + ISlope + (TE+TESlope) * cxmax),
+                   y = (Intercept + TE + (ISlope+TESlope) * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope) * cxmax),
                    group = site_code,
                    colour = continent),
                size = .7) +
@@ -621,8 +621,6 @@ s.change.im
 
 
 grid_arrange_shared_legend(s.loss.im,s.gain.im,s.change.im,nrow=1)
-
-
 
 
 

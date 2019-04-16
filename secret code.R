@@ -178,26 +178,29 @@ cde_posterior <- study_sample_posterior  %>%
 
 library("scales")
 
+View(sl_posterior)
+
 slf<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = sl_posterior %>% distinct(sl.trt_lower_slope, sl.trt_upper_slope),
             aes(xmin = sl.trt_lower_slope, xmax =  sl.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
   geom_density_ridges(data = sl_posterior,
-                      aes(x = sl.trt + unique(sl.trt_global_slope), 
-                          y = habitat,
-                          fill = habitat
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = sl_posterior,
-                      aes(x = sl.ctl + unique(sl.ctl_global_slope), 
+                      aes(x = sl.ctl + unique(sl.ctl_global_slope),
                           y = habitat,
                           color= "grey"
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = 'habitat') +
+  geom_density_ridges(data = sl_posterior,
+                      aes(x = sl.trt + unique(sl.trt_global_slope), 
+                          y = habitat,
+                          fill = continent
+                      ),
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #scale_fill_viridis_d(name = 'habitat') +
+  scale_fill_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   geom_vline(data = sl_posterior,
              aes(xintercept = sl.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -210,7 +213,7 @@ slf<-ggplot() +
         legend.key = element_blank(),
         legend.position="bottom")
 
-
+slf
 
 
 sgf<-ggplot() +
@@ -219,20 +222,21 @@ sgf<-ggplot() +
             aes(xmin = sg.trt_lower_slope, xmax =  sg.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
   geom_density_ridges(data = sg_posterior,
-                      aes(x = sg.trt + unique(sg.trt_global_slope), 
-                          y = habitat,
-                          fill= habitat
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = sg_posterior,
-                      aes(x = sg.ctl + unique(sg.ctl_global_slope), 
+                      aes(x = sg.ctl + unique(sg.ctl_global_slope),
                           y = habitat,
                           color = "grey"
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = 'habitat') +
+  geom_density_ridges(data = sg_posterior,
+                      aes(x = sg.trt + unique(sg.trt_global_slope), 
+                          y = habitat,
+                          fill= continent
+                      ),
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #scale_fill_viridis_d(name = 'habitat') +
+  scale_fill_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   geom_vline(data = sg_posterior,
              aes(xintercept = sg.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -252,20 +256,21 @@ cdef<-ggplot() +
             aes(xmin = cde.trt_lower_slope, xmax =  cde.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
   geom_density_ridges(data = cde_posterior,
-                      aes(x = cde.trt + unique(cde.trt_global_slope), 
-                          y = habitat,
-                          fill= habitat
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = cde_posterior,
-                      aes(x = cde.ctl + unique(cde.ctl_global_slope), 
+                      aes(x = cde.ctl + unique(cde.ctl_global_slope),
                           y = habitat,
                           color = "grey"
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = 'habitat') +
+  geom_density_ridges(data = cde_posterior,
+                      aes(x = cde.trt + unique(cde.trt_global_slope), 
+                          y = habitat,
+                          fill= continent
+                      ),
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #scale_fill_viridis_d(name = 'habitat') +
+  scale_fill_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   geom_vline(data = cde_posterior,
              aes(xintercept = cde.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -316,6 +321,8 @@ bm_posterior <- study_sample_posterior  %>%
   left_join(plotmeta, 
             by = 'site_code')
 
+nrow(bm_posterior)
+nrow(rich_posterior)
 
 rf<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
@@ -323,20 +330,21 @@ rf<-ggplot() +
             aes(xmin = rich.trt_lower_slope, xmax =  rich.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
   geom_density_ridges(data = rich_posterior,
-                      aes(x = rich.trt + unique(rich.trt_global_slope), 
-                          y = habitat,
-                          fill = habitat
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = rich_posterior,
-                      aes(x = rich.ctl + unique(rich.ctl_global_slope), 
+                      aes(x = rich.ctl + unique(rich.ctl_global_slope),
                           y = habitat,
                           color= "grey"
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = 'habitat') +
+  geom_density_ridges(data = rich_posterior,
+                      aes(x = rich.trt + unique(rich.trt_global_slope), 
+                          y = habitat,
+                          fill = continent
+                      ),
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #scale_fill_viridis_d(name = 'habitat') +
+  scale_fill_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   geom_vline(data = rich_posterior,
              aes(xintercept = rich.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -356,20 +364,21 @@ bf<-ggplot() +
             aes(xmin = bm.trt_lower_slope, xmax =  bm.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
   geom_density_ridges(data = bm_posterior,
-                      aes(x = bm.trt + unique(bm.trt_global_slope), 
-                          y = habitat,
-                          fill = habitat
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = bm_posterior,
-                      aes(x = bm.ctl + unique(bm.ctl_global_slope), 
+                      aes(x = bm.ctl + unique(bm.ctl_global_slope),
                           y = habitat,
                           color= "grey"
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = 'habitat') +
+  geom_density_ridges(data = bm_posterior,
+                      aes(x = bm.trt + unique(bm.trt_global_slope), 
+                          y = habitat,
+                          fill = continent
+                      ),
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #scale_fill_viridis_d(name = 'habitat') +
+  scale_fill_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
   geom_vline(data = bm_posterior,
              aes(xintercept = bm.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -439,13 +448,13 @@ sgf2<-ggplot() +
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  geom_density_ridges(data = sg_posterior,
-                      aes(x = sg.ctl + unique(sg.ctl_global_slope), 
-                          y = continent,
-                          color = "grey"
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
+  # geom_density_ridges(data = sg_posterior,
+  #                     aes(x = sg.ctl + unique(sg.ctl_global_slope), 
+  #                         y = continent,
+  #                         color = "grey"
+  #                     ),
+  #                     scale = 1, alpha = 0.6,
+  #                     linetype = 0) +
   scale_fill_viridis_d(name = 'continent') +
   geom_vline(data = sg_posterior,
              aes(xintercept = sg.trt_global_slope)) +
@@ -536,16 +545,16 @@ bf2<-ggplot() +
             aes(xmin = bm.trt_lower_slope, xmax =  bm.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
   geom_density_ridges(data = bm_posterior,
-                      aes(x = bm.trt + unique(bm.trt_global_slope), 
+                      aes(x = bm.ctl + unique(bm.ctl_global_slope), 
                           y = continent,
-                          fill = continent
+                          color= "grey"
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   geom_density_ridges(data = bm_posterior,
-                      aes(x = bm.ctl + unique(bm.ctl_global_slope), 
+                      aes(x = bm.trt + unique(bm.trt_global_slope), 
                           y = continent,
-                          color= "grey"
+                          fill = continent
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
