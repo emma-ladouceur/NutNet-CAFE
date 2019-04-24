@@ -85,24 +85,28 @@ s.change <- brm(s.change ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.
 
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
-save(s.loss,s.gain,s.change,file = 'price_lgc.Rdata')
-write.csv(p.dat3,file = 'price_models.csv')
-load('~/Dropbox/Projects/NutNet/Model_fits/price_lgc.Rdata')
+#save(s.loss,s.gain,s.change,file = 'price_lgc.Rdata')
+#write.csv(p.dat3,file = 'price_models.csv')
+#load('~/Dropbox/Projects/NutNet/Model_fits/price_lgc.Rdata')
 
-s.loss.i <- brm(s.loss.p.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id), 
+s.loss.i <- brm(s.loss.p.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
               data = p.dat3, cores = 4, chains = 4)
 
 
-s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id), 
+s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
               data = p.dat3, cores = 4, chains = 4)
 
 
-s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id), 
+s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
                 data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
-save(s.loss.i,s.gain.i,s.change.i,file = 'price_trt_i_lgc.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_lgc.Rdata')
+#save(s.loss.i,s.gain.i,file = 'price_trt_i_lg.Rdata')
+#losses and gains
+load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_lg.Rdata')
+#save(s.change.i,file = 'price_trt_i_schange.Rdata')
+#species change
+load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_schange.Rdata')
 
      
 summary(s.loss.i)
@@ -135,31 +139,32 @@ s.loss.i_fitted <- cbind(s.loss.i$data,
                        fitted(s.loss.i, re_formula = NA)) %>% 
   as_tibble()
 
-View(s.loss.i_fitted)
-View(p.dat5)
-p.dat5<-distinct(p.dat3,site_code, year.y,year.y.m, s.loss.p,s.loss.p.log)
+s.loss.i_fitted
+p.dat5<-distinct(p.dat3,site_code, year.y,year.y.m, s.loss.p,s.loss.p.log,x.rich)
 s.loss.i_fitted2<-inner_join(s.loss.i_fitted,dat)
 s.loss.i_fitted3<-inner_join(s.loss.i_fitted2,p.dat5)
-View(s.loss.i_fitted3)
+
+
+
+s.loss.i_fitted3$starting.richness <- ifelse(s.loss.i_fitted3$x.rich >= 1 & s.loss.i_fitted3$x.rich <= 5, '1-5 species',
+                                  ifelse(s.loss.i_fitted3$x.rich >=6 & s.loss.i_fitted3$x.rich <=10, '6-10',
+                                         ifelse(s.loss.i_fitted3$x.rich >=11 & s.loss.i_fitted3$x.rich <=15, '11-15',    
+                                                ifelse(s.loss.i_fitted3$x.rich >=16 & s.loss.i_fitted3$x.rich <=20, '16-20',
+                                                       ifelse(s.loss.i_fitted3$x.rich >=21 & s.loss.i_fitted3$x.rich <=25, '21-25',
+                                                              ifelse(s.loss.i_fitted3$x.rich >=26, '>26', 'other'))))))
+
 
 s.loss.i_fitted.npk<-s.loss.i_fitted3[s.loss.i_fitted3$trt.y %in% c('NPK'),]
 s.loss.i_fitted.ctl<-s.loss.i_fitted3[s.loss.i_fitted3$trt.y %in% c('Control'),]
 
-View(s.loss.i_fitted.npk)
-nrow(s.loss.i_fitted)
-nrow(s.gain.i_fitted)
-nrow(s.loss.i_fitted.npk)
-nrow(s.gain.i_fitted.npk)
+
 
 # fixed effect coefficients -coefficient plot
 s.loss.i_fixef <- fixef(s.loss.i)
 
-# coefficients for experiment-level (random) effects
-s.loss.i_coef
+
 s.loss.i_coef <- coef(s.loss.i)
-View(s.loss.i_coef)
-
-
+s.loss.i_coef
 
 s.loss.i_coef2 <-  bind_cols(s.loss.i_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -192,69 +197,36 @@ s.loss.i_coef2 <-  bind_cols(s.loss.i_coef$site_code[,,'Intercept'] %>%
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
-                         cxmax = max(year.y.m)),
+                         cxmax = max(year.y.m),
+                         s.rich = mean(x.rich),
+                         r.rich = round(s.rich)),
              by = 'site_code')
 
+s.loss.i_coef2$starting.richness <- ifelse(s.loss.i_coef2$r.rich >= 1 & s.loss.i_coef2$r.rich <= 5, '1-5 species',
+                                ifelse(s.loss.i_coef2$r.rich >=6 & s.loss.i_coef2$r.rich <=10, '6-10',
+                                       ifelse(s.loss.i_coef2$r.rich >=11 & s.loss.i_coef2$r.rich <=15, '11-15',    
+                                              ifelse(s.loss.i_coef2$r.rich >=16 & s.loss.i_coef2$r.rich <=20, '16-20',
+                                                     ifelse(s.loss.i_coef2$r.rich >=21 & s.loss.i_coef2$r.rich <=25, '21-25',
+                                                            ifelse(s.loss.i_coef2$r.rich >=26, '>26', 'other'))))))
 
 s.loss.i_coef3<-inner_join(s.loss.i_coef2,dat)
 View(s.loss.i_coef3)
 
 
-#convert to negative
-#s.loss.i_coef3$Intercept<-log(s.loss.i_coef3$Intercept)
-#s.loss.i_coef3$Intercept_upper<-log(s.loss.i_coef3$Intercept_upper)
-#s.loss.i_coef3$Intercept_lower<-log(s.loss.i_coef3$Intercept_lower)
-#s.loss.i_coef3$s.loss.iope<-log(s.loss.i_coef3$s.loss.iope)
-#s.loss.i_coef3$s.loss.iope_upper<-log(s.loss.i_coef3$s.loss.iope_upper)
-#s.loss.i_coef3$s.loss.iope_lower<-log(s.loss.i_coef3$s.loss.iope_lower)
+rm(s.loss.i)
+save(s.loss.i_fitted.npk,s.loss.i_fitted.ctl,s.loss.i_coef3,file = 's.loss_dat.Rdata')
+load('~/Desktop/Academic/R code/NutNet/s.loss_dat.Rdata')
 
 
-s.loss.i_coef3$Intercept.n<-(s.loss.i_coef3$Intercept * -1)
-s.loss.i_coef3$Intercept_upper.n<-(s.loss.i_coef3$Intercept_upper * -1)
-s.loss.i_coef3$Intercept_lower.n<-(s.loss.i_coef3$Intercept_lower * -1)
-s.loss.i_coef3$s.loss.iope.n<-(s.loss.i_coef3$s.loss.iope * -1)
-s.loss.i_coef3$s.loss.iope_upper.n<-(s.loss.i_coef3$s.loss.iope_upper * -1)
-s.loss.i_coef3$s.loss.iope_lower.n<-(s.loss.i_coef3$s.loss.iope_lower * -1)
 
-s.loss.i_coef3$Intercept.log<-log(s.loss.i_coef3$Intercept)
-s.loss.i_coef3$s.loss.iope.log<-log(s.loss.i_coef3$s.loss.iope)
-s.loss.i_coef3$Intercept.log.n<-(s.loss.i_coef3$Intercept.log * -1)
-s.loss.i_coef3$s.loss.iope.log.n<-(s.loss.i_coef3$s.loss.iope.log * -1)
+View(s.loss.i_fitted.npk)
 
-View(s.loss.i_coef3)
-View(p.dat3)
-dat2<-distinct(p.dat3, site_code,year.y, year.y.m)
-View(dat2)
+s.loss.i_fitted.npk<-s.loss.i_fitted.npk[complete.cases(s.loss.i_fitted.npk$starting.richness), ]
+s.loss.i_coef3<-s.loss.i_coef3[complete.cases(s.loss.i_coef3$starting.richness), ]
 
-
-View(s.loss.i_fitted2)
-View(dat2)
-#neg
-s.loss.i_fitted2$s.loss.i.n<-(s.loss.i_fitted2$s.loss.i.p * -1)
-s.loss.i_fitted2$Estimate.n<-(s.loss.i_fitted2$Estimate * -1)
-s.loss.i_fitted2$Est.Error.n<-(s.loss.i_fitted2$Est.Error * -1)
-s.loss.i_fitted2$Q2.5.n<-(s.loss.i_fitted2$Q2.5 * -1)
-s.loss.i_fitted2$Q97.5.n<-(s.loss.i_fitted2$Q97.5 * -1)
-
-
-View(p.dat3)
-s.loss.i_fitted2$year.y.f<-as.factor(s.loss.i_fitted2$year.y)
-levels(s.loss.i_fitted2$year.y.f)
-
-
-View(s.loss.i_fitted2)
-View(p.dat3)
-dat<-distinct(plot,site_code,continent)
-nrow(s.loss.idat)
-nrow(s.loss.i_fitted2)
-
-#s.loss.i_fitted2<-inner_join(s.loss.i_fitted,dat)
-
-View(s.loss.i_fitted3)
-View(s.loss.i_coef3)
-
-summary(s.loss.i_fitted.npk)
-summary(s.loss.i_coef3)
+s.loss.i_fitted.npk$starting.richness <- factor(s.loss.i_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+s.loss.i_coef3$starting.richness <- factor(s.loss.i_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+is.factor(s.loss.i_coef3$starting.richness)
 
 library("scales")
 reverselog_trans <- function(base = exp(1)) {
@@ -270,11 +242,11 @@ s.loss.im<-ggplot() +
   # data
   geom_point(data = s.loss.i_fitted.npk,
              aes(x = year.y, y = s.loss.p,
-                 colour = continent, alpha=0.02),
-             size = 1.2) +
-  geom_jitter(data=s.loss.i_fitted.npk,
-              aes(x = year.y, y = s.loss.p,
-                  colour = continent), height=0.25,width = 0.25)+
+                 colour = starting.richness, alpha=0.01),
+             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+  # geom_jitter(data=s.loss.i_fitted.npk,
+  #             aes(x = year.y, y = s.loss.p,
+  #                 colour = starting.richness), height=0.45,width = 0.45)+
   # experiment (random) effects
   geom_segment(data = s.loss.i_coef3,
                aes(x = xmin, 
@@ -282,19 +254,19 @@ s.loss.im<-ggplot() +
                    y = exp(Intercept + TE + (ISlope+TESlope) *  cxmin),
                    yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
                    group = site_code,
-                   colour = continent),
+                   colour = starting.richness),
                size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = s.loss.i_fitted.npk,
               aes(x = year.y, ymin = exp(Q2.5), ymax = exp(Q97.5)),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
   geom_line(data = s.loss.i_fitted.npk,
             aes(x = year.y, y = exp(Estimate)),
             size = 1.5) +
   geom_ribbon(data = s.loss.i_fitted.ctl,
               aes(x = year.y, ymin = exp(Q2.5), ymax = exp(Q97.5)),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
   geom_line(data =  s.loss.i_fitted.ctl,
             aes(x = year.y, y = exp(Estimate)),
@@ -302,8 +274,13 @@ s.loss.im<-ggplot() +
   scale_y_continuous(trans = reverselog_trans(), breaks=c(1,2,4,6,8,16,24) ) +
   labs(x = 'Years',
        y = expression(paste('Plot Species Loss')), title= 'a) Species Loss') +
-  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
-  theme_bw()+ theme(legend.position="bottom")
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
 
 s.loss.im
 
@@ -337,18 +314,28 @@ s.gain.i_fitted <- cbind(s.gain.i$data,
                        fitted(s.gain.i, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(s.gain.i_fitted)
-p.dat4<-distinct(p.dat3,site_code, year.y, year.y.m, s.gain,s.gain.log)
+s.gain.i_fitted
+p.dat4<-distinct(p.dat3,site_code, year.y, year.y.m, s.gain,s.gain.log,x.rich)
 s.gain.i_fitted2<-inner_join(s.gain.i_fitted,dat)
 s.gain.i_fitted3<-inner_join(s.gain.i_fitted2,p.dat4)
 
-View(s.gain.i_fitted2)
+View(s.gain.i_fitted3)
+
+s.gain.i_fitted3$starting.richness <- ifelse(s.gain.i_fitted3$x.rich >= 1 & s.gain.i_fitted3$x.rich <= 5, '1-5 species',
+                                    ifelse(s.gain.i_fitted3$x.rich >=6 & s.gain.i_fitted3$x.rich <=10, '6-10',
+                                           ifelse(s.gain.i_fitted3$x.rich >=11 & s.gain.i_fitted3$x.rich <=15, '11-15',    
+                                                  ifelse(s.gain.i_fitted3$x.rich >=16 & s.gain.i_fitted3$x.rich <=20, '16-20',
+                                                         ifelse(s.gain.i_fitted3$x.rich >=21 & s.gain.i_fitted3$x.rich <=25, '21-25',
+                                                                ifelse(s.gain.i_fitted3$x.rich >=26, '>26', 'other'))))))
+
+
 
 s.gain.i_fitted.npk<-s.gain.i_fitted3[s.gain.i_fitted3$trt.y %in% c('NPK'),]
 s.gain.i_fitted.ctl<-s.gain.i_fitted3[s.gain.i_fitted3$trt.y %in% c('Control'),]
 
 
 View(p.dat3)
-View(s.gain.i_fitted2)
+View(s.gain.i_fitted.npk)
 
 
 # fixed effect coefficients (I want these for the coefficient plot)
@@ -389,9 +376,17 @@ s.gain.i_coef2 <-  bind_cols(s.gain.i_coef$site_code[,,'Intercept'] %>%
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
-                         cxmax = max(year.y.m)),
+                         cxmax = max(year.y.m),
+                         s.rich = mean(x.rich),
+                         r.rich = round(s.rich)),
              by = 'site_code')
 
+s.gain.i_coef2$starting.richness <- ifelse(s.gain.i_coef2$r.rich >= 1 & s.gain.i_coef2$r.rich <= 5, '1-5 species',
+                                  ifelse(s.gain.i_coef2$r.rich >=6 & s.gain.i_coef2$r.rich <=10, '6-10',
+                                         ifelse(s.gain.i_coef2$r.rich >=11 & s.gain.i_coef2$r.rich <=15, '11-15',    
+                                                ifelse(s.gain.i_coef2$r.rich >=16 & s.gain.i_coef2$r.rich <=20, '16-20',
+                                                       ifelse(s.gain.i_coef2$r.rich >=21 & s.gain.i_coef2$r.rich <=25, '21-25',
+                                                              ifelse(s.gain.i_coef2$r.rich >=26, '>26', 'other'))))))
 
 
 View(s.gain.i_coef3)
@@ -402,26 +397,28 @@ dat<-distinct(plot, site_code, continent,habitat)
 
 s.gain.i_coef3<-full_join(s.gain.i_coef2,dat)
 
+rm(s.gain.i)
+save(s.gain.i_fitted.npk,s.gain.i_fitted.ctl,s.gain.i_coef3, file = 's.gain_dat.Rdata')
+load('~/Desktop/Academic/R code/NutNet/s.gain_dat.Rdata')
 
-View(s.gain.i_coef3)
-s.gain.i_coef4<-s.gain.i_coef3[complete.cases(s.gain.i_coef3), ]
-nrow(s.gain.i_coef4)
-View(s.gain.i_fitted.npk)
+s.gain.i_fitted.npk<-s.gain.i_fitted.npk[complete.cases(s.gain.i_fitted.npk$starting.richness), ]
+s.gain.i_coef3<-s.gain.i_coef3[complete.cases(s.gain.i_coef3$starting.richness), ]
+
+s.gain.i_fitted.npk$starting.richness <- factor(s.gain.i_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+s.gain.i_coef3$starting.richness <- factor(s.gain.i_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 
-summary(s.gain.i_fitted3)
-summary(s.gain.i_coef3)
 
 #gai
 s.gain.im<-ggplot() +
   # data
   geom_point(data = s.gain.i_fitted.npk,
              aes(x = year.y, y = s.gain,
-                 colour = continent, alpha=0.2),
-             size = 1.2) +
-  geom_jitter(data=s.gain.i_fitted.npk,
-              aes(x = year.y, y = s.gain,
-                  colour = continent), height=0.25,width = 0.25)+
+                 colour = starting.richness, alpha=0.1),
+             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+  # geom_jitter(data=s.gain.i_fitted.npk,
+  #             aes(x = year.y, y = s.gain,
+  #                 colour = starting.richness), height=0.45,width = 0.45)+
   # experiment (random) effects
   geom_segment(data = s.gain.i_coef3,
                aes(x = xmin, 
@@ -429,28 +426,33 @@ s.gain.im<-ggplot() +
                    y = exp(Intercept + TE + (ISlope+TESlope) * cxmin),
                    yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
                    group = site_code,
-                   colour = continent),
+                   colour = starting.richness),
                size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = s.gain.i_fitted.npk,
               aes(x = year.y, ymin = exp(Q2.5), ymax = exp(Q97.5)),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
   geom_line(data = s.gain.i_fitted.npk,
             aes(x = year.y, y = exp(Estimate)),
             size = 1.5) +
   geom_ribbon(data = s.gain.i_fitted.ctl,
              aes(x = year.y, ymin = exp(Q2.5), ymax = exp(Q97.5)),
-             alpha = 0.3) +
+             alpha = 0.5) +
   # fixed effect
   geom_line(data =  s.gain.i_fitted.ctl,
             aes(x = year.y, y = exp(Estimate)),
             size = 1.5, linetype= "dashed") +
   scale_y_continuous(trans = 'log' , breaks=c(1,2,4,6,8,16,24)  ) +
   labs(x = 'Years',
-       y = expression(paste('Plot Species Gain')), title= 'b) Species Gain') +
-  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
-  theme_bw()+ theme(legend.position="bottom")
+       y = expression(paste('Plot Species Gain')), title= 'c) Species Gain') +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
 
 s.gain.im
 
@@ -459,8 +461,11 @@ s.gain.im
 grid_arrange_shared_legend(s.loss.im,s.gain.im,nrow=1)
 
 
+
+
+
 ########################################################################################################################
-#####################################CDE model###################################################################################
+##################################### SPECIES CHANGE ###################################################################################
 ########################################################################################################################
 
 summary(s.change.i)
@@ -517,6 +522,7 @@ s.change.i_fixef <- fixef(s.change.i)
 
 # coefficients for experiment-level (random) effects
 s.change.i_coef <- coef(s.change.i)
+s.change.i
 
 s.change.i_coef2 <-  bind_cols(s.change.i_coef$site_code[,,'Intercept'] %>% 
                                as_tibble() %>% 
@@ -566,7 +572,9 @@ s.change.i_fitted3<-full_join(s.change.i_fitted2,dat2)
 s.change.i_fitted.npk<-s.change.i_fitted3[s.change.i_fitted3$trt.y %in% c('NPK'),]
 s.change.i_fitted.ctl<-s.change.i_fitted3[s.change.i_fitted3$trt.y %in% c('Control'),]
 
-
+rm(s.change.i)
+save(s.change.i_fitted.npk,s.change.i_fitted.ctl,s.change.i_coef3,file = 's.change_dat.Rdata')
+load('~/Desktop/Academic/R code/NutNet/s.change_dat.Rdata')
 
 library(scales)
 sign_sqrt <- scales::trans_new('sign_sqrt',
@@ -614,7 +622,9 @@ s.change.im<-ggplot() +
   ) +
   labs(x = 'Years',
        y = expression(paste('Species Change')), title= 'c) Species Change') +
-  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  #scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  #scale_colour_manual(values = c("#E5BA3AFF", "#75B41EFF","#5AC2F1FF","#0C5BB0FF","#972C8DFF","#E0363AFF" ))+
+  scale_colour_manual(values = c("#972C8DFF","#E0363AFF","#75B41EFF","#E5BA3AFF" ,"#5AC2F1FF","#0C5BB0FF"))+
   theme_bw()+ theme(legend.position="bottom")
 
 s.change.im

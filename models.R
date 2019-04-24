@@ -16,6 +16,8 @@ sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 dat2<-distinct(p, continent, site_code, year_trt)
+
+dat2<-distinct(p, continent, site_code, year_trt)
 View(dat2)
 colnames(plot)
 dat2<-distinct(plot, site_code,site_name, country, continent,habitat, latitude, longitude,elevation, experiment_type)
@@ -78,13 +80,10 @@ plot.bm.im <- brm(log.live.mass ~ trt * year_trt + (trt * year_trt | site_code/b
 
 
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
-
 #save(plot.rich.m,plot.bm.m,file = 'plot.nutnet.models.Rdata')
 #load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.models.Rdata')
 
-
-save(plot.rich.im,plot.bm.im,file = 'plot.nutnet.i.models.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
+#save(plot.rich.im,plot.bm.im,file = 'plot.nutnet.i.models.Rdata')
 #em
 load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
 
@@ -145,7 +144,10 @@ plot.rich_coeff <- coef(plot.rich.im)
 
 plot.rich_coef<-as.data.frame(plot.rich_coeff$site_code)
 #names(plot.rich_coef) <- gsub(":", ".", names(plot.rich_coef), fixed = TRUE)
-plot.rich_coef %>% head
+
+
+startrich<-plot[plot$year_trt %in% c('0'),]
+View(startrich)
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef %>% 
                                 as_tibble() %>% 
@@ -163,7 +165,22 @@ plot.rich_coef2 <-  bind_cols(plot.rich_coef %>%
                group_by(site_code) %>% 
                summarise(xmin = min(year_trt),
                          xmax = max(year_trt)),
-             by = 'site_code'))
+             by = 'site_code') %>%
+inner_join(startrich %>%
+           group_by(site_code) %>%
+           summarise(m.rich = mean(rich),
+                     r.rich = round(m.rich)),
+           by = 'site_code'))
+
+
+
+plot.rich_coef2$starting.richness <- ifelse(plot.rich_coef2$r.rich >= 1 & plot.rich_coef2$r.rich <= 5, '1-5 species',
+                  ifelse(plot.rich_coef2$r.rich >=6 & plot.rich_coef2$r.rich <=10, '6-10',
+                         ifelse(plot.rich_coef2$r.rich >=11 & plot.rich_coef2$r.rich <=15, '11-15',    
+                                ifelse(plot.rich_coef2$r.rich >=16 & plot.rich_coef2$r.rich <=20, '16-20',
+                                       ifelse(plot.rich_coef2$r.rich >=21 & plot.rich_coef2$r.rich <=25, '21-25',
+                         ifelse(plot.rich_coef2$r.rich >=26, '>26', 'other'))))))
+  #View(plot.rich_coef2)                       
 
 colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Estimate.trtNPK:year_trt"] <- "Estimate.trtNPK.year_trt"
 colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q2.5.trtNPK:year_trt"] <- "Q2.5.trtNPK.year_trt"
@@ -172,51 +189,76 @@ colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q97.5.trtNPK:year_trt"] <-
 
 
 
-View(plot.rich_coef3)
+View(plot.rich_coef2)
 
 dat<-distinct(plot, site_code, continent,habitat)
 plot.rich_coef3<-full_join(plot.rich_coef2,dat)
 
 View(plot.rich_fitted)
+summary(plot.rich_fitted)
+plot.rich_fitted$starting.richness <- ifelse(plot.rich_fitted$rich >= 1 & plot.rich_fitted$rich <= 5, '1-5 species',
+                                   ifelse(plot.rich_fitted$rich >=6 & plot.rich_fitted$rich <=10, '6-10',
+                                          ifelse(plot.rich_fitted$rich >=11 & plot.rich_fitted$rich <=15, '11-15',    
+                                                 ifelse(plot.rich_fitted$rich >=16 & plot.rich_fitted$rich <=20, '16-20',
+                                                        ifelse(plot.rich_fitted$rich >=21 & plot.rich_fitted$rich <=25, '21-25',
+                                                               ifelse(plot.rich_fitted$rich >=26, '>26', 'other'))))))
 plot.rich_fitted2<-full_join(plot.rich_fitted,dat)
 plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
 View(plot.rich_fitted2)
 
-colnames(plot.rich_coef3)
-View(plot.rich_fitted2)
+View(plot.rich_coef3)
+View(plot.rich_fitted.npk)
 
 plot.rich_fixef
+
+levels(plot.rich_fitted.npk$rich.cat)
+levels(plot.rich_coef3$rich.cat)
+
+plot.rich_fitted.npk<-plot.rich_fitted.npk[complete.cases(plot.rich_fitted.npk$starting.richness), ]
+plot.rich_coef3<-plot.rich_coef3[complete.cases(plot.rich_coef3$starting.richness), ]
+
+plot.rich_fitted.npk$starting.richness <- factor(plot.rich_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+
+
+library(yarrr)
+piratepal(palette = "all", plot.result = TRUE)
+piratepal(palette = "info2")
+piratepal(palette = "cars")
+# pal "#E5BA3AFF", "#75B41EFF","#5AC2F1FF","#0C5BB0FF","#972C8DFF","#E0363AFF"
+
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
+
 r1<-ggplot() +
   # data
   geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich,
-                 colour = continent, alpha=0.5),
-             size = 1.2) +
-  geom_jitter(data=plot.rich_fitted.npk,
-           aes(x = year_trt, y = rich,
-             colour = continent), height=0.25,width = 0.25)+
+                 colour = starting.richness, alpha=0.1),
+             size = 1.3, position = position_jitter(width = 0.45, height = 0.45)) +
+  # geom_jitter(data=plot.rich_fitted.npk,
+  #          aes(x = year_trt, y = rich,
+  #            colour = starting.richness), height=0.45,width = 0.45)+
   # experiment (random) effects
   geom_segment(data = plot.rich_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmin),
-                   yend = exp(Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmax),
+                   y = (Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmin),
+                   yend = (Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmax),
                    group = site_code,
-                   colour = continent),
+                   colour = starting.richness),
                size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = plot.rich_fitted.npk,
               aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
   geom_line(data = plot.rich_fitted.npk,
             aes(x = year_trt, y = Estimate),
             size = 1.5) +
   geom_ribbon(data = plot.rich_fitted.ctl,
               aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
   geom_line(data = plot.rich_fitted.ctl,
             aes(x = year_trt, y = Estimate),
@@ -229,9 +271,16 @@ r1<-ggplot() +
   #             colour = 'pink') +
   labs(x = 'Years',
        y = 'Species richness', title= 'a) Plot Richness') +
-  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
-  theme_bw()#+ theme(legend.position="bottom")
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+ theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
+                               #+ theme(legend.position="bottom")
 r1
+
 
 
 #plot biomass
@@ -311,9 +360,20 @@ plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>%
                group_by(site_code) %>% 
                summarise(xmin = min(year_trt),
                          xmax = max(year_trt)),
+             by = 'site_code') %>%
+  inner_join(startrich %>%
+               group_by(site_code) %>%
+               summarise(m.rich = mean(rich),
+                         r.rich = round(m.rich)),
              by = 'site_code')
 
 
+plot.bm_coef2$starting.richness <- ifelse(plot.bm_coef2$r.rich >= 1 & plot.bm_coef2$r.rich <= 5, '1-5 species',
+                                   ifelse(plot.bm_coef2$r.rich >=6 & plot.bm_coef2$r.rich <=10, '6-10',
+                                          ifelse(plot.bm_coef2$r.rich >=11 & plot.bm_coef2$r.rich <=15, '11-15',    
+                                                 ifelse(plot.bm_coef2$r.rich >=16 & plot.bm_coef2$r.rich <=20, '16-20',
+                                                        ifelse(plot.bm_coef2$r.rich >=21 & plot.bm_coef2$r.rich <=25, '21-25',
+                                                               ifelse(plot.bm_coef2$r.rich >=26, '>26', 'other'))))))
 View(plot.bm_coef2)
 
 
@@ -324,24 +384,55 @@ plot.bm_coef3<-full_join(plot.bm_coef2,dat)
 
 View(plot.bm_coef3)
 View(plot.bm_fitted)
+dat2<-distinct(plot,habitat, continent,site_code, year_trt,block, plot,log.live.mass,live_mass,rich)
 plot.bm_fitted2<-full_join(plot.bm_fitted,dat2)
 View(plot.bm_fitted2)
 View(plot)
-dat2<-distinct(plot,habitat, continent,site_code, year_trt,block, plot,log.live.mass,live_mass)
+
+
+plot.bm_fitted2$starting.richness <- ifelse(plot.bm_fitted2$rich >= 1 & plot.bm_fitted2$rich <= 5, '1-5 species',
+                                    ifelse(plot.bm_fitted2$rich >=6 & plot.bm_fitted2$rich <=10, '6-10',
+                                           ifelse(plot.bm_fitted2$rich >=11 & plot.bm_fitted2$rich <=15, '11-15',    
+                                                  ifelse(plot.bm_fitted2$rich >=16 & plot.bm_fitted2$rich <=20, '16-20',
+                                                         ifelse(plot.bm_fitted2$rich >=21 & plot.bm_fitted2$rich <=25, '21-25',
+                                                                ifelse(plot.bm_fitted2$rich >=26, '>26', 'other'))))))
 
 plot.bm_fitted.npk<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('NPK'),]
 plot.bm_fitted.ctl<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('Control'),]
+
+
+
+
+plot.bm_fitted.npk<-plot.bm_fitted.npk[complete.cases(plot.bm_fitted.npk$starting.richness), ]
+plot.bm_coef3<-plot.bm_coef3[complete.cases(plot.bm_coef3$starting.richness), ]
+
+
+plot.bm_fitted.npk$starting.richness <- factor(plot.bm_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+plot.bm_coef3$starting.richness <- factor(plot.bm_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+
+#are low and lowest even there?
+# plot.bm_fitted.npkt<-plot.bm_fitted.npk[plot.bm_fitted.npk$starting.richness %in% c('lowest', 'low'),]
+# plot.bm_coef3t<-plot.bm_coef3[plot.bm_coef3$starting.richness %in% c('lowest', 'low'),]
+# plot.bm_fitted.npkt<-plot.bm_fitted.npk[plot.bm_fitted.npk$starting.richness %in% c('highest', 'high'),]
+# plot.bm_coef3t<-plot.bm_coef3[plot.bm_coef3$starting.richness %in% c('highest', 'high'),]
+# plot.bm_fitted.npkt<-plot.bm_fitted.npk[plot.bm_fitted.npk$starting.richness %in% c('medium-high', 'medium'),]
+# plot.bm_coef3t<-plot.bm_coef3[plot.bm_coef3$starting.richness %in% c('medium-high', 'medium'),]
+# #yep!
+#finland there? saana montane
+# plot.bm_coef3t<-plot.bm_coef3[plot.bm_coef3$site_code %in% c('saana.fi'),]
+# plot.bm_fitted.npkt<-plot.bm_fitted.npk[plot.bm_fitted.npk$site_code %in% c('saana.fi'),]
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
 b1<-ggplot() +
   # data
   geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = live_mass,
-                 colour = continent),
-             size = 1.2,alpha=0.5) +
-  geom_jitter(data=plot.bm_fitted.npk,
-              aes(x = year_trt, y = live_mass,
-                colour = continent), height=0.25,width = 0.25)+
+                 colour = starting.richness, alpha=0.1),
+             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+  # geom_jitter(data=plot.bm_fitted.npk,
+  #             aes(x = year_trt, y = live_mass,
+  #               colour = starting.richness), height=0.45,width = 0.45)+
+ 
    #experiment (random) effects
   geom_segment(data = plot.bm_coef3,
                aes(x = xmin, 
@@ -349,28 +440,35 @@ b1<-ggplot() +
                    y = exp(Intercept + TE  + (ISlope+TESlope) * xmin),
                    yend = exp(Intercept + TE + (ISlope+TESlope) * xmax),
                    group = site_code,
-                   colour = continent),
+                   colour = factor(starting.richness)),
                size = 0.7) +
-  # uncertainy in fixed effect
+ # uncertainy in fixed effect
   geom_ribbon(data = plot.bm_fitted.npk,
               aes(x = year_trt, ymin = exp(Q2.5), ymax = exp(Q97.5)),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
   geom_line(data = plot.bm_fitted.npk,
             aes(x = year_trt, y = exp(Estimate)),
             size = 1.5) +
     geom_ribbon(data = plot.bm_fitted.ctl,
                 aes(x = year_trt, ymin = exp(Q2.5), ymax = exp(Q97.5)),
-                alpha = 0.3) +
+                alpha = 0.5) +
     # fixed effect
     geom_line(data = plot.bm_fitted.ctl,
               aes(x = year_trt, y = exp(Estimate)),
               size = 1.5,linetype= "dashed") +
-  scale_y_continuous(trans = 'log', breaks = c(8, 64, 512, 1024, 2048, 4096)) +
+  scale_y_continuous(trans = 'log10', #breaks = c(8, 64, 512, 1024, 2048, 4096)
+                     ) +
   labs(x = 'Years',
        y = expression(paste('Biomass (g/',m^2, ')')), title= 'b) Plot Biomass') +
-  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF"))+
-  theme_bw()#+ theme(legend.position="bottom")
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
+#+ theme(legend.position="bottom")
   
 b1
 
