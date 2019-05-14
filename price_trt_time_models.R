@@ -38,92 +38,99 @@ nrow(p.dat2)
 
 
 p.dat3<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
-nrow(p.dat3)
+p.dat4<-unite_(p.dat3, "trt.xy", c("trt.x","trt.y"), remove=FALSE)
+p.dat5<-p.dat4[p.dat4$trt.xy %in% c('Control_Control','NPK_NPK'),]
 
-View(p.dat3)
+nrow(p.dat5)
 
-colnames(p.dat3)
-head(p.dat3)
-summary(p.dat3)
-View(p.dat3)
+View(p.dat5)
+
+colnames(p.dat5)
+head(p.dat5)
+summary(p.dat5)
+View(p.dat5)
 
 #write.csv(p.all4,"~/Desktop/pricel.csv")
 
-p.dat3$year.y.m<-p.dat3$year.y-mean(p.dat3$year.y)
+p.dat5$year.y.m<-p.dat5$year.y-mean(p.dat5$year.y)
 
-p.dat3$SL.p<-abs(p.dat3$SL)
-p.dat3$SL.p.log1<-log1p(p.dat3$SL.p)
-p.dat3$SG.log1<-log1p(p.dat3$SG)
-p.dat3$CDE.log<-log1p(p.dat3$CDE)
+p.dat5$SL.p<-abs(p.dat5$SL)
+p.dat5$SL.p.log1<-log1p(p.dat5$SL.p)
+p.dat5$SG.log1<-log1p(p.dat5$SG)
+p.dat5$CDE.log<-log1p(p.dat5$CDE)
 
 #try shanes funky custom transformation for cde
-p.dat3$CDE.t<- sign(p.dat3$CDE)*sqrt(abs(p.dat3$CDE))
+p.dat5$CDE.t<- sign(p.dat5$CDE)*sqrt(abs(p.dat5$CDE))
 
 
 par(mfrow=c(1,1))
-hist(p.dat3$CDE.t, breaks=40, main="CDE Funky Transformed", xlab= "CDE FT")
+hist(p.dat5$CDE.t, breaks=40, main="CDE Funky Transformed", xlab= "CDE FT")
 
 
 #histograms of sl & sg
 par(mfrow=c(2,3))
-hist(p.dat3$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
-hist(p.dat3$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
-hist(p.dat3$CDE, breaks=40, main="CDE", xlab= "CDE")
+hist(p.dat5$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
+hist(p.dat5$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
+hist(p.dat5$CDE, breaks=40, main="CDE", xlab= "CDE")
 
-hist(p.dat3$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
-hist(p.dat3$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
-hist(p.dat3$CDE.t, breaks=40, main="CDE t", xlab= "CDE t")
+hist(p.dat5$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
+hist(p.dat5$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
+hist(p.dat5$CDE.t, breaks=40, main="CDE t", xlab= "CDE t")
 
 
 # s loss, gain and change metrics
-p.dat3$s.loss <- -1*(p.dat3$x.rich - p.dat3$c.rich)
-p.dat3$s.gain <- p.dat3$y.rich - p.dat3$c.rich
-p.dat3$s.change <- p.dat3$y.rich - p.dat3$x.rich
+p.dat5$s.loss <- -1*(p.dat5$x.rich - p.dat5$c.rich)
+p.dat5$s.gain <- p.dat5$y.rich - p.dat5$c.rich
+p.dat5$s.change <- p.dat5$y.rich - p.dat5$x.rich
+
+p.dat5$s.loss.p<-abs(p.dat5$s.loss)
+p.dat5$s.loss.p.log <- log1p(abs(p.dat5$s.loss.p))
+p.dat5$s.gain.log<-log1p(p.dat5$s.gain)
+
+par(mfrow=c(2,3))
+hist(p.dat5$s.loss.p,breaks =10, main="Species Loss", xlab= "Species Loss")
+hist(p.dat5$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
+hist(p.dat5$s.change, breaks=10, main="Species Change", xlab= "Species Change")
+hist(p.dat5$s.loss.p.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
+hist(p.dat5$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
+hist(p.dat5$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Species Change")
 
 
-p.dat3$s.loss.log <- sign(p.dat3$s.loss)*log1p(abs(p.dat3$s.loss))
-p.dat3$s.gain.log<-log1p(p.dat3$s.gain)
+p.dat5$site_code<-as.factor(p.dat5$site_code)
+p.dat5$site.year.id<-as.factor(p.dat5$site.year.id)
 
-par(mfrow=c(2,2))
-hist(p.dat3$s.loss,breaks =10, main="Species Loss", xlab= "Species Loss")
-hist(p.dat3$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
-hist(p.dat3$s.loss.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
-hist(p.dat3$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
-
-
-p.dat3$site_code<-as.factor(p.dat3$site_code)
-p.dat3$site.year.id<-as.factor(p.dat3$site.year.id)
+write.csv(p.dat5,"~/Desktop/price_time_only.csv")
 
 #try out models on a sample of data?
-#levels(p.dat3$site_code)
-#samp<-p.dat3[p.dat3$site_code %in% c('arch.us','azi.cn'),]
+#levels(p.dat5$site_code)
+#samp<-p.dat5[p.dat5$site_code %in% c('arch.us','azi.cn'),]
 
-colnames(p.dat3) 
+colnames(p.dat5) 
 
 sl.trt <- brm(SL.p ~  trt.y * year.y.m + ( year.y.m |  site_code/site.year.id), 
-            data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
+            data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
 
 #, control = list(adapt_delta = 0.999, max_treedepth = 15))
 
 sg.trt <- brm(SG ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-            data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
+            data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
 
 
 CDE.trt <- brm(CDE ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-             data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
+             data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
 
 #treat interaction
 sl.trt.i <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-              data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4)
+              data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
 
 #, control = list(adapt_delta = 0.999, max_treedepth = 15)
 
 sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-              data = p.dat3, family=hurdle_lognormal(),cores = 4, chains = 4)
+              data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
 
 
 CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-               data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
+               data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
 
 
 summary(CDE.trt.i)
@@ -200,7 +207,7 @@ View(sl.trt_fitted3)
 
 sl.trt_fitted3$starting.richness <- ifelse(sl.trt_fitted3$x.rich >= 1 & sl.trt_fitted3$x.rich <= 5, '1-5 species',
                                    ifelse(sl.trt_fitted3$x.rich >=6 & sl.trt_fitted3$x.rich <=10, '6-10',
-                                          ifelse(sl.trt_fitted3$x.rich >=11 & sl.trt_fitted3$x.rich <=15, 'medium 11-15',    
+                                          ifelse(sl.trt_fitted3$x.rich >=11 & sl.trt_fitted3$x.rich <=15, '11-15',    
                                                  ifelse(sl.trt_fitted3$x.rich >=16 & sl.trt_fitted3$x.rich <=20, '16-20',
                                                         ifelse(sl.trt_fitted3$x.rich >=21 & sl.trt_fitted3$x.rich <=25, '21-25',
                                                                ifelse(sl.trt_fitted3$x.rich >=26, '>26', 'other'))))))

@@ -52,7 +52,7 @@ p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=
 #shanes links
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/PNutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 p.all2<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
@@ -138,7 +138,7 @@ levels(npk3$site_name)
 list2<-distinct(npk3,site_code,site_name)
 list2
 #npk4<-npk4[npk4$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
-dat1<-npk4
+dat1<-npk3
 
 levels(npk4$site_code)
 
@@ -178,6 +178,7 @@ dat30<-dat1[dat1$site_code %in% c('kbs.us'),]
 dat31<-dat1[dat1$site_code %in% c('kibber.in'),]
 dat32<-dat1[dat1$site_code %in% c('kidman.au'),]
 dat33<-dat1[dat1$site_code %in% c('kilp.fi'),]
+View(dat33)
 dat34<-dat1[dat1$site_code %in% c('koffler.ca'),]
 
 dat35<-dat1[dat1$site_code %in% c('konz.us'),]
