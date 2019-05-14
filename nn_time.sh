@@ -13,3 +13,5 @@ module load R/3.4.3-1
 export OFILE=/work/$USER/NutNet/$JOB_NAME-$JOB_ID.Rdata
 export LANG=en_US.UTF-8
 Rscript --vanilla /home/ladouceu/projects/NutNet/nn_time.R
+
+
