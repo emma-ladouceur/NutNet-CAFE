@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#$ -N nn_time
+#$ -N nn_time.sg
 #$ -S /bin/bash
 #$ -l h_rt=620:00:00
 #$ -l h_vmem=8G
@@ -12,6 +12,6 @@
 module load R/3.4.3-1
 export OFILE=/work/$USER/NutNet/$JOB_NAME-$JOB_ID.Rdata
 export LANG=en_US.UTF-8
-Rscript --vanilla /home/ladouceu/projects/NutNet/nn_time.R
+Rscript --vanilla /home/ladouceu/projects/NutNet/nn_time.sg.R
 
 
