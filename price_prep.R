@@ -48,22 +48,28 @@ uyindex<-sort(unique(yindex))
 all_lst<-NULL
 n<-1
 for (i in 1:length(usindex)){
+  #select all instances from a site
   subs<-which(sindex==usindex[i])
   uindex_small<-sort(unique(all[subs,]$year_trt))
   
   for(j in 2:length(uindex_small)) {
-    subs2<-which(yindex[subs]%in%c(uindex_small[j], "0"))
+    subs2<-which(as.numeric(as.character(yindex[subs]))%in%
+                   (uindex_small[j]-c(0,1)))
   
-    all_lst[[n]]<-all[subs[subs2],]
-    names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
-    n<-n+1
+    #table(all[subs[subs2],]$site.year.id)
+    if(length(unique(all[subs[subs2],]$site.year.id))==2) {
+      all_lst[[n]]<-all[subs[subs2],]
+      names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
+      n<-n+1
+    }
   }
   print(i/length(usindex))
 }
 
 
-
-folder = "output_all"
+View(arch.us_1)
+View(all_lst)
+folder = "output_new"
 #input RDS files for cluster, price analysis
 mapply(saveRDS, all_lst, file=paste0(folder, "/",names(all_lst), '.rds'))
 
@@ -98,6 +104,7 @@ for (i in 1:length(nusindex)){
 
 
 View(n_lst)
+
 folder = "output_native"
 #input RDS files for cluster, price analysis
 mapply(saveRDS, n_lst, file=paste0(folder, "/",names(n_lst), '.rds'))
