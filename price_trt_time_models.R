@@ -13,7 +13,10 @@ library(priceTools)
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+#p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
 #shanes links
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -30,76 +33,82 @@ p.all$plot<-as.factor(p.all$plot)
 p.all$site_code<-as.factor(p.all$site_code)
 
 dat<-distinct(plot, site_code, continent,habitat)
-p.dat<-inner_join(p.all,dat)
+p.dat2<-inner_join(p.all,dat)
 
 nrow(p.dat)
-p.dat2<-p.dat[complete.cases(p.dat), ]
+#p.dat2<-p.dat[complete.cases(p.dat), ]
+nrow(p.dat2)
+View(p.dat2)
+
+
+# p.dat2<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
+# p.dat2<-unite_(p.dat2, "trt.xy", c("trt.x","trt.y"), remove=FALSE)
+# p.dat2<-p.dat2[p.dat2$trt.xy %in% c('Control_Control','NPK_NPK'),]
+
 nrow(p.dat2)
 
+View(p.dat2)
 
-p.dat3<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
-p.dat4<-unite_(p.dat3, "trt.xy", c("trt.x","trt.y"), remove=FALSE)
-p.dat5<-p.dat4[p.dat4$trt.xy %in% c('Control_Control','NPK_NPK'),]
-
-nrow(p.dat5)
-
-View(p.dat5)
-
-colnames(p.dat5)
-head(p.dat5)
-summary(p.dat5)
-View(p.dat5)
+colnames(p.dat2)
+head(p.dat2)
+summary(p.dat2)
+View(p.dat2)
 
 #write.csv(p.all4,"~/Desktop/pricel.csv")
 
-p.dat5$year.y.m<-p.dat5$year.y-mean(p.dat5$year.y)
+p.dat2$year.y.m<-p.dat2$year.y-mean(p.dat2$year.y)
 
-p.dat5$SL.p<-abs(p.dat5$SL)
-p.dat5$SL.p.log1<-log1p(p.dat5$SL.p)
-p.dat5$SG.log1<-log1p(p.dat5$SG)
-p.dat5$CDE.log<-log1p(p.dat5$CDE)
+p.dat2$SL.p<-abs(p.dat2$SL)
+p.dat2$SL.p.log1<-log1p(p.dat2$SL.p)
+
+is.numeric(p.dat2$SG)
+
+p.dat2$SG.log1<-log1p(p.dat2$SG)
+p.dat2$CDE.log<-log1p(p.dat2$CDE)
 
 #try shanes funky custom transformation for cde
-p.dat5$CDE.t<- sign(p.dat5$CDE)*sqrt(abs(p.dat5$CDE))
+p.dat2$CDE.t<- sign(p.dat2$CDE)*sqrt(abs(p.dat2$CDE))
 
 
 par(mfrow=c(1,1))
-hist(p.dat5$CDE.t, breaks=40, main="CDE Funky Transformed", xlab= "CDE FT")
+hist(p.dat2$CDE.t, breaks=40, main="CDE Funky Transformed", xlab= "CDE FT")
 
 
 #histograms of sl & sg
 par(mfrow=c(2,3))
-hist(p.dat5$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
-hist(p.dat5$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
-hist(p.dat5$CDE, breaks=40, main="CDE", xlab= "CDE")
+hist(p.dat2$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
+hist(p.dat2$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
+hist(p.dat2$CDE, breaks=40, main="CDE", xlab= "CDE")
 
-hist(p.dat5$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
-hist(p.dat5$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
-hist(p.dat5$CDE.t, breaks=40, main="CDE t", xlab= "CDE t")
+hist(p.dat2$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
+hist(p.dat2$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
+hist(p.dat2$CDE.log, breaks=40, main="CDE log + 1", xlab= "CDE log + 1")
 
 
 # s loss, gain and change metrics
-p.dat5$s.loss <- -1*(p.dat5$x.rich - p.dat5$c.rich)
-p.dat5$s.gain <- p.dat5$y.rich - p.dat5$c.rich
-p.dat5$s.change <- p.dat5$y.rich - p.dat5$x.rich
+p.dat2$s.loss <- -1*(p.dat2$x.rich - p.dat2$c.rich)
+p.dat2$s.gain <- p.dat2$y.rich - p.dat2$c.rich
+p.dat2$s.change <- p.dat2$y.rich - p.dat2$x.rich
 
-p.dat5$s.loss.p<-abs(p.dat5$s.loss)
-p.dat5$s.loss.p.log <- log1p(abs(p.dat5$s.loss.p))
-p.dat5$s.gain.log<-log1p(p.dat5$s.gain)
+p.dat2$s.loss.p<-abs(p.dat2$s.loss)
+p.dat2$s.loss.p.log <- log1p(abs(p.dat2$s.loss.p))
+p.dat2$s.gain.log<-log1p(p.dat2$s.gain)
 
 par(mfrow=c(2,3))
-hist(p.dat5$s.loss.p,breaks =10, main="Species Loss", xlab= "Species Loss")
-hist(p.dat5$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
-hist(p.dat5$s.change, breaks=10, main="Species Change", xlab= "Species Change")
-hist(p.dat5$s.loss.p.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
-hist(p.dat5$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
-hist(p.dat5$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Species Change")
+hist(p.dat2$s.loss.p,breaks =10, main="Species Loss", xlab= "Species Loss")
+hist(p.dat2$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
+hist(p.dat2$s.change, breaks=10, main="Species Change", xlab= "Species Change")
+hist(p.dat2$s.loss.p.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
+hist(p.dat2$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
+hist(p.dat2$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Species Change")
 
 
-p.dat5$site_code<-as.factor(p.dat5$site_code)
-p.dat5$site.year.id<-as.factor(p.dat5$site.year.id)
 
-write.csv(p.dat5,"~/Desktop/price_time_only.csv")
+summary(p.dat2)
+p.dat2$site_code<-as.factor(p.dat2$site_code)
+p.dat2$site.year.id<-as.factor(p.dat2$site.year.id)
+
+write.csv(p.dat2,"~/Desktop/price_time_only.csv")
 
 #try out models on a sample of data?
 #levels(p.dat5$site_code)
@@ -153,7 +162,7 @@ setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 
 #!!!!!!!!
-#we call this new progressive
+#we call this new cumulative
 #where  everything is pruned to be only time
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg.Rdata')
@@ -188,17 +197,20 @@ pp_check(CDE.trt.i)
 
 levels(p.dat3$f.year.y)
 #residuals
-sl.trtm1<-residuals(sl.trt)
+sl.trtm1<-residuals(sl.trt.i)
 sl.trtm1<-as.data.frame(sl.trtm1)
 View(sl.trtm1)
 nrow(sl.trtm1)
-nrow(p.dat3)
-p.dat4<-p.dat3[complete.cases(p.dat3$SL.p), ]
+nrow(p.dat2)
+#p.dat4<-p.dat2[complete.cases(p.dat2$SL.p), ]
 nrow(p.dat4)
-sl.trt.plot<-cbind(p.dat4,sl.trtm1$Estimate)
+sl.trt.plot<-cbind(p.dat2,sl.trtm1$Estimate)
 sl.trt.plot2<-inner_join(sl.trt.plot,dat)
 
-
+View(sl.trt.plot2)
+p.dat2$habitat<-as.character(as.factor(p.dat2$habitat))
+is.character(p.dat2$habitat)
+is.character(p.dat2$site_code)
 
 par(mfrow=c(3,2))
 with(sl.trt.plot2, plot(continent, sl.trtm1$Estimate))
@@ -206,7 +218,7 @@ with(sl.trt.plot2, plot(habitat, sl.trtm1$Estimate))
 with(sl.trt.plot2, plot(site_code, sl.trtm1$Estimate))
 with(sl.trt.plot2, plot(block, sl.trtm1$Estimate))
 with(sl.trt.plot2, plot(plot, sl.trtm1$Estimate))
-with(sl.trt.plot2, plot(year.y, sl.trtm1$Estimate))
+with(sl.trt.plot2, plot(f.year.y, sl.trtm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
@@ -216,9 +228,15 @@ sl.trt_fitted <- cbind(sl.trt.i$data,
   as_tibble()
 
 View(sl.trt_fitted)
-p.dat5<-distinct(p.dat3,site_code, year.y,year.y.m, SL,SL.p,x.rich)
-sl.trt_fitted2<-inner_join(sl.trt_fitted,p.dat5)
-sl.trt_fitted3<-inner_join(sl.trt_fitted2,dat)
+nrow(sl.trt_fitted)
+p.dat5<-distinct(p.dat2,site_code, year.y,year.y.m, SL,SL.p,x.rich,block,plot,trt.y)
+View(p.dat5)
+nrow(p.dat5)
+sl.trt_fitted2<-full_join(sl.trt_fitted,dat)
+View(dat)
+p.dat5$block<-as.character(as.factor(p.dat5$block))
+p.dat5$trt.y<-as.character(as.factor(p.dat5$trt.y))
+sl.trt_fitted3<-inner_join(sl.trt_fitted2,p.dat5)
 View(sl.trt_fitted3)
 
 sl.trt_fitted3$starting.richness <- ifelse(sl.trt_fitted3$x.rich >= 1 & sl.trt_fitted3$x.rich <= 5, '1-5 species',
@@ -288,13 +306,13 @@ sl.trt_coef2$starting.richness <- ifelse(sl.trt_coef2$r.rich >= 1 & sl.trt_coef2
                                                       ifelse(sl.trt_coef2$r.rich >=21 & sl.trt_coef2$r.rich <=25, '21-25',
                                                              ifelse(sl.trt_coef2$r.rich >=26, '>26', 'other'))))))
 
-dat<-distinct(p.dat3, site_code, continent,habitat)
+dat<-distinct(p.dat2, site_code, continent,habitat)
 
 sl.trt_coef3<-inner_join(sl.trt_coef2,dat)
 View(sl.trt_coef3)
 
 rm(sl.trt.i)
-save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef3,file = 'sl_dat.Rdata')
+save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef3,file = 'sl_dat.new.Rdata')
 load('~/Desktop/Academic/R code/NutNet/sl_dat.Rdata')
 
 
@@ -322,7 +340,7 @@ sl.trt_coef3<-sl.trt_coef3[complete.cases(sl.trt_coef3$starting.richness), ]
 sl.trt_fitted.npk$starting.richness <- factor(sl.trt_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 sl.trt_coef3$starting.richness <- factor(sl.trt_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
-
+View(sl.trt_fitted.npk)
 sl.trtm<-ggplot() +
   # data
   geom_point(data = sl.trt_fitted.npk,
