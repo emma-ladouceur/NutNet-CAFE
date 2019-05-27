@@ -14,7 +14,7 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 
-s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                 data = p.all, cores = 4, chains = 4)
 
 

@@ -13,30 +13,12 @@ p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 
 
-sl.trt.i <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-                data = p.all, family=hurdle_lognormal(),cores = 4, chains = 4)
-
-
-sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-                data = p.all, family=hurdle_lognormal(),cores = 4, chains = 4)
-
 
 CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
                  data = p.all, family=asym_laplace(),cores = 4, chains = 4)
 
 
-s.loss.i <- brm(s.loss.p.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-                data = p.all, cores = 4, chains = 4)
-
-
-s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-                data = p.all, cores = 4, chains = 4)
-
-
-s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-                  data = p.all, family=asym_laplace(),cores = 4, chains = 4)
-
-save(sl.trt.i,sg.trt.i,CDE.trt.i,s.loss.i,s.gain.i,s.change.i,
+save(CDE.trt.i,
      file=Sys.getenv('OFILE'))
 
 
