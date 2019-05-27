@@ -17,8 +17,8 @@ library(foreach)
 
 p <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_introduced/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
-price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input/", pattern = ".rds$")
+price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_new/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
+#price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_new/", pattern = ".rds$")
 
 View(price.list)
 
@@ -29,10 +29,12 @@ price.all <- foreach (file = price.list,.combine=rbind) %do% {
 }
 
 
-write.csv(price.all,"~/Desktop/Academic/Data/NutNet/nutnet_price_combine_introduced.csv")
+write.csv(price.all,"~/Desktop/Academic/Data/NutNet/nutnet_price_combine_new.csv")
 
-price.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_combine_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_combine_new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+
+View(price.all)
 price.all2<-separate(price.all,trt_year,into=c("trt_year.x","trt_year.y"),sep = " ", remove=FALSE)
 price.all3<-separate(price.all2,trt_year.y,into=c("trt.y","year.y"),sep = "_", remove=FALSE)
 price.all4<-separate(price.all3,trt_year.x,into=c("trt.x","year.x"),sep = "_", remove=FALSE)
@@ -42,7 +44,7 @@ View(price.all5)
 nrow(price.all5)
 #88,982 rows
 
-price.reduced<-price.all5[price.all5$trt_year.x %in% c('Control_0','NPK_0'),]
+#price.reduced<-price.all5[price.all5$trt_year.x %in% c('Control_0','NPK_0'),]
 nrow(price.reduced)
 #46,686 rows
 #don't do this ever you fucking moron

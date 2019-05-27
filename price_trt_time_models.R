@@ -17,7 +17,7 @@ p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=
 #shanes links
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/PNutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 View(p.all)
@@ -147,7 +147,23 @@ setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 
 #save(sl.trt.i,sg.trt.i,CDE.trt.i,file = 'price_trt_interact_time.Rdata')
 #emma
+#!!!!!!!!
+#we now call these the old cumulative models 
+#where we compare everything to year 0
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
+
+#!!!!!!!!
+#we call this new progressive
+#where  everything is pruned to be only time
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde.Rdata')
+#models have the same names(oops)
+
+#then next we call these progressive
+#where everything is compared to the year before it instead of year 0
+
+
 #shane
 load('~/Dropbox/NutNet/Model_fits/price_trt_interact_time.Rdata')
 

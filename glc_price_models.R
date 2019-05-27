@@ -100,6 +100,8 @@ s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/
 s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
                 data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
 
+
+#old cumulative models
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 #save(s.loss.i,s.gain.i,file = 'price_trt_i_lg.Rdata')
 #losses and gains
@@ -108,14 +110,19 @@ load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_lg.Rdata')
 #species change
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_schange.Rdata')
 
+
+#cumulative models with time only
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.schange.Rdata')
+
+
      
 summary(s.loss.i)
 
 summary(s.gain.i)
 
 summary(s.change.i)
-
-
 
 
 plot(s.loss.i)
