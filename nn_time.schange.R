@@ -4,7 +4,7 @@ library(brms)
 
 
 path <- '/gpfs1/data/idiv_chase/emmala/NutNet'
-p.all <- read.csv(paste0(path, '/price_time_only.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv(paste0(path, '/progressive_time_only.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 p.all$site_code<-as.factor(p.all$site_code)
@@ -13,10 +13,10 @@ p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 
 
-s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+p.s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                   data = p.all, family=asym_laplace(),cores = 4, chains = 4)
 
-save(s.change.i,
+save(p.s.change.i,
      file=Sys.getenv('OFILE'))
 
 
