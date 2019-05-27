@@ -165,7 +165,9 @@ load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 #we call this new cumulative
 #where  everything is pruned to be only time
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg.Rdata')
+#nn_time.sl-5241651.Rdata removed site.year.id
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl-5241651.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg-5241970.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde.Rdata')
 #models have the same names(oops)
 
@@ -396,20 +398,20 @@ sl.trtm
 
 
 color_scheme_set("purple")
-pp_check(sg.trt)
-pp_check(sg.trt, type = "hist")
+pp_check(sg.trt.i)
+pp_check(sg.trt.i, type = "hist")
 #marginal effects
-marginal_effects(sg.trt, surface = TRUE)
-marginal_smooths(sg.trt)
+marginal_effects(sg.trt.i, surface = TRUE)
+marginal_smooths(sg.trt.i)
 
 
-summary(sg.trt)
+summary(sg.trt.i)
 #residuals
-sg.trtm1<-residuals(sg.trt)
+sg.trtm1<-residuals(sg.trt.i)
 sg.trtm1<-as.data.frame(sg.trtm1)
 nrow(sg.trtm1)
-nrow(p.dat3)
-sg.trt.plot<-cbind(p.dat3,sg.trtm1$Estimate)
+nrow(p.dat2)
+sg.trt.plot<-cbind(p.dat2,sg.trtm1$Estimate)
 sg.trt.plot2<-inner_join(sg.trt.plot,dat)
 
 par(mfrow=c(3,2))
@@ -429,9 +431,9 @@ sg.trt_fitted <- cbind(sg.trt.i$data,
                      fitted(sg.trt.i, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(sg.trt_fitted)
-p.dat4<-distinct(p.dat3,site_code, year.y, year.y.m, SG,x.rich)
+p.dat4<-distinct(p.dat2,site_code, year.y, year.y.m, SG,x.rich)
 sg.trt_fitted2<-inner_join(sg.trt_fitted,dat)
-View(sg.trt_fitted)
+View(sg.trt_fitted2)
 sg.trt_fitted3<-inner_join(sg.trt_fitted2,p.dat4)
 
 sg.trt_fitted3$starting.richness <- ifelse(sg.trt_fitted3$x.rich >= 1 & sg.trt_fitted3$x.rich <= 5, '1-5 species',
