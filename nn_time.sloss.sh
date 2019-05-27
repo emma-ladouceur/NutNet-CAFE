@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#$ -N nn_time.sloss
+#$ -N nn_time_p.sloss
 #$ -S /bin/bash
 #$ -l h_rt=620:00:00
 #$ -l h_vmem=8G
