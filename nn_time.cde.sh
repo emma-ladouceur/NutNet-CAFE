@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#$ -N nn_time_p.cde
+#$ -N nn_time.cde
 #$ -S /bin/bash
 #$ -l h_rt=620:00:00
 #$ -l h_vmem=8G
