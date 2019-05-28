@@ -10,7 +10,7 @@ library(priceTools)
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 #shanes links
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -34,7 +34,7 @@ p.dat2<-p.dat[complete.cases(p.dat), ]
 nrow(p.dat2)
 
 
-p.dat3<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
+#p.dat3<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
 nrow(p.dat3)
 
 View(p.dat3)
@@ -112,10 +112,10 @@ load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_schange.Rdata')
 
 
 #cumulative models with time only
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss-5241975.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain-5241976.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.schange.Rdata')
-
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss-cumulative.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain-cumulative.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.schange-cumulative.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.crich-cumulative.Rdata')
 
      
 summary(s.loss.i)
@@ -123,6 +123,9 @@ summary(s.loss.i)
 summary(s.gain.i)
 
 summary(s.change.i)
+
+summary(c.rich.i)
+
 
 
 plot(s.loss.i)
@@ -146,20 +149,21 @@ s.loss.i_fitted <- cbind(s.loss.i$data,
                        fitted(s.loss.i, re_formula = NA)) %>% 
   as_tibble()
 
-s.loss.i_fitted3
-p.dat5<-distinct(p.dat,site_code, year.y,year.y.m, s.loss.p,s.loss.p.log,x.rich)
-s.loss.i_fitted2<-inner_join(s.loss.i_fitted,dat)
-View(s.loss.i_fitted2)
-s.loss.i_fitted3<-inner_join(s.loss.i_fitted2,p.dat5)
+p.dat3<-p.dat2 %>% 
+  group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m,s.loss.p) %>% 
+  summarise(s.rich = mean(x.rich),
+            r.rich = round(s.rich))
+
+s.loss.i_fitted3<-inner_join(s.loss.i_fitted2,p.dat3)
 View(s.loss.i_fitted3)
 
 
-s.loss.i_fitted3$starting.richness <- ifelse(s.loss.i_fitted3$x.rich >= 1 & s.loss.i_fitted3$x.rich <= 5, '1-5 species',
-                                  ifelse(s.loss.i_fitted3$x.rich >=6 & s.loss.i_fitted3$x.rich <=10, '6-10',
-                                         ifelse(s.loss.i_fitted3$x.rich >=11 & s.loss.i_fitted3$x.rich <=15, '11-15',    
-                                                ifelse(s.loss.i_fitted3$x.rich >=16 & s.loss.i_fitted3$x.rich <=20, '16-20',
-                                                       ifelse(s.loss.i_fitted3$x.rich >=21 & s.loss.i_fitted3$x.rich <=25, '21-25',
-                                                              ifelse(s.loss.i_fitted3$x.rich >=26, '>26', 'other'))))))
+s.loss.i_fitted3$starting.richness <- ifelse(s.loss.i_fitted3$r.rich >= 1 & s.loss.i_fitted3$r.rich <= 5, '1-5 species',
+                                  ifelse(s.loss.i_fitted3$r.rich >=6 & s.loss.i_fitted3$r.rich <=10, '6-10',
+                                         ifelse(s.loss.i_fitted3$r.rich >=11 & s.loss.i_fitted3$r.rich <=15, '11-15',    
+                                                ifelse(s.loss.i_fitted3$r.rich >=16 & s.loss.i_fitted3$r.rich <=20, '16-20',
+                                                       ifelse(s.loss.i_fitted3$r.rich >=21 & s.loss.i_fitted3$r.rich <=25, '21-25',
+                                                              ifelse(s.loss.i_fitted3$r.rich >=26, '>26', 'other'))))))
 
 
 s.loss.i_fitted.npk<-s.loss.i_fitted3[s.loss.i_fitted3$trt.y %in% c('NPK'),]
@@ -246,6 +250,7 @@ reverselog_trans <- function(base = exp(1)) {
 }
 
 View(s.loss.i_fitted3)
+s.loss.i_coef3$xs<-1
 s.loss.im<-ggplot() +
   # data
   geom_point(data = s.loss.i_fitted.npk,
@@ -257,7 +262,7 @@ s.loss.im<-ggplot() +
   #                 colour = starting.richness), height=0.45,width = 0.45)+
   # experiment (random) effects
   geom_segment(data = s.loss.i_coef3,
-               aes(x = xmin, 
+               aes(x = xs, 
                    xend = xmax,
                    y = exp(Intercept + TE + (ISlope+TESlope) *  cxmin),
                    yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
@@ -280,6 +285,7 @@ s.loss.im<-ggplot() +
             aes(x = year.y, y = exp(Estimate)),
             size = 1.5, linetype= "dashed") +
   scale_y_continuous(trans = reverselog_trans(), breaks=c(1,2,4,6,8,16,24) ) +
+  scale_x_continuous(breaks=c(1,3,6,9,11)) +
   labs(x = 'Years',
        y = expression(paste('Plot Species Loss')), title= 'a) Species Loss') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
@@ -323,18 +329,21 @@ s.gain.i_fitted <- cbind(s.gain.i$data,
   as_tibble() 
 as.data.frame(s.gain.i_fitted)
 s.gain.i_fitted
-p.dat4<-distinct(p.dat,site_code, year.y, year.y.m, s.gain,s.gain.log,x.rich)
-s.gain.i_fitted2<-inner_join(s.gain.i_fitted,dat)
-s.gain.i_fitted3<-inner_join(s.gain.i_fitted2,p.dat4)
+p.dat3<-p.dat2 %>% 
+  group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m,s.gain) %>% 
+  summarise(s.rich = mean(x.rich),
+            r.rich = round(s.rich))
+
+s.gain.i_fitted3<-inner_join(s.gain.i_fitted2,p.dat3)
 
 View(s.gain.i_fitted3)
 
-s.gain.i_fitted3$starting.richness <- ifelse(s.gain.i_fitted3$x.rich >= 1 & s.gain.i_fitted3$x.rich <= 5, '1-5 species',
-                                    ifelse(s.gain.i_fitted3$x.rich >=6 & s.gain.i_fitted3$x.rich <=10, '6-10',
-                                           ifelse(s.gain.i_fitted3$x.rich >=11 & s.gain.i_fitted3$x.rich <=15, '11-15',    
-                                                  ifelse(s.gain.i_fitted3$x.rich >=16 & s.gain.i_fitted3$x.rich <=20, '16-20',
-                                                         ifelse(s.gain.i_fitted3$x.rich >=21 & s.gain.i_fitted3$x.rich <=25, '21-25',
-                                                                ifelse(s.gain.i_fitted3$x.rich >=26, '>26', 'other'))))))
+s.gain.i_fitted3$starting.richness <- ifelse(s.gain.i_fitted3$r.rich >= 1 & s.gain.i_fitted3$r.rich <= 5, '1-5 species',
+                                    ifelse(s.gain.i_fitted3$r.rich >=6 & s.gain.i_fitted3$r.rich <=10, '6-10',
+                                           ifelse(s.gain.i_fitted3$r.rich >=11 & s.gain.i_fitted3$r.rich <=15, '11-15',    
+                                                  ifelse(s.gain.i_fitted3$r.rich >=16 & s.gain.i_fitted3$r.rich <=20, '16-20',
+                                                         ifelse(s.gain.i_fitted3$r.rich >=21 & s.gain.i_fitted3$r.rich <=25, '21-25',
+                                                                ifelse(s.gain.i_fitted3$r.rich >=26, '>26', 'other'))))))
 
 
 
@@ -416,7 +425,7 @@ s.gain.i_fitted.npk$starting.richness <- factor(s.gain.i_fitted.npk$starting.ric
 s.gain.i_coef3$starting.richness <- factor(s.gain.i_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 
-
+s.gain.i_coef3$xs<-1
 #gai
 s.gain.im<-ggplot() +
   # data
@@ -429,7 +438,7 @@ s.gain.im<-ggplot() +
   #                 colour = starting.richness), height=0.45,width = 0.45)+
   # experiment (random) effects
   geom_segment(data = s.gain.i_coef3,
-               aes(x = xmin, 
+               aes(x = xs, 
                    xend = xmax,
                    y = exp(Intercept + TE + (ISlope+TESlope) * cxmin),
                    yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
@@ -452,6 +461,7 @@ s.gain.im<-ggplot() +
             aes(x = year.y, y = exp(Estimate)),
             size = 1.5, linetype= "dashed") +
   scale_y_continuous(trans = 'log' , breaks=c(1,2,4,6,8,16,24)  ) +
+  scale_x_continuous(breaks=c(1,3,6,9,11)) +
   labs(x = 'Years',
        y = expression(paste('Plot Species Gain')), title= 'c) Species Gain') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
@@ -592,6 +602,7 @@ sign_sqrt <- scales::trans_new('sign_sqrt',
 
 View(s.change.i_fitted.npk)
 View(s.change.i_coef3)
+s.change.trt.i_coef3$xs<-1
 #s.change.i
 s.change.im<-ggplot() +
   # data

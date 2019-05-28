@@ -12,7 +12,7 @@ p.all$site.year.id<-as.factor(p.all$site.year.id)
 p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 
-p.dat2$c.rich.log<-log1p(p.dat2$c.rich)
+p.all$c.rich.log<-log1p(p.all$c.rich)
 
 c.rich.i <- brm(c.rich.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                   data = p.all,cores = 4, chains = 4)
