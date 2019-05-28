@@ -13,7 +13,7 @@ library(priceTools)
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/progressive_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 #p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
@@ -166,9 +166,9 @@ load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 #where  everything is pruned to be only time
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl.Rdata')
 #nn_time.sl-5241651.Rdata removed site.year.id
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl-5241651.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg-5241970.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl-cumulative.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg-cumulative.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde-cumulative.Rdata')
 #models have the same names(oops)
 
 #then next we call these progressive
@@ -611,12 +611,12 @@ marginal_smooths(CDE.trt)
 
 
 #residuals
-cm1<-residuals(CDE.trt)
+cm1<-residuals(CDE.trt.i)
 cm1<-as.data.frame(cm1)
 nrow(cm1)
-nrow(p.dat3)
-p.dat4<-p.dat3[complete.cases(p.dat3$CDE), ]
-cde.plot<-cbind(p.dat3,cm1$Estimate)
+nrow(p.dat2)
+#p.dat4<-p.dat3[complete.cases(p.dat3$CDE), ]
+cde.plot<-cbind(p.dat2,cm1$Estimate)
 cde.plot2<-inner_join(cde.plot,dat)
 
 par(mfrow=c(3,2))
@@ -636,7 +636,7 @@ cde_fitted <- cbind(CDE.trt.i$data,
   as_tibble() 
 as.data.frame(cde_fitted)
 View(cde_fitted)
-p.dat4<-distinct(p.dat3,site_code,continent,x.rich,year.y,year.y.m, CDE)
+p.dat4<-distinct(p.dat2,site_code,continent,x.rich,year.y,year.y.m, CDE)
 View(dat)
 cde_fitted2<-full_join(cde_fitted,dat)
 cde_fitted3<-full_join(cde_fitted2,p.dat4)

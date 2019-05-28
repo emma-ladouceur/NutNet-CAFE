@@ -10,7 +10,7 @@ library(priceTools)
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 #shanes links
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -112,8 +112,8 @@ load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_schange.Rdata')
 
 
 #cumulative models with time only
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss-5241975.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain-5241976.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.schange.Rdata')
 
 
@@ -138,7 +138,7 @@ pp_check(s.gain.i)
 
 pp_check(s.change.i)
 
-dat<-distinct(p.dat3, site_code, continent,habitat)
+dat<-distinct(p.dat, site_code, continent,habitat)
 
 
 s.loss.i_fitted <- cbind(s.loss.i$data,
@@ -146,11 +146,12 @@ s.loss.i_fitted <- cbind(s.loss.i$data,
                        fitted(s.loss.i, re_formula = NA)) %>% 
   as_tibble()
 
-s.loss.i_fitted
-p.dat5<-distinct(p.dat3,site_code, year.y,year.y.m, s.loss.p,s.loss.p.log,x.rich)
+s.loss.i_fitted3
+p.dat5<-distinct(p.dat,site_code, year.y,year.y.m, s.loss.p,s.loss.p.log,x.rich)
 s.loss.i_fitted2<-inner_join(s.loss.i_fitted,dat)
+View(s.loss.i_fitted2)
 s.loss.i_fitted3<-inner_join(s.loss.i_fitted2,p.dat5)
-
+View(s.loss.i_fitted3)
 
 
 s.loss.i_fitted3$starting.richness <- ifelse(s.loss.i_fitted3$x.rich >= 1 & s.loss.i_fitted3$x.rich <= 5, '1-5 species',
@@ -301,8 +302,8 @@ s.loss.im
 s.gain.im1<-residuals(s.gain.i)
 s.gain.im1<-as.data.frame(s.gain.im1)
 nrow(s.gain.im1)
-nrow(p.dat3)
-s.gain.i.plot<-cbind(p.dat3,s.gain.im1$Estimate)
+nrow(p.dat)
+s.gain.i.plot<-cbind(p.dat,s.gain.im1$Estimate)
 s.gain.i.plot2<-inner_join(s.gain.i.plot,dat)
 
 par(mfrow=c(3,2))
@@ -322,7 +323,7 @@ s.gain.i_fitted <- cbind(s.gain.i$data,
   as_tibble() 
 as.data.frame(s.gain.i_fitted)
 s.gain.i_fitted
-p.dat4<-distinct(p.dat3,site_code, year.y, year.y.m, s.gain,s.gain.log,x.rich)
+p.dat4<-distinct(p.dat,site_code, year.y, year.y.m, s.gain,s.gain.log,x.rich)
 s.gain.i_fitted2<-inner_join(s.gain.i_fitted,dat)
 s.gain.i_fitted3<-inner_join(s.gain.i_fitted2,p.dat4)
 
