@@ -70,201 +70,143 @@ is.numeric(price.r$SL)
 
 write.csv(price.r,"~/Desktop/Academic/Data/NutNet/nutnet_price_all2.csv")
 
-p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.native <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_native.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.int <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_introduced.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-??priceTools
 
-is.numeric(p.all$year.y)
+#progressive
+price.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-summary(p.all)
+
+View(price.all)
+price.all2<-separate(price.all,trt_year,into=c("trt_year.x","trt_year.y"),sep = " ", remove=FALSE)
+price.all3<-separate(price.all2,trt_year.y,into=c("trt.y","year.y"),sep = "_", remove=FALSE)
+price.all4<-separate(price.all3,trt_year.x,into=c("trt.x","year.x"),sep = "_", remove=FALSE)
+price.all5<-separate(price.all4,site.year.id,into=c("site.year.id.x","site.year.id.y"),sep = " ", remove=FALSE)
+price.all6<-unite_(price.all5, "trt.xy", c("trt.x","trt.y"), remove=FALSE)
+price.all7<-unite_(price.all6, "year.xy", c("year.x","year.y"), remove=FALSE)
+
+View(price.all7)
+nrow(price.all7)
+#84,546 rows
+
+price.reduced<-price.all7[price.all7$trt.xy %in% c('Control_Control','NPK_NPK'),]
+price.reduced2<-price.reduced[price.reduced$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
+price.reduced2$year.xy<-as.factor(price.reduced2$year.xy)
+levels(price.reduced2$year.xy)
+price.reduced3<-price.reduced2[price.reduced2$year.xy %in% c('0_1','1_2','2_3','3_4','4_5','5_6','6_7','7_8','8_9','9_10','10_11'),]
+View(price.reduced3)
+nrow(price.reduced3)
+#3801
+
+View(price.reduced3)
+price.reduced3$unique.id<-as.character(with(price.reduced3, paste(site.year.id,trt_year,block,plot, sep=".")))
+
+#remove duplicates
+#price.reduced2$unique.id[duplicated(price.reduced2)]
+price.r<-price.reduced %>% distinct(unique.id, .keep_all = TRUE)
+nrow(price.r)
+#8,646
+
+View(price.r)
+
+price.r$year.y<-as.numeric(price.r$year.y)
+is.numeric(price.r$year.y)
+is.numeric(price.r$SL)
+
+write.csv(price.reduced3,"~/Desktop/Academic/Data/NutNet/nutnet_progressive_time_only.csv")
+
+p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_progressive_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 View(p.all)
-colnames(p.all)
-levels(p.all$trt.x)
 
-t.ctl<-p.all[p.all$trt_year %in% c('Control_0 NPK_0'),]
+p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
 
-t.ctl2<-t.ctl[complete.cases(t.ctl), ]
-View(t.ctl)
+p.all$f.year.y<-as.factor(p.all$year.y)
+p.all$plot<-as.factor(p.all$plot)
+p.all$site_code<-as.factor(p.all$site_code)
 
-ctl<-p.all[p.all$trt.x %in% c('Control'),]
-ctl2<-ctl[ctl$trt.y %in% c('Control'),]
-ctl3<-ctl2[complete.cases(ctl2), ]
-View(ctl3)
-npk<-p.all[p.all$trt.x %in% c('NPK'),]
-npk2<-npk[npk$trt.y %in% c('NPK'),]
-nrow(npk2)
+dat<-distinct(plot, site_code, continent,habitat)
+p.dat2<-inner_join(p.all,dat)
 
-npk3<-npk2[complete.cases(npk2), ]
-nrow(npk3)
+p.dat2$year.y.m<-p.dat2$year.y-mean(p.dat2$year.y)
 
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-leap.zig(b.dat.all,type='cafe',xlim=c(0,15),ylim=c(0,700),standardize = FALSE,raw.points = FALSE)+ 
-  annotate("text", x = mean(b.dat.all$x.rich), y = mean(b.dat.all$x.func), 
-           label = "*",size=8)+ggtitle('Across Time')+theme_classic()
+p.dat2$SL.p<-abs(p.dat2$SL)
+p.dat2$SL.p.log1<-log1p(p.dat2$SL.p)
+
+is.numeric(p.dat2$SG)
+
+p.dat2$SG.log1<-log1p(p.dat2$SG)
+p.dat2$CDE.log<-log1p(p.dat2$CDE)
 
 
-hist(npk3$SL)
-hist(npk3$SG)
-hist(npk3$CDE)
-View(npk3)
+p.dat2$s.loss <- -1*(p.dat2$x.rich - p.dat2$c.rich)
+p.dat2$s.gain <- p.dat2$y.rich - p.dat2$c.rich
+p.dat2$s.change <- p.dat2$y.rich - p.dat2$x.rich
 
-b.dat.all<-bind_rows(npk3,t.ctl2)
-is.numeric(b.dat.all$year.y)
-View(b.dat.all)
-
-#price models
-#all
-SL.m <- brm(SL ~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-                   data = npk3, cores = 4, chains = 4)
+p.dat2$s.loss.p<-abs(p.dat2$s.loss)
+p.dat2$s.loss.p.log <- log1p(abs(p.dat2$s.loss.p))
+p.dat2$s.gain.log<-log1p(p.dat2$s.gain)
 
 
-SG.m <- brm(SG ~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-            data = npk3, cores = 4, chains = 4)
+#histograms of sl & sg
+par(mfrow=c(2,3))
+hist(p.dat2$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
+hist(p.dat2$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
+hist(p.dat2$CDE, breaks=40, main="CDE", xlab= "CDE")
 
-
-CDE.m <- brm(CDE ~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-            data = b.dat.all, cores = 4, chains = 4)
-
-
-#native
-SL.n.m <- brm(SL~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-            data = p.native, cores = 4, chains = 4)
-
-
-SG.n.m <- brm(SG~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-            data = p.native, cores = 4, chains = 4)
-
-
-CDE.n.m <- brm(CDE~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-             data = p.native, cores = 4, chains = 4)
-
-
-#introduced
-SL.i.m <- brm(SL~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-              data = p.introduced, cores = 4, chains = 4)
-
-
-SG.i.m <- brm(SG~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-              data = p.introduced, cores = 4, chains = 4)
-
-
-CDE.i.m <- brm(CDE~  year.y + (year.y | site.year.id/block/plot/site.year.id.y), 
-               data = p.introduced, cores = 4, chains = 4)
-
-setwd('~/Dropbox/Projects/NutNet/Model_fits/')
-save(SL.m,SG.m,CDE.m,file = 'price.all.Rdata')
-#save(SL.n.m,SG.n.m,CDE.n.m,file = 'price.native.Rdata')
-#save(SL.i.m,SG.i.m,CDE.i.m,file = 'price.introduced.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/price.all.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/price.native.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/price.introduced.Rdata')
+hist(p.dat2$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
+hist(p.dat2$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
+hist(p.dat2$CDE.log, breaks=40, main="CDE log + 1", xlab= "CDE log + 1")
 
 
 
-summary(CDE.m)
-hist(m1$Estimate)
+par(mfrow=c(2,3))
+hist(p.dat2$s.loss.p,breaks =10, main="Species Loss", xlab= "Species Loss")
+hist(p.dat2$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
+hist(p.dat2$s.change, breaks=10, main="Species Change", xlab= "Species Change")
+hist(p.dat2$s.loss.p.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
+hist(p.dat2$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
+hist(p.dat2$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Species Change")
 
 
-# inspection of chain diagnostic
-plot(CDE.m)# looks ok
+View(p.dat2)
+write.csv(p.dat2,"~/Dropbox/Projects/NutNet/Data/progressive_time_only.csv")
 
 
-# predicted values vs observed: not great, but not too bad (there is a skew-normal distribution
-# that is in the brms package - I will see if that improves this later)
-pp_check(CDE.m)
 
-#residuals
-m1<-residuals(CDE.m)
-m1<-as.data.frame(m1)
-nrow(m1)
-nrow(plot)
-rr.plot<-cbind(plot,m1$Estimate)
-View(rr.plot)
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/progressive_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-head(rr.plot)
-par(mfrow=c(3,2))
-with(rr.plot, plot(continent, m1$Estimate))
-with(rr.plot, plot(habitat, m1$Estimate))
-with(rr.plot, plot(site.year.id, m1$Estimate))
-with(rr.plot, plot(block, m1$Estimate))
-with(rr.plot, plot(plot, m1$Estimate))
+p.all2<-separate(p.all,plot,into=c("plot.x","plot.y"),sep = " ", remove=FALSE)
+p.all2$plot.x<-as.factor(p.all2$plot.x)
+p.all2$plot.y<-as.factor(p.all2$plot.y)
+levels(p.all2$plot.x)
+levels(p.all2$plot.y)
+p.all2$plot.x<-as.numeric(p.all2$plot.x)
+p.all2$plot.y<-as.numeric(p.all2$plot.y)
+summary(p.all2)
+
+#because some projects have multiple replicates within block must also filter by plot
+p.all3<-p.all2[p.all2$plot %in% c('1 1','2 2','3 3','4 4','5 5','6 6','7 7','8 8','9 9','10 10','11 11','12 12','13 13','14 14','15 15','16 16','17 17','18 18','19 19','20 20','21 21','22 22','23 23','24 24','25 25','26 26','27 27','28 28','29 29','30 30','31 31','32 32','33 33','34 34','35 35','36 36','37 37','38 38','39 39','40 40','41 41','42 42','43 43','44 44','45 45','46 46','47 47','48 48','49 49','50 50','51 51','52 52','53 53'),]
+p.all3$plot<-as.factor(p.all3$plot)
+levels(p.all3$plot)
+
+write.csv(p.all3,"~/Dropbox/Projects/NutNet/Data/progressive_time_only2.csv")
 
 
-# #------plot richness model all sp----------------
-# fixed effects
-sl.fitted <- cbind(CDE.m$data,
-                          # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(CDE.m, re_formula = NA)) %>% 
-  as_tibble() 
 
-# fixed effect coefficients (I want these for the coefficient plot)
-sl_fixef <- fixef(CDE.m)
-View(sl_fixef)
-# coefficients for experiment-level (random) effects
-sl_coef <- coef(CDE.m)
-View(sl_coef)
-sl_coef<-as.data.frame(sl_coef$site.year.id)
-sl_coef2 <-  bind_cols(sl_coef$site.year.id[,,'Intercept'] %>% 
-                                as_tibble() %>% 
-                                mutate(Intercept = Estimate,
-                                       Intercept_lower = Q2.5,
-                                       Intercept_upper = Q97.5,
-                                       site.year.id = rownames(sl_coef$site.year.id[,,'Intercept'])) %>% 
-                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                              sl_coef$site.year.id[,,'year.y'] %>% 
-                                as_tibble() %>% 
-                                mutate(Slope = Estimate,
-                                       Slope_lower = Q2.5,
-                                       Slope_upper = Q97.5) %>% 
-                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
-  # join with min and max of the x-values
-  inner_join(p.all %>% 
-               group_by(site.year.id) %>% 
-               summarise(xmin = min(year.y),
-                         xmax = max(year.y)),
-             by = 'site.year.id')
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all2<-separate(p.all,plot,into=c("plot.x","plot.y"),sep = " ", remove=FALSE)
+p.all2$plot.x<-as.factor(p.all2$plot.x)
+p.all2$plot.y<-as.factor(p.all2$plot.y)
+levels(p.all2$plot.x)
+levels(p.all2$plot.y)
+p.all2$plot.x<-as.numeric(p.all2$plot.x)
+p.all2$plot.y<-as.numeric(p.all2$plot.y)
+summary(p.all2)
 
-View(sl_coef2)
-View(plot)
-View(sl.fitted)
-colnames(dat)
-dat<-distinct(p, site.year.id, continent,habitat)
-View(dat)
+#because some projects have multiple replicates within block must also filter by plot
+p.all3<-p.all2[p.all2$plot %in% c('1 1','2 2','3 3','4 4','5 5','6 6','7 7','8 8','9 9','10 10','11 11','12 12','13 13','14 14','15 15','16 16','17 17','18 18','19 19','20 20','21 21','22 22','23 23','24 24','25 25','26 26','27 27','28 28','29 29','30 30','31 31','32 32','33 33','34 34','35 35','36 36','37 37','38 38','39 39','40 40','41 41','42 42','43 43','44 44','45 45','46 46','47 47','48 48','49 49','50 50','51 51','52 52','53 53'),]
+p.all3$plot<-as.factor(p.all3$plot)
+levels(p.all3$plot)
 
-sl_coef3<-full_join(sl_coef2,dat)
-View(sl_coef3)
-sl.fitted2<-full_join(sl.fitted,dat)
-View(sl.fitted2)
+write.csv(p.all3,"~/Dropbox/Projects/NutNet/Data/cumulative_time_only.csv")
 
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-r1<-ggplot() +
-  # data
-  geom_point(data = sl.fitted2,
-             aes(x = year.y , y = SL,
-                 colour = continent, alpha=0.5),
-             size = 1.2) +
-  geom_jitter(data=sl.fitted2,
-              aes(x = year.y, y = SL,
-                  colour = continent), height=0.45,width = 0.45)+
-  # experiment (random) effects
-  geom_segment(data = sl_coef3,
-               aes(x = xmin, 
-                   xend = xmax,
-                   y = Intercept + Slope * xmin,
-                   yend = Intercept + Slope * xmax,
-                   group = site.year.id,
-                   colour = continent),
-               size = .7) +
-  # uncertainy in fixed effect
-  geom_ribbon(data = sl.fitted,
-              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.3) +
-  # fixed effect
-  geom_line(data = sl.fitted,
-            aes(x = year.y, y = Estimate),
-            size = 1.5) +
-  labs(x = 'Years',
-       y = 'Species richness', title= 'a) Plot Richness') +
-  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
-  theme_bw()#+ theme(legend.position="bottom")
+
+

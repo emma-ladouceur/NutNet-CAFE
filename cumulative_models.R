@@ -115,31 +115,31 @@ write.csv(p.dat2,"~/Desktop/price_time_only.csv")
 #samp<-p.dat5[p.dat5$site_code %in% c('arch.us','azi.cn'),]
 
 colnames(p.dat5) 
-
-sl.trt <- brm(SL.p ~  trt.y * year.y.m + ( year.y.m |  site_code/site.year.id), 
-            data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
-
-#, control = list(adapt_delta = 0.999, max_treedepth = 15))
-
-sg.trt <- brm(SG ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-            data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
-
-
-CDE.trt <- brm(CDE ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-             data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
-
-#treat interaction
-sl.trt.i <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-              data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
-
-#, control = list(adapt_delta = 0.999, max_treedepth = 15)
-
-sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-              data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
-
-
-CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-               data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
+# 
+# sl.trt <- brm(SL.p ~  trt.y * year.y.m + ( year.y.m |  site_code/site.year.id), 
+#             data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
+# 
+# #, control = list(adapt_delta = 0.999, max_treedepth = 15))
+# 
+# sg.trt <- brm(SG ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
+#             data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
+# 
+# 
+# CDE.trt <- brm(CDE ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
+#              data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
+# 
+# #treat interaction
+# sl.trt.i <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+#               data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
+# 
+# #, control = list(adapt_delta = 0.999, max_treedepth = 15)
+# 
+# sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+#               data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
+# 
+# 
+# CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+#                data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
 
 
 summary(CDE.trt.i)
@@ -162,21 +162,20 @@ setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 
 #!!!!!!!!
-#we call this new cumulative
-#where  everything is pruned to be only time
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl.Rdata')
-#nn_time.sl-5241651.Rdata removed site.year.id
+#we call this new cumulative models
+#where  everything is pruned to be only time#random effects are site/block/plot
+#model objects are much smaller
+#not sure theres any purpose for a non independent random variable anymore
+#but to discuss
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl-cumulative.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg-cumulative.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde-cumulative.Rdata')
-#models have the same names(oops)
-
-#then next we call these progressive
-#where everything is compared to the year before it instead of year 0
 
 
 #shane
-load('~/Dropbox/NutNet/Model_fits/price_trt_interact_time.Rdata')
+load('~/Dropbox/NutNet/Model_fits/nn_time.sl-cumulative.Rdata')
+load('~/Dropbox/NutNet/Model_fits/nn_time.sg-cumulative.Rdata')
+load('~/Dropbox/NutNet/Model_fits/nn_time.cde-cumulative.Rdata')
 
 summary(CDE.trt.i)
 
@@ -343,6 +342,8 @@ sl.trt_fitted.npk$starting.richness <- factor(sl.trt_fitted.npk$starting.richnes
 sl.trt_coef3$starting.richness <- factor(sl.trt_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 View(sl.trt_fitted.npk)
+View(sl.trt_coef3)
+
 sl.trtm<-ggplot() +
   # data
   geom_point(data = sl.trt_fitted.npk,

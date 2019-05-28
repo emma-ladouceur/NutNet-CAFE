@@ -266,6 +266,8 @@ p.sl.trt_fitted.npk$starting.richness <- factor(p.sl.trt_fitted.npk$starting.ric
 p.sl.trt_coef3$starting.richness <- factor(p.sl.trt_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 View(p.sl.trt_fitted.npk)
+View(p.sl.trt_coef3)
+
 p.sl.trtm<-ggplot() +
   # data
   geom_point(data = p.sl.trt_fitted.npk,
