@@ -14,8 +14,8 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 
-s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                data = p.all, cores = 4, chains = 4)
+s.gain.i <- brm(s.gain ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                data = p.all, family=hurdle_lognormal(),cores = 4, chains = 4)
 
 
 save(s.gain.i,

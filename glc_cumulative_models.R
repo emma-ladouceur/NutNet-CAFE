@@ -388,7 +388,7 @@ s.gain.i_coef2 <-  bind_cols(s.gain.i_coef$site_code[,,'Intercept'] %>%
                                       TESlope_upper = Q97.5) %>% 
                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat3 %>% 
+  inner_join(p.dat32 %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
@@ -530,10 +530,26 @@ s.change.i_fitted <- cbind(s.change.i$data,
 as.data.frame(s.change.i_fitted)
 
 View(s.change.i_fitted)
+p.dat3<-p.dat2 %>% 
+  group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
+  summarise(s.rich = mean(x.rich),
+            r.rich = round(s.rich))
 
-p.dat4<-distinct(p.dat3,site_code, year.y, continent,s.change)
-#s.change.i_fitted2<-inner_join(s.change.i_fitted,p.all5,  by = c('site_code', 'year.y'))
+s.change.i_fitted3<-inner_join(s.change.i_fitted,p.dat3)
 
+View(s.change.i_fitted3)
+
+s.change.i_fitted3$starting.richness <- ifelse(s.change.i_fitted3$r.rich >= 1 & s.change.i_fitted3$r.rich <= 5, '1-5 species',
+                                             ifelse(s.change.i_fitted3$r.rich >=6 & s.change.i_fitted3$r.rich <=10, '6-10',
+                                                    ifelse(s.change.i_fitted3$r.rich >=11 & s.change.i_fitted3$r.rich <=15, '11-15',    
+                                                           ifelse(s.change.i_fitted3$r.rich >=16 & s.change.i_fitted3$r.rich <=20, '16-20',
+                                                                  ifelse(s.change.i_fitted3$r.rich >=21 & s.change.i_fitted3$r.rich <=25, '21-25',
+                                                                         ifelse(s.change.i_fitted3$r.rich >=26, '>26', 'other'))))))
+
+
+
+s.change.i_fitted.npk<-s.change.i_fitted3[s.change.i_fitted3$trt.y %in% c('NPK'),]
+s.change.i_fitted.ctl<-s.change.i_fitted3[s.change.i_fitted3$trt.y %in% c('Control'),]
 
 # fixed effect coefficients (I want these for the coefficient plot)
 s.change.i_fixef <- fixef(s.change.i)
@@ -568,15 +584,23 @@ s.change.i_coef2 <-  bind_cols(s.change.i_coef$site_code[,,'Intercept'] %>%
                                       TESlope_upper = Q97.5) %>% 
                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat3 %>% 
+  inner_join(p.dat2 %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
-                         cxmax = max(year.y.m)),
+                         cxmax = max(year.y.m),
+                         s.rich = mean(x.rich),
+                         r.rich = round(s.rich)),
              by = 'site_code')
 
 
+s.change.i_coef2$starting.richness <- ifelse(s.change.i_coef2$r.rich >= 1 & s.change.i_coef2$r.rich <= 5, '1-5 species',
+                                           ifelse(s.change.i_coef2$r.rich >=6 & s.change.i_coef2$r.rich <=10, '6-10',
+                                                  ifelse(s.change.i_coef2$r.rich >=11 & s.change.i_coef2$r.rich <=15, '11-15',    
+                                                         ifelse(s.change.i_coef2$r.rich >=16 & s.change.i_coef2$r.rich <=20, '16-20',
+                                                                ifelse(s.change.i_coef2$r.rich >=21 & s.change.i_coef2$r.rich <=25, '21-25',
+                                                                       ifelse(s.change.i_coef2$r.rich >=26, '>26', 'other'))))))
 
 View(s.change.i_coef2)
 
@@ -584,11 +608,8 @@ View(s.change.i_fitted)
 
 
 s.change.i_coef3<-full_join(s.change.i_coef2,dat)
-s.change.i_fitted2<-full_join(s.change.i_fitted,dat)
-s.change.i_fitted3<-full_join(s.change.i_fitted2,dat2)
 
-s.change.i_fitted.npk<-s.change.i_fitted3[s.change.i_fitted3$trt.y %in% c('NPK'),]
-s.change.i_fitted.ctl<-s.change.i_fitted3[s.change.i_fitted3$trt.y %in% c('Control'),]
+
 
 rm(s.change.i)
 save(s.change.i_fitted.npk,s.change.i_fitted.ctl,s.change.i_coef3,file = 's.change_dat.Rdata')
@@ -600,56 +621,66 @@ sign_sqrt <- scales::trans_new('sign_sqrt',
                                inverse = function(x){sign(x) * abs(x)^2})
 
 
-View(s.change.i_fitted.npk)
-View(s.change.i_coef3)
-s.change.trt.i_coef3$xs<-1
+#s.change.i_fitted.npk<-s.change.i_fitted.npk[complete.cases(s.change.i_fitted.npk$starting.richness), ]
+#s.change.i_coef3<-s.change.i_coef3[complete.cases(s.change.i_coef3$starting.richness), ]
+
+s.change.i_fitted.npk$starting.richness <- factor(s.change.i_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+s.change.i_coef3$starting.richness <- factor(s.change.i_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+
+
+s.change.i_coef3$xs<-1
+
+summary(s.change.i)
 #s.change.i
 s.change.im<-ggplot() +
   # data
   geom_point(data = s.change.i_fitted.npk,
              aes(x = year.y, y = s.change,
-                 colour = continent, alpha=0.2),
-             size = 1.2) +
-  geom_jitter(data=s.change.i_fitted.npk,
-              aes(x = year.y, y = s.change,
-                  colour = continent), height=0.25,width = 0.25)+
-  #experiment (random) effects
+                 colour = starting.richness, alpha=0.1),
+             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+  # geom_jitter(data=s.change.i_fitted.npk,
+  #             aes(x = year.y, y = s.gain,
+  #                 colour = starting.richness), height=0.45,width = 0.45)+
+  # experiment (random) effects
   geom_segment(data = s.change.i_coef3,
-               aes(x = xmin, 
+               aes(x = xs, 
                    xend = xmax,
                    y = (Intercept + TE + (ISlope+TESlope) * cxmin),
-                   yend = (Intercept + TE + (ISlope+TESlope) * cxmax),
+                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                    group = site_code,
-                   colour = continent),
+                   colour = starting.richness),
                size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = s.change.i_fitted.npk,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
   geom_line(data = s.change.i_fitted.npk,
             aes(x = year.y, y = Estimate),
             size = 1.5) +
   geom_ribbon(data = s.change.i_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.3) +
+              alpha = 0.5) +
   # fixed effect
-  geom_line(data = s.change.i_fitted.ctl,
+  geom_line(data =  s.change.i_fitted.ctl,
             aes(x = year.y, y = Estimate),
-            size = 1.5,linetype="dashed") +
-  scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
-  ) +
+            size = 1.5, linetype= "dashed") +
+  # scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
+  # ) +
+  scale_x_continuous(breaks=c(1,3,6,9,11)) +
   labs(x = 'Years',
-       y = expression(paste('Species Change')), title= 'c) Species Change') +
-  #scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
-  #scale_colour_manual(values = c("#E5BA3AFF", "#75B41EFF","#5AC2F1FF","#0C5BB0FF","#972C8DFF","#E0363AFF" ))+
-  scale_colour_manual(values = c("#972C8DFF","#E0363AFF","#75B41EFF","#E5BA3AFF" ,"#5AC2F1FF","#0C5BB0FF"))+
-  theme_bw()+ theme(legend.position="bottom")
+       y = expression(paste('Plot Species Gain')), title= 'a) Richness Change') +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
 
 s.change.im
 
-
-grid_arrange_shared_legend(s.loss.im,s.gain.im,s.change.im,nrow=1)
+grid_arrange_shared_legend(s.change.im,c.rich.im,nrow=1)
 
 
 
