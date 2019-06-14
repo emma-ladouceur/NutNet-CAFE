@@ -12,9 +12,10 @@ sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 #shanes links
+
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/PNutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/NutNet/Data/cumulative_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 View(p.all)
@@ -34,90 +35,70 @@ p.dat2<-p.dat[complete.cases(p.dat), ]
 nrow(p.dat2)
 
 
-#p.dat3<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
-nrow(p.dat3)
-
-View(p.dat3)
-
-colnames(p.dat3)
-head(p.dat3)
-summary(p.dat3)
-View(p.dat3)
-
-#write.csv(p.all4,"~/Desktop/pricel.csv")
-
-p.dat3$year.y.m<-p.dat3$year.y-mean(p.dat3$year.y)
-
+colnames(p.dat2)
 # s loss, gain and change metrics
-p.dat3$s.loss <- -1*(p.dat3$x.rich - p.dat3$c.rich)
-p.dat3$s.gain <- p.dat3$y.rich - p.dat3$c.rich
-p.dat3$s.change <- p.dat3$y.rich - p.dat3$x.rich
+# p.dat2$s.loss <- -1*(p.dat2$x.rich - p.dat2$c.rich)
+# p.dat2$s.gain <- p.dat2$y.rich - p.dat2$c.rich
+# p.dat2$s.change <- p.dat2$y.rich - p.dat2$x.rich
 
-p.dat3$s.loss.p<-abs(p.dat3$s.loss)
+p.dat2$c.rich.log<-log1p(p.dat2$c.rich)
+as.numeric(p.all$c.rich)
+par(mfrow=c(1,2))
+hist(p.dat2$c.rich, breaks=10, main="C. Rich", xlab= "C. Rich")
+hist(p.dat2$c.rich.log, breaks=10, main="Log C. Rich", xlab= "Log C. Rich")
 
-p.dat3$s.loss.p.log <- log1p(abs(p.dat3$s.loss.p))
-p.dat3$s.gain.log<-log1p(p.dat3$s.gain)
-p.dat3$s.change.log<-log1p(p.dat3$s.change)
+par(mfrow=c(1,1))
+hist(p.dat2$c.func, breaks=10, main="C. Func", xlab= "Log C. Func")
 
+
+summary(p.dat2)
 par(mfrow=c(2,3))
-hist(p.dat3$s.loss.p,breaks =10, main="Species Loss", xlab= "Species Loss")
-hist(p.dat3$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
-hist(p.dat3$s.change, breaks=10, main="Species Change", xlab= "Species Change")
-hist(p.dat3$s.loss.p.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
-hist(p.dat3$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
-hist(p.dat3$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Species Change")
-
-p.dat3$site_code<-as.factor(p.dat3$site_code)
-p.dat3$site.year.id<-as.factor(p.dat3$site.year.id)
-
-
-s.loss <- brm(s.loss.p.log ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-              data = p.dat3, cores = 4, chains = 4)
-
-
-s.gain <- brm(s.gain.log ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-              data = p.dat3, cores = 4, chains = 4)
-
-
-s.change <- brm(s.change ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-               data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
+hist(p.dat2$s.loss.p,breaks =20, main="Species Loss", xlab= "Species Loss")
+hist(p.dat2$s.gain, breaks=20, main="Species Gains", xlab= "Species Gains")
+hist(p.dat2$s.change, breaks=10, main="Species Change", xlab= "Species Change")
+hist(p.dat2$s.loss.p.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
+hist(p.dat2$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
+hist(p.dat2$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Species Change")
 
 
 
+# s.loss.i <- brm(s.loss.p.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+#               data = p.dat3, cores = 4, chains = 4)
+# 
+# 
+# s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+#               data = p.dat3, cores = 4, chains = 4)
+# 
+# 
+# s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
+#                 data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
+
+
+# c.rich.i <- brm(c.rich ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+#                 data = p.all,family=hurdle_lognormal(),cores = 4, chains = 4)
+
+
+c.func.i <- brm(c.func ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                data = p.all,family=asym_laplace(),cores = 4, chains = 4)
+
+
+#save mods
 setwd('~/Dropbox/Projects/NutNet/Model_fits/')
-#save(s.loss,s.gain,s.change,file = 'price_lgc.Rdata')
-#write.csv(p.dat3,file = 'price_models.csv')
-#load('~/Dropbox/Projects/NutNet/Model_fits/price_lgc.Rdata')
-
-s.loss.i <- brm(s.loss.p.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-              data = p.dat3, cores = 4, chains = 4)
-
-
-s.gain.i <- brm(s.gain.log ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-              data = p.dat3, cores = 4, chains = 4)
-
-
-s.change.i <- brm(s.change ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-                data = p.dat3, family=asym_laplace(),cores = 4, chains = 4)
-
-
-#old cumulative models
-setwd('~/Dropbox/Projects/NutNet/Model_fits/')
-#save(s.loss.i,s.gain.i,file = 'price_trt_i_lg.Rdata')
-#losses and gains
-load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_lg.Rdata')
-#save(s.change.i,file = 'price_trt_i_schange.Rdata')
-#species change
-load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_i_schange.Rdata')
-
+save(c.func.i,file = 'nn_time.cfunc-cumulative.Rdata.Rdata')
 
 #cumulative models with time only
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss-cumulative.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain-cumulative.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.schange-cumulative.Rdata')
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.crich-cumulative.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cfunc-cumulative.Rdata')
 
-     
+#hurdle log normal models
+#models have same names as above-oops
+#these do converge (unlike progressive hurdles)
+# load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss-cumulative-hurdle.Rdata')
+# load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain-cumulative-hurdle.Rdata')
+#      
 summary(s.loss.i)
 
 summary(s.gain.i)
@@ -126,6 +107,7 @@ summary(s.change.i)
 
 summary(c.rich.i)
 
+summary(c.func.i)
 
 
 plot(s.loss.i)
@@ -134,12 +116,20 @@ plot(s.gain.i)
 
 plot(s.change.i)
 
-
 pp_check(s.loss.i)
+pp_check(s.loss.i)+ scale_x_continuous(trans="log") +theme_bw()
 
 pp_check(s.gain.i)
+pp_check(s.gain.i)+ scale_x_continuous(trans="log") +theme_bw()
 
 pp_check(s.change.i)
+
+pp_check(c.rich.i)
+pp_check(c.rich.i)+ scale_x_continuous(trans="log") +theme_bw()
+
+
+pp_check(c.func.i)
+
 
 dat<-distinct(p.dat, site_code, continent,habitat)
 
@@ -669,7 +659,7 @@ s.change.im<-ggplot() +
   # ) +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   labs(x = 'Years',
-       y = expression(paste('Plot Species Gain')), title= 'a) Richness Change') +
+       y = expression(paste('Richness Change')), title= 'a) Richness Change') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -683,6 +673,364 @@ s.change.im
 grid_arrange_shared_legend(s.change.im,c.rich.im,nrow=1)
 
 
+
+########################################################################################################################
+##################################### C RICH ###################################################################################
+########################################################################################################################
+
+
+
+c.rich.i_fitted <- cbind(c.rich.i$data,
+                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                         fitted(c.rich.i, re_formula = NA)) %>% 
+  as_tibble()
+
+p.dat3<-p.dat2 %>% 
+  group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
+  summarise(s.rich = mean(x.rich),
+            r.rich = round(s.rich))
+
+c.rich.i_fitted3<-inner_join(c.rich.i_fitted,p.dat3)
+View(c.rich.i_fitted3)
+
+
+c.rich.i_fitted3$starting.richness <- ifelse(c.rich.i_fitted3$r.rich >= 1 & c.rich.i_fitted3$r.rich <= 5, '1-5 species',
+                                             ifelse(c.rich.i_fitted3$r.rich >=6 & c.rich.i_fitted3$r.rich <=10, '6-10',
+                                                    ifelse(c.rich.i_fitted3$r.rich >=11 & c.rich.i_fitted3$r.rich <=15, '11-15',    
+                                                           ifelse(c.rich.i_fitted3$r.rich >=16 & c.rich.i_fitted3$r.rich <=20, '16-20',
+                                                                  ifelse(c.rich.i_fitted3$r.rich >=21 & c.rich.i_fitted3$r.rich <=25, '21-25',
+                                                                         ifelse(c.rich.i_fitted3$r.rich >=26, '>26', 'other'))))))
+
+
+c.rich.i_fitted.npk<-c.rich.i_fitted3[c.rich.i_fitted3$trt.y %in% c('NPK'),]
+c.rich.i_fitted.ctl<-c.rich.i_fitted3[c.rich.i_fitted3$trt.y %in% c('Control'),]
+
+
+
+# fixed effect coefficients -coefficient plot
+c.rich.i_fixef <- fixef(c.rich.i)
+
+
+c.rich.i_coef <- coef(c.rich.i)
+c.rich.i_coef
+
+c.rich.i_coef2 <-  bind_cols(c.rich.i_coef$site_code[,,'Intercept'] %>% 
+                               as_tibble() %>% 
+                               mutate(Intercept = Estimate,
+                                      Intercept_lower = Q2.5,
+                                      Intercept_upper = Q97.5,
+                                      site_code = rownames(c.rich.i_coef$site_code[,,'Intercept'])) %>% 
+                               select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                             c.rich.i_coef$site_code[,,'year.y.m'] %>% 
+                               as_tibble() %>% 
+                               mutate(ISlope = Estimate,
+                                      ISlope_lower = Q2.5,
+                                      ISlope_upper = Q97.5) %>% 
+                               select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                             c.rich.i_coef$site_code[,,'trt.yNPK'] %>% 
+                               as_tibble() %>% 
+                               mutate(TE = Estimate,
+                                      TE_lower = Q2.5,
+                                      TE_upper = Q97.5) %>% 
+                               select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                             c.rich.i_coef$site_code[,,'trt.yNPK:year.y.m'] %>% 
+                               as_tibble() %>% 
+                               mutate(TESlope = Estimate,
+                                      TESlope_lower = Q2.5,
+                                      TESlope_upper = Q97.5) %>% 
+                               select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(p.dat2 %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y),
+                         cxmin = min(year.y.m),
+                         cxmax = max(year.y.m),
+                         s.rich = mean(x.rich),
+                         r.rich = round(s.rich)),
+             by = 'site_code')
+
+c.rich.i_coef2$starting.richness <- ifelse(c.rich.i_coef2$r.rich >= 1 & c.rich.i_coef2$r.rich <= 5, '1-5 species',
+                                           ifelse(c.rich.i_coef2$r.rich >=6 & c.rich.i_coef2$r.rich <=10, '6-10',
+                                                  ifelse(c.rich.i_coef2$r.rich >=11 & c.rich.i_coef2$r.rich <=15, '11-15',    
+                                                         ifelse(c.rich.i_coef2$r.rich >=16 & c.rich.i_coef2$r.rich <=20, '16-20',
+                                                                ifelse(c.rich.i_coef2$r.rich >=21 & c.rich.i_coef2$r.rich <=25, '21-25',
+                                                                       ifelse(c.rich.i_coef2$r.rich >=26, '>26', 'other'))))))
+
+c.rich.i_coef3<-inner_join(c.rich.i_coef2,dat)
+View(c.rich.i_coef3)
+
+
+rm(c.rich.i)
+save(c.rich.i_fitted.npk,c.rich.i_fitted.ctl,c.rich.i_coef3,file = 'c.rich_dat.Rdata')
+load('~/Desktop/Academic/R code/NutNet/c.rich_dat.Rdata')
+
+
+
+View(c.rich.i_fitted.npk)
+
+c.rich.i_fitted.npk<-c.rich.i_fitted.npk[complete.cases(c.rich.i_fitted.npk$starting.richness), ]
+c.rich.i_coef3<-c.rich.i_coef3[complete.cases(c.rich.i_coef3$starting.richness), ]
+
+c.rich.i_fitted.npk$starting.richness <- factor(c.rich.i_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+c.rich.i_coef3$starting.richness <- factor(c.rich.i_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+is.factor(c.rich.i_coef3$starting.richness)
+
+
+
+View(c.rich.i_fitted3)
+c.rich.i_coef3$xs<-1
+c.rich.im<-ggplot() +
+  # data
+  geom_point(data = c.rich.i_fitted.npk,
+             aes(x = year.y, y = c.rich,
+                 colour = starting.richness, alpha=0.01),
+             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+  # geom_jitter(data=c.rich.i_fitted.npk,
+  #             aes(x = year.y, y = c.rich.p,
+  #                 colour = starting.richness), height=0.45,width = 0.45)+
+  # experiment (random) effects
+  geom_segment(data = c.rich.i_coef3,
+               aes(x = xs, 
+                   xend = xmax,
+                   y = exp(Intercept + TE + (ISlope+TESlope) *  cxmin),
+                   yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
+                   group = site_code,
+                   colour = starting.richness),
+               size = .7) +
+  # uncertainy in fixed effect
+  geom_ribbon(data = c.rich.i_fitted.npk,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  # fixed effect
+  geom_line(data = c.rich.i_fitted.npk,
+            aes(x = year.y, y = Estimate),
+            size = 1.5) +
+  geom_ribbon(data = c.rich.i_fitted.ctl,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  # fixed effect
+  geom_line(data =  c.rich.i_fitted.ctl,
+            aes(x = year.y, y = Estimate),
+            size = 1.5, linetype= "dashed") +
+  scale_y_continuous(trans = 'log', breaks=c(1,2,4,6,8,16,24,36) ) +
+  scale_x_continuous(breaks=c(1,3,6,9,11)) +
+  labs(x = 'Years',
+       y = expression(paste('Persistent Richness')), title= 'Persistent Species') +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
+
+c.rich.im
+
+
+
+########################################################################################################################
+##################################### C FUNC ###################################################################################
+########################################################################################################################
+
+summary(c.func.i)
+color_scheme_set("purple")
+pairs(c.func.i)
+
+# inspection of chain diagnostic
+plot(c.func.i)  
+
+
+pp_check(c.func.i)
+
+pp_check(c.func.i, type = "hist")
+#marginal effects
+marginal_effects(c.func.i, surface = TRUE)
+marginal_smooths(c.func.i)
+
+
+
+#residuals
+cm1<-residuals(c.func.i)
+cm1<-as.data.frame(cm1)
+nrow(cm1)
+nrow(p.dat3)
+#p.dat4<-p.dat3[complete.cases(p.dat3$CDE), ]
+cde.plot<-cbind(p.dat3,cm1$Estimate)
+cde.plot2<-inner_join(cde.plot,dat)
+
+par(mfrow=c(3,2))
+with(cde.plot2, plot(continent, cm1$Estimate))
+with(cde.plot2, plot(habitat, cm1$Estimate))
+with(cde.plot, plot(site_code, cm1$Estimate))
+with(cde.plot2, plot(block, cm1$Estimate))
+with(cde.plot2, plot(plot, cm1$Estimate))
+with(cde.plot2, plot(f.year.y, cm1$Estimate))
+
+
+# #------plot richness model all sp----------------
+# fixed effects
+c.func.i_fitted <- cbind(c.func.i$data,
+                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                           fitted(c.func.i, re_formula = NA)) %>% 
+  as_tibble() 
+as.data.frame(c.func.i_fitted)
+
+View(c.func.i_fitted)
+p.dat3<-p.dat2 %>% 
+  group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
+  summarise(s.rich = mean(x.rich),
+            r.rich = round(s.rich))
+
+c.func.i_fitted3<-inner_join(c.func.i_fitted,p.dat3)
+
+View(c.func.i_fitted3)
+
+c.func.i_fitted3$starting.richness <- ifelse(c.func.i_fitted3$r.rich >= 1 & c.func.i_fitted3$r.rich <= 5, '1-5 species',
+                                               ifelse(c.func.i_fitted3$r.rich >=6 & c.func.i_fitted3$r.rich <=10, '6-10',
+                                                      ifelse(c.func.i_fitted3$r.rich >=11 & c.func.i_fitted3$r.rich <=15, '11-15',    
+                                                             ifelse(c.func.i_fitted3$r.rich >=16 & c.func.i_fitted3$r.rich <=20, '16-20',
+                                                                    ifelse(c.func.i_fitted3$r.rich >=21 & c.func.i_fitted3$r.rich <=25, '21-25',
+                                                                           ifelse(c.func.i_fitted3$r.rich >=26, '>26', 'other'))))))
+
+
+
+c.func.i_fitted.npk<-c.func.i_fitted3[c.func.i_fitted3$trt.y %in% c('NPK'),]
+c.func.i_fitted.ctl<-c.func.i_fitted3[c.func.i_fitted3$trt.y %in% c('Control'),]
+
+
+# fixed effect coefficients (I want these for the coefficient plot)
+c.func.i_fixef <- fixef(c.func.i)
+
+# coefficients for experiment-level (random) effects
+c.func.i_coef <- coef(c.func.i)
+c.func.i
+
+c.func.i_coef2 <-  bind_cols(c.func.i_coef$site_code[,,'Intercept'] %>% 
+                                 as_tibble() %>% 
+                                 mutate(Intercept = Estimate,
+                                        Intercept_lower = Q2.5,
+                                        Intercept_upper = Q97.5,
+                                        site_code = rownames(c.func.i_coef$site_code[,,'Intercept'])) %>% 
+                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                               c.func.i_coef$site_code[,,'year.y.m'] %>% 
+                                 as_tibble() %>% 
+                                 mutate(ISlope = Estimate,
+                                        ISlope_lower = Q2.5,
+                                        ISlope_upper = Q97.5) %>% 
+                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                               c.func.i_coef$site_code[,,'trt.yNPK'] %>% 
+                                 as_tibble() %>% 
+                                 mutate(TE = Estimate,
+                                        TE_lower = Q2.5,
+                                        TE_upper = Q97.5) %>% 
+                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                               c.func.i_coef$site_code[,,'trt.yNPK:year.y.m'] %>% 
+                                 as_tibble() %>% 
+                                 mutate(TESlope = Estimate,
+                                        TESlope_lower = Q2.5,
+                                        TESlope_upper = Q97.5) %>% 
+                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(p.dat2 %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y),
+                         cxmin = min(year.y.m),
+                         cxmax = max(year.y.m),
+                         s.rich = mean(x.rich),
+                         r.rich = round(s.rich)),
+             by = 'site_code')
+
+
+c.func.i_coef2$starting.richness <- ifelse(c.func.i_coef2$r.rich >= 1 & c.func.i_coef2$r.rich <= 5, '1-5 species',
+                                             ifelse(c.func.i_coef2$r.rich >=6 & c.func.i_coef2$r.rich <=10, '6-10',
+                                                    ifelse(c.func.i_coef2$r.rich >=11 & c.func.i_coef2$r.rich <=15, '11-15',    
+                                                           ifelse(c.func.i_coef2$r.rich >=16 & c.func.i_coef2$r.rich <=20, '16-20',
+                                                                  ifelse(c.func.i_coef2$r.rich >=21 & c.func.i_coef2$r.rich <=25, '21-25',
+                                                                         ifelse(c.func.i_coef2$r.rich >=26, '>26', 'other'))))))
+
+View(c.func.i_coef2)
+
+View(c.func.i_fitted)
+
+
+c.func.i_coef3<-full_join(c.func.i_coef2,dat)
+
+
+
+rm(c.func.i)
+save(c.func.i_fitted.npk,c.func.i_fitted.ctl,c.func.i_coef3,file = 'c.func_dat.Rdata')
+load('~/Desktop/Academic/R code/NutNet/c.func_dat.Rdata')
+
+library(scales)
+sign_sqrt <- scales::trans_new('sign_sqrt',
+                               transform = function(x) {sign(x) * sqrt(abs(x))},
+                               inverse = function(x){sign(x) * abs(x)^2})
+
+
+#c.func.i_fitted.npk<-c.func.i_fitted.npk[complete.cases(c.func.i_fitted.npk$starting.richness), ]
+#c.func.i_coef3<-c.func.i_coef3[complete.cases(c.func.i_coef3$starting.richness), ]
+
+c.func.i_fitted.npk$starting.richness <- factor(c.func.i_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+c.func.i_coef3$starting.richness <- factor(c.func.i_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+
+
+c.func.i_coef3$xs<-1
+
+summary(c.func.i)
+#c.func.i
+c.func.m<-ggplot() +
+  # data
+  geom_point(data = c.func.i_fitted.npk,
+             aes(x = year.y, y = c.func,
+                 colour = starting.richness, alpha=0.1),
+             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+  # geom_jitter(data=c.func_fitted.npk,
+  #             aes(x = year.y, y = c.func,
+  #                 colour = starting.richness), height=0.25,width = 0.25)+
+  #experiment (random) effects
+  geom_segment(data = c.func.i_coef3,
+               aes(x = xs, 
+                   xend = xmax,
+                   y = (Intercept + TE + (ISlope+TESlope)  * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
+                   group = site_code,
+                   colour = starting.richness),
+               size = .7) +
+  # uncertainy in fixed effect
+  geom_ribbon(data = c.func.i_fitted.npk,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  # fixed effect
+  geom_line(data = c.func.i_fitted.npk,
+            aes(x = year.y, y = Estimate),
+            size = 1.5) +
+  geom_ribbon(data = c.func.i_fitted.ctl,
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  # fixed effect
+  geom_line(data = c.func.i_fitted.ctl,
+            aes(x = year.y, y = Estimate),
+            size = 1.5,  linetype= "dashed") +
+  scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
+  ) +
+  scale_x_continuous(breaks=c(1,3,6,9,11)) +
+  labs(x = 'Years',
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b) Biomass Change') +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
+#+ theme(legend.position="bottom")
+
+c.func.m
+
+
+grid_arrange_shared_legend(s.change.im,c.func.m,nrow=1)
 
 
 

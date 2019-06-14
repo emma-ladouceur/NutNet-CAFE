@@ -84,6 +84,9 @@ hist(p.dat2$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species 
 hist(p.dat2$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
 hist(p.dat2$CDE.log, breaks=40, main="CDE log + 1", xlab= "CDE log + 1")
 
+par(mfrow=c(1,1))
+hist(p.dat2$c.func,breaks =40, main="Biomass Change", xlab= "Biomass Change")
+
 
 # s loss, gain and change metrics
 p.dat2$s.loss <- -1*(p.dat2$x.rich - p.dat2$c.rich)
@@ -250,7 +253,7 @@ sl.trt_fitted3$starting.richness <- ifelse(sl.trt_fitted3$r.rich >= 1 & sl.trt_f
 
 sl.trt_fitted.npk<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('NPK'),]
 sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
-
+sl.trt_fitted.npk
 
 #either subset NPK and/or have two seperate lines for NPK and control
 
@@ -705,7 +708,7 @@ cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>%
                                     TESlope_upper = Q97.5) %>% 
                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat3 %>% 
+  inner_join(p.dat2 %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
@@ -803,7 +806,7 @@ cdem<-ggplot() +
 cdem
 
 
-grid_arrange_shared_legend(sl.trtm,sg.trtm,cdem,nrow=1)
+grid_arrange_shared_legend(c.rich.im,cdem,nrow=1)
 
 
 

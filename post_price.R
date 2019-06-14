@@ -206,6 +206,10 @@ p.all3<-p.all2[p.all2$plot %in% c('1 1','2 2','3 3','4 4','5 5','6 6','7 7','8 8
 p.all3$plot<-as.factor(p.all3$plot)
 levels(p.all3$plot)
 
+View(p.all3)
+#also calc biomass channnnggggggeeeee
+p.all3$c.func <- (p.all3$y.func - p.all3$x.func)
+
 write.csv(p.all3,"~/Dropbox/Projects/NutNet/Data/cumulative_time_only.csv")
 
 
