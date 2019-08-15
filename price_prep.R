@@ -5,11 +5,12 @@ rm(list=ls())
 
 library(gridExtra)
 library(ggplot2)
-library(reshape2)
+library(reshape2) 
 library(MCMCglmm)
 library(tidyr)
 
 library(priceTools)
+library(tidyverse)
 
 
 sp <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -19,12 +20,12 @@ sp$year_trt<-as.factor(sp$year_trt)
 levels(sp$year_trt)
 levels(sp$site_code)
 sp2<-group_by(sp, site_code,year_trt)
-View(sp2)
+# View(sp2)
 
 all<-unite_(sp2, "site.year.id", c("site_code","year_trt"), remove=FALSE)
 all<-unite_(all, "trt_year", c("trt","year_trt"), remove=FALSE)
 all<-unite_(all, "site_trt_year", c("site_code","trt","year_trt"), remove=FALSE)
-View(all)
+# View(all)
 levels(all$site_code)
 colnames(all)
 native<-all[all$local_provenance %in% c('NAT'),]
@@ -44,33 +45,54 @@ uindex<-sort(unique(index))
 usindex<-sort(unique(sindex))
 uyindex<-sort(unique(yindex))
 
-
+# cumulative
 all_lst<-NULL
 n<-1
 for (i in 1:length(usindex)){
-  #select all instances from a site
   subs<-which(sindex==usindex[i])
   uindex_small<-sort(unique(all[subs,]$year_trt))
   
   for(j in 2:length(uindex_small)) {
-    subs2<-which(as.numeric(as.character(yindex[subs]))%in%
-                   (uindex_small[j]-c(0,1)))
-  
-    #table(all[subs[subs2],]$site.year.id)
-    if(length(unique(all[subs[subs2],]$site.year.id))==2) {
-      all_lst[[n]]<-all[subs[subs2],]
-      names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
-      n<-n+1
-    }
+    subs2<-which(yindex[subs]%in%c(uindex_small[j], "0"))
+    
+    all_lst[[n]]<-all[subs[subs2],]
+    names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
+    n<-n+1
   }
   print(i/length(usindex))
 }
 
 
+#progressive
+# all_lst<-NULL
+# n<-1
+# for (i in 1:length(usindex)){
+#   #select all instances from a site
+#   subs<-which(sindex==usindex[i])
+#   uindex_small<-sort(unique(all[subs,]$year_trt))
+# 
+#   for(j in 2:length(uindex_small)) {
+#     subs2<-which(as.numeric(as.character(yindex[subs]))%in%
+#                    (uindex_small[j]-c(0,1)))
+# 
+#     #table(all[subs[subs2],]$site.year.id)
+#     if(length(unique(all[subs[subs2],]$site.year.id))==2) {
+#       all_lst[[n]]<-all[subs[subs2],]
+#       names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
+#       n<-n+1
+#     }
+#   }
+#   print(i/length(usindex))
+# }
+
+
+summary(arch.us)
 View(arch.us_1)
 View(all_lst)
 folder = "output_new"
 #input RDS files for cluster, price analysis
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#if this doesnt work close R and try again only happens because wd has changed
 mapply(saveRDS, all_lst, file=paste0(folder, "/",names(all_lst), '.rds'))
 
 
@@ -150,16 +172,16 @@ mapply(saveRDS, i_lst, file=paste0(folder, "/",names(i_lst), '.rds'))
 View(all_lst)
 list2env(all_lst, envir= .GlobalEnv) #split the list into separate dataframes
 nn.dist<-distinct(all,site.year.id)
-View(nn.dist)
+# View(nn.dist)
 azi.cn_2$site.year.id<-as.factor(as.character(azi.cn_2$site.year.id))
 levels(azi.cn_2$site.year.id)
-View(azi.cn_5)
+View(azi.cn_2)
 colnames(azi.cn_2)
 
 group.vars <- c('site.year.id','plot','block')
 treat.vars<-c('trt_year')
 
-grouped.data <- azi.cn_2 %>% group_by_(.dots=c(group.vars,treat.vars))
+grouped.data <- azi.cn_5 %>% group_by(.dots=c(group.vars,treat.vars))
 
 #takes a long time
 res <- pairwise.price(grouped.data, species="Taxon", func="Biomass_CalcSp")

@@ -26,6 +26,7 @@ View(dat2)
 
 #plot<-p[p$trt %in% c('NPK'),]
 #or
+View(p)
 plot<-p[p$trt %in% c('NPK', 'Control'),]
 nrow(plot)
 
@@ -214,7 +215,7 @@ setwd('~/Dropbox/Projects/NutNet/Model_fits/')
 #save(plot.rich.m,plot.bm.m,file = 'plot.nutnet.models.Rdata')
 #load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.models.Rdata')
 
-#save(plot.rich.im,plot.bm.im,file = 'plot.nutnet.i.models.Rdata')
+save(plot.rich.im,plot.bm.im,file = 'plot.nutnet.i.models.Rdata')
 #em
 
 

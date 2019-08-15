@@ -367,7 +367,7 @@ ggplot(data=delta.coefs, aes(x=R.Slope, y=B.Slope,color=continent)) +
 # DERIVATIVES DELTA OVER TIME
 # CAFE BAYES VECTORS
 
-# SP LOSS VECTOR, SP GAIN VECTOR, CDE VECTOR
+# SP LOSS VECTOR, SP GAIN VECTOR, CDE VECTOR... but what about....log?
 
 
 
