@@ -9,9 +9,9 @@ library(tidyr)
 library(dplyr)
 
 
-comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-25-January-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-cover<- read.csv("~/Dropbox/NutNet data/full-cover-25-January-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-25-January-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-02-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+cover<- read.csv("~/Dropbox/NutNet data/full-cover-02-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-02-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
 #There are 0's when biomass wasnt collected.
@@ -29,7 +29,6 @@ hist(comb$live_mass)
 View(cover)
 #THIS ONE
 
-require(tidyr)
 datnn2<- cover %>% group_by(year,site_name,site_code,block,plot,subplot,trt)
 datnn3<-datnn2[complete.cases(datnn2$Family),]
 datnn3$max_cover<-as.numeric(datnn3$max_cover)
@@ -41,7 +40,7 @@ comb$live_mass<-as.numeric(comb$live_mass)
 datnn_cover2<-unite_(datnn_cover, "id", c("year","site_name","site_code","block","plot","trt","year_trt"), remove=FALSE)
 View(datnn_cover2)
 comb2<-unite_(comb, "id", c("year","site_name","site_code","block","plot","trt","year_trt"), remove=FALSE)
-View(datnn_biod2)
+
 
 #plot level cover and plot env. data cobmined
 datnn<-full_join(comb2,datnn_cover2, by= "id")
@@ -109,38 +108,11 @@ colnames(bce3)[colnames(bce3)=="year.x"] <- "year"
 colnames(bce3)
 
 
-
+nndistinct<-distinct(bce3,continent, country,site_code,year_trt,year)
+View(nndistinct)
+levels(nndistinct$site_code)
 
 write.csv(bce3,"/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv")
-
-
-#this needs to be fixed
-#seperate NA's from 0's
-biomassc <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-colnames(biomassc)
-biomassc$nat_biomass[is.na(biomassc$nat_biomass)] <- 0
-biomassc$int_biomass[is.na(biomassc$int_biomass)] <- 0
-biomassc$unk_biomass[is.na(biomassc$unk_biomass)] <- 0
-summary(biomassc)
-
-#There are 0's when biomass wasnt collected.
-#actually they are NA's for some reason 'view' shows them as 0's incorrectly
-#comb %>%
-biomassc %>% mutate(nat_biomass = ifelse(Biomass_CalcSp > 0 , 0,biomassc$nat_biomass))
-??ifelse
-#mutate(live_mass = ifelse(rich > 0 & live_mass == 0, NA,comb$live_mass))
-
-biomassc2<-mutate(biomassc, nat_biomass=ifelse(Biomass_CalcSp == 0 , 0))
-biomassc %>% mutate(int_biomass=ifelse(Biomass_CalcSp >= 0 , 0,NA))
-biomassc %>% mutate(unk_biomass=ifelse(Biomass_CalcSp >= 0 , 0,NA))
-
-summary(biomassc2)
-
-biomassc[181:201,]
-
-
-biomassc <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
