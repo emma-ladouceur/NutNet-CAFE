@@ -20,7 +20,7 @@ p <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc
 price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_new/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
 #price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_new/", pattern = ".rds$")
 
-View(price.list)
+
 
 
 price.all <- foreach (file = price.list,.combine=rbind) %do% {
@@ -28,6 +28,7 @@ price.all <- foreach (file = price.list,.combine=rbind) %do% {
   price.file$data
 }
 
+View(price.all)
 
 write.csv(price.all,"~/Desktop/Academic/Data/NutNet/nutnet_price_combine_new.csv")
 
@@ -44,35 +45,21 @@ View(price.all5)
 nrow(price.all5)
 #88,982 rows
 
-#price.reduced<-price.all5[price.all5$trt_year.x %in% c('Control_0','NPK_0'),]
-nrow(price.reduced)
-#46,686 rows
-#don't do this ever you fucking moron
-#replicates are between blocks, not within blocks for 90% of sites
-#price.reduced2<-price.reduced[price.reduced$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
-nrow(price.reduced2)
-#12,450
 
-View(price.reduced)
-price.reduced$unique.id<-as.character(with(price.reduced, paste(site.year.id,trt_year,block,plot, sep=".")))
+price.all5$unique.id<-as.character(with(price.all5, paste(site.year.id,trt_year,block,plot, sep=".")))
 
-#remove duplicates
-#price.reduced2$unique.id[duplicated(price.reduced2)]
-price.r<-price.reduced %>% distinct(unique.id, .keep_all = TRUE)
-nrow(price.r)
-#8,646
 
-View(price.r)
+price.r<-price.all5 %>% distinct(unique.id, .keep_all = TRUE)
 
 price.r$year.y<-as.numeric(price.r$year.y)
 is.numeric(price.r$year.y)
 is.numeric(price.r$SL)
 
-write.csv(price.r,"~/Desktop/Academic/Data/NutNet/nutnet_price_all2.csv")
+write.csv(price.r,"~/Desktop/Academic/Data/NutNet/nutnet_price_all.csv")
 
 
-#progressive
-price.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+#
+price.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 View(price.all)
@@ -90,30 +77,21 @@ nrow(price.all7)
 price.reduced<-price.all7[price.all7$trt.xy %in% c('Control_Control','NPK_NPK'),]
 price.reduced2<-price.reduced[price.reduced$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
 price.reduced2$year.xy<-as.factor(price.reduced2$year.xy)
+View(price.reduced2)
+
 levels(price.reduced2$year.xy)
-price.reduced3<-price.reduced2[price.reduced2$year.xy %in% c('0_1','1_2','2_3','3_4','4_5','5_6','6_7','7_8','8_9','9_10','10_11'),]
+price.reduced3<-price.reduced2[price.reduced2$year.xy %in% c('0_0','0_1','0_2','0_3','0_4','0_5','0_6','0_7','0_8','0_9','0_10','0_11'),]
 View(price.reduced3)
 nrow(price.reduced3)
-#3801
+#4787
 
 View(price.reduced3)
 price.reduced3$unique.id<-as.character(with(price.reduced3, paste(site.year.id,trt_year,block,plot, sep=".")))
 
-#remove duplicates
-#price.reduced2$unique.id[duplicated(price.reduced2)]
-price.r<-price.reduced %>% distinct(unique.id, .keep_all = TRUE)
-nrow(price.r)
-#8,646
 
-View(price.r)
+write.csv(price.reduced3,"~/Desktop/Academic/Data/NutNet/nutnet_cumulative_time_only.csv")
 
-price.r$year.y<-as.numeric(price.r$year.y)
-is.numeric(price.r$year.y)
-is.numeric(price.r$SL)
-
-write.csv(price.reduced3,"~/Desktop/Academic/Data/NutNet/nutnet_progressive_time_only.csv")
-
-p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_progressive_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_cumulative_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 View(p.all)
 
 p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
@@ -169,48 +147,6 @@ hist(p.dat2$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Speci
 View(p.dat2)
 write.csv(p.dat2,"~/Dropbox/Projects/NutNet/Data/progressive_time_only.csv")
 
-
-
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/progressive_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-p.all2<-separate(p.all,plot,into=c("plot.x","plot.y"),sep = " ", remove=FALSE)
-p.all2$plot.x<-as.factor(p.all2$plot.x)
-p.all2$plot.y<-as.factor(p.all2$plot.y)
-levels(p.all2$plot.x)
-levels(p.all2$plot.y)
-p.all2$plot.x<-as.numeric(p.all2$plot.x)
-p.all2$plot.y<-as.numeric(p.all2$plot.y)
-summary(p.all2)
-
-#because some projects have multiple replicates within block must also filter by plot
-p.all3<-p.all2[p.all2$plot %in% c('1 1','2 2','3 3','4 4','5 5','6 6','7 7','8 8','9 9','10 10','11 11','12 12','13 13','14 14','15 15','16 16','17 17','18 18','19 19','20 20','21 21','22 22','23 23','24 24','25 25','26 26','27 27','28 28','29 29','30 30','31 31','32 32','33 33','34 34','35 35','36 36','37 37','38 38','39 39','40 40','41 41','42 42','43 43','44 44','45 45','46 46','47 47','48 48','49 49','50 50','51 51','52 52','53 53'),]
-p.all3$plot<-as.factor(p.all3$plot)
-levels(p.all3$plot)
-
-write.csv(p.all3,"~/Dropbox/Projects/NutNet/Data/progressive_time_only2.csv")
-
-
-
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/price_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all2<-separate(p.all,plot,into=c("plot.x","plot.y"),sep = " ", remove=FALSE)
-p.all2$plot.x<-as.factor(p.all2$plot.x)
-p.all2$plot.y<-as.factor(p.all2$plot.y)
-levels(p.all2$plot.x)
-levels(p.all2$plot.y)
-p.all2$plot.x<-as.numeric(p.all2$plot.x)
-p.all2$plot.y<-as.numeric(p.all2$plot.y)
-summary(p.all2)
-
-#because some projects have multiple replicates within block must also filter by plot
-p.all3<-p.all2[p.all2$plot %in% c('1 1','2 2','3 3','4 4','5 5','6 6','7 7','8 8','9 9','10 10','11 11','12 12','13 13','14 14','15 15','16 16','17 17','18 18','19 19','20 20','21 21','22 22','23 23','24 24','25 25','26 26','27 27','28 28','29 29','30 30','31 31','32 32','33 33','34 34','35 35','36 36','37 37','38 38','39 39','40 40','41 41','42 42','43 43','44 44','45 45','46 46','47 47','48 48','49 49','50 50','51 51','52 52','53 53'),]
-p.all3$plot<-as.factor(p.all3$plot)
-levels(p.all3$plot)
-
-View(p.all3)
-#also calc biomass channnnggggggeeeee
-p.all3$c.func <- (p.all3$y.func - p.all3$x.func)
-
-write.csv(p.all3,"~/Dropbox/Projects/NutNet/Data/cumulative_time_only.csv")
 
 
 
