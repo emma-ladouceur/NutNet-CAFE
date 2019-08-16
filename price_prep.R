@@ -45,7 +45,7 @@ uindex<-sort(unique(index))
 usindex<-sort(unique(sindex))
 uyindex<-sort(unique(yindex))
 
-# cumulative
+#cumulative
 all_lst<-NULL
 n<-1
 for (i in 1:length(usindex)){

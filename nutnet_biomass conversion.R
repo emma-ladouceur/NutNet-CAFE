@@ -70,32 +70,23 @@ p.biomass2<-full_join(p.biomass,unk2,by="id")
 datnn6<-full_join(datnn5,p.biomass2,by="id")
 head(datnn6)
 
-
-
-
 write.csv(datnn6,"/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc.csv")
 
 
 
 #clean it up, reduce it down
 biomassc <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-colnames(biomassc)
-head(biomassc)
-levels(biomassc$experiment_type)
 
 bce <- droplevels(subset(biomassc, experiment_type == "Experimental (Full Factorial)"| experiment_type == "Experimental (Nutrients Only)"))
-#bce2 <- droplevels(subset(bce, year_trt.x.x=="0"|year_trt.x.x=="2"))
-#levels(bce2$trt.x)
 bce2 <- droplevels(subset(bce, trt=="NPK"|trt=="Control"))
 
-View(bce2)
 
 bce2[131:161,]
 
 colnames(bce2)
 bce3 <- bce2[,c(-48,-49,-50,-51,-52,-53,-54,-56,-57,-58,-59,-60,-61,-62,-63)]
 colnames(bce3)
-#bce3 <- bce2[,c(-56,-57,-58,-59,-60,-61,-62,-63)]
+
 
 colnames(bce3)
 colnames(bce3)[colnames(bce3)=="site_name.x"] <- "site_name"
@@ -109,9 +100,22 @@ colnames(bce3)
 
 
 nndistinct<-distinct(bce3,continent, country,site_code,year_trt,year)
-View(nndistinct)
+# View(nndistinct)
 levels(nndistinct$site_code)
 
+
+
+#seperate NA's from 0's
+
+colnames(bce3)
+bce3$nat_biomass[is.na(bce3$nat_biomass)] <- 0
+bce3$int_biomass[is.na(bce3$int_biomass)] <- 0
+bce3$unk_biomass[is.na(bce3$unk_biomass)] <- 0
+summary(bce3)
+#!!!!!!!!!!!!!!!!!
+#filter manually, where live_mass is NA, NA belongs in biomass columns
+
+#write.csv(bce3,"/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv")
 write.csv(bce3,"/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv")
 
 
