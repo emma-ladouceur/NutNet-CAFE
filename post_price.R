@@ -91,6 +91,8 @@ price.reduced3$unique.id<-as.character(with(price.reduced3, paste(site.year.id,t
 
 write.csv(price.reduced3,"~/Desktop/Academic/Data/NutNet/nutnet_cumulative_time_only.csv")
 
+
+# remove all this??
 p.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_cumulative_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 View(p.all)
 
@@ -129,9 +131,9 @@ hist(p.dat2$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
 hist(p.dat2$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
 hist(p.dat2$CDE, breaks=40, main="CDE", xlab= "CDE")
 
-hist(p.dat2$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
-hist(p.dat2$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
-hist(p.dat2$CDE.log, breaks=40, main="CDE log + 1", xlab= "CDE log + 1")
+hist(p.dat2$SL.p,breaks=40, main="Positive Species Loss")
+hist(p.dat2$SG, breaks=40, main="Species Gains")
+hist(p.dat2$CDE, breaks=40, main="CDE ")
 
 
 
@@ -145,7 +147,7 @@ hist(p.dat2$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Speci
 
 
 View(p.dat2)
-write.csv(p.dat2,"~/Dropbox/Projects/NutNet/Data/progressive_time_only.csv")
+write.csv(p.dat2,"~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv")
 
 
 
