@@ -1,4 +1,7 @@
 
+
+# Figs 1-2
+
 rm(list=ls())
 
 library(ggplot2)
@@ -63,6 +66,7 @@ plot2$unique.id<-as.character(with(plot2, paste(site_code,block,plot, sep=".")))
 #remove NAS
 plot3<-plot2 %>% drop_na(live_mass)
 
+View(plot3)
 plot4<-plot3 %>% group_by(site_code, block,plot,year_trt) %>%
   select(continent,unique.id,site_code,block, plot,year_trt,rich,live_mass)
 
@@ -84,6 +88,7 @@ plot6<-plot5 %>%
             m.mass = mean(live_mass),
             sd.mass = sd(live_mass))
 
+View(plot6)
 zerorich<-plot6[plot6$year_trt %in% c('0'),]
 
 zerorich$starting.richness <- ifelse(zerorich$r.rich >= 1 & zerorich$r.rich <= 5, '1-5 species',
@@ -135,6 +140,7 @@ plot9 <- plot8 %>%
   mutate(rich.start = start,
          rich.end = end ) %>% 
   select(-start, -end)
+View(plot9)
 
 plot10 <- plot8 %>%
   select(site_code,m.mass,startend) %>%
@@ -166,7 +172,7 @@ ggplot() +
 
 plot13$starting.richness <- factor(plot13$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
-
+View(plot13)
 
 
 # FIGURE 1
@@ -193,10 +199,14 @@ ggplot() +
 
 
 # FIGURE 2
-# QUADRANT PLOT DELTA BIOMASS DELTA RICH
+# QUADRANT PLOT DELTA BIOMASS DELTA RICH ?
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+startrich<-plot[plot$year_trt %in% c('0'),]
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/plot.nutnet.i.models.Rdata')
+#models
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.bm.Rdata') # plot.bm.im 
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
 
 #RICHNESS
 
@@ -204,6 +214,7 @@ plot.rich_coeff <- coef(plot.rich.im)
 
 plot.rich_coef<-as.data.frame(plot.rich_coeff$site_code)
 #names(plot.rich_coef) <- gsub(":", ".", names(plot.rich_coef), fixed = TRUE)
+
 
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef %>% 
@@ -246,12 +257,17 @@ colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q97.5.trtNPK:year_trt"] <-
 
 
 
-View(plot.rich_coef2)
+# View(plot.rich_coef2)
 
 dat<-distinct(plot, site_code, continent,habitat)
 plot.rich_coef3<-full_join(plot.rich_coef2,dat)
 
-View(plot.rich_fitted)
+
+plot.rich_fitted <- cbind(plot.rich.im$data,
+                          # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
+                          fitted(plot.rich.im, re_formula = NA)) %>% 
+  as_tibble() 
+# View(plot.rich_fitted)
 summary(plot.rich_fitted)
 plot.rich_fitted$starting.richness <- ifelse(plot.rich_fitted$rich >= 1 & plot.rich_fitted$rich <= 5, '1-5 species',
                                              ifelse(plot.rich_fitted$rich >=6 & plot.rich_fitted$rich <=10, '6-10',
@@ -262,15 +278,8 @@ plot.rich_fitted$starting.richness <- ifelse(plot.rich_fitted$rich >= 1 & plot.r
 plot.rich_fitted2<-full_join(plot.rich_fitted,dat)
 plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
-View(plot.rich_fitted2)
+# View(plot.rich_fitted2)
 
-View(plot.rich_coef3)
-View(plot.rich_fitted.npk)
-
-plot.rich_fixef
-
-levels(plot.rich_fitted.npk$rich.cat)
-levels(plot.rich_coef3$rich.cat)
 
 plot.rich_fitted.npk<-plot.rich_fitted.npk[complete.cases(plot.rich_fitted.npk$starting.richness), ]
 plot.rich_coef3<-plot.rich_coef3[complete.cases(plot.rich_coef3$starting.richness), ]
@@ -282,33 +291,21 @@ plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , 
 #BIOMASS
 plot.bm_coef <- coef(plot.bm.im)
 plot.bm_coef 
+colnames(plot.bm_coef)
+plot.bm_coef<-as.data.frame(plot.bm_coef$site_code)
 
-plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
+plot.bm_coef2 <-  bind_cols(plot.bm_coef %>% 
                               as_tibble() %>% 
-                              mutate(Intercept = Estimate,
-                                     Intercept_lower = Q2.5,
-                                     Intercept_upper = Q97.5,
-                                     site_code = rownames(plot.bm_coef$site_code[,,'Intercept'])) %>% 
-                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                            plot.bm_coef$site_code[,,'year_trt'] %>% 
-                              as_tibble() %>% 
-                              mutate(ISlope = Estimate,
-                                     ISlope_lower = Q2.5,
-                                     ISlope_upper = Q97.5) %>% 
-                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                            plot.bm_coef$site_code[,,'trtNPK'] %>% 
-                              as_tibble() %>% 
-                              mutate(TE = Estimate,
-                                     TE_lower = Q2.5,
-                                     TE_upper = Q97.5) %>% 
-                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                            plot.bm_coef$site_code[,,'trtNPK:year_trt'] %>% 
-                              as_tibble() %>% 
-                              mutate(TESlope = Estimate,
-                                     TESlope_lower = Q2.5,
-                                     TESlope_upper = Q97.5) %>% 
-                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
-  # join with min and max of the x-values
+                              mutate(
+                                # Estimate.trtNPK.year_trt = "Estimate.trtNPK:year_trt",
+                                #trtNPK.year_trt_lower = "Q2.5.trtNPK:year_trt",
+                                #trtNPK.year_trt_upper = "Q97.5.trtNPK:year_trt",
+                                #    Slope = Estimate.year_trt ,
+                                #   Slope_lower =Q2.5.year_trt ,
+                                #  Slope_upper = Q97.5.year_trt,
+                                site_code = rownames(plot.bm_coef)) %>% 
+                              as_tibble() %>%
+                              # join with min and max of the x-values
   inner_join(plot %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year_trt),
@@ -318,7 +315,12 @@ plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>%
                group_by(site_code) %>%
                summarise(m.rich = mean(rich),
                          r.rich = round(m.rich)),
-             by = 'site_code')
+             by = 'site_code'))
+
+colnames(plot.bm_coef2)[colnames(plot.bm_coef2)=="Estimate.trtNPK:year_trt"] <- "Estimate.trtNPK.year_trt"
+colnames(plot.bm_coef2)[colnames(plot.bm_coef2)=="Q2.5.trtNPK:year_trt"] <- "Q2.5.trtNPK.year_trt"
+colnames(plot.bm_coef2)[colnames(plot.bm_coef2)=="Q97.5.trtNPK:year_trt"] <- "Q97.5.trtNPK.year_trt"
+
 
 
 plot.bm_coef2$starting.richness <- ifelse(plot.bm_coef2$r.rich >= 1 & plot.bm_coef2$r.rich <= 5, '1-5 species',
@@ -339,35 +341,77 @@ View(plot.rich_coef3)
 View(plot.bm_coef3)
 colnames(plot.rich_coef3)
 colnames(plot.bm_coef3)
-plot.rich_coef4<-plot.rich_coef3[,c(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-16,-17,-18,-20)]
-plot.bm_coef4<-plot.bm_coef3[,c(-1,-2,-3,-8,-9,-10,-12)]
+plot.rich_coef4<-plot.rich_coef3[,c(-1,-2,-3,-4,-5,-6,-7,-8,-10,-14,-18,-19,-20,-21)]
+plot.bm_coef4<-plot.bm_coef3[,c(-1,-2,-3,-4,-5,-6,-7,-8,-10,-14,-18,-19,-20,-21)]
 colnames(plot.rich_coef4)
-colnames(plot.bm_coef4)
-names(plot.rich_coef4) <- c("R.Slope","R.Slope_lower","R.Slope_upper","site_code","continent")
-names(plot.bm_coef4) <- c("site_code","B.Slope","B.Slope_lower","B.Slope_upper","continent")
-delta.coefs<-bind_cols(plot.rich_coef4,plot.bm_coef4)
+View(plot.bm_coef4)
+
+names(plot.rich_coef4) <- c("IR.Slope","IR.Slope_lower","IR.Slope_upper","R.Slope","R.Slope_lower","R.Slope_upper","site_code","starting.richness","continent","habitat")
+names(plot.bm_coef4) <- c("IB.Slope","IB.Slope_lower","IB.Slope_upper","B.Slope","B.Slope_lower","B.Slope_upper","site_code","starting.richness","continent","habitat")
+#plot.bm_coef5<-plot.bm_coef4[complete.cases(plot.bm_coef4$B.Slope),]
+delta.coefs<-left_join(plot.rich_coef4,plot.bm_coef4)
 View(delta.coefs)
 
-# DELTA QUDRANT PLOT
+# DELTA QUDRANT PLOT Model
 # GROUP VARIATION
+levels(delta.coefs$starting.richness)
+delta.coefs$starting.richness <- factor(delta.coefs$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
-
-ggplot(data=delta.coefs, aes(x=R.Slope, y=B.Slope,color=continent)) +
+mod.fig<-ggplot(data=delta.coefs, aes(x= IR.Slope+R.Slope, y= IB.Slope+B.Slope,color=starting.richness)) +
   geom_point(size=2) +
   #geom_jitter(height=0.45,width = 0.45)+
   #facet_grid(continent~., scales= 'free', space='free')+
-  geom_errorbar(aes(ymin = B.Slope_lower, ymax = B.Slope_upper,colour = continent), width = 0, size = 0.75,alpha=0.5) +
-  geom_errorbarh(aes(xmin = R.Slope_lower, xmax = R.Slope_upper,colour = continent), width = 0, size = 0.75,alpha=0.5) +
-  scale_colour_manual(values = c("#FA6B09FF", "#8F2F8BFF", "#F9B90AFF",  "#EE0011FF","#15983DFF", "#0C5BB0FF" ))+
+  geom_errorbar(aes(ymin = IB.Slope_lower+B.Slope_lower, ymax = IB.Slope_upper+B.Slope_upper,colour = starting.richness), width = 0, size = 0.35,alpha=0.3) +
+  geom_errorbarh(aes(xmin = IR.Slope_lower+R.Slope_lower, xmax = IR.Slope_upper+R.Slope_upper,colour = starting.richness), width = 0, size = 0.35,alpha=0.3) +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
   labs(x = 'Richness Slope',
-       y = 'Biomass Slope') +
+       y = 'Biomass Slope',
+       title= 'Model') +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+mod.fig
+
+#RAW DELTA PLOT
+
+plot13$starting.richness <- factor(plot13$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+colnames(plot13)
+plot13$delta.rich=plot13$rich.end-plot13$rich.start
+plot13$delta.mass=plot13$mass.end-plot13$mass.start
+View(plot13)
+
+# add in standard dev's
+
+raw.fig<-ggplot(data=plot13, aes(x=delta.rich, y=delta.mass,color=starting.richness)) +
+  geom_point(size=2) +
+  #geom_jitter(height=0.45,width = 0.45)+
+  #facet_grid(continent~., scales= 'free', space='free')+
+  #geom_errorbar(aes(ymin = B.Slope_lower, ymax = B.Slope_upper,colour = starting.richness), width = 0, size = 0.75,alpha=0.5) +
+  #geom_errorbarh(aes(xmin = R.Slope_lower, xmax = R.Slope_upper,colour = starting.richness), width = 0, size = 0.75,alpha=0.5) +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  labs(x = 'Richness Change',
+       y = 'Biomass Change',
+       title= 'Raw Data') +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+
+grid_arrange_shared_legend(mod.fig,raw.fig,nrow=1)
 
 # FIGURE 3
 # DERIVATIVES DELTA OVER TIME
 # CAFE BAYES VECTORS
 
-# SP LOSS VECTOR, SP GAIN VECTOR, CDE VECTOR... but what about....log?
+# SP LOSS VECTOR, SP GAIN VECTOR, CDE VECTOR... but what about....transformations?
+# held back on this one.
 
 
 
@@ -376,7 +420,7 @@ ggplot(data=delta.coefs, aes(x=R.Slope, y=B.Slope,color=continent)) +
 # POSTERIORS ACROSS GROUPS
 
 # SITE DIVERSITY
-# CO-LIMITED (STAND'S PAPER HOW DID HE DO IT) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
+# CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
 # EXOTIC VS. NATIVE DOMINATED
 # ANTHROPOGENIC
 # HERBIVORY
