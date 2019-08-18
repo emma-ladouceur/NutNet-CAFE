@@ -406,32 +406,3 @@ raw.fig<-ggplot(data=plot13, aes(x=delta.rich, y=delta.mass,color=starting.richn
 
 grid_arrange_shared_legend(mod.fig,raw.fig,nrow=1)
 
-# FIGURE 3
-# DERIVATIVES DELTA OVER TIME
-# CAFE BAYES VECTORS
-
-# SP LOSS VECTOR, SP GAIN VECTOR, CDE VECTOR... but what about....transformations?
-# held back on this one.
-
-
-
-
-# FIGURE 4
-# POSTERIORS ACROSS GROUPS
-
-# SITE DIVERSITY
-# CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
-# EXOTIC VS. NATIVE DOMINATED
-# ANTHROPOGENIC
-# HERBIVORY
-# BIOGEO / CLIMATE
-# N. DEPOSITION
-
-# FACETED AS LOSSES, GAINS, CDE? WITH POSTERIORS GROUPED AS ABOVE IN DIFF COLOURS
-# CONTROLS GREY IN THE BACKGROUND
-
-
-
-
-
-

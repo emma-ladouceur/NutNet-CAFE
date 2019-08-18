@@ -23,58 +23,71 @@ head(pp)
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl.Rdata') # sl.trt.i
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg.Rdata') # sg.trt.i
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde.Rdata') # p.CDE.trt.i
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sloss.Rdata') # s.loss.i
+load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sgain.Rdata') # s.gain.i
+#load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
 
-rich_fixef <- fixef(plot.rich.im)
+sloss_fixef <- fixef(s.loss.i)
+sgain_fixef <- fixef(s.gain.i)
 sl_fixef <- fixef(sl.trt.i)
 sg_fixef <- fixef(sg.trt.i)
 cde_fixef <- fixef(p.CDE.trt.i)
 
-rich_fixef<-as.data.frame(rich_fixef)
+sgain_fixef<-as.data.frame(sgain_fixef)
+sloss_fixef<-as.data.frame(sloss_fixef)
 sl_fixef<-as.data.frame(sl_fixef)
 sg_fixef<-as.data.frame(sg_fixef)
 cde_fixef<-as.data.frame(cde_fixef)
 
-rich_fixef$Model<-'Richness'
+sgain_fixef$names <- rownames(sgain_fixef)
+sloss_fixef$names <- rownames(sloss_fixef)
+sl_fixef$names <- rownames(sl_fixef)
+sg_fixef$names <- rownames(sg_fixef)
+cde_fixef$names <- rownames(cde_fixef)
+
+sgain_fixef$Model<-'Sgain'
+sloss_fixef$Model<-'Sloss'
+sloss_fixef$Estimate<-(sloss_fixef$Estimate)*-1
 sl_fixef$Estimate<-(sl_fixef$Estimate)*-1
+sgain_fixef$Estimate<-(sgain_fixef$Estimate)*-1
 sl_fixef$Model<-'SL'
 sg_fixef$Model<-'SG'
 cde_fixef$Model<-'CDE'
-fixedf_pp<-bind_rows(sl_fixef,sg_fixef,cde_fixef,rich_fixef)
+fixedf_pp<-bind_rows(sl_fixef,sg_fixef,cde_fixef,sloss_fixef,sgain_fixef)
 fixedf_pp
 
 ggplot()+
-  geom_segment(data = fixedf_pp,
-               aes(x = Estimate[4]+Estimate[8],
-                   xend = Estimate[4]+Estimate[8],
-                   y = Estimate[8],
-                   yend = +Estimate[12]),
+  geom_segment(data = fixedf_pp, # cde
+               aes(x = Estimate[16]+Estimate[20], #losses + gains
+                   xend = Estimate[16]+Estimate[20], # losses + gains
+                   y = Estimate[4]+Estimate[8],   # effect of sl + effect of sg on bm
+                   yend = Estimate[4]+Estimate[8]+Estimate[12]), # effect of sl + sg + cde on biomass
                colour= "purple",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  geom_segment(data = fixedf_pp,
-               aes(x = Estimate[16],
-                   xend = Estimate[16],
-                   y = Estimate[4],
-                   yend = Estimate[8]),
+  geom_segment(data = fixedf_pp, # gains
+               aes(x = Estimate[16], # start at losses
+                   xend = Estimate[16]+Estimate[20], #species losses + species gains
+                   y = Estimate[4],    # effect of sl on biomass
+                   yend = Estimate[4]+Estimate[8]),  # effect of sl + effect of sg on bm
                colour= "red",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  geom_segment(data = filter(fixedf_pp, Model=='SL'),
+  geom_segment(data = fixedf_pp, # losses
                             aes(x = 0,
-                                xend = Estimate[16],
+                                xend = Estimate[16], # species losses
                                 y = 0,
-                                yend = Estimate[4]),
+                                yend = Estimate[4]), # effect of sl on biomass
                             colour= "blue",
                             size = 1.5,
                             arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  labs(x = 'Species Richness',
-       y = 'Biomass',
+  labs(x = 'Effect on Species',
+       y = 'Effect on Biomass',
        title= 'CAFE Bayes Vector') +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 
-
+#you could also start them all from 0?
 ggplot()+
   geom_segment(data = fixedf_pp,
                aes(x = 0,
@@ -181,21 +194,6 @@ ggplot() +
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                      strip.background = element_rect(colour="black", fill="white"))
 
-
-
-# FIGURE 4
-# POSTERIORS ACROSS GROUPS
-
-# SITE DIVERSITY
-# CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
-# EXOTIC VS. NATIVE DOMINATED
-# ANTHROPOGENIC
-# HERBIVORY
-# BIOGEO / CLIMATE
-# N. DEPOSITION
-
-# FACETED AS LOSSES, GAINS, CDE? WITH POSTERIORS GROUPED AS ABOVE IN DIFF COLOURS
-# CONTROLS GREY IN THE BACKGROUND
 
 
 
