@@ -16,7 +16,7 @@
 
 #$ -cwd
 
-module load R/3.4.3-1
+module load R/3.5.0-1
 
 experiment=$1
 input=$2
