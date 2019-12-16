@@ -288,7 +288,7 @@ ggplot(data=nnr, aes(x=habitat, y=site_n, color=continent)) +scale_x_discrete(li
 
 
 
-#I LIKE THIS ONE
+# I LIKE THIS ONE
 
 nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
 nnr2 <- droplevels(subset(nnr, experiment_type == "Experimental (Full Factorial)"))

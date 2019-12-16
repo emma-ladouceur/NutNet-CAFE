@@ -361,8 +361,8 @@ mod.fig<-ggplot(data=delta.coefs, aes(x= IR.Slope+R.Slope, y= IB.Slope+B.Slope,c
   geom_point(size=2) +
   #geom_jitter(height=0.45,width = 0.45)+
   #facet_grid(continent~., scales= 'free', space='free')+
-  geom_errorbar(aes(ymin = IB.Slope_lower+B.Slope_lower, ymax = IB.Slope_upper+B.Slope_upper,colour = starting.richness), width = 0, size = 0.35,alpha=0.3) +
-  geom_errorbarh(aes(xmin = IR.Slope_lower+R.Slope_lower, xmax = IR.Slope_upper+R.Slope_upper,colour = starting.richness), width = 0, size = 0.35,alpha=0.3) +
+  geom_errorbar(aes(ymin = IB.Slope_lower+B.Slope_lower, ymax = IB.Slope_upper+B.Slope_upper,colour = starting.richness), width = 0, size = 0.45,alpha=0.3) +
+  geom_errorbarh(aes(xmin = IR.Slope_lower+R.Slope_lower, xmax = IR.Slope_upper+R.Slope_upper,colour = starting.richness), width = 0, size = 0.45,alpha=0.3) +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",

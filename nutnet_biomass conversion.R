@@ -5,13 +5,12 @@ library(gridExtra)
 library(ggplot2)
 library(reshape2)
 library(MCMCglmm)
-library(tidyr)
-library(dplyr)
+library(tidyverse)
 
 
-comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-02-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-cover<- read.csv("~/Dropbox/NutNet data/full-cover-02-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-02-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-01-November-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+cover<- read.csv("~/Dropbox/NutNet data/full-cover-01-November-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-01-November-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
 #There are 0's when biomass wasnt collected.
@@ -53,16 +52,16 @@ datnn4<-unite_(datnn3, "id", c("year","site_name","site_code","block","plot","tr
 datnn5<-full_join(datnn,datnn4, by= "id")
 
 #biomass per species
-datnn5$Biomass_CalcSp <- datnn5$max_cover/datnn5$live.cover * datnn5$live_mass
+datnn5$biomass.sp <- datnn5$max_cover/datnn5$live.cover * datnn5$live_mass
 
 # subset NAT, INT, UNK
 # calculate plot level biomass for each
 nat <- droplevels(subset(datnn5, local_provenance == "NAT"))
 int <- droplevels(subset(datnn5, local_provenance == "INT"))
 unk <- droplevels(subset(datnn5, local_provenance == "UNK"))
-nat2<- nat %>% group_by(id) %>% summarise(nat_biomass=sum(Biomass_CalcSp))
-int2<- int %>% group_by(id) %>% summarise(int_biomass=sum(Biomass_CalcSp))
-unk2<- unk %>% group_by(id) %>% summarise(unk_biomass=sum(Biomass_CalcSp))
+nat2<- nat %>% group_by(id) %>% summarise(nat_biomass=sum(biomass.sp))
+int2<- int %>% group_by(id) %>% summarise(int_biomass=sum(biomass.sp))
+unk2<- unk %>% group_by(id) %>% summarise(unk_biomass=sum(biomass.sp))
 head(unk2)
 p.biomass<-full_join(nat2,int2,by="id")
 View(p.biomass2)
@@ -72,9 +71,7 @@ head(datnn6)
 
 write.csv(datnn6,"/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc.csv")
 
-
-
-#clean it up, reduce it down
+# clean it up, reduce it down
 biomassc <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 bce <- droplevels(subset(biomassc, experiment_type == "Experimental (Full Factorial)"| experiment_type == "Experimental (Nutrients Only)"))
@@ -105,29 +102,29 @@ levels(nndistinct$site_code)
 
 
 
-#seperate NA's from 0's
+# seperate NA's from 0's
 
-colnames(bce3)
-bce3$nat_biomass[is.na(bce3$nat_biomass)] <- 0
-bce3$int_biomass[is.na(bce3$int_biomass)] <- 0
-bce3$unk_biomass[is.na(bce3$unk_biomass)] <- 0
-summary(bce3)
+# colnames(bce3)
+# head(bce3)
+# bce3$nat_biomass[is.na(bce3$nat_biomass)] <- 0
+# bce3$int_biomass[is.na(bce3$int_biomass)] <- 0
+# bce3$unk_biomass[is.na(bce3$unk_biomass)] <- 0
+# summary(bce3)
 #!!!!!!!!!!!!!!!!!
-#filter manually, where live_mass is NA, NA belongs in biomass columns
+# filter manually, where live_mass is NA, NA belongs in biomass columns
 
 #write.csv(bce3,"/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv")
 write.csv(bce3,"/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv")
 
-
-
-#plot level with new calcs and all
+# PLOT LEVEL
 biomassc <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
 biomassc$rich<-as.numeric(biomassc$rich)
 nrow(biomassc)
 colnames(biomassc)
 head(biomassc)
-#drop sp columns
-biomassc2<-biomassc[ , -which(names(biomassc) %in% c("X.1","X","Family","Taxon","local_provenance","local_lifeform","local_lifespan","functional_group","N_fixer","ps_path","max_cover","Biomass_CalcSp"))]
+# drop sp columns
+biomassc2<-biomassc[ , -which(names(biomassc) %in% c("X.1","X","Family","Taxon","local_provenance","local_lifeform","local_lifespan","functional_group","N_fixer","ps_path","max_cover","biomass.sp"))]
 colnames(biomassc2)
 biomassc3 <- unique(biomassc2)
 head(biomassc3)

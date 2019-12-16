@@ -44,23 +44,64 @@ sloss_fixef$names <- rownames(sloss_fixef)
 sl_fixef$names <- rownames(sl_fixef)
 sg_fixef$names <- rownames(sg_fixef)
 cde_fixef$names <- rownames(cde_fixef)
+sloss_fixef
+
+# 
+sloss_fixef$Estimate<- -abs(sloss_fixef$Estimate)
+sloss_fixef$Q2.5<- -abs(sloss_fixef$Q2.5)
+sloss_fixef$Q97.5<- -abs(sloss_fixef$Q97.5)
+
+sl_fixef$Estimate<- -abs(sl_fixef$Estimate)
+sl_fixef$Q2.5<- -abs(sl_fixef$Q2.5)
+sl_fixef$Q97.5<- -abs(sl_fixef$Q97.5)
+sl_fixef
+
+sgain_fixef$Estimate<- abs(sgain_fixef$Estimate)
+sgain_fixef$Q2.5<- abs(sgain_fixef$Q2.5)
+sgain_fixef$Q97.5<- abs(sgain_fixef$Q97.5)
+sgain_fixef
+
+# sg_fixef$Estimate<- -abs(sg_fixef$Estimate)
+# sg_fixef$Q2.5<- -abs(sg_fixef$Q2.5)
+# sg_fixef$Q97.5<- -abs(sg_fixef$Q97.5)
+sg_fixef
 
 sgain_fixef$Model<-'Sgain'
 sloss_fixef$Model<-'Sloss'
-sloss_fixef$Estimate<-(sloss_fixef$Estimate)*-1
-sl_fixef$Estimate<-(sl_fixef$Estimate)*-1
-sgain_fixef$Estimate<-(sgain_fixef$Estimate)*-1
 sl_fixef$Model<-'SL'
 sg_fixef$Model<-'SG'
 cde_fixef$Model<-'CDE'
 fixedf_pp<-bind_rows(sl_fixef,sg_fixef,cde_fixef,sloss_fixef,sgain_fixef)
 fixedf_pp
 
-ggplot()+
+
+ggplot(data = fixedf_pp)+
+  geom_point(aes(x=Estimate[16], #losses
+                 y=Estimate[4]),
+                 colour="blue",
+                 size=0.7)+
+  geom_errorbar(aes(x=Estimate[16],
+                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "blue", size = 0.35,alpha=0.3) +
+  geom_errorbarh(aes(y=Estimate[4],
+                    xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "blue", size = 0.35,alpha=0.3) +
+  geom_point(aes(x=Estimate[16]+Estimate[20], #gains
+             y= Estimate[8]),
+                 colour="red",size=0.7)+
+  geom_errorbar(aes(x=Estimate[16]+Estimate[20],
+                ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "red", size = 0.35,alpha=0.3) +
+  geom_errorbarh(aes(y=Estimate[8],
+                    xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "red", size = 0.35,alpha=0.3) +
+  geom_point(aes(x=Estimate[16]+Estimate[20], #persistent
+                 y=Estimate[8]+Estimate[12]),
+             colour="purple",size=0.7)+
+  geom_errorbar(aes(x=Estimate[16]+Estimate[20],
+                    ymin = Q2.5[8]+Q2.5[12], ymax = Q97.5[4]+Q97.5[8]+Q97.5[12]),width=0,colour = "purple", size = 0.35,alpha=0.3) +
+  geom_errorbarh(aes(y=Estimate[8]+Estimate[12],
+                     xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "purple", size = 0.35,alpha=0.3) +
   geom_segment(data = fixedf_pp, # cde
                aes(x = Estimate[16]+Estimate[20], #losses + gains
                    xend = Estimate[16]+Estimate[20], # losses + gains
-                   y = Estimate[4]+Estimate[8],   # effect of sl + effect of sg on bm
+                   y = Estimate[8],   # effect of sl + effect of sg on bm
                    yend = Estimate[4]+Estimate[8]+Estimate[12]), # effect of sl + sg + cde on biomass
                colour= "purple",
                size = 1.5,
@@ -69,7 +110,7 @@ ggplot()+
                aes(x = Estimate[16], # start at losses
                    xend = Estimate[16]+Estimate[20], #species losses + species gains
                    y = Estimate[4],    # effect of sl on biomass
-                   yend = Estimate[4]+Estimate[8]),  # effect of sl + effect of sg on bm
+                   yend = Estimate[8]),  # effect of sl + effect of sg on bm
                colour= "red",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
@@ -81,9 +122,9 @@ ggplot()+
                             colour= "blue",
                             size = 1.5,
                             arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  labs(x = 'Effect on Species',
+   labs(x = 'Effect on Species',
        y = 'Effect on Biomass',
-       title= 'CAFE Bayes Vector') +
+       title= 'CAFE Bayes Vector Plot') +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 
