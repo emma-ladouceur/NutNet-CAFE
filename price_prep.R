@@ -46,6 +46,7 @@ sindex<-as.character(all$site_code)
 yindex<-as.character(all$year_trt)
 uindex<-sort(unique(index))
 usindex<-sort(unique(sindex))
+
 uyindex<-sort(unique(yindex))
 
 #cumulative
@@ -96,16 +97,16 @@ folder = "output_new"
 #input RDS files for cluster, price analysis
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #if this doesnt work close R and try again only happens because wd has changed
-mapply(saveRDS, all_lst, file=paste0(folder, "/",names(all_lst), '.rds'))
+mapply(saveRDS, all_lst, file=paste0(folder, "/",names(all_lst), '.rds', version=3.4))
 
-library(dplyr)
+#test
 samp <- readRDS("arch.us_2.rds")
 colnames(samp)
 
 group.vars <- c('site.year.id','plot','block')
 treat.vars<-c('trt_year')
 
-grouped.data <- samp %>% group_by_(.dots=c(group.vars,treat.vars))
+grouped.data <- samp %>% group_by(.dots=c(group.vars,treat.vars))
 
 #takes a long time
 res <- pairwise.price(grouped.data, species="Taxon", func="biomass.sp")
@@ -115,6 +116,7 @@ pp<-res
 pp<-group.columns(pp,gps=c(group.vars,treat.vars), drop=T)
 
 View(pp)
+?pairwise.price
 
 #NATIVE
 nindex<-paste(native$site_name, native$site.year.id)
