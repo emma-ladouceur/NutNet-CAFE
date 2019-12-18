@@ -97,7 +97,7 @@ folder = "output_new"
 #input RDS files for cluster, price analysis
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #if this doesnt work close R and try again only happens because wd has changed
-mapply(saveRDS, all_lst, file=paste0(folder, "/",names(all_lst), '.rds', version=3.4))
+mapply(saveRDS, all_lst, version=2, file=paste0(folder, "/",names(all_lst), '.rds'))
 
 #test
 samp <- readRDS("arch.us_2.rds")

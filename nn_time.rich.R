@@ -14,7 +14,7 @@ plot$plot<-as.factor(plot$plot)
 
 
 plot.rich.im <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                    data = plot,   cores = 4, chains = 4)
+                    data = plot, cores = 4, chains = 4)
 
 
 save(plot.rich.im,

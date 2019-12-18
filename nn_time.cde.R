@@ -14,8 +14,11 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 
+# p.CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+#                  data = p.all, family=asym_laplace(),cores = 4, chains = 4)
+
 p.CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all, family=asym_laplace(),cores = 4, chains = 4)
+                  data = p.all,cores = 4, chains = 4)
 
 
 save(p.CDE.trt.i,
