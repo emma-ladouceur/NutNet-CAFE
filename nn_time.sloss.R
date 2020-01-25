@@ -14,14 +14,16 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 
-s.loss.h <- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                data = p.all,family=hurdle_lognormal(), cores = 4, chains = 4)
+# s.loss.h <- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+#                 data = p.all,family=hurdle_lognormal(), cores = 4, chains = 4)
 
 # s.loss.i <- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
 #                 data = p.all, cores = 4, chains = 4)
 
+ s.loss.p <- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                 data = p.all,family=poisson(), cores = 4, chains = 4)
 
-save(s.loss.h,
+save(s.loss.p,
      file=Sys.getenv('OFILE'))
 
 
