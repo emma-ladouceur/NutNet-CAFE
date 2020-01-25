@@ -65,9 +65,9 @@ hist(plot$log.live.mass)
 summary(pplot)
 
 # richness models
-# no transform, poisson distribution, non-convergence
+# no transform, poisson distribution, log link, non-convergence
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.poisson.Rdata') # plot.rich
-# no transform, gaussian distribution
+# no transform, lognormal distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
 #lognormal distribution
 load('~/Dropbox/Projects/SeedAdd/Model_fits/rich3.Rdata')
@@ -77,15 +77,15 @@ summary(plot.rich)
 summary(plot.rich.log)
 summary(rich.new3)
 
-plot(rich.new) 
-plot(plot.rich.log)
+plot(plot.rich) 
+plot(plot.rich.log) # catepillars are wonky
 plot(rich.new3)
 
 color_scheme_set("darkgray")
-pr1<-pp_check(rich.new)+ theme_classic()
+pr1<-pp_check(plot.rich)+ theme_classic()
 pr2<-pp_check(plot.rich.log)+ theme_classic()
 pr3<-pp_check(rich.new3)+ theme_classic()
-grid_arrange_shared_legend(pr1,pr2,pr3,ncol=3) 
+grid_arrange_shared_legend(pr1,pr2,ncol=2) 
 
 m1<-residuals(rich.new)
 m1<-as.data.frame(m1)
@@ -125,7 +125,6 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 # no transform, gaussian distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass.local.Rdata') # plot.bm.im
 # no transform, lognormal distribution, error because the neg values!!
-
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass1.Rdata') # plot.bm.log
 # no transform, lognormal distribution
 load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata')
@@ -161,24 +160,47 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 
 
 
+# price data
+price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+head(price)
+
+hist(price$SL.p)  # biomass change due to species loss
+hist(price$SG) # biomass change due to species gains
+hist(price$CDE) # biomass change in persistent species
+hist(price$s.loss.p) # species loss
+hist(price$s.gain) # species gains
 
 
-#price data
-pplot <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+#SL
+
+#SG
+
+
+# cde
+# no transform, gaussian, non convergence
+load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # p.CDE.trt.i
+# studentt distribution
+load('~/Dropbox/Projects/NutNet/Model_fits/cde2.Rdata') # CDE.s
+
+
+summary(p.CDE.trt.i)
+summary(CDE.s)
+
 
 
 # sloss
+# hurdle log normal distribution (original mod)
+load('~/Dropbox/Projects/SeedAdd/Model_fits/sloss2.Rdata') # s.loss.h
 # gaussian, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
-# gaussian distribution, richness not transformed, biomass transformed, 
-load('~/Dropbox/Projects/SeedAdd/Model_fits/multi2.Rdata')
 # no transform, gaussian distribution 
 load('~/Dropbox/Projects/SeedAdd/Model_fits/multi3.Rdata')
 # lognormal distribution, richness not transformed, biomass not transformed
 load('~/Dropbox/Projects/SeedAdd/Model_fits/multi4.Rdata')
 
+summary(s.loss.h)
 summary(s.loss.i)
-summary(multi2)
 summary(multi3)
 summary(multi4)
 
@@ -187,122 +209,15 @@ plot(multi2)
 plot(multi3)
 plot(multi4)
 
-pmb<-pp_check(multi, resp = 'lbiomass')+ theme_classic()
-pmr<-pp_check(multi, resp = 'lrich')+ theme_classic()
-#grid_arrange_shared_legend(pr,pb,nrow=1) 
-
-pmb2<-pp_check(multi2, resp = 'lbiomass')+ theme_classic()
-pmr2<-pp_check(multi2, resp = 'richplot')+ theme_classic()
-
-pmb3<-pp_check(multi3, resp = 'biomassplot')+ theme_classic()
-pmr3<-pp_check(multi3, resp = 'richplot')+ theme_classic()
-
-pmb4<-pp_check(multi4, resp = 'biomassplot')+ theme_classic()
-pmr4<-pp_check(multi4, resp = 'richplot')+ theme_classic()
-grid_arrange_shared_legend(pmr,pmr2,pmr3,pmr4,pmb,pmb2,pmb3,pmb4,nrow=2,ncol=4) 
-
-m1<-residuals(multi)
-m1
-plot <- cbind(plot,
-              residual_m1_rich = m1[,,'lrich'][,'Estimate'],
-              residual_m1_biomass = m1[,,'lbiomass'][,'Estimate'])
-
-m2<-residuals(multi2)
-m2
-plot <- cbind(plot,
-              residual_m2_rich = m2[,,'richplot'][,'Estimate'],
-              residual_m2_biomass = m2[,,'lbiomass'][,'Estimate'])
-
-par(mfrow=c(5,2))
-with(plot, plot(Experiment, residual_m1_rich))
-with(plot, plot(Experiment, residual_m2_rich))
-with(plot, plot(site, residual_m1_rich))
-with(plot, plot(site, residual_m2_rich))
-with(plot, plot(block, residual_m1_rich))
-with(plot, plot(block, residual_m2_rich))
-with(plot, plot(fyr.trt, residual_m1_rich))
-with(plot, plot(fyr.trt, residual_m2_rich))
-with(plot, plot(seed.rich, residual_m1_rich))
-with(plot, plot(seed.rich, residual_m2_rich))
-
-par(mfrow=c(5,2))
-with(plot, plot(Experiment, residual_m1_biomass))
-with(plot, plot(Experiment, residual_m2_biomass))
-with(plot, plot(site, residual_m1_biomass))
-with(plot, plot(site, residual_m2_biomass))
-with(plot, plot(block, residual_m1_biomass))
-with(plot, plot(block, residual_m2_biomass))
-with(plot, plot(fyr.trt, residual_m1_biomass))
-with(plot, plot(fyr.trt, residual_m2_biomass))
-with(plot, plot(seed.rich, residual_m1_biomass))
-with(plot, plot(seed.rich, residual_m2_biomass))
-
-
-# Diversity
-seed.pie.dat <- read.csv("~/Dropbox/Projects/SeedAdd/Data/seed.pie.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))%>% 
-  as_tibble()
-
-seed.pie$fyr.trt<-as.factor(seed.pie$yr.trt)
-seed.pie$seed.rich<-as.numeric(as.character(seed.pie$seed.rich))
-seed.pie$site<-as.factor(seed.pie$site)
-seed.pie$block<-as.factor(seed.pie$block)
-seed.pie$seed.rich.m<-seed.pie$seed.rich-mean(seed.pie$seed.rich)
-seed.pie$l.b.pie <- log(seed.pie$biomass.pie)
-
-hist(seed.pie$biomass.pie)
-hist(seed.pie$l.b.pie)
-
-
-# seedpie
-# log transform variables, gaussian distribution 
-load('~/Dropbox/Projects/SeedAdd/Model_fits/seedpie.Rdata')
-# gaussian distribution, no transform
-load('~/Dropbox/Projects/SeedAdd/Model_fits/seedpie2.Rdata')
-# no transform, lognormal distribution 
-load('~/Dropbox/Projects/SeedAdd/Model_fits/seedpie3.Rdata')
-
-
-summary(m.l.seed.pie)
-summary(seed.pie2)
-summary(seed.pie3)
-
-# inspection of chain diagnostics
-plot(m.l.seed.pie) 
-plot(seed.pie2) 
-plot(seed.pie3) 
-
-# predicted values vs observed
-sp1<-pp_check(m.l.seed.pie)+ theme_classic()
-sp2<-pp_check(seed.pie2)+ theme_classic()
-sp3<-pp_check(seed.pie3)+ theme_classic()
-grid_arrange_shared_legend(sp1,sp2,sp3,ncol=3) 
-
-#residuals
-m2<-residuals(seed.pie2)
-m2<-as.data.frame(m2)
-sp.plot2<-cbind(seed.pie.dat,m2$Estimate)
-
-m1<-residuals(m.l.seed.pie)
-m1<-as.data.frame(m1)
-sp.plot1<-cbind(seed.pie.dat,m1$Estimate)
-
-par(mfrow=c(5,2))
-with(sp.plot1, plot(Experiment, m1$Estimate));abline(h=0, lty=2)
-with(sp.plot2, plot(Experiment, m2$Estimate));abline(h=0, lty=2)
-with(sp.plot1, plot(site, m1$Estimate));abline(h=0, lty=2)
-with(sp.plot2, plot(site, m2$Estimate));abline(h=0, lty=2)
-with(sp.plot1, plot(block, m1$Estimate));abline(h=0, lty=2)
-with(sp.plot2, plot(block, m2$Estimate));abline(h=0, lty=2)
-with(sp.plot1, plot(fyr.trt, m1$Estimate));abline(h=0, lty=2)
-with(sp.plot2, plot(fyr.trt, m2$Estimate));abline(h=0, lty=2)
-with(sp.plot1, plot(seed.rich, m1$Estimate));abline(h=0, lty=2)
-with(sp.plot2, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
-
 
 #sgain
-#gaussian, not converged
+# no transform, hurdle lognormal distribution (original mod)
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
+# gaussian, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
 
+
+summary(s.gain.h)
 summary(s.gain.i)
 
 
