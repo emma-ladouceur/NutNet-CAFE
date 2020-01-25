@@ -124,8 +124,8 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 #biomass
 # no transform, gaussian distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass.local.Rdata') # plot.bm.im
-# no transform, lognormal distribution, error because the neg values!!
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass1.Rdata') # plot.bm.log
+# log transform, gauss distribution
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.log
 # no transform, lognormal distribution
 load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata')
 
@@ -163,18 +163,22 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 # price data
 price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+View(price)
 head(price)
 
-hist(price$SL.p)  # biomass change due to species loss
-hist(price$SG) # biomass change due to species gains
+# hist(price$SL.p)  # biomass change due to species loss
+# hist(price$SG) # biomass change due to species gains
 hist(price$CDE) # biomass change in persistent species
 hist(price$s.loss.p) # species loss
 hist(price$s.gain) # species gains
+hist(price$SRE.L) # biomass change due to species loss
+hist(price$SRE.G) # biomass change due to species gains
+price$SRE.L.p<-abs(price$SRE.L)
+hist(price$SRE.L.p) # biomass change due to species loss
 
+# SL
 
-#SL
-
-#SG
+# SG
 
 
 # cde
