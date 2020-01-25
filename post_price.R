@@ -166,7 +166,7 @@ View(plot)
 head(plot)
 
 plot2<-plot %>% drop_na(live_mass)
-nrow(plot2)
+summary(plot2)
 
 colnames(plot)
 par(mfrow=c(2,2))
@@ -175,9 +175,9 @@ hist(plot$live_mass, breaks=30, main="Biomass", xlab= "Plot Biomass")
 hist(plot$log.rich, breaks=30, main="Log Rich", xlab= " Log Species Rich")
 hist(plot$log.live.mass,breaks =30, main="Log Biomass", xlab= "Log Plot Biomass")
 
-View(plot)
+View(plot2)
 
-plot.bm.im <- brm(live_mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+plot.bm.im <- brm(log.live.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
                   data = plot2 ,family=gaussian(), cores = 4, chains = 4)
 
 summary(plot.bm.im)
@@ -224,7 +224,8 @@ p.all$site_code<-as.factor(p.all$site_code)
 p.all$site.year.id<-as.factor(p.all$site.year.id)
 p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
-
+head(p.all)
+summary(p.all)
 
 s.loss.i <- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                 data = p.all, family=student ,cores = 4, chains = 4)
@@ -233,7 +234,8 @@ s.gain.i <- brm(s.gain ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/bloc
                 data = p.all, cores = 4, chains = 4)
 
 p.CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                   data = p.all,family=student_t(),cores = 4, chains = 4)
+                   data = p.all,family= dstudent_t(),cores = 4, chains = 4)
+# Error in dt((x - mu)/sigma, df = df) : argument "x" is missing, with no default
 
 save(s.loss.i,file = 'sloss.Rdata')
 save(s.gain.i,file = 'sgain.Rdata')

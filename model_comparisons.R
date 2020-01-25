@@ -57,10 +57,12 @@ plot$log.rich<-log(plot$rich)
 #bm
 plot$log.live.mass<-log(plot$live_mass)
 
-hist(plot$rich)
-hist(plot$log.rich)
-hist(plot$live_mass)
-hist(plot$log.live.mass)
+par(mfrow=c(2,2))
+hist(plot$rich,breaks =30, main="Rich")
+hist(plot$live_mass, breaks=30, main="Biomass")
+hist(plot$log.rich, breaks=30, main="Log Rich")
+hist(plot$log.live.mass,breaks =30, main="Log Biomass")
+
 
 summary(pplot)
 
@@ -163,22 +165,23 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 # price data
 price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-View(price)
+summary(price)
 head(price)
 
-# hist(price$SL.p)  # biomass change due to species loss
-# hist(price$SG) # biomass change due to species gains
-hist(price$CDE) # biomass change in persistent species
-hist(price$s.loss.p) # species loss
-hist(price$s.gain) # species gains
-hist(price$SRE.L) # biomass change due to species loss
-hist(price$SRE.G) # biomass change due to species gains
+# transform  biomass change due to species loss to positive values for modelling
 price$SRE.L.p<-abs(price$SRE.L)
-hist(price$SRE.L.p) # biomass change due to species loss
 
-# SL
+par(mfrow=c(2,3))
+hist(price$SRE.L.p,breaks =40, main="Loss Func") # biomass change due to species loss (positive)
+hist(price$SRE.G, breaks=40, main="Gain Func") # biomass change due to species gains
+hist(price$CDE, breaks=40, main="Persistent Func") # biomass change in persistent species
+hist(price$s.loss.p,breaks =40, main="Sp Loss")  # species loss (positive)
+hist(price$s.gain,breaks =40, main="Gain Sp") # species gains
+hist(plot$rich,breaks =40, main="Richness") # richness (compare to loss and gains)
 
-# SG
+# SRE.L
+
+# SRE.G
 
 
 # cde
@@ -194,8 +197,8 @@ summary(CDE.s)
 
 
 # sloss
-# hurdle log normal distribution (original mod)
-load('~/Dropbox/Projects/SeedAdd/Model_fits/sloss2.Rdata') # s.loss.h
+# hurdle log normal distribution (original mod), now does not converge
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss2.Rdata') # s.loss.h
 # gaussian, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
 # no transform, gaussian distribution 
@@ -215,7 +218,7 @@ plot(multi4)
 
 
 #sgain
-# no transform, hurdle lognormal distribution (original mod)
+# no transform, hurdle lognormal distribution (original mod), does not converge
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
 # gaussian, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
