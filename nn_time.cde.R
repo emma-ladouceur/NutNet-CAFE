@@ -15,7 +15,7 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 CDE.s <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                  data = p.all, family= dstudent_t(),cores = 4, chains = 4)
+                  data = p.all, family = student(),cores = 4, chains = 4)
 
 # p.CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
 #                   data = p.all,cores = 4, chains = 4)
