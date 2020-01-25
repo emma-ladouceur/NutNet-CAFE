@@ -62,6 +62,8 @@ hist(plot$log.rich)
 hist(plot$live_mass)
 hist(plot$log.live.mass)
 
+summary(pplot)
+
 # richness models
 # no transform, poisson distribution, non-convergence
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.poisson.Rdata') # plot.rich
@@ -122,7 +124,8 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 #biomass
 # no transform, gaussian distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass.local.Rdata') # plot.bm.im
-# no transform, lognormal distribution
+# no transform, lognormal distribution, error because the neg values!!
+
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass1.Rdata') # plot.bm.log
 # no transform, lognormal distribution
 load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata')
@@ -159,17 +162,13 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 
 
 
-# Multi
 
-# when including all random effects the error appears
-
-#Error: Can only combine group-level terms of the same grouping factors.
-
-#not sure this error means what we think it means
+#price data
 
 
-# log transform both variables, gaussian distribution (only experiment as random effect)
-load('~/Dropbox/Projects/SeedAdd/Model_fits/multi.Rdata')
+# sloss
+# gaussian, not converged
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
 # gaussian distribution, richness not transformed, biomass transformed, 
 load('~/Dropbox/Projects/SeedAdd/Model_fits/multi2.Rdata')
 # no transform, gaussian distribution 
@@ -177,7 +176,7 @@ load('~/Dropbox/Projects/SeedAdd/Model_fits/multi3.Rdata')
 # lognormal distribution, richness not transformed, biomass not transformed
 load('~/Dropbox/Projects/SeedAdd/Model_fits/multi4.Rdata')
 
-summary(multi)
+summary(s.loss.i)
 summary(multi2)
 summary(multi3)
 summary(multi4)
@@ -297,6 +296,13 @@ with(sp.plot1, plot(fyr.trt, m1$Estimate));abline(h=0, lty=2)
 with(sp.plot2, plot(fyr.trt, m2$Estimate));abline(h=0, lty=2)
 with(sp.plot1, plot(seed.rich, m1$Estimate));abline(h=0, lty=2)
 with(sp.plot2, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
+
+
+#sgain
+#gaussian, not converged
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
+
+summary(s.gain.i)
 
 
 
