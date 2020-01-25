@@ -13,11 +13,12 @@ plot$plot<-as.factor(plot$plot)
 plot$log.rich<-log(plot$rich)
 
 
-# plot.rich.im <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
-#                     data = plot, cores = 4, chains = 4)
-# log
+# plot.rich <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
+#                     data = plot, family= poisson(), cores = 4, chains = 4)
+
+# lognormal dist
 plot.rich.log <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                    data = plot, cores = 4, chains = 4)
+                    data = plot, family=lognormal(), cores = 4, chains = 4)
 
 save(plot.rich.log,
      file=Sys.getenv('OFILE'))

@@ -12,7 +12,11 @@ library(bayesplot)
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.bm.Rdata') # plot.bm.im 
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
 
+load('~/Desktop/Model Fits/nn_time.bm.Rdata') # plot.bm.im 
+load('~/Desktop/Model Fits/nn_time.rich.Rdata') # plot.rich.im
+
 summary(plot.bm.im )
+summary(plot.rich.im )
 pp_check(plot.bm.im)
 
 # inspection of chain diagnostic
