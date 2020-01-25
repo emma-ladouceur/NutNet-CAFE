@@ -47,7 +47,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 }
 
 # plot data
-pplot <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+pplot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
@@ -164,6 +164,7 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 
 
 #price data
+pplot <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 # sloss
