@@ -14,11 +14,11 @@ plot$log.live.mass<-log(plot$live_mass)
 
 
 
-plot.bm.im <- brm(log.live.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                  data = plot , cores = 4, chains = 4)
+plot.bm.log <- brm(live_mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+                  data = plot ,family=lognormal(), cores = 4, chains = 4)
 
 
-save(plot.bm.im,
+save(plot.bm.log,
      file=Sys.getenv('OFILE'))
 
 
