@@ -47,46 +47,41 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 }
 
 # plot data
-plot <- read.csv("~/Dropbox/Projects/SeedAdd/Data/Master_Plot_Level_SeedAdd_New.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+pplot <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-
-plot$fyr.trt<-as.factor(plot$yr.trt)
-plot$seed.rich<-as.numeric(as.character(plot$seed.rich))
-plot$site<-as.factor(plot$site)
+colnames(plot)
+plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
-# Centered seed richness
-plot$seed.rich.m<-plot$seed.rich-mean(plot$seed.rich)
-# log-biomass
-plot$l.biomass <- log(plot$biomass.plot)
-plot$l.rich <- log(plot$rich.plot)
-plot$Experiment<-plot$Experiment_
+plot$plot<-as.factor(plot$plot)
+plot$log.rich<-log(plot$rich)
+#bm
+plot$log.live.mass<-log(plot$live_mass)
 
-
-hist(plot$rich.plot)
-hist(plot$l.rich)
-hist(plot$biomass.plot)
-hist(plot$l.biomass)
+hist(plot$rich)
+hist(plot$log.rich)
+hist(plot$live_mass)
+hist(plot$log.live.mass)
 
 # richness models
-# log transform, gaussian distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/rich.Rdata')
+# no transform, poisson distribution, non-convergence
+load('~/Dropbox/Projects/NutNet/Model_fits/rich.poisson.Rdata') # plot.rich
 # no transform, gaussian distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/rich2.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
 #lognormal distribution
 load('~/Dropbox/Projects/SeedAdd/Model_fits/rich3.Rdata')
 
 
-summary(rich.new)
-summary(rich.new2)
+summary(plot.rich)
+summary(plot.rich.log)
 summary(rich.new3)
 
 plot(rich.new) 
-plot(rich.new2)
+plot(plot.rich.log)
 plot(rich.new3)
 
 color_scheme_set("darkgray")
 pr1<-pp_check(rich.new)+ theme_classic()
-pr2<-pp_check(rich.new2)+ theme_classic()
+pr2<-pp_check(plot.rich.log)+ theme_classic()
 pr3<-pp_check(rich.new3)+ theme_classic()
 grid_arrange_shared_legend(pr1,pr2,pr3,ncol=3) 
 
@@ -125,25 +120,25 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 
 
 #biomass
-# log transform, gaussian distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass.Rdata')
 # no transform, gaussian distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass2.Rdata')
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass.local.Rdata') # plot.bm.im
+# no transform, lognormal distribution
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass1.Rdata') # plot.bm.log
 # no transform, lognormal distribution
 load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata')
 
-summary(biomass.new)
-summary(biomass.new2)
+summary(plot.bm.im)
+summary(plot.bm.log)
 summary(biomass.new3)
 
 # inspection of chain diagnostics
-plot(biomass.new) 
-plot(biomass.new2) 
+plot(plot.bm.im) 
+plot(plot.bm.log) 
 plot(biomass.new3) 
 
 # predicted values vs observed
-pb1<-pp_check(biomass.new)+ theme_classic()
-pb2<-pp_check(biomass.new2)+ theme_classic()
+pb1<-pp_check(plot.bm.im)+ theme_classic()
+pb2<-pp_check(plot.bm.log)+ theme_classic()
 pb3<-pp_check(biomass.new3)+ theme_classic()
 grid_arrange_shared_legend(pb1,pb2,pb3,ncol=3) 
 
