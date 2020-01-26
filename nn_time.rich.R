@@ -17,7 +17,7 @@ plot$log.rich<-log(plot$rich)
 #                     data = plot, family= poisson(), cores = 4, chains = 4)
 
 # lognormal dist
-plot.rich..g <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
+plot.rich.g <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
                     data = plot, cores = 4, chains = 4)
 
 save(plot.rich.g,
