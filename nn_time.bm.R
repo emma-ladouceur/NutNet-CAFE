@@ -15,9 +15,9 @@ plot2<-plot %>% drop_na(live_mass)
 plot2$log.live.mass<-log(plot2$live_mass)
 
 
-plot.bm <- brm(live_mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                  data = plot2 ,  cores = 4, chains = 4)
+plot.bm.logd <- brm(live_mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+                  data = plot2 , family=lognormal(),  cores = 4, chains = 4)
 
-save(plot.bm,
+save(plot.bm.logd,
      file=Sys.getenv('OFILE'))
 

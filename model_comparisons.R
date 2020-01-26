@@ -8,6 +8,7 @@ library(tidyverse)
 library(brms)
 library(broom)
 library(lme4)
+library(loo)
 library(sjstats)
 library(bayesplot)
 library(grid)
@@ -67,29 +68,28 @@ hist(plot$log.live.mass,breaks =30, main="Log Biomass")
 summary(pplot)
 
 # richness models
-# no transform, poisson distribution, log link, non-convergence
-load('~/Dropbox/Projects/NutNet/Model_fits/rich.poisson.Rdata') # plot.rich
+# no transform, poisson distribution,  non-convergence
+load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.p
 # no transform, lognormal distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
 # gaussian distribution 
-load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich..g
+load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
-
-summary(plot.rich)
+summary(plot.rich.p)
 summary(plot.rich.log)
-summary(plot.rich..g)
+summary(plot.rich.g)
 
-plot(plot.rich) 
+plot(plot.rich.p) 
 plot(plot.rich.log) # catepillars are wonky
-plot(plot.rich..g)
+plot(plot.rich.g)
 
 color_scheme_set("darkgray")
-pr1<-pp_check(plot.rich)+ theme_classic()
+pr1<-pp_check(plot.rich.p)+ theme_classic()
 pr2<-pp_check(plot.rich.log)+ theme_classic()
-pr3<-pp_check(plot.rich..g)+ theme_classic()
+pr3<-pp_check(plot.rich.g)+ theme_classic()
 grid_arrange_shared_legend(pr1,pr2,pr3,ncol=3) 
 
-m1<-residuals(rich.new)
+m1<-residuals(rich.new.p)
 m1<-as.data.frame(m1)
 View(m1)
 nrow(m1)
@@ -129,21 +129,30 @@ load('~/Dropbox/Projects/NutNet/Model_fits/biomass.local.Rdata') # plot.bm.im
 # log transform, gauss distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
 # no transform, lognormal distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata') # biomass.new3
+load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata') # plot.bm.logd
 
 summary(plot.bm.im)
-summary(plot.bm.log)
-summary(biomass.new3)
+summary(plot.bm.logt)
+summary(plot.bm.logd)
+
+# compare two models using loo (but should use waic or loo criterion?)
+# must have same number of observations
+plot.bm.logt <- add_criterion(plot.bm.logt, "waic")
+plot.bm.logt <- add_criterion(plot.bm.logt, "loo")
+plot.bm.logd <- add_criterion(plot.bm.logd, "waic")
+plot.bm.logd <- add_criterion(plot.bm.logd, "loo")
+loo_compare(plot.bm.im, biomass.new3, criterion = "waic")
+loo_compare(plot.bm.im, biomass.new3, criterion = "loo")
 
 # inspection of chain diagnostics
 plot(plot.bm.im) 
-plot(plot.bm.log) 
-plot(biomass.new3) 
+plot(plot.bm.logt) 
+plot(plot.bm.logd) 
 
 # predicted values vs observed
 pb1<-pp_check(plot.bm.im)+ theme_classic()
-pb2<-pp_check(plot.bm.log)+ theme_classic()
-pb3<-pp_check(biomass.new3)+ theme_classic()
+pb2<-pp_check(plot.bm.logt)+ theme_classic()
+pb3<-pp_check(plot.bm.logd)+ theme_classic()
 grid_arrange_shared_legend(pb1,pb2,pb3,ncol=3) 
 
 #residuals
@@ -179,7 +188,7 @@ hist(price$s.loss.p,breaks =40, main="Sp Loss")  # species loss (positive)
 hist(price$s.gain,breaks =40, main="Gain Sp") # species gains
 hist(plot$rich,breaks =40, main="Richness") # richness (compare to loss and gains)
 
-# SRE.L
+# SL- effect of species loss on biomass
 # no transform, hurdle lognormal dist, non convergence
 load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.trt.h
 
@@ -188,10 +197,10 @@ summary(sl.trt.h)
 plot(sl.trt.h)
 
 # predicted values vs observed
-pp_check(sl.trt.h)+ theme_classic()
+pp_check(sl.trt.h)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 
-# SRE.G
+# SG - effect of species gains on biomass
 # no transform, hurdle lognormal dist
 load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.trt.h
 
@@ -200,10 +209,10 @@ summary(sg.trt.h)
 plot(sg.trt.h)
 
 # predicted values vs observed
-pp_check(sg.trt.h)+ theme_classic()
+pp_check(sg.trt.h)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 
-# cde - biomass change in persistent species
+# CDE - biomass change in persistent species
 # no transform, gaussian, non convergence
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # p.CDE.trt.i
 # student-t distribution, not converged
