@@ -13,7 +13,7 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 
-sg.trt.h <- brm(SRE.G ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+sg.trt.h <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                 data = p.all, family=hurdle_lognormal(),cores = 4, chains = 4)
 
 # sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 

@@ -71,23 +71,23 @@ summary(pplot)
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.poisson.Rdata') # plot.rich
 # no transform, lognormal distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
-#lognormal distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/rich3.Rdata')
+# gaussian distribution 
+load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich..g
 
 
 summary(plot.rich)
 summary(plot.rich.log)
-summary(rich.new3)
+summary(plot.rich..g)
 
 plot(plot.rich) 
 plot(plot.rich.log) # catepillars are wonky
-plot(rich.new3)
+plot(plot.rich..g)
 
 color_scheme_set("darkgray")
 pr1<-pp_check(plot.rich)+ theme_classic()
 pr2<-pp_check(plot.rich.log)+ theme_classic()
-pr3<-pp_check(rich.new3)+ theme_classic()
-grid_arrange_shared_legend(pr1,pr2,ncol=2) 
+pr3<-pp_check(plot.rich..g)+ theme_classic()
+grid_arrange_shared_legend(pr1,pr2,pr3,ncol=3) 
 
 m1<-residuals(rich.new)
 m1<-as.data.frame(m1)
@@ -127,9 +127,9 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 # no transform, gaussian distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass.local.Rdata') # plot.bm.im
 # log transform, gauss distribution
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.log
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
 # no transform, lognormal distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata')
+load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata') # biomass.new3
 
 summary(plot.bm.im)
 summary(plot.bm.log)
@@ -180,52 +180,94 @@ hist(price$s.gain,breaks =40, main="Gain Sp") # species gains
 hist(plot$rich,breaks =40, main="Richness") # richness (compare to loss and gains)
 
 # SRE.L
+# no transform, hurdle lognormal dist, non convergence
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.trt.h
+
+summary(sl.trt.h)
+
+plot(sl.trt.h)
+
+# predicted values vs observed
+pp_check(sl.trt.h)+ theme_classic()
+
 
 # SRE.G
+# no transform, hurdle lognormal dist
+load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.trt.h
+
+summary(sg.trt.h)
+
+plot(sg.trt.h)
+
+# predicted values vs observed
+pp_check(sg.trt.h)+ theme_classic()
 
 
-# cde
+# cde - biomass change in persistent species
 # no transform, gaussian, non convergence
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # p.CDE.trt.i
-# studentt distribution
+# student-t distribution, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/cde2.Rdata') # CDE.s
-
 
 summary(p.CDE.trt.i)
 summary(CDE.s)
 
+plot(p.CDE.trt.i)
+plot(CDE.s)
+
+# predicted values vs observed
+c1<-pp_check(p.CDE.trt.i)+ theme_classic()
+c2<-pp_check(CDE.s)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
+grid_arrange_shared_legend(c1,c2,ncol=2) 
 
 
-# sloss
-# hurdle log normal distribution (original mod), now does not converge
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss2.Rdata') # s.loss.h
+# sloss - species loss
 # gaussian, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
-# no transform, gaussian distribution 
-load('~/Dropbox/Projects/SeedAdd/Model_fits/multi3.Rdata')
-# lognormal distribution, richness not transformed, biomass not transformed
-load('~/Dropbox/Projects/SeedAdd/Model_fits/multi4.Rdata')
+# hurdle log normal distribution  does not converge
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss2.Rdata') # s.loss.h
 
-summary(s.loss.h)
+# no transform, poission distribution 
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss3.Rdata') # s.loss.p
+
+
 summary(s.loss.i)
-summary(multi3)
-summary(multi4)
+summary(s.loss.h)
+summary(s.loss.p)
 
-plot(multi)
-plot(multi2)
-plot(multi3)
-plot(multi4)
+plot(s.loss.i)
+plot(s.loss.h)
+plot(s.loss.p)
+
+# predicted values vs observed
+sloss1<-pp_check(s.loss.i)+ theme_classic()
+sloss2<-pp_check(s.loss.h)+ theme_classic()
+sloss3<-pp_check(s.loss.p)+ theme_classic()
+grid_arrange_shared_legend(sloss1,sloss2,sloss3,ncol=3) 
 
 
-#sgain
-# no transform, hurdle lognormal distribution (original mod), does not converge
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
+# sgain - species gain
 # gaussian, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
+# no transform, hurdle lognormal distribution  does not converge
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
 
+# poisson, not converged
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain3.Rdata') # s.gain.p
 
 summary(s.gain.h)
 summary(s.gain.i)
+summary(s.gain.p)
 
+
+plot(s.gain.i)
+plot(s.gain.h)
+plot(s.gain.p)
+
+# predicted values vs observed
+sgain1<-pp_check(s.gain.i)+ theme_classic()
+sgain2<-pp_check(s.gain.h)+ theme_classic()
+sgain3<-pp_check(s.gain.p)+ theme_classic()
+grid_arrange_shared_legend(sgain1,sgain2,sgain3,ncol=3) 
 
 
