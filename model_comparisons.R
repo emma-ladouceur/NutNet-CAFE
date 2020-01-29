@@ -68,7 +68,7 @@ hist(plot$log.live.mass,breaks =30, main="Log Biomass")
 summary(pplot)
 
 # richness models
-# no transform, poisson distribution,  non-convergence
+# no transform, poisson distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.p
 # no transform, lognormal distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
@@ -125,13 +125,13 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 
 #biomass
 # no transform, gaussian distribution
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass.local.Rdata') # plot.bm.im
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass.Rdata') # plot.bm
 # log transform, gauss distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
-# no transform, lognormal distribution
-load('~/Dropbox/Projects/SeedAdd/Model_fits/biomass3.Rdata') # plot.bm.logd
+# no transform, lognormal distribution # small ESS
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass3.Rdata') # plot.bm.logd
 
-summary(plot.bm.im)
+summary(plot.bm)
 summary(plot.bm.logt)
 summary(plot.bm.logd)
 
@@ -141,16 +141,16 @@ plot.bm.logt <- add_criterion(plot.bm.logt, "waic")
 plot.bm.logt <- add_criterion(plot.bm.logt, "loo")
 plot.bm.logd <- add_criterion(plot.bm.logd, "waic")
 plot.bm.logd <- add_criterion(plot.bm.logd, "loo")
-loo_compare(plot.bm.im, biomass.new3, criterion = "waic")
-loo_compare(plot.bm.im, biomass.new3, criterion = "loo")
+loo_compare(plot.bm.logt, plot.bm.logd, criterion = "waic")
+loo_compare(plot.bm.logt, plot.bm.logd, criterion = "loo")
 
 # inspection of chain diagnostics
-plot(plot.bm.im) 
+plot(plot.bm) 
 plot(plot.bm.logt) 
 plot(plot.bm.logd) 
 
 # predicted values vs observed
-pb1<-pp_check(plot.bm.im)+ theme_classic()
+pb1<-pp_check(plot.bm)+ theme_classic()
 pb2<-pp_check(plot.bm.logt)+ theme_classic()
 pb3<-pp_check(plot.bm.logd)+ theme_classic()
 grid_arrange_shared_legend(pb1,pb2,pb3,ncol=3) 
@@ -177,12 +177,10 @@ price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",hea
 summary(price)
 head(price)
 
-# transform  biomass change due to species loss to positive values for modelling
-price$SRE.L.p<-abs(price$SRE.L)
 
 par(mfrow=c(2,3))
-hist(price$SRE.L.p,breaks =40, main="Loss Func") # biomass change due to species loss (positive)
-hist(price$SRE.G, breaks=40, main="Gain Func") # biomass change due to species gains
+hist(price$SL.p,breaks =40, main="Loss Func") # biomass change due to species loss (positive)
+hist(price$SG, breaks=40, main="Gain Func") # biomass change due to species gains
 hist(price$CDE, breaks=40, main="Persistent Func") # biomass change in persistent species
 hist(price$s.loss.p,breaks =40, main="Sp Loss")  # species loss (positive)
 hist(price$s.gain,breaks =40, main="Gain Sp") # species gains
@@ -235,7 +233,6 @@ grid_arrange_shared_legend(c1,c2,ncol=2)
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
 # hurdle log normal distribution  does not converge
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss2.Rdata') # s.loss.h
-
 # no transform, poission distribution 
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss3.Rdata') # s.loss.p
 
@@ -260,7 +257,6 @@ grid_arrange_shared_legend(sloss1,sloss2,sloss3,ncol=3)
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
 # no transform, hurdle lognormal distribution  does not converge
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
-
 # poisson, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain3.Rdata') # s.gain.p
 
