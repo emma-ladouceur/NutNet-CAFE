@@ -106,7 +106,7 @@ plot7<-inner_join(plot6,zrich)
 plot7$starting.richness <- factor(plot7$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 ggplot(plot7, aes(x=m.rich, y=m.mass, color=starting.richness,group=site_code))+
-  geom_point(size=2,shape=1)+ geom_line()
+  geom_point(size=2,shape=1)+ geom_line()+
 scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                "6-10" = "#75B41EFF",
                                "11-15" ="#5AC2F1FF",
@@ -403,6 +403,6 @@ raw.fig<-ggplot(data=plot13, aes(x=delta.rich, y=delta.mass,color=starting.richn
        title= 'Raw Data') +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
-
+raw.fig
 grid_arrange_shared_legend(mod.fig,raw.fig,nrow=1)
 

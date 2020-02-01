@@ -12,13 +12,13 @@ p.all$site.year.id<-as.factor(p.all$site.year.id)
 p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 
-sl.trt.h.d <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all, family=hurdle_lognormal(), cores = 4, iter=4000, chains = 4)
+sl.trt.h.t <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                 data = p.all, family=hurdle_lognormal(), cores = 4, iter=6000, chains = 4)
 
 # sl.trt.i <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
 #                 data = p.all, cores = 4, chains = 4)
 
-save(sl.trt.h.d,
+save(sl.trt.h.t,
      file=Sys.getenv('OFILE'))
 
 
