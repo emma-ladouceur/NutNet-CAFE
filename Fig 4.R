@@ -8,12 +8,12 @@ library(grid)
 # FIGURE 4
 # POSTERIORS ACROSS GROUPS
 
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.bm.Rdata') # plot.bm.im 
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
+load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl.Rdata') # sl.trt.i
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg.Rdata') # sg.trt.i
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde.Rdata') # p.CDE.trt.i
+load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
+load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
+load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
 
 # meta data
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -43,71 +43,71 @@ meta.c<-distinct(meta.ctl,site_code, continent, habitat,anthropogenic,r.rich)
 meta.t<-distinct(meta.trt,site_code, continent, habitat,anthropogenic,r.rich)
 
 
-study_levels <- plot.rich.im$data %>% 
+study_levels <- plot.rich.g$data %>% 
   as_tibble() %>% 
   distinct(site_code) %>% 
   mutate(level =  site_code) %>%
-  nest(level)
+  nest_legacy(level)
 
-parnames(plot.rich.im)
+parnames(plot.rich.g)
 study_sample_posterior <- study_levels %>%
-  mutate(sl.ctl = purrr::map(data, ~posterior_samples(sl.trt.i,
+  mutate(sl.ctl = purrr::map(data, ~posterior_samples(sl.trt.h.t,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,
                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sg.ctl = purrr::map(data, ~posterior_samples(sg.trt.i,
+         sg.ctl = purrr::map(data, ~posterior_samples(sg.trt.d,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,
                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         cde.ctl = purrr::map(data, ~posterior_samples(p.CDE.trt.i,
+         cde.ctl = purrr::map(data, ~posterior_samples(CDE.s.t,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         rich.ctl = purrr::map(data, ~posterior_samples(plot.rich.im,
+         rich.ctl = purrr::map(data, ~posterior_samples(plot.rich.g,
                                                         pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                         exact = TRUE,
                                                         subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         bm.ctl = purrr::map(data, ~posterior_samples(plot.bm.im,
+         bm.ctl = purrr::map(data, ~posterior_samples(plot.bm.logt,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         sl.trt = purrr::map(data, ~posterior_samples(sl.trt.i, 
+         sl.trt = purrr::map(data, ~posterior_samples(sl.trt.h.t, 
                                                       pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sg.trt = purrr::map(data, ~posterior_samples(sg.trt.i, 
+         sg.trt = purrr::map(data, ~posterior_samples(sg.trt.d, 
                                                       pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,
                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         cde.trt = purrr::map(data, ~posterior_samples(p.CDE.trt.i,
+         cde.trt = purrr::map(data, ~posterior_samples(CDE.s.t,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         rich.trt = purrr::map(data, ~posterior_samples(plot.rich.im,
+         rich.trt = purrr::map(data, ~posterior_samples(plot.rich.g,
                                                         pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                         exact = TRUE,
                                                         subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         bm.trt = purrr::map(data, ~posterior_samples(plot.bm.im,
+         bm.trt = purrr::map(data, ~posterior_samples(plot.bm.logt,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()))
 
 
 
-sl.trt.i_fixef <- fixef(sl.trt.i)
-sg.trt.i_fixef <- fixef(sg.trt.i)
-CDE.trt.i_fixef <- fixef(p.CDE.trt.i)
-plot.rich.im_fixef <- fixef(plot.rich.im)
-plot.bm.im_fixef <- fixef(plot.bm.im)
+sl.trt.i_fixef <- fixef(sl.trt.h.t)
+sg.trt.i_fixef <- fixef(sg.trt.d)
+CDE.trt.i_fixef <- fixef(CDE.s.t)
+plot.rich.im_fixef <- fixef(plot.rich.g)
+plot.bm.im_fixef <- fixef(plot.bm.logt)
 
 
 
 sl_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
-  unnest(sl.ctl,sl.trt) %>% 
+  unnest_legacy(sl.ctl,sl.trt) %>% 
   mutate(response = 'sl',
          sl.ctl_global_slope = sl.trt.i_fixef['year.y.m','Estimate'],
          sl.ctl_upper_slope = sl.trt.i_fixef['year.y.m','Q97.5'],
@@ -149,7 +149,7 @@ sl.p.t$starting.richness <- ifelse(sl.p.t$r.rich >= 1 & sl.p.t$r.rich <= 5, '1-5
 # View(sg.trt.i_fixef)
 sg_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
-  unnest(sg.ctl,sg.trt) %>% 
+  unnest_legacy(sg.ctl,sg.trt) %>% 
   mutate(response = 'sg',
          sg.ctl_global_slope = sg.trt.i_fixef['year.y.m','Estimate'],
          sg.ctl_upper_slope = sg.trt.i_fixef['year.y.m','Q97.5'],
@@ -187,7 +187,7 @@ sg.p.t$starting.richness <- ifelse(sg.p.t$r.rich >= 1 & sg.p.t$r.rich <= 5, '1-5
 
 cde_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
-  unnest(cde.ctl,cde.trt) %>% 
+  unnest_legacy(cde.ctl,cde.trt) %>% 
   mutate(response = 'cde',
          cde.ctl_global_slope = CDE.trt.i_fixef['year.y.m','Estimate'],
          cde.ctl_upper_slope = CDE.trt.i_fixef['year.y.m','Q97.5'],
@@ -407,7 +407,7 @@ meta.t.p<-distinct(meta.trt.p,site_code, continent, habitat,anthropogenic,r.rich
 #plot.rich.im_fixef
 rich_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
-  unnest(rich.ctl,rich.trt) %>% 
+  unnest_legacy(rich.ctl,rich.trt) %>% 
   mutate(response = 'rich',
          rich.ctl_global_slope = plot.rich.im_fixef['year_trt','Estimate'],
          rich.ctl_upper_slope = plot.rich.im_fixef['year_trt','Q97.5'],
@@ -446,7 +446,7 @@ rich.p.t$starting.richness <- ifelse(rich.p.t$r.rich >= 1 & rich.p.t$r.rich <= 5
 
 bm_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
-  unnest(bm.ctl,bm.trt) %>% 
+  unnest_legacy(bm.ctl,bm.trt) %>% 
   mutate(response = 'bm',
          bm.ctl_global_slope = plot.bm.im_fixef['year_trt','Estimate'],
          bm.ctl_upper_slope = plot.bm.im_fixef['year_trt','Q97.5'],

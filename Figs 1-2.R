@@ -205,12 +205,12 @@ startrich<-plot[plot$year_trt %in% c('0'),]
 
 
 #models
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.bm.Rdata') # plot.bm.im 
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
+load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
 #RICHNESS
 
-plot.rich_coeff <- coef(plot.rich.im)
+plot.rich_coeff <- coef(plot.rich.g)
 
 plot.rich_coef<-as.data.frame(plot.rich_coeff$site_code)
 #names(plot.rich_coef) <- gsub(":", ".", names(plot.rich_coef), fixed = TRUE)
@@ -263,9 +263,9 @@ dat<-distinct(plot, site_code, continent,habitat)
 plot.rich_coef3<-full_join(plot.rich_coef2,dat)
 
 
-plot.rich_fitted <- cbind(plot.rich.im$data,
+plot.rich_fitted <- cbind(plot.rich.g$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(plot.rich.im, re_formula = NA)) %>% 
+                          fitted(plot.rich.g, re_formula = NA)) %>% 
   as_tibble() 
 # View(plot.rich_fitted)
 summary(plot.rich_fitted)
@@ -289,7 +289,7 @@ plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , 
 
 
 #BIOMASS
-plot.bm_coef <- coef(plot.bm.im)
+plot.bm_coef <- coef(plot.bm.logt)
 plot.bm_coef 
 colnames(plot.bm_coef)
 plot.bm_coef<-as.data.frame(plot.bm_coef$site_code)

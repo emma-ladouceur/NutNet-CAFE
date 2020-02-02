@@ -69,9 +69,9 @@ summary(pplot)
 
 # richness models
 # no transform, poisson distribution
-load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.p
+#load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.p
 # no transform, lognormal distribution
-load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
+#load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
 # gaussian distribution 
 load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
@@ -87,13 +87,11 @@ color_scheme_set("darkgray")
 pr1<-pp_check(plot.rich.p)+ theme_classic()
 pr2<-pp_check(plot.rich.log)+ theme_classic()
 pr3<-pp_check(plot.rich.g)+ theme_classic()
+pr3
 grid_arrange_shared_legend(pr1,pr2,pr3,ncol=3) 
 
-m1<-residuals(rich.new.p)
+m1<-residuals(plot.rich.g)
 m1<-as.data.frame(m1)
-View(m1)
-nrow(m1)
-nrow(plot)
 rr.plot<-cbind(plot,m1$Estimate)
 View(rr.plot)
 
@@ -125,11 +123,11 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 
 #biomass
 # no transform, gaussian distribution
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass.Rdata') # plot.bm
+#load('~/Dropbox/Projects/NutNet/Model_fits/biomass.Rdata') # plot.bm
 # log transform, gauss distribution
 load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
 # no transform, lognormal distribution # small ESS
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass3.Rdata') # plot.bm.logd
+#load('~/Dropbox/Projects/NutNet/Model_fits/biomass3.Rdata') # plot.bm.logd
 
 summary(plot.bm)
 summary(plot.bm.logt)
@@ -188,58 +186,78 @@ hist(plot$rich,breaks =40, main="Richness") # richness (compare to loss and gain
 
 # SL- effect of species loss on biomass
 # no transform, hurdle lognormal dist, non convergence
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.trt.h
+#load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.trt.h
+# no transform, hurdle lognormal dist, 4000 iterations, non convergence
+load('~/Dropbox/Projects/NutNet/Model_fits/sl2.Rdata') # sl.trt.h.d
+# no transform, hurdle lognormal dist, 6000 iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
 
-summary(sl.trt.h)
+summary(sl.trt.h.d)
+summary(sl.trt.h.t)
 
-plot(sl.trt.h)
+plot(sl.trt.h.d)
+plot(sl.trt.h.t)
 
 # predicted values vs observed
-pp_check(sl.trt.h)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
-
+pp_check(sl.trt.h.d)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
+pp_check(sl.trt.h.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 # SG - effect of species gains on biomass
 # no transform, hurdle lognormal dist
-load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.trt.h
+#load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.trt.h
+# no transform, hurdle lognormal dist, 4000 iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
 
-summary(sg.trt.h)
+summary(sg.trt.d)
 
-plot(sg.trt.h)
+
+plot(sg.trt.h.)
 
 # predicted values vs observed
-pp_check(sg.trt.h)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
+pp_check(sg.trt.d)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 
 # CDE - biomass change in persistent species
 # no transform, gaussian, non convergence
-load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # p.CDE.trt.i
+#load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # p.CDE.trt.i
 # student-t distribution, not converged
 load('~/Dropbox/Projects/NutNet/Model_fits/cde2.Rdata') # CDE.s
+# student-t distribution, double the iterations (4000), not converged
+load('~/Dropbox/Projects/NutNet/Model_fits/cde3.Rdata') # CDE.s.d
+# student-t distribution,  triple the iterations (6000)
+load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
 
 summary(p.CDE.trt.i)
-summary(CDE.s)
+summary(CDE.s.d)
+summary(CDE.s.t)
 
 plot(p.CDE.trt.i)
-plot(CDE.s)
+plot(CDE.s.d)
+plot(CDE.s.t)
 
 # predicted values vs observed
 c1<-pp_check(p.CDE.trt.i)+ theme_classic()
-c2<-pp_check(CDE.s)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
+pp_check(CDE.s.d)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
+pp_check(CDE.s.t)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
+
+
 grid_arrange_shared_legend(c1,c2,ncol=2) 
 
 
 # sloss - species loss
 # gaussian, not converged
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
+#load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
 # hurdle log normal distribution  does not converge
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss2.Rdata') # s.loss.h
+#load('~/Dropbox/Projects/NutNet/Model_fits/sloss2.Rdata') # s.loss.h
 # no transform, poission distribution 
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss3.Rdata') # s.loss.p
+#load('~/Dropbox/Projects/NutNet/Model_fits/sloss3.Rdata') # s.loss.p
+# no transform, poission distribution , double iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss4.Rdata') # s.loss.p.d
 
 
 summary(s.loss.i)
 summary(s.loss.h)
-summary(s.loss.p)
+summary(s.loss.p.d)
 
 plot(s.loss.i)
 plot(s.loss.h)
@@ -248,31 +266,35 @@ plot(s.loss.p)
 # predicted values vs observed
 sloss1<-pp_check(s.loss.i)+ theme_classic()
 sloss2<-pp_check(s.loss.h)+ theme_classic()
-sloss3<-pp_check(s.loss.p)+ theme_classic()
+sloss3<-pp_check(s.loss.p.d)+ theme_classic()
+sloss3
 grid_arrange_shared_legend(sloss1,sloss2,sloss3,ncol=3) 
 
 
 # sgain - species gain
 # gaussian, not converged
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
+#load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
 # no transform, hurdle lognormal distribution  does not converge
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
+#load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
 # poisson, not converged
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain3.Rdata') # s.gain.p
+#load('~/Dropbox/Projects/NutNet/Model_fits/sgain3.Rdata') # s.gain.p
+# poisson, double iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain4.Rdata') # s.gain.p.d
 
 summary(s.gain.h)
 summary(s.gain.i)
-summary(s.gain.p)
+summary(s.gain.p.d)
 
 
 plot(s.gain.i)
 plot(s.gain.h)
-plot(s.gain.p)
+plot(s.gain.p.d)
 
 # predicted values vs observed
 sgain1<-pp_check(s.gain.i)+ theme_classic()
 sgain2<-pp_check(s.gain.h)+ theme_classic()
-sgain3<-pp_check(s.gain.p)+ theme_classic()
+sgain3<-pp_check(s.gain.p.d)+ theme_classic()
+sgain3
 grid_arrange_shared_legend(sgain1,sgain2,sgain3,ncol=3) 
 
 
