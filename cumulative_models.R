@@ -13,15 +13,15 @@ library(priceTools)
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 #p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 #shanes links
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
+p.all  <- read.csv('~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv', sep=',') %>% 
+  as_tibble() 
 
 View(p.all)
 levels(p.all3$trt_year)
@@ -174,10 +174,9 @@ load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
 #model objects are much smaller
 #not sure theres any purpose for a non independent random variable anymore
 #but to discuss
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sl-cumulative.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.sg-cumulative.Rdata')
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.cde-cumulative.Rdata')
-
+load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
+load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
+load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
 
 #shane
 load('~/Dropbox/NutNet/Model_fits/nn_time.sl-cumulative.Rdata')
@@ -230,9 +229,9 @@ with(sl.trt.plot2, plot(f.year.y, sl.trtm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-sl.trt_fitted <- cbind(sl.trt.i$data,
+sl.trt_fitted <- cbind(sl.trt.h.t$data,
                      # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                     fitted(sl.trt.i, re_formula = NA)) %>% 
+                     fitted(sl.trt.h.t, re_formula = NA)) %>% 
   as_tibble()
 
 View(sl.trt_fitted)
@@ -241,7 +240,7 @@ p.dat3<-p.dat2 %>%
   group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
   summarise(s.rich = mean(x.rich),
             r.rich = round(s.rich))
-sl.trt_fitted3<-inner_join(sl.trt_fitted2,p.dat3)
+sl.trt_fitted3<-inner_join(sl.trt_fitted,p.dat3)
 View(sl.trt_fitted3)
 
 sl.trt_fitted3$starting.richness <- ifelse(sl.trt_fitted3$r.rich >= 1 & sl.trt_fitted3$r.rich <= 5, '1-5 species',
@@ -260,11 +259,11 @@ sl.trt_fitted.npk
 
 
 # fixed effect coefficients -coefficient plot
-sl.trt_fixef <- fixef(sl.trt.i)
+sl.trt_fixef <- fixef(sl.trt.h.t)
 
 # coefficients for experiment-level (random) effects
 sl.trt_coef
-sl.trt_coef <- coef(sl.trt.i)
+sl.trt_coef <- coef(sl.trt.h.t)
 View(sl.trt_coef)
 
 sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>% 
@@ -293,16 +292,19 @@ sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>%
            TESlope_upper = Q97.5) %>% 
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat3 %>% 
+  inner_join(p.dat2 %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
                          cxmax = max(year.y.m),
                          s.rich = mean(x.rich),
-                         r.rich = round(s.rich)),
+                         r.rich = round(s.rich)
+                         ),
              by = 'site_code')
 
+View(p.dat3)
+View(sl.trt_coef2)
 
 sl.trt_coef2$starting.richness <- ifelse(sl.trt_coef2$r.rich >= 1 & sl.trt_coef2$r.rich <= 5, '1-5 species',
                                  ifelse(sl.trt_coef2$r.rich >=6 & sl.trt_coef2$r.rich <=10, '6-10',
@@ -434,9 +436,9 @@ with(sg.trt.plot2, plot(f.year.y, sg.trtm1$Estimate))
 # #------plot richness model all sp----------------
 # fixed effects
 
-sg.trt_fitted <- cbind(sg.trt.i$data,
+sg.trt_fitted <- cbind(sg.trt.d$data,
                      # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                     fitted(sg.trt.i, re_formula = NA)) %>% 
+                     fitted(sg.trt.d, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(sg.trt_fitted)
 p.dat3<-p.dat2 %>% 
@@ -444,9 +446,9 @@ p.dat3<-p.dat2 %>%
   summarise(s.rich = mean(x.rich),
             r.rich = round(s.rich))
 
-
-View(sg.trt_fitted3)
-sg.trt_fitted3<-inner_join(sg.trt_fitted2,p.dat3)
+View(p.dat3)
+View(sg.trt_fitted)
+sg.trt_fitted3<-left_join(sg.trt_fitted,p.dat3)
 
 sg.trt_fitted3$starting.richness <- ifelse(sg.trt_fitted3$r.rich >= 1 & sg.trt_fitted3$r.rich <= 5, '1-5 species',
                                   ifelse(sg.trt_fitted3$r.rich >=6 & sg.trt_fitted3$r.rich <=10, '6-10',
@@ -465,10 +467,10 @@ View(sg.trt_fitted3)
 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-sg.trt_fixef <- fixef(sg.trt.i)
+sg.trt_fixef <- fixef(sg.trt.d)
 
 # coefficients for experiment-level (random) effects
-sg.trt_coef <- coef(sg.trt.i)
+sg.trt_coef <- coef(sg.trt.d)
 sg.trt_coef 
 sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -496,7 +498,7 @@ sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>%
                                     TESlope_upper = Q97.5) %>% 
                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat3 %>% 
+  inner_join(p.dat2 %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
@@ -505,6 +507,8 @@ sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>%
                          s.rich = mean(x.rich),
                          r.rich = round(s.rich)),
              by = 'site_code')
+
+View(sg.trt_coef2)
 
 sg.trt_coef2$starting.richness <- ifelse(sg.trt_coef2$r.rich >= 1 & sg.trt_coef2$r.rich <= 5, '1-5 species',
                                 ifelse(sg.trt_coef2$r.rich >=6 & sg.trt_coef2$r.rich <=10, '6-10',
@@ -643,9 +647,9 @@ with(cde.plot2, plot(f.year.y, cm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-cde_fitted <- cbind(CDE.trt.i$data,
+cde_fitted <- cbind(CDE.s.t$data,
                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                    fitted(CDE.trt.i, re_formula = NA)) %>% 
+                    fitted(CDE.s.t, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(cde_fitted)
 
@@ -677,10 +681,10 @@ View(cde_fitted.npk)
 View(cde_fitted.ctl)
 
 # fixed effect coefficients (I want these for the coefficient plot)
-cde_fixef <- fixef(CDE.trt.i)
+cde_fixef <- fixef(CDE.s.t)
 
 # coefficients for experiment-level (random) effects
-cde_coef <- coef(CDE.trt.i)
+cde_coef <- coef(CDE.s.t)
 cde_coef
 cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -789,8 +793,8 @@ cdem<-ggplot() +
   geom_line(data = cde_fitted.ctl,
             aes(x = year.y, y = Estimate),
             size = 1.5,  linetype= "dashed") +
-  scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
-  ) +
+  #scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
+  #) +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   labs(x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'Biomass Change in Persistent Species') +
@@ -835,7 +839,7 @@ View(sl.trt_coef4)
 View(sl.trt_fixef2)
 sl.trtm2<-ggplot() + 
   geom_point(data = sl.trt_coef4, aes(x =reorder(site_code,TESlope), y = TESlope, colour = continent),size = 2) +
-  geom_errorbar(data = sl.trt_coef4, aes(x = reorder(site_code,TESlope),ymin = TESlope_6-10er,
+  geom_errorbar(data = sl.trt_coef4, aes(x = reorder(site_code,TESlope),ymin = TESlope,
                                        ymax = TESlope_upper,colour = continent),
                 width = 0, size = 0.7) + 
   #facet_wrap(Model~.)+
@@ -871,7 +875,7 @@ View(sg.trt_coef5)
 View(sg.trt_fixef2)
 sg.trtm2<-ggplot() + 
   geom_point(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl), y = TESlope,colour = continent),size = 2) +
-  geom_errorbar(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl),ymin = TESlope_6-10er,
+  geom_errorbar(data = sg.trt_coef5, aes(x = reorder(site_code,Slope.sl),ymin = TESlope,
                                        ymax = TESlope_upper,colour = continent),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
@@ -902,9 +906,10 @@ cde_coef5<-inner_join(cde_coef4,sl.trt.Slope)
 is.numeric(sg.trt_coef5$Slope.sl)
 
 cde_fixef2
+cde_coef4
 cdem2<-ggplot() + 
-  geom_point(data = cde_coef5, aes(x = reorder(site_code,Slope.sl), y = TESlope,colour = continent),size = 2) +
-  geom_errorbar(data = cde_coef5, aes(x = reorder(site_code,Slope.sl),ymin = TESlope_6-10er,
+  geom_point(data = cde_coef4, aes(x = reorder(site_code,TESlope), y = TESlope,colour = continent),size = 2) +
+  geom_errorbar(data = cde_coef4, aes(x = reorder(site_code,TESlope),ymin = TESlope_lower,
                                       ymax = TESlope_upper,colour = continent),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+

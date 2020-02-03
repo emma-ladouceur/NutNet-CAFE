@@ -9,27 +9,46 @@ library(grid)
 library(sjstats)
 library(bayesplot)
 
+
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+colnames(plot)
+plot$site_code<-as.factor(plot$site_code)
+plot$block<-as.factor(plot$block)
+plot$plot<-as.factor(plot$plot)
+plot$log.rich<-log(plot$rich)
+#bm
+plot$log.live.mass<-log(plot$live_mass)
+
+
+
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.bm.Rdata') # plot.bm.im 
 load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
 
 load('~/Desktop/Model Fits/nn_time.bm.Rdata') # plot.bm.im 
 load('~/Desktop/Model Fits/nn_time.rich.Rdata') # plot.rich.im
 
+# log transform, gauss distribution
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
+# gaussian distribution 
+load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
+
+
 summary(plot.bm.im )
-summary(plot.rich.im )
+summary(plot.rich.g )
 pp_check(plot.bm.im)
 
 # inspection of chain diagnostic
-plot(plot.rich.im)
+plot(plot.rich.g)
 # predicted values vs observed: not great, but not too bad (there is a skew-normal distribution
 # that is in the brms package - I will see if that improves this later)
 color_scheme_set("purple")
-pp_check(plot.rich.im)
+pp_check(plot.rich.g)
 
 
 
 #residuals
-m1<-residuals(plot.rich.im)
+m1<-residuals(plot.rich.g)
 m1<-as.data.frame(m1)
 nrow(m1)
 nrow(plot)
@@ -49,17 +68,17 @@ with(rr.plot, plot(f.year_trt, m1$Estimate))
 # #------plot richness model all sp----------------
 # fixed effects
 
-plot.rich_fitted <- cbind(plot.rich.im$data,
+plot.rich_fitted <- cbind(plot.rich.g$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(plot.rich.im, re_formula = NA)) %>% 
+                          fitted(plot.rich.g, re_formula = NA)) %>% 
   as_tibble() 
 
 View(plot.rich_fitted)
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.rich_fixef <- fixef(plot.rich.im)
+plot.rich_fixef <- fixef(plot.rich.g)
 
 # coefficients for experiment-level (random) effects
-plot.rich_coeff <- coef(plot.rich.im)
+plot.rich_coeff <- coef(plot.rich.g)
 
 plot.rich_coef<-as.data.frame(plot.rich_coeff$site_code)
 #names(plot.rich_coef) <- gsub(":", ".", names(plot.rich_coef), fixed = TRUE)
@@ -92,7 +111,7 @@ plot.rich_coef2 <-  bind_cols(plot.rich_coef %>%
                                            by = 'site_code'))
 
 
-
+View(plot.rich_coef2)
 plot.rich_coef2$starting.richness <- ifelse(plot.rich_coef2$r.rich >= 1 & plot.rich_coef2$r.rich <= 5, '1-5 species',
                                             ifelse(plot.rich_coef2$r.rich >=6 & plot.rich_coef2$r.rich <=10, '6-10',
                                                    ifelse(plot.rich_coef2$r.rich >=11 & plot.rich_coef2$r.rich <=15, '11-15',    
@@ -138,6 +157,7 @@ plot.rich_coef3<-plot.rich_coef3[complete.cases(plot.rich_coef3$starting.richnes
 plot.rich_fitted.npk$starting.richness <- factor(plot.rich_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
+View(plot.rich_coef3)
 
 r1<-ggplot() +
   # data
@@ -195,20 +215,20 @@ r1
 #plot biomass
 
 
-summary(plot.bm.im)
+summary(plot.bm.logt)
 
 
 # inspection of chain diagnostic
-plot(plot.bm.im)  
+plot(plot.bm.logt)  
 
 
 # predicted values vs observed: not great, but not too bad (there is a skew-normal distribution
 # that is in the brms package - I will see if that improves this later)
-pp_check(plot.bm.im)
+pp_check(plot.bm.logt)
 
 
 #residuals
-bm1<-residuals(plot.bm.im)
+bm1<-residuals(plot.bm.logt)
 bm1<-as.data.frame(bm1)
 nrow(bm1)
 nrow(plot)
@@ -227,16 +247,16 @@ with(rb.plot, plot(f.year_trt, bm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-plot.bm_fitted <- cbind(plot.bm.im$data,
+plot.bm_fitted <- cbind(plot.bm.logt$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(plot.bm.im, re_formula = NA)) %>% 
+                        fitted(plot.bm.logt, re_formula = NA)) %>% 
   as_tibble() 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(plot.bm.im)
+plot.bm_fixef <- fixef(plot.bm.logt)
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(plot.bm.im)
+plot.bm_coef <- coef(plot.bm.logt)
 plot.bm_coef 
 
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
@@ -283,24 +303,29 @@ plot.bm_coef2$starting.richness <- ifelse(plot.bm_coef2$r.rich >= 1 & plot.bm_co
                                                         ifelse(plot.bm_coef2$r.rich >=16 & plot.bm_coef2$r.rich <=20, '16-20',
                                                                ifelse(plot.bm_coef2$r.rich >=21 & plot.bm_coef2$r.rich <=25, '21-25',
                                                                       ifelse(plot.bm_coef2$r.rich >=26, '>26', 'other'))))))
-# View(plot.bm_coef2)
+View(plot.bm_coef2)
 
 
+plot.bm_coef2
 
-#dat<-distinct(plot, site_code, continent,habitat)
-
-plot.bm_coef3<-full_join(plot.bm_coef2,dat)
-
+dat<-distinct(plot, site_code, continent,habitat)
+# 
+plot.bm_coef3<-left_join(plot.bm_coef2,dat)
+# 
 # View(plot.bm_coef3)
-# View(plot.bm_fitted)
+View(plot.bm_coef3)
+
 dat2$block<-as.numeric(dat2$block)
 plot.bm_fitted$block<-as.numeric(plot.bm_fitted$block)
 dat2$plot<-as.numeric(dat2$plot)
 plot.bm_fitted$plot<-as.numeric(plot.bm_fitted$plot)
-dat2<-distinct(plot,habitat, continent,site_code, year_trt,block, plot,log.live.mass,live_mass,rich)
+head(plot)
+
+
+dat2<-distinct(plot,habitat, continent,site_code, year_trt, block, plot,log.live.mass,live_mass,rich)
 plot.bm_fitted2<-full_join(plot.bm_fitted,dat2)
 # View(plot.bm_fitted)
-# View(dat2)
+View(plot.bm_fitted2)
 
 
 plot.bm_fitted2$starting.richness <- ifelse(plot.bm_fitted2$rich >= 1 & plot.bm_fitted2$rich <= 5, '1-5 species',
@@ -324,7 +349,7 @@ plot.bm_fitted.npk$starting.richness <- factor(plot.bm_fitted.npk$starting.richn
 plot.bm_coef3$starting.richness <- factor(plot.bm_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 
-
+View(plot.bm_fitted.npk)
 b1<-ggplot() +
   # data
   geom_point(data = plot.bm_fitted.npk,
@@ -355,8 +380,8 @@ b1<-ggplot() +
   geom_line(data = plot.bm_fitted.ctl,
             aes(x = year_trt, y = exp(Estimate)),
             size = 1.5,linetype= "dashed") +
-  scale_y_continuous(trans = 'log10', #breaks = c(8, 64, 512, 1024, 2048, 4096)
-  ) +
+  scale_y_continuous(trans = 'log10', breaks = c(8, 64, 512, 1024, 2048, 4096)
+                     ) +
   labs(x = 'Years',
        y = expression(paste('Biomass (g/',m^2, ')')), title= 'b) Plot Biomass') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
