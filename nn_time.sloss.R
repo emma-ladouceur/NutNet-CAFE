@@ -20,10 +20,10 @@ p.all$plot<-as.factor(p.all$plot)
 # s.loss.i <- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
 #                 data = p.all, cores = 4, chains = 4)
 
- s.loss.p.d <- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all,family=poisson(), cores = 4, iter = 4000, chains = 4)
+ s.loss.s.t<- brm(s.loss.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                 data = p.all,family=student(), cores = 4, iter = 6000, chains = 4)
 
-save(s.loss.p.d,
+save(s.loss.s.t,
      file=Sys.getenv('OFILE'))
 
 

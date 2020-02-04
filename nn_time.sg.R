@@ -13,13 +13,13 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 
-sg.trt.d <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                data = p.all, family=hurdle_lognormal(),cores = 4,iter=4000, chains = 4)
+sg.s.t <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                data = p.all, family=student(),cores = 4,iter=6000, chains = 4)
 
 # sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
 #                 data = p.all, cores = 4, chains = 4)
 
 
-save(sg.trt.d,
+save(sg.s.t,
      file=Sys.getenv('OFILE'))
 

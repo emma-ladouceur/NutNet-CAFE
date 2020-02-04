@@ -15,33 +15,58 @@ load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
 load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
 load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
 
+
+summary(CDE.s.t)
+
 # meta data
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-# ANTHROPOGENIC
-p2<-distinct(p,site_code,anthropogenic)
+pdeets<-distinct(p,site_code,block,plot,trt,year_trt,rich,NAT_rich,INT_rich,UNK_rich,live_mass)
+p.x<-pdeets[pdeets$year_trt %in% c('0'),]
+p.y<-pdeets[pdeets$year_trt != "0",]
+colnames(p.x)
 
-dat <- read.csv('~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv', sep=',') %>% 
-  as_tibble() 
+colnames(p.x)[5] <-"year_trt.x"
+colnames(p.x)[6] <-"rich.x"
+colnames(p.x)[7] <-"NAT_rich.x"
+colnames(p.x)[8] <-"INT_rich.x"
+colnames(p.x)[9] <-"UNK_rich.x"
+colnames(p.x)[10] <-"live_mass.x"
 
-dat.ctl<-dat[dat$trt.y%in% c('Control'),]
-dat.trt<-dat[dat$trt.y %in% c('NPK'),]
+colnames(p.y)[5] <-"year_trt.y"
+colnames(p.y)[6] <-"rich.y"
+colnames(p.y)[7] <-"NAT_rich.y"
+colnames(p.y)[8] <-"INT_rich.y"
+colnames(p.y)[9] <-"UNK_rich.y"
+colnames(p.y)[10] <-"live_mass.y"
 
-dat.trt2<-dat.trt %>% group_by(site_code,continent, habitat) %>%
-  summarise(s.rich = mean(x.rich),
+
+p.xy<-left_join(p.x,p.y)
+View(p.x)
+
+View(p)
+p2<-distinct(p,elevation,latitude,longitude,continent,country,site_code,region,grazed,burned,managed,anthropogenic,habitat,site_richness,site_native_richness,site_introduced_richness)
+
+View(p2)
+#p3<-left_join(p2,p.xy)
+p2$site_percent_native_rich<- (p2$site_native_richness/p2$site_richness) * 100
+p2$site_percent_int_rich<- (p2$site_introduced_richness/p2$site_richness) * 100
+
+p2$site_dom <- ifelse(p2$site_percent_native_rich >= p2$site_percent_int_rich , 'native dominated',
+                                 ifelse(p2$site_percent_int_rich  >= p2$site_percent_native_rich, 'introduced dominated','other'))
+
+View(p2)
+rr<-p.xy %>% group_by(site_code) %>%
+  summarise(s.rich = mean(rich.x),
             r.rich = round(s.rich))
 
-dat.ctl2<-dat.ctl %>% group_by(site_code,continent, habitat) %>%
-  summarise(s.rich = mean(x.rich),
-            r.rich = round(s.rich))
+
+meta<-left_join(p2,rr)
 
 
-meta.ctl<-inner_join(dat.ctl2,p2)
-meta.trt<-inner_join(dat.trt2,p2)
-# View(meta.trt)
-meta.c<-distinct(meta.ctl,site_code, continent, habitat,anthropogenic,r.rich)
-meta.t<-distinct(meta.trt,site_code, continent, habitat,anthropogenic,r.rich)
-meta<-bind_rows(meta.c,meta.t)
+
+
+#start with mods
 
 study_levels <- plot.rich.g$data %>% 
   as_tibble() %>% 
@@ -124,7 +149,7 @@ sl_posterior$sl.upper<-sl_posterior$sl.ctl_upper_slope + sl_posterior$sl.trt_upp
 sl_posterior$sl.lower<-sl_posterior$sl.ctl_lower_slope + sl_posterior$sl.trt_lower_slope
 sl.p<-sl_posterior %>% inner_join(meta, by = 'site_code')
 
-
+View(sl.p)
 
 
 sl.p$starting.richness <- ifelse(sl.p$r.rich >= 1 & sl.p$r.rich <= 5, '1-5 species',
@@ -197,38 +222,68 @@ cde.p$starting.richness <- ifelse(cde.p$r.rich >= 1 & cde.p$r.rich <= 5, '1-5 sp
 
 library("scales")
 
-View(sl_posterior)
+
 sl.p$starting.richness <- factor(sl.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 sl.p$anthropogenic<-as.factor(sl.p$anthropogenic)
+sl.p$grazed<-as.factor(as.character(sl.p$grazed))
+sl.p$managed<-as.factor(as.character(sl.p$managed))
+sl.p$burned<-as.factor(as.character(sl.p$burned))
+
+sl.p$site_rich_range <- ifelse(sl.p$site_richness >= 2 & sl.p$site_richness <= 44, '2-40 species',
+                               ifelse(sl.p$site_richness >=45 & sl.p$site_richness <=69, '45-69',
+                                      ifelse(sl.p$site_richness >=70 & sl.p$site_richness <=90, '70-90',    
+                                             ifelse(sl.p$site_richness >=91 & sl.p$site_richness <=119, '90-119',
+                                                    ifelse(sl.p$site_richness >=120 & sl.p$site_richness <=144, '120-144',
+                                                           ifelse(sl.p$site_richness >=145, '>145', 'other'))))))
 
 View(sl.p)
+write.csv(sl.p,"~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv")
 
-slf<-ggplot() +
+sl.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+
+summary(sl.p)
+
+View(sl.p)
+colnames(sl.p)
+
+
+#slf<-
+  ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = sl.p %>% distinct(sl.trt_lower_slope, sl.trt_upper_slope),
             aes(xmin = sl.trt_lower_slope, xmax =  sl.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
-  geom_density_ridges(data = sl.p,
-                      aes(x = sl.ctl + unique(sl.ctl_global_slope),
-                          y = anthropogenic,
-                          color= "grey"
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
+  # geom_density_ridges(data = sl.p,
+  #                     aes(x = sl.ctl + unique(sl.ctl_global_slope),
+  #                         # y = anthropogenic ,
+  #                         # y = managed,
+  #                         y = grazed,
+  #                         color= "grey"
+  #                     ),
+  #                     scale = 1, alpha = 0.6,
+  #                     linetype = 0) +
   geom_density_ridges(data = sl.p,
                       aes(x = sl + unique(sl.global), 
                           y = anthropogenic,
-                          fill = starting.richness
-                      ),
+                          # y = grazed, 
+                          #y= managed,
+                          # fill = starting.richness
+                           #fill = site_dom
+                          fill= site_rich_range
+                          ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  #scale_fill_viridis_d(name = 'habitat') +
-  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-                               "6-10" = "#75B41EFF",
-                               "11-15" ="#5AC2F1FF",
-                               "16-20"= "#0C5BB0FF",
-                               "21-25" = "#972C8DFF",
-                               ">26" = "#E0363AFF", drop =FALSE))+
+  scale_fill_viridis_d(name = #'site_rich_range'
+                      # 'starting.richness'   
+                       'site_rich_range') +
+  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                              "6-10" = "#75B41EFF",
+  #                              "11-15" ="#5AC2F1FF",
+  #                              "16-20"= "#0C5BB0FF",
+  #                              "21-25" = "#972C8DFF",
+  #                              ">26" = "#E0363AFF", drop =FALSE))+
   geom_vline(data = sl_posterior,
              aes(xintercept = sl.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -248,8 +303,23 @@ slf
 sg.p$starting.richness <- factor(sg.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 sg.p$anthropogenic<-as.factor(sg.p$anthropogenic)
 
+sg.p$grazed<-as.factor(as.character(sg.p$grazed))
+sg.p$managed<-as.factor(as.character(sg.p$managed))
+sg.p$burned<-as.factor(as.character(sg.p$burned))
 
-sgf<-ggplot() +
+sg.p$site_rich_range <- ifelse(sg.p$site_richness >= 2 & sg.p$site_richness <= 44, '2-40 species',
+                               ifelse(sg.p$site_richness >=45 & sg.p$site_richness <=69, '45-69',
+                                      ifelse(sg.p$site_richness >=70 & sg.p$site_richness <=90, '70-90',    
+                                             ifelse(sg.p$site_richness >=91 & sg.p$site_richness <=119, '90-119',
+                                                    ifelse(sg.p$site_richness >=120 & sg.p$site_richness <=144, '120-144',
+                                                           ifelse(sg.p$site_richness >=145, '>145', 'other'))))))
+
+write.csv(sg.p,"~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv")
+sg.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+#sgf<-
+ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = sg.p %>% distinct(sg.trt_lower_slope, sg.trt_upper_slope),
             aes(xmin = sg.trt_lower_slope, xmax =  sg.trt_upper_slope), ymin = -Inf, ymax = Inf,
@@ -264,19 +334,25 @@ sgf<-ggplot() +
   geom_density_ridges(data = sg.p,
                       aes(x = sg + unique(sg.global), 
                           y = anthropogenic,
-                          fill= starting.richness
+                          # y = grazed, 
+                          #y= managed,
+                          # fill = starting.richness
+                          #fill = site_dom
+                          fill= site_rich_range
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  #scale_fill_viridis_d(name = 'habitat') +
-  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-                               "6-10" = "#75B41EFF",
-                               "11-15" ="#5AC2F1FF",
-                               "16-20"= "#0C5BB0FF",
-                               "21-25" = "#972C8DFF",
-                               ">26" = "#E0363AFF", drop =FALSE))+
+  scale_fill_viridis_d(name = #'site_dom'
+                         # 'starting.richness' 
+                       'site_rich_range') +
+  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                              "6-10" = "#75B41EFF",
+  #                              "11-15" ="#5AC2F1FF",
+  #                              "16-20"= "#0C5BB0FF",
+  #                              "21-25" = "#972C8DFF",
+  #                              ">26" = "#E0363AFF", drop =FALSE))+
   geom_vline(data = sg_posterior,
-             aes(xintercept = sg.global)) +
+             aes(xintercept = sg.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
   labs(y = 'Anthropogenic',
@@ -292,36 +368,59 @@ sgf
 
 cde.p$starting.richness <- factor(cde.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 cde.p$anthropogenic<-as.factor(cde.p$anthropogenic)
+cde.p$grazed<-as.factor(as.character(cde.p$grazed))
+cde.p$burned<-as.factor(as.character(cde.p$burned))
+
+cde.p$site_rich_range <- ifelse(cde.p$site_richness >= 2 & cde.p$site_richness <= 44, '2-40 species',
+                               ifelse(cde.p$site_richness >=45 & cde.p$site_richness <=69, '45-69',
+                                      ifelse(cde.p$site_richness >=70 & cde.p$site_richness <=90, '70-90',    
+                                             ifelse(cde.p$site_richness >=91 & cde.p$site_richness <=119, '90-119',
+                                                    ifelse(cde.p$site_richness >=120 & cde.p$site_richness <=144, '120-144',
+                                                           ifelse(cde.p$site_richness >=145, '>145', 'other'))))))
+
+
+write.csv(cde.p,"~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv")
+cde.p <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
 
 View(cde.p)
-cdef<-ggplot() +
+#cdef<-
+ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
-  geom_rect(data = cde.p %>% distinct(cde.lower, cde.upper),
-            aes(xmin = cde.lower, xmax =  cde.upper), ymin = -Inf, ymax = Inf,
+  geom_rect(data = cde.p %>% distinct(cde.trt_lower_slope, cde.trt_upper_slope),
+            aes(xmin = cde.trt_lower_slope, xmax =  cde.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
-  geom_density_ridges(data = cde.p,
-                      aes(x = cde.ctl + unique(cde.ctl_global_slope),
-                          y = anthropogenic,
-                          color = "grey"
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
+  # geom_density_ridges(data = cde.p,
+  #                     aes(x = cde.ctl + unique(cde.ctl_global_slope),
+  #                         y = anthropogenic,
+  #                         color = "grey"
+  #                     ),
+  #                     scale = 1, alpha = 0.6,
+  #                     linetype = 0) +
   geom_density_ridges(data = cde.p,
                       aes(x = cde + unique(cde.global), 
-                          y = anthropogenic,
-                          fill= starting.richness
+                          y = interaction(anthropogenic,site_dom),
+                          #y = anthropogenic,
+                          # y = grazed, 
+                          #y = managed,
+                          # fill = starting.richness
+                          #fill = site_dom
+                          fill= site_rich_range
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  #scale_fill_viridis_d(name = 'habitat') +
-  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-                               "6-10" = "#75B41EFF",
-                               "11-15" ="#5AC2F1FF",
-                               "16-20"= "#0C5BB0FF",
-                               "21-25" = "#972C8DFF",
-                               ">26" = "#E0363AFF", drop =FALSE))+
+  scale_fill_viridis_d(name = #'site_dom'
+                        # 'starting.richness' 
+                       'site_rich_range'
+                      ) +
+  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                              "6-10" = "#75B41EFF",
+  #                              "11-15" ="#5AC2F1FF",
+  #                              "16-20"= "#0C5BB0FF",
+  #                              "21-25" = "#972C8DFF",
+  #                              ">26" = "#E0363AFF", drop =FALSE))+
   geom_vline(data = cde_posterior,
-             aes(xintercept = cde.global)) +
+             aes(xintercept = cde.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
   labs(y = 'Anthropogenic',
@@ -329,7 +428,7 @@ cdef<-ggplot() +
        title= 'Biomass Change') +
   xlim(-150,150) +
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
+        #axis.text.y = element_blank(),
         legend.key = element_blank(),
         legend.position="bottom")
 
@@ -341,35 +440,6 @@ grid_arrange_shared_legend(slf,sgf,cdef,nrow=1)
 #########################
 # BIOMASS RICHNESS MODELS
 #########################
-
-
-p <- read.csv('~/Dropbox/Projects/NutNet/Data/plot_calc.csv', sep=',') %>% 
-  as_tibble() 
-
-
-plot<-p[p$year_trt %in% c('0'),]
-colnames(plot)
-
-plot.ctl<-plot[plot$trt%in% c('Control'),]
-plot.trt<-plot[plot$trt %in% c('NPK'),]
-
-plot.trt2<-plot.trt %>% group_by(site_code,continent, habitat) %>%
-  summarise(s.rich = mean(rich),
-            r.rich = round(s.rich))
-
-plot.ctl2<-plot.ctl %>% group_by(site_code,continent, habitat) %>%
-  summarise(s.rich = mean(rich),
-            r.rich = round(s.rich))
-
-# View(dat.ctl2)
-meta.ctl.p<-inner_join(plot.ctl2,plot)
-meta.trt.p<-inner_join(plot.trt2,plot)
-# View(meta.trt)
-meta.c.p<-distinct(meta.ctl.p,site_code, continent, habitat,anthropogenic,r.rich)
-meta.t.p<-distinct(meta.trt.p,site_code, continent, habitat,anthropogenic,r.rich)
-
-
-#plotmeta<-distinct(plot,site_code, continent, habitat)
 
 
 
@@ -392,25 +462,23 @@ rich_posterior.ctl <- rich_posterior[rich.ctl]
 rich.trt <- c("site_code","rich.trt" , "response","rich.trt_global_slope", "rich.trt_upper_slope" , "rich.trt_lower_slope")
 rich_posterior.trt <- rich_posterior[rich.trt]
 
-rich.p.c<-rich_posterior.ctl %>% inner_join(meta.c.p, by = 'site_code')
-rich.p.t<-rich_posterior.trt %>% inner_join(meta.t.p, by = 'site_code')
+
+rich_posterior$rich<-rich_posterior$rich.ctl+rich_posterior$rich.trt
+rich_posterior$rich.global<-rich_posterior$rich.ctl_global_slope + rich_posterior$rich.trt_global_slope
+rich_posterior$rich.upper<-rich_posterior$rich.ctl_upper_slope + rich_posterior$rich.trt_upper_slope
+rich_posterior$rich.lower<-rich_posterior$rich.ctl_lower_slope + rich_posterior$rich.trt_lower_slope
+rich.p<-rich_posterior %>% inner_join(meta, by = 'site_code')
+
 
 # View(rich.p.c)
 
 
-rich.p.c$starting.richness <- ifelse(rich.p.c$r.rich >= 1 & rich.p.c$r.rich <= 5, '1-5 species',
-                                     ifelse(rich.p.c$r.rich >=6 & rich.p.c$r.rich <=10, '6-10',
-                                            ifelse(rich.p.c$r.rich >=11 & rich.p.c$r.rich <=15, '11-15',    
-                                                   ifelse(rich.p.c$r.rich >=16 & rich.p.c$r.rich <=20, '16-20',
-                                                          ifelse(rich.p.c$r.rich >=21 & rich.p.c$r.rich <=25, '21-25',
-                                                                 ifelse(rich.p.c$r.rich >=26, '>26', 'other'))))))
-
-rich.p.t$starting.richness <- ifelse(rich.p.t$r.rich >= 1 & rich.p.t$r.rich <= 5, '1-5 species',
-                                     ifelse(rich.p.t$r.rich >=6 & rich.p.t$r.rich <=10, '6-10',
-                                            ifelse(rich.p.t$r.rich >=11 & rich.p.t$r.rich <=15, '11-15',    
-                                                   ifelse(rich.p.t$r.rich >=16 & rich.p.t$r.rich <=20, '16-20',
-                                                          ifelse(rich.p.t$r.rich >=21 & rich.p.t$r.rich <=25, '21-25',
-                                                                 ifelse(rich.p.t$r.rich >=26, '>26', 'other'))))))
+rich.p$starting.richness <- ifelse(rich.p$r.rich >= 1 & rich.p$r.rich <= 5, '1-5 species',
+                                     ifelse(rich.p$r.rich >=6 & rich.p$r.rich <=10, '6-10',
+                                            ifelse(rich.p$r.rich >=11 & rich.p$r.rich <=15, '11-15',    
+                                                   ifelse(rich.p$r.rich >=16 & rich.p$r.rich <=20, '16-20',
+                                                          ifelse(rich.p$r.rich >=21 & rich.p$r.rich <=25, '21-25',
+                                                                 ifelse(rich.p$r.rich >=26, '>26', 'other'))))))
 
 
 bm_posterior <- study_sample_posterior  %>% 
@@ -430,61 +498,78 @@ bm_posterior.ctl <- bm_posterior[bm.ctl]
 bm.trt <- c("site_code","bm.trt" , "response","bm.trt_global_slope", "bm.trt_upper_slope" , "bm.trt_lower_slope")
 bm_posterior.trt <- bm_posterior[bm.trt]
 
-bm.p.c<-bm_posterior.ctl %>% inner_join(meta.c.p, by = 'site_code')
-bm.p.t<-bm_posterior.trt %>% inner_join(meta.t.p, by = 'site_code')
+
+bm_posterior$bm<-bm_posterior$bm.ctl+bm_posterior$bm.trt
+bm_posterior$bm.global<-bm_posterior$bm.ctl_global_slope + bm_posterior$bm.trt_global_slope
+bm_posterior$bm.upper<-bm_posterior$bm.ctl_upper_slope + bm_posterior$bm.trt_upper_slope
+bm_posterior$bm.lower<-bm_posterior$bm.ctl_lower_slope + bm_posterior$bm.trt_lower_slope
+bm.p<-bm_posterior %>% inner_join(meta, by = 'site_code')
 
 # View(bm.p.c)
 
 
-bm.p.c$starting.richness <- ifelse(bm.p.c$r.rich >= 1 & bm.p.c$r.rich <= 5, '1-5 species',
-                                   ifelse(bm.p.c$r.rich >=6 & bm.p.c$r.rich <=10, '6-10',
-                                          ifelse(bm.p.c$r.rich >=11 & bm.p.c$r.rich <=15, '11-15',    
-                                                 ifelse(bm.p.c$r.rich >=16 & bm.p.c$r.rich <=20, '16-20',
-                                                        ifelse(bm.p.c$r.rich >=21 & bm.p.c$r.rich <=25, '21-25',
-                                                               ifelse(bm.p.c$r.rich >=26, '>26', 'other'))))))
-
-bm.p.t$starting.richness <- ifelse(bm.p.t$r.rich >= 1 & bm.p.t$r.rich <= 5, '1-5 species',
-                                   ifelse(bm.p.t$r.rich >=6 & bm.p.t$r.rich <=10, '6-10',
-                                          ifelse(bm.p.t$r.rich >=11 & bm.p.t$r.rich <=15, '11-15',    
-                                                 ifelse(bm.p.t$r.rich >=16 & bm.p.t$r.rich <=20, '16-20',
-                                                        ifelse(bm.p.t$r.rich >=21 & bm.p.t$r.rich <=25, '21-25',
-                                                               ifelse(bm.p.t$r.rich >=26, '>26', 'other'))))))
+bm.p$starting.richness <- ifelse(bm.p$r.rich >= 1 & bm.p$r.rich <= 5, '1-5 species',
+                                   ifelse(bm.p$r.rich >=6 & bm.p$r.rich <=10, '6-10',
+                                          ifelse(bm.p$r.rich >=11 & bm.p$r.rich <=15, '11-15',    
+                                                 ifelse(bm.p$r.rich >=16 & bm.p$r.rich <=20, '16-20',
+                                                        ifelse(bm.p$r.rich >=21 & bm.p$r.rich <=25, '21-25',
+                                                               ifelse(bm.p$r.rich >=26, '>26', 'other'))))))
 
 nrow(bm_posterior)
 nrow(rich_posterior)
 
-rich.p.c$starting.richness <- factor(rich.p.c$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-rich.p.c$anthropogenic<-as.factor(rich.p.c$anthropogenic)
-rich.p.t$starting.richness <- factor(rich.p.t$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-rich.p.t$anthropogenic<-as.factor(rich.p.t$anthropogenic)
+rich.p$starting.richness <- factor(rich.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+rich.p$anthropogenic<-as.factor(rich.p$anthropogenic)
+rich.p$grazed<-as.factor(as.character(rich.p$grazed))
+rich.p$managed<-as.factor(as.character(rich.p$managed))
+rich.p$burned<-as.factor(as.character(rich.p$burned))
+
+rich.p$site_rich_range <- ifelse(rich.p$site_richness >= 2 & rich.p$site_richness <= 44, '2-40 species',
+                               ifelse(rich.p$site_richness >=45 & rich.p$site_richness <=69, '45-69',
+                                      ifelse(rich.p$site_richness >=70 & rich.p$site_richness <=90, '70-90',    
+                                             ifelse(rich.p$site_richness >=91 & rich.p$site_richness <=119, '90-119',
+                                                    ifelse(rich.p$site_richness >=120 & rich.p$site_richness <=144, '120-144',
+                                                           ifelse(rich.p$site_richness >=145, '>145', 'other'))))))
 
 
-rf<-ggplot() +
+write.csv(rich.p,"~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv")
+rich.p <- read.csv("~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+
+#f<-
+ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
-  geom_rect(data = rich.p.t %>% distinct(rich.trt_lower_slope, rich.trt_upper_slope),
+  geom_rect(data = rich.p %>% distinct(rich.trt_lower_slope, rich.trt_upper_slope),
             aes(xmin = rich.trt_lower_slope, xmax =  rich.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
-  geom_density_ridges(data = rich.p.c,
-                      aes(x = rich.ctl + unique(rich.ctl_global_slope),
+  # geom_density_ridges(data = rich.p,
+  #                     aes(x = rich.ctl + unique(rich.ctl_global_slope),
+  #                         y = anthropogenic,
+  #                         color= "grey"
+  #                     ),
+  #                     scale = 1, alpha = 0.6,
+  #                     linetype = 0) +
+  geom_density_ridges(data = rich.p,
+                      aes(x = rich + unique(rich.global), 
                           y = anthropogenic,
-                          color= "grey"
+                          # y = grazed, 
+                          #y= managed,
+                          # fill = starting.richness
+                          #fill = site_dom
+                          fill= site_rich_range
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  geom_density_ridges(data = rich.p.t,
-                      aes(x = rich.trt + unique(rich.trt_global_slope), 
-                          y = anthropogenic,
-                          fill = starting.richness
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  #scale_fill_viridis_d(name = 'habitat') +
-  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-                               "6-10" = "#75B41EFF",
-                               "11-15" ="#5AC2F1FF",
-                               "16-20"= "#0C5BB0FF",
-                               "21-25" = "#972C8DFF",
-                               ">26" = "#E0363AFF", drop =FALSE))+
+  scale_fill_viridis_d(name = #'site_dom'
+                         # 'starting.richness' 
+                       'site_rich_range') +
+  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                              "6-10" = "#75B41EFF",
+  #                              "11-15" ="#5AC2F1FF",
+  #                              "16-20"= "#0C5BB0FF",
+  #                              "21-25" = "#972C8DFF",
+  #                              ">26" = "#E0363AFF", drop =FALSE))+
   geom_vline(data = rich_posterior,
              aes(xintercept = rich.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -499,38 +584,58 @@ rf<-ggplot() +
 rf
 
 
-bm.p.c$starting.richness <- factor(bm.p.c$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-bm.p.c$anthropogenic<-as.factor(bm.p.c$anthropogenic)
-bm.p.t$starting.richness <- factor(bm.p.t$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-bm.p.t$anthropogenic<-as.factor(bm.p.t$anthropogenic)
+bm.p$starting.richness <- factor(bm.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+bm.p$anthropogenic<-as.factor(bm.p$anthropogenic)
+bm.p$grazed<-as.factor(as.character(bm.p$grazed))
+bm.p$managed<-as.factor(as.character(bm.p$managed))
+bm.p$burned<-as.factor(as.character(bm.p$burned))
 
-bf<-ggplot() +
+bm.p$site_rich_range <- ifelse(bm.p$site_richness >= 2 & bm.p$site_richness <= 44, '2-40 species',
+                               ifelse(bm.p$site_richness >=45 & bm.p$site_richness <=69, '45-69',
+                                      ifelse(bm.p$site_richness >=70 & bm.p$site_richness <=90, '70-90',    
+                                             ifelse(bm.p$site_richness >=91 & bm.p$site_richness <=119, '90-119',
+                                                    ifelse(bm.p$site_richness >=120 & bm.p$site_richness <=144, '120-144',
+                                                           ifelse(bm.p$site_richness >=145, '>145', 'other'))))))
+
+write.csv(bm.p,"~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv")
+bm.p <- read.csv("~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+
+#bf<-
+ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
-  geom_rect(data = bm.p.t %>% distinct(bm.trt_lower_slope, bm.trt_upper_slope),
+  geom_rect(data = bm.p %>% distinct(bm.trt_lower_slope, bm.trt_upper_slope),
             aes(xmin = bm.trt_lower_slope, xmax =  bm.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
-  geom_density_ridges(data = bm.p.c,
-                      aes(x = bm.ctl + unique(bm.ctl_global_slope),
+  # geom_density_ridges(data = bm.p,
+  #                     aes(x = bm.ctl + unique(bm.ctl_global_slope),
+  #                         y = anthropogenic,
+  #                         color= "grey"
+  #                     ),
+  #                     scale = 1, alpha = 0.6,
+  #                     linetype = 0) +
+  geom_density_ridges(data = bm.p,
+                      aes(x = bm + unique(bm.global), 
                           y = anthropogenic,
-                          color= "grey"
+                          # y = grazed, 
+                          #y= managed,
+                          # fill = starting.richness
+                          #fill = site_dom
+                          fill= site_rich_range
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  geom_density_ridges(data = bm.p.t,
-                      aes(x = bm.trt + unique(bm.trt_global_slope), 
-                          y = anthropogenic,
-                          fill = starting.richness
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  #scale_fill_viridis_d(name = 'habitat') +
-  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-                               "6-10" = "#75B41EFF",
-                               "11-15" ="#5AC2F1FF",
-                               "16-20"= "#0C5BB0FF",
-                               "21-25" = "#972C8DFF",
-                               ">26" = "#E0363AFF", drop =FALSE))+
-  geom_vline(data = bm_posterior,
+  scale_fill_viridis_d(name = #'site_dom'
+                         # 'starting.richness' 
+                         'site_rich_range') +
+  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                              "6-10" = "#75B41EFF",
+  #                              "11-15" ="#5AC2F1FF",
+  #                              "16-20"= "#0C5BB0FF",
+  #                              "21-25" = "#972C8DFF",
+  #                              ">26" = "#E0363AFF", drop =FALSE))+
+   geom_vline(data = bm_posterior,
              aes(xintercept = bm.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
@@ -726,10 +831,10 @@ bf2<-ggplot() +
 grid_arrange_shared_legend(rf2,bf2,nrow=1)
 
 # SITE DIVERSITY
-# CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
 # EXOTIC VS. NATIVE DOMINATED
-
 # HERBIVORY
+
+# CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
 # BIOGEO / CLIMATE
 # N. DEPOSITION
 
