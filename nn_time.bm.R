@@ -14,9 +14,9 @@ plot2<-plot %>% drop_na(live_mass)
 plot2$log.live.mass<-log(plot2$live_mass)
 
 
-plot.bm.s <- brm(live_mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                  data = plot2 , family=student(),  cores = 4,iter=6000, warmup = 1000, chains = 4)
+plot.bm.sk <- brm(live_mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+                  data = plot2 , family=skew_normal(),  cores = 4,iter=6000, warmup = 1000, chains = 4)
 
-save(plot.bm.s,
+save(plot.bm.sk,
      file=Sys.getenv('OFILE'))
 
