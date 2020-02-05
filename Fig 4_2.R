@@ -63,6 +63,8 @@ rr<-p.xy %>% group_by(site_code) %>%
 
 meta<-left_join(p2,rr)
 
+# climate and N deposition data
+# site-worldclim-2-August-2019.csv
 
 
 

@@ -30,6 +30,12 @@ load('~/Dropbox/Projects/NutNet/Model_fits/sloss4.Rdata') # s.loss.p.d
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain4.Rdata') # s.gain.p.d
 #load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
+
+summary(sl.trt.h.t)
+s.loss.p.d
+CDE.s.t
+sloss_fixef
+
 sloss_fixef <- fixef(s.loss.p.d)
 sgain_fixef <- fixef(s.gain.p.d)
 sl_fixef <- fixef(sl.trt.h.t)

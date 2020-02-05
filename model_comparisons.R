@@ -191,30 +191,44 @@ hist(plot$rich,breaks =40, main="Richness") # richness (compare to loss and gain
 load('~/Dropbox/Projects/NutNet/Model_fits/sl2.Rdata') # sl.trt.h.d
 # no transform, hurdle lognormal dist, 6000 iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
+# no transform, student-t dist, 6000 iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sl4.Rdata') # sl.s.t
+
+
+
+
 
 summary(sl.trt.h.d)
 summary(sl.trt.h.t)
+summary(sl.s.t)
+
 
 plot(sl.trt.h.d)
 plot(sl.trt.h.t)
+plot(sl.s.t)
 
 # predicted values vs observed
 pp_check(sl.trt.h.d)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 pp_check(sl.trt.h.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
+pp_check(sl.s.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 # SG - effect of species gains on biomass
 # no transform, hurdle lognormal dist
 #load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.trt.h
 # no transform, hurdle lognormal dist, 4000 iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
+# no transform, student-t dist, 6000 iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sg3.Rdata') # sg..s.t
 
 summary(sg.trt.d)
+summary(sg.s.t)
 
-
-plot(sg.trt.h.)
+plot(sg.trt.h)
+plot(sg.s.t)
 
 # predicted values vs observed
 pp_check(sg.trt.d)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
+pp_check(sg.s.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 
 # CDE - biomass change in persistent species
@@ -253,21 +267,28 @@ grid_arrange_shared_legend(c1,c2,ncol=2)
 #load('~/Dropbox/Projects/NutNet/Model_fits/sloss3.Rdata') # s.loss.p
 # no transform, poission distribution , double iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss4.Rdata') # s.loss.p.d
+# no transform, student-t distribution , 6000 iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss5.Rdata') # s.loss.s.t
 
 
 summary(s.loss.i)
 summary(s.loss.h)
 summary(s.loss.p.d)
+summary(s.loss.s.t)
 
 plot(s.loss.i)
 plot(s.loss.h)
 plot(s.loss.p)
+plot(s.loss.s.t)
+
 
 # predicted values vs observed
 sloss1<-pp_check(s.loss.i)+ theme_classic()
 sloss2<-pp_check(s.loss.h)+ theme_classic()
 sloss3<-pp_check(s.loss.p.d)+ theme_classic()
 sloss3
+sloss4<-pp_check(s.loss.s.t)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
+sloss4
 grid_arrange_shared_legend(sloss1,sloss2,sloss3,ncol=3) 
 
 
@@ -280,21 +301,26 @@ grid_arrange_shared_legend(sloss1,sloss2,sloss3,ncol=3)
 #load('~/Dropbox/Projects/NutNet/Model_fits/sgain3.Rdata') # s.gain.p
 # poisson, double iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain4.Rdata') # s.gain.p.d
+# student-t, 6000 iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain5.Rdata') # s.gain.s.t
 
 summary(s.gain.h)
 summary(s.gain.i)
 summary(s.gain.p.d)
-
+summary(s.gain.s.t)
 
 plot(s.gain.i)
 plot(s.gain.h)
 plot(s.gain.p.d)
+plot(s.gain.s.t)
 
 # predicted values vs observed
 sgain1<-pp_check(s.gain.i)+ theme_classic()
 sgain2<-pp_check(s.gain.h)+ theme_classic()
 sgain3<-pp_check(s.gain.p.d)+ theme_classic()
 sgain3
+sgain4<-pp_check(s.gain.s.t)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
+sgain4
 grid_arrange_shared_legend(sgain1,sgain2,sgain3,ncol=3) 
 
 
