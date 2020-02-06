@@ -48,7 +48,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 }
 
 # plot data
-pplot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
@@ -64,7 +64,8 @@ hist(plot$live_mass, breaks=30, main="Biomass")
 hist(plot$log.rich, breaks=30, main="Log Rich")
 hist(plot$log.live.mass,breaks =30, main="Log Biomass")
 
-
+summary(plot)
+summa
 summary(pplot)
 
 # richness models
@@ -122,14 +123,22 @@ with(rr.plot, plot(seed.rich, m1$Estimate))
 
 
 #biomass
-# no transform, gaussian distribution
-#load('~/Dropbox/Projects/NutNet/Model_fits/biomass.Rdata') # plot.bm
+# no transform, gaussian distribution, converges, but not a great fit
+load('~/Dropbox/Projects/NutNet/Model_Fits/biomass.Rdata') # plot.bm
 # log transform, gauss distribution
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
+#load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
 # no transform, lognormal distribution # small ESS
 #load('~/Dropbox/Projects/NutNet/Model_fits/biomass3.Rdata') # plot.bm.logd
+# student t, 6000 iterations, 1000 warmup
+load('~/Dropbox/Projects/NutNet/Model_Fits/biomass4.Rdata') # plot.bm.s
+# skew normal, 6000 iterartions, 1000 warm up
+load('~/Dropbox/Projects/NutNet/Model_Fits/biomass5.Rdata') # plot.bm.sk
 
 summary(plot.bm)
+summary(plot.bm.s)
+summary(plot.bm.sk)
+
+
 summary(plot.bm.logt)
 summary(plot.bm.logd)
 
@@ -144,14 +153,19 @@ loo_compare(plot.bm.logt, plot.bm.logd, criterion = "loo")
 
 # inspection of chain diagnostics
 plot(plot.bm) 
-plot(plot.bm.logt) 
-plot(plot.bm.logd) 
+plot(plot.bm.s) 
+plot(plot.bm.sk) 
+
 
 # predicted values vs observed
-pb1<-pp_check(plot.bm)+ theme_classic()
-pb2<-pp_check(plot.bm.logt)+ theme_classic()
-pb3<-pp_check(plot.bm.logd)+ theme_classic()
-grid_arrange_shared_legend(pb1,pb2,pb3,ncol=3) 
+pb1<-pp_check(plot.bm)+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))
+pb1
+pb2<-pp_check(plot.bm.s)+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))
+pb2
+pb3<-pp_check(plot.bm.sk)+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))
+pb3
+grid_arrange_shared_legend(pb2,pb3,ncol=2)
+
 
 #residuals
 m2<-residuals(biomass.new)
@@ -182,7 +196,7 @@ hist(price$SG, breaks=40, main="Gain Func") # biomass change due to species gain
 hist(price$CDE, breaks=40, main="Persistent Func") # biomass change in persistent species
 hist(price$s.loss.p,breaks =40, main="Sp Loss")  # species loss (positive)
 hist(price$s.gain,breaks =40, main="Gain Sp") # species gains
-hist(plot$rich,breaks =40, main="Richness") # richness (compare to loss and gains)
+hist(pplot$rich,breaks =40, main="Richness") # richness (compare to loss and gains)
 
 # SL- effect of species loss on biomass
 # no transform, hurdle lognormal dist, non convergence
@@ -193,10 +207,8 @@ load('~/Dropbox/Projects/NutNet/Model_fits/sl2.Rdata') # sl.trt.h.d
 load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
 # no transform, student-t dist, 6000 iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sl4.Rdata') # sl.s.t
-
-
-
-
+# no transform, student-t dist, 6000 iterations, 1000 warm
+load('~/Dropbox/Projects/NutNet/Model_fits/sl5.Rdata') # sl.s.t
 
 summary(sl.trt.h.d)
 summary(sl.trt.h.t)
@@ -219,6 +231,8 @@ pp_check(sl.s.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
 # no transform, student-t dist, 6000 iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sg3.Rdata') # sg..s.t
+# no transform, student-t dist, 6000 iterations, 1000 warmup
+load('~/Dropbox/Projects/NutNet/Model_fits/sg4.Rdata') # sg..s.t
 
 summary(sg.trt.d)
 summary(sg.s.t)
@@ -240,6 +254,9 @@ load('~/Dropbox/Projects/NutNet/Model_fits/cde2.Rdata') # CDE.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde3.Rdata') # CDE.s.d
 # student-t distribution,  triple the iterations (6000)
 load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
+# student-t distribution,  triple the iterations (6000), 1000 warm up
+load('~/Dropbox/Projects/NutNet/Model_fits/cde5.Rdata') # CDE.s.t
+
 
 summary(p.CDE.trt.i)
 summary(CDE.s.d)
@@ -269,7 +286,8 @@ grid_arrange_shared_legend(c1,c2,ncol=2)
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss4.Rdata') # s.loss.p.d
 # no transform, student-t distribution , 6000 iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss5.Rdata') # s.loss.s.t
-
+# no transform, student-t distribution , 6000 iterations
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss6.Rdata') # s.loss.s.t
 
 summary(s.loss.i)
 summary(s.loss.h)
@@ -303,6 +321,9 @@ grid_arrange_shared_legend(sloss1,sloss2,sloss3,ncol=3)
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain4.Rdata') # s.gain.p.d
 # student-t, 6000 iterations
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain5.Rdata') # s.gain.s.t
+# student, 6000 iterations, 1000 warm up- converged!!!!
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain6.Rdata') # s.gain.s.t
+
 
 summary(s.gain.h)
 summary(s.gain.i)
