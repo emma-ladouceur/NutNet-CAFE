@@ -14,7 +14,7 @@ library(gridExtra)
 
 #just use the here package to locate data
 # you can update this script with new comb-by-plot versions just by changing this line
-nn <- read.csv("~/Dropbox/NutNet data/comb-by-plot-22-February-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+nn <- read.csv("~/Dropbox/Projects/NutNet/Data/comb-by-plot-01-November-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 # SOME DATA WRANGLING FIRST
 # create a new dataset of some basics from comb-by-plot
@@ -26,19 +26,19 @@ unique.sites <- unique(nn[c("site_name","country","continent","habitat","year_tr
 unique.sites$site_n<-"1"
 #write to a new file
 View(unique.sites)
-write.csv(unique.sites, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", row.names=F)
+write.csv(unique.sites, "~/Dropbox/Projects/NutNet/Data/basics_1.csv", row.names=F)
 
 # and a second dataset that summarizes sites, by only their max year
-nn_agg <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", sep=",",header=T, strip.white=T)
+nn_agg <- read.csv("~/Dropbox/Projects/NutNet/Data/basics_1.csv", sep=",",header=T, strip.white=T)
 # take only the max year of every site
 nn_agg_2<-nn_agg %>% group_by(site_name) %>% top_n(1, year_trt)
 View(nn_agg_2)
 ??group_by
-write.csv(nn_agg_2, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", row.names=F)
+write.csv(nn_agg_2, "~/Dropbox/Projects/NutNet/Data/basics_2.csv", row.names=F)
 
 
 
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
+nnr <- read.csv("~/Dropbox/Projects/NutNet/Data/basics_2.csv", sep=",",header=T, strip.white=T)
 nnr2 <- droplevels(subset(nnr, experiment_type == "Experimental (Full Factorial)"| experiment_type == "Experimental (Nutrients Only)"))
 
 colnames(nnr2)
@@ -48,7 +48,7 @@ nnr4<- nnr3[nnr3$year_trt != "1" ,]
 levels(nnr3$year_trt)
 View(nnr4)
 
-write.csv(nnr4, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_3.csv", row.names=F)
+write.csv(nnr4, "~/Dropbox/Projects/NutNet/Data/basics_3.csv", row.names=F)
 
 
 
@@ -56,7 +56,7 @@ write.csv(nnr4, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_
 
 # Okay now ready to plot descriptive statistics
 # PLOT 1: YEAR X SITE
-nn_agg <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", sep=",",header=T, strip.white=T)
+nn_agg <- read.csv("~/Dropbox/Projects/NutNet/Data/basics_1.csv", sep=",",header=T, strip.white=T)
 
 # !!!!!!! ATTENTION: Optional to remove observational sites, 
 # if you want to exclude them just remove the # and run this line
@@ -118,7 +118,7 @@ YearSiteStackFig
 
 #I LIKE THIS ONE
 
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
+nnr <- read.csv("~/Dropbox/Projects/NutNet/Data/basics_2.csv", sep=",",header=T, strip.white=T)
 nnr2 <- droplevels(subset(nnr, experiment_type == "Experimental (Full Factorial)" | experiment_type == "Experimental (Nutrients Only)"))
 
 ggplot(data = nnr2, aes(x = continent, y = site_n, color=habitat)) +scale_x_discrete(limits = rev(levels(nnr2$continent)))+
@@ -127,6 +127,21 @@ ggplot(data = nnr2, aes(x = continent, y = site_n, color=habitat)) +scale_x_disc
             position = position_stack(vjust = .5))+coord_flip()+
   labs(x = 'Continents',
        y = 'Number of Sites', title= 'The Number of Experimental Sites per Continent in Nutrient Network') +
+  #facet_grid(experiment_type ~ .)
+  theme_classic()+ theme(legend.position="bottom")
+
+
+colnames(nnr2)
+
+nnr2$year_trt<-as.factor(as.character(nnr2$year_trt))
+nnr2$year_trt<- factor(nnr2$year_trt, levels=c("0","1","2","3","4","5","6","7","8","9","10","11"))
+
+ggplot(data = nnr2, aes(x = year_trt, y = site_n, color=continent)) +
+  geom_col(fill = "white") +
+  # geom_text(aes(label = year_trt),
+  #           position = position_stack(vjust = .5))+ 
+  labs(x = 'Number of Years',
+       y = 'Number of Sites', title= 'The Number of Experimental Sites ') +
   #facet_grid(experiment_type ~ .)
   theme_classic()+ theme(legend.position="bottom")
 

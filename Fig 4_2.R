@@ -4,72 +4,27 @@ library(brms)
 library(ggridges)
 library(gridExtra)
 library(grid)
+library("scales")
 
 # FIGURE 4
 # POSTERIORS ACROSS GROUPS
 
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
+# models
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass4.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
-load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
-load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
+load('~/Dropbox/Projects/NutNet/Model_fits/sl6.Rdata') # sl.s.t
+# load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
+load('~/Dropbox/Projects/NutNet/Model_fits/cde5.Rdata') # CDE.s.t
 
 
-summary(CDE.s.t)
+# site level meta data for posrteriors
+# calculated to site level details found in Climate_Data.R
+# latitude and longitude dont match due to decimal rounding
+# lat.x long.x is nutnet site, lat.y long.y is world clim
+meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-# meta data
-p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-pdeets<-distinct(p,site_code,block,plot,trt,year_trt,rich,NAT_rich,INT_rich,UNK_rich,live_mass)
-p.x<-pdeets[pdeets$year_trt %in% c('0'),]
-p.y<-pdeets[pdeets$year_trt != "0",]
-colnames(p.x)
-
-colnames(p.x)[5] <-"year_trt.x"
-colnames(p.x)[6] <-"rich.x"
-colnames(p.x)[7] <-"NAT_rich.x"
-colnames(p.x)[8] <-"INT_rich.x"
-colnames(p.x)[9] <-"UNK_rich.x"
-colnames(p.x)[10] <-"live_mass.x"
-
-colnames(p.y)[5] <-"year_trt.y"
-colnames(p.y)[6] <-"rich.y"
-colnames(p.y)[7] <-"NAT_rich.y"
-colnames(p.y)[8] <-"INT_rich.y"
-colnames(p.y)[9] <-"UNK_rich.y"
-colnames(p.y)[10] <-"live_mass.y"
-
-
-p.xy<-left_join(p.x,p.y)
-View(p.x)
-
-View(p)
-p2<-distinct(p,elevation,latitude,longitude,continent,country,site_code,region,grazed,burned,managed,anthropogenic,habitat,site_richness,site_native_richness,site_introduced_richness)
-
-View(p2)
-#p3<-left_join(p2,p.xy)
-p2$site_percent_native_rich<- (p2$site_native_richness/p2$site_richness) * 100
-p2$site_percent_int_rich<- (p2$site_introduced_richness/p2$site_richness) * 100
-
-p2$site_dom <- ifelse(p2$site_percent_native_rich >= p2$site_percent_int_rich , 'native dominated',
-                                 ifelse(p2$site_percent_int_rich  >= p2$site_percent_native_rich, 'introduced dominated','other'))
-
-View(p2)
-rr<-p.xy %>% group_by(site_code) %>%
-  summarise(s.rich = mean(rich.x),
-            r.rich = round(s.rich))
-
-
-meta<-left_join(p2,rr)
-
-# climate and N deposition data
-# site-worldclim-2-August-2019.csv
-
-
-
-#start with mods
-
+#  mods study level dat
 study_levels <- plot.rich.g$data %>% 
   as_tibble() %>% 
   distinct(site_code) %>% 
@@ -78,17 +33,17 @@ study_levels <- plot.rich.g$data %>%
 
 parnames(plot.rich.g)
 study_sample_posterior <- study_levels %>%
-  mutate(sl.ctl = purrr::map(data, ~posterior_samples(sl.trt.h.t,
+  mutate(sl.ctl = purrr::map(data, ~posterior_samples(sl.s.t,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,
                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sg.ctl = purrr::map(data, ~posterior_samples(sg.trt.d,
-                                                      pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
-                                                      exact = TRUE,
-                                                      subset = floor(runif(n = 1000,
-                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         cde.ctl = purrr::map(data, ~posterior_samples(CDE.s.t,
+         # sg.ctl = purrr::map(data, ~posterior_samples(sg.trt.d,
+         #                                              pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
+         #                                              exact = TRUE,
+         #                                              subset = floor(runif(n = 1000,
+         #                                                                   min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+          cde.ctl = purrr::map(data, ~posterior_samples(CDE.s.t,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
@@ -96,19 +51,19 @@ study_sample_posterior <- study_levels %>%
                                                         pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                         exact = TRUE,
                                                         subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         bm.ctl = purrr::map(data, ~posterior_samples(plot.bm.logt,
+         bm.ctl = purrr::map(data, ~posterior_samples(plot.bm.s,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         sl.trt = purrr::map(data, ~posterior_samples(sl.trt.h.t, 
+         sl.trt = purrr::map(data, ~posterior_samples(sl.s.t, 
                                                       pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sg.trt = purrr::map(data, ~posterior_samples(sg.trt.d, 
-                                                      pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
-                                                      exact = TRUE,
-                                                      subset = floor(runif(n = 1000,
-                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+         # sg.trt = purrr::map(data, ~posterior_samples(sg.trt.d, 
+         #                                              pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
+         #                                              exact = TRUE,
+         #                                              subset = floor(runif(n = 1000,
+         #                                                                   min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
          cde.trt = purrr::map(data, ~posterior_samples(CDE.s.t,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                        exact = TRUE,
@@ -117,18 +72,18 @@ study_sample_posterior <- study_levels %>%
                                                         pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                         exact = TRUE,
                                                         subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         bm.trt = purrr::map(data, ~posterior_samples(plot.bm.logt,
+         bm.trt = purrr::map(data, ~posterior_samples(plot.bm.s,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()))
 
 
 
-sl.trt.i_fixef <- fixef(sl.trt.h.t)
-sg.trt.i_fixef <- fixef(sg.trt.d)
+sl.trt.i_fixef <- fixef(sl.s.t)
+#sg.trt.i_fixef <- fixef(sg.s.t)
 CDE.trt.i_fixef <- fixef(CDE.s.t)
 plot.rich.im_fixef <- fixef(plot.rich.g)
-plot.bm.im_fixef <- fixef(plot.bm.logt)
+plot.bm.im_fixef <- fixef(plot.bm.s)
 
 
 
@@ -145,14 +100,11 @@ sl_posterior <- study_sample_posterior  %>%
 
 
 head(sl_posterior)
-sl_posterior$sl<-sl_posterior$sl.ctl+sl_posterior$sl.trt
-sl_posterior$sl.global<-sl_posterior$sl.ctl_global_slope + sl_posterior$sl.trt_global_slope
-sl_posterior$sl.upper<-sl_posterior$sl.ctl_upper_slope + sl_posterior$sl.trt_upper_slope
-sl_posterior$sl.lower<-sl_posterior$sl.ctl_lower_slope + sl_posterior$sl.trt_lower_slope
+# sl_posterior$sl<-sl_posterior$sl.ctl+sl_posterior$sl.trt
+# sl_posterior$sl.global<-sl_posterior$sl.ctl_global_slope + sl_posterior$sl.trt_global_slope
+# sl_posterior$sl.upper<-sl_posterior$sl.ctl_upper_slope + sl_posterior$sl.trt_upper_slope
+# sl_posterior$sl.lower<-sl_posterior$sl.ctl_lower_slope + sl_posterior$sl.trt_lower_slope
 sl.p<-sl_posterior %>% inner_join(meta, by = 'site_code')
-
-View(sl.p)
-
 
 sl.p$starting.richness <- ifelse(sl.p$r.rich >= 1 & sl.p$r.rich <= 5, '1-5 species',
                                    ifelse(sl.p$r.rich >=6 & sl.p$r.rich <=10, '6-10',
@@ -160,70 +112,6 @@ sl.p$starting.richness <- ifelse(sl.p$r.rich >= 1 & sl.p$r.rich <= 5, '1-5 speci
                                                  ifelse(sl.p$r.rich >=16 & sl.p$r.rich <=20, '16-20',
                                                         ifelse(sl.p$r.rich >=21 & sl.p$r.rich <=25, '21-25',
                                                                ifelse(sl.p$r.rich >=26, '>26', 'other'))))))
-
-
-
-# View(sg.trt.i_fixef)
-sg_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
-  unnest_legacy(sg.ctl,sg.trt) %>% 
-  mutate(response = 'sg',
-         sg.ctl_global_slope = sg.trt.i_fixef['year.y.m','Estimate'],
-         sg.ctl_upper_slope = sg.trt.i_fixef['year.y.m','Q97.5'],
-         sg.ctl_lower_slope = sg.trt.i_fixef['year.y.m','Q2.5'],
-         sg.trt_global_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
-         sg.trt_upper_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
-         sg.trt_lower_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],
-  ) 
-
-View(sg_posterior)
-sg_posterior$sg<-sg_posterior$sg.ctl+sg_posterior$sg.trt
-sg_posterior$sg.global<-sg_posterior$sg.ctl_global_slope + sg_posterior$sg.trt_global_slope
-sg_posterior$sg.upper<-sg_posterior$sg.ctl_upper_slope + sg_posterior$sg.trt_upper_slope
-sg_posterior$sg.lower<-sg_posterior$sg.ctl_lower_slope + sg_posterior$sg.trt_lower_slope
-sg.p<-sg_posterior %>% inner_join(meta, by = 'site_code')
-
-
-
-
-sg.p$starting.richness <- ifelse(sg.p$r.rich >= 1 & sg.p$r.rich <= 5, '1-5 species',
-                                   ifelse(sg.p$r.rich >=6 & sg.p$r.rich <=10, '6-10',
-                                          ifelse(sg.p$r.rich >=11 & sg.p$r.rich <=15, '11-15',    
-                                                 ifelse(sg.p$r.rich >=16 & sg.p$r.rich <=20, '16-20',
-                                                        ifelse(sg.p$r.rich >=21 & sg.p$r.rich <=25, '21-25',
-                                                               ifelse(sg.p$r.rich >=26, '>26', 'other'))))))
-
-
-cde_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
-  unnest_legacy(cde.ctl,cde.trt) %>% 
-  mutate(response = 'cde',
-         cde.ctl_global_slope = CDE.trt.i_fixef['year.y.m','Estimate'],
-         cde.ctl_upper_slope = CDE.trt.i_fixef['year.y.m','Q97.5'],
-         cde.ctl_lower_slope = CDE.trt.i_fixef['year.y.m','Q2.5'],
-         cde.trt_global_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
-         cde.trt_upper_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
-         cde.trt_lower_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],
-  ) 
-
-cde_posterior$cde<-cde_posterior$cde.ctl+cde_posterior$cde.trt
-cde_posterior$cde.global<-cde_posterior$cde.ctl_global_slope + cde_posterior$cde.trt_global_slope
-cde_posterior$cde.upper<-cde_posterior$cde.ctl_upper_slope + cde_posterior$cde.trt_upper_slope
-cde_posterior$cde.lower<-cde_posterior$cde.ctl_lower_slope + cde_posterior$cde.trt_lower_slope
-cde.p<-cde_posterior %>% inner_join(meta, by = 'site_code')
-
-
-
-cde.p$starting.richness <- ifelse(cde.p$r.rich >= 1 & cde.p$r.rich <= 5, '1-5 species',
-                                    ifelse(cde.p$r.rich >=6 & cde.p$r.rich <=10, '6-10',
-                                           ifelse(cde.p$r.rich >=11 & cde.p$r.rich <=15, '11-15',    
-                                                  ifelse(cde.p$r.rich >=16 & cde.p$r.rich <=20, '16-20',
-                                                         ifelse(cde.p$r.rich >=21 & cde.p$r.rich <=25, '21-25',
-                                                                ifelse(cde.p$r.rich >=26, '>26', 'other'))))))
-
-
-library("scales")
-
 
 sl.p$starting.richness <- factor(sl.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 sl.p$anthropogenic<-as.factor(sl.p$anthropogenic)
@@ -241,8 +129,99 @@ sl.p$site_rich_range <- ifelse(sl.p$site_richness >= 2 & sl.p$site_richness <= 4
 View(sl.p)
 write.csv(sl.p,"~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv")
 
-sl.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+# SG
+sg_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(sg.ctl,sg.trt) %>% 
+  mutate(response = 'sg',
+         sg.ctl_global_slope = sg.trt.i_fixef['year.y.m','Estimate'],
+         sg.ctl_upper_slope = sg.trt.i_fixef['year.y.m','Q97.5'],
+         sg.ctl_lower_slope = sg.trt.i_fixef['year.y.m','Q2.5'],
+         sg.trt_global_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
+         sg.trt_upper_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
+         sg.trt_lower_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],
+  ) 
 
+
+# sg_posterior$sg<-sg_posterior$sg.ctl+sg_posterior$sg.trt
+# sg_posterior$sg.global<-sg_posterior$sg.ctl_global_slope + sg_posterior$sg.trt_global_slope
+# sg_posterior$sg.upper<-sg_posterior$sg.ctl_upper_slope + sg_posterior$sg.trt_upper_slope
+# sg_posterior$sg.lower<-sg_posterior$sg.ctl_lower_slope + sg_posterior$sg.trt_lower_slope
+sg.p<-sg_posterior %>% inner_join(meta, by = 'site_code')
+
+
+sg.p$starting.richness <- ifelse(sg.p$r.rich >= 1 & sg.p$r.rich <= 5, '1-5 species',
+                                   ifelse(sg.p$r.rich >=6 & sg.p$r.rich <=10, '6-10',
+                                          ifelse(sg.p$r.rich >=11 & sg.p$r.rich <=15, '11-15',    
+                                                 ifelse(sg.p$r.rich >=16 & sg.p$r.rich <=20, '16-20',
+                                                        ifelse(sg.p$r.rich >=21 & sg.p$r.rich <=25, '21-25',
+                                                               ifelse(sg.p$r.rich >=26, '>26', 'other'))))))
+
+
+sg.p$starting.richness <- factor(sg.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+sg.p$anthropogenic<-as.factor(sg.p$anthropogenic)
+
+sg.p$grazed<-as.factor(as.character(sg.p$grazed))
+sg.p$managed<-as.factor(as.character(sg.p$managed))
+sg.p$burned<-as.factor(as.character(sg.p$burned))
+
+sg.p$site_rich_range <- ifelse(sg.p$site_richness >= 2 & sg.p$site_richness <= 44, '2-40 species',
+                               ifelse(sg.p$site_richness >=45 & sg.p$site_richness <=69, '45-69',
+                                      ifelse(sg.p$site_richness >=70 & sg.p$site_richness <=90, '70-90',    
+                                             ifelse(sg.p$site_richness >=91 & sg.p$site_richness <=119, '90-119',
+                                                    ifelse(sg.p$site_richness >=120 & sg.p$site_richness <=144, '120-144',
+                                                           ifelse(sg.p$site_richness >=145, '>145', 'other'))))))
+
+write.csv(sg.p,"~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv")
+
+# CDE
+cde_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(cde.ctl,cde.trt) %>% 
+  mutate(response = 'cde',
+         cde.ctl_global_slope = CDE.trt.i_fixef['year.y.m','Estimate'],
+         cde.ctl_upper_slope = CDE.trt.i_fixef['year.y.m','Q97.5'],
+         cde.ctl_lower_slope = CDE.trt.i_fixef['year.y.m','Q2.5'],
+         cde.trt_global_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
+         cde.trt_upper_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
+         cde.trt_lower_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],
+  ) 
+
+# cde_posterior$cde<-cde_posterior$cde.ctl+cde_posterior$cde.trt
+# cde_posterior$cde.global<-cde_posterior$cde.ctl_global_slope + cde_posterior$cde.trt_global_slope
+# cde_posterior$cde.upper<-cde_posterior$cde.ctl_upper_slope + cde_posterior$cde.trt_upper_slope
+# cde_posterior$cde.lower<-cde_posterior$cde.ctl_lower_slope + cde_posterior$cde.trt_lower_slope
+cde.p<-cde_posterior %>% inner_join(meta, by = 'site_code')
+
+
+cde.p$starting.richness <- ifelse(cde.p$r.rich >= 1 & cde.p$r.rich <= 5, '1-5 species',
+                                    ifelse(cde.p$r.rich >=6 & cde.p$r.rich <=10, '6-10',
+                                           ifelse(cde.p$r.rich >=11 & cde.p$r.rich <=15, '11-15',    
+                                                  ifelse(cde.p$r.rich >=16 & cde.p$r.rich <=20, '16-20',
+                                                         ifelse(cde.p$r.rich >=21 & cde.p$r.rich <=25, '21-25',
+                                                                ifelse(cde.p$r.rich >=26, '>26', 'other'))))))
+
+
+
+
+cde.p$starting.richness <- factor(cde.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+cde.p$anthropogenic<-as.factor(cde.p$anthropogenic)
+cde.p$grazed<-as.factor(as.character(cde.p$grazed))
+cde.p$burned<-as.factor(as.character(cde.p$burned))
+
+cde.p$site_rich_range <- ifelse(cde.p$site_richness >= 2 & cde.p$site_richness <= 44, '2-40 species',
+                                ifelse(cde.p$site_richness >=45 & cde.p$site_richness <=69, '45-69',
+                                       ifelse(cde.p$site_richness >=70 & cde.p$site_richness <=90, '70-90',    
+                                              ifelse(cde.p$site_richness >=91 & cde.p$site_richness <=119, '90-119',
+                                                     ifelse(cde.p$site_richness >=120 & cde.p$site_richness <=144, '120-144',
+                                                            ifelse(cde.p$site_richness >=145, '>145', 'other'))))))
+
+
+write.csv(cde.p,"~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv")
+
+
+
+sl.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 summary(sl.p)
@@ -301,24 +280,7 @@ colnames(sl.p)
 
 slf
 
-
-sg.p$starting.richness <- factor(sg.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-sg.p$anthropogenic<-as.factor(sg.p$anthropogenic)
-
-sg.p$grazed<-as.factor(as.character(sg.p$grazed))
-sg.p$managed<-as.factor(as.character(sg.p$managed))
-sg.p$burned<-as.factor(as.character(sg.p$burned))
-
-sg.p$site_rich_range <- ifelse(sg.p$site_richness >= 2 & sg.p$site_richness <= 44, '2-40 species',
-                               ifelse(sg.p$site_richness >=45 & sg.p$site_richness <=69, '45-69',
-                                      ifelse(sg.p$site_richness >=70 & sg.p$site_richness <=90, '70-90',    
-                                             ifelse(sg.p$site_richness >=91 & sg.p$site_richness <=119, '90-119',
-                                                    ifelse(sg.p$site_richness >=120 & sg.p$site_richness <=144, '120-144',
-                                                           ifelse(sg.p$site_richness >=145, '>145', 'other'))))))
-
-write.csv(sg.p,"~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv")
 sg.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
 
 #sgf<-
 ggplot() +
@@ -368,20 +330,6 @@ ggplot() +
 
 sgf
 
-cde.p$starting.richness <- factor(cde.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-cde.p$anthropogenic<-as.factor(cde.p$anthropogenic)
-cde.p$grazed<-as.factor(as.character(cde.p$grazed))
-cde.p$burned<-as.factor(as.character(cde.p$burned))
-
-cde.p$site_rich_range <- ifelse(cde.p$site_richness >= 2 & cde.p$site_richness <= 44, '2-40 species',
-                               ifelse(cde.p$site_richness >=45 & cde.p$site_richness <=69, '45-69',
-                                      ifelse(cde.p$site_richness >=70 & cde.p$site_richness <=90, '70-90',    
-                                             ifelse(cde.p$site_richness >=91 & cde.p$site_richness <=119, '90-119',
-                                                    ifelse(cde.p$site_richness >=120 & cde.p$site_richness <=144, '120-144',
-                                                           ifelse(cde.p$site_richness >=145, '>145', 'other'))))))
-
-
-write.csv(cde.p,"~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv")
 cde.p <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
@@ -444,7 +392,6 @@ grid_arrange_shared_legend(slf,sgf,cdef,nrow=1)
 #########################
 
 
-
 #plot.rich.im_fixef
 rich_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
@@ -459,20 +406,17 @@ rich_posterior <- study_sample_posterior  %>%
   ) 
 
 # View(cde_posterior)
-rich.ctl <- c("site_code","rich.ctl" , "response","rich.ctl_global_slope", "rich.ctl_upper_slope" , "rich.ctl_lower_slope")
-rich_posterior.ctl <- rich_posterior[rich.ctl]
-rich.trt <- c("site_code","rich.trt" , "response","rich.trt_global_slope", "rich.trt_upper_slope" , "rich.trt_lower_slope")
-rich_posterior.trt <- rich_posterior[rich.trt]
+# rich.ctl <- c("site_code","rich.ctl" , "response","rich.ctl_global_slope", "rich.ctl_upper_slope" , "rich.ctl_lower_slope")
+# rich_posterior.ctl <- rich_posterior[rich.ctl]
+# rich.trt <- c("site_code","rich.trt" , "response","rich.trt_global_slope", "rich.trt_upper_slope" , "rich.trt_lower_slope")
+# rich_posterior.trt <- rich_posterior[rich.trt]
 
 
-rich_posterior$rich<-rich_posterior$rich.ctl+rich_posterior$rich.trt
-rich_posterior$rich.global<-rich_posterior$rich.ctl_global_slope + rich_posterior$rich.trt_global_slope
-rich_posterior$rich.upper<-rich_posterior$rich.ctl_upper_slope + rich_posterior$rich.trt_upper_slope
-rich_posterior$rich.lower<-rich_posterior$rich.ctl_lower_slope + rich_posterior$rich.trt_lower_slope
+# rich_posterior$rich<-rich_posterior$rich.ctl+rich_posterior$rich.trt
+# rich_posterior$rich.global<-rich_posterior$rich.ctl_global_slope + rich_posterior$rich.trt_global_slope
+# rich_posterior$rich.upper<-rich_posterior$rich.ctl_upper_slope + rich_posterior$rich.trt_upper_slope
+# rich_posterior$rich.lower<-rich_posterior$rich.ctl_lower_slope + rich_posterior$rich.trt_lower_slope
 rich.p<-rich_posterior %>% inner_join(meta, by = 'site_code')
-
-
-# View(rich.p.c)
 
 
 rich.p$starting.richness <- ifelse(rich.p$r.rich >= 1 & rich.p$r.rich <= 5, '1-5 species',
@@ -483,6 +427,23 @@ rich.p$starting.richness <- ifelse(rich.p$r.rich >= 1 & rich.p$r.rich <= 5, '1-5
                                                                  ifelse(rich.p$r.rich >=26, '>26', 'other'))))))
 
 
+rich.p$starting.richness <- factor(rich.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+rich.p$anthropogenic<-as.factor(rich.p$anthropogenic)
+rich.p$grazed<-as.factor(as.character(rich.p$grazed))
+rich.p$managed<-as.factor(as.character(rich.p$managed))
+rich.p$burned<-as.factor(as.character(rich.p$burned))
+
+rich.p$site_rich_range <- ifelse(rich.p$site_richness >= 2 & rich.p$site_richness <= 44, '2-40 species',
+                                 ifelse(rich.p$site_richness >=45 & rich.p$site_richness <=69, '45-69',
+                                        ifelse(rich.p$site_richness >=70 & rich.p$site_richness <=90, '70-90',    
+                                               ifelse(rich.p$site_richness >=91 & rich.p$site_richness <=119, '90-119',
+                                                      ifelse(rich.p$site_richness >=120 & rich.p$site_richness <=144, '120-144',
+                                                             ifelse(rich.p$site_richness >=145, '>145', 'other'))))))
+
+
+write.csv(rich.p,"~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv")
+
+# Biomass
 bm_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
   unnest_legacy(bm.ctl,bm.trt) %>% 
@@ -495,16 +456,16 @@ bm_posterior <- study_sample_posterior  %>%
          bm.trt_lower_slope = plot.bm.im_fixef['trtNPK:year_trt','Q2.5'],
   ) 
 
-bm.ctl <- c("site_code","bm.ctl" , "response","bm.ctl_global_slope", "bm.ctl_upper_slope" , "bm.ctl_lower_slope")
-bm_posterior.ctl <- bm_posterior[bm.ctl]
-bm.trt <- c("site_code","bm.trt" , "response","bm.trt_global_slope", "bm.trt_upper_slope" , "bm.trt_lower_slope")
-bm_posterior.trt <- bm_posterior[bm.trt]
-
-
-bm_posterior$bm<-bm_posterior$bm.ctl+bm_posterior$bm.trt
-bm_posterior$bm.global<-bm_posterior$bm.ctl_global_slope + bm_posterior$bm.trt_global_slope
-bm_posterior$bm.upper<-bm_posterior$bm.ctl_upper_slope + bm_posterior$bm.trt_upper_slope
-bm_posterior$bm.lower<-bm_posterior$bm.ctl_lower_slope + bm_posterior$bm.trt_lower_slope
+# bm.ctl <- c("site_code","bm.ctl" , "response","bm.ctl_global_slope", "bm.ctl_upper_slope" , "bm.ctl_lower_slope")
+# bm_posterior.ctl <- bm_posterior[bm.ctl]
+# bm.trt <- c("site_code","bm.trt" , "response","bm.trt_global_slope", "bm.trt_upper_slope" , "bm.trt_lower_slope")
+# bm_posterior.trt <- bm_posterior[bm.trt]
+# 
+# 
+# bm_posterior$bm<-bm_posterior$bm.ctl+bm_posterior$bm.trt
+# bm_posterior$bm.global<-bm_posterior$bm.ctl_global_slope + bm_posterior$bm.trt_global_slope
+# bm_posterior$bm.upper<-bm_posterior$bm.ctl_upper_slope + bm_posterior$bm.trt_upper_slope
+# bm_posterior$bm.lower<-bm_posterior$bm.ctl_lower_slope + bm_posterior$bm.trt_lower_slope
 bm.p<-bm_posterior %>% inner_join(meta, by = 'site_code')
 
 # View(bm.p.c)
@@ -520,21 +481,23 @@ bm.p$starting.richness <- ifelse(bm.p$r.rich >= 1 & bm.p$r.rich <= 5, '1-5 speci
 nrow(bm_posterior)
 nrow(rich_posterior)
 
-rich.p$starting.richness <- factor(rich.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-rich.p$anthropogenic<-as.factor(rich.p$anthropogenic)
-rich.p$grazed<-as.factor(as.character(rich.p$grazed))
-rich.p$managed<-as.factor(as.character(rich.p$managed))
-rich.p$burned<-as.factor(as.character(rich.p$burned))
+bm.p$starting.richness <- factor(bm.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+bm.p$anthropogenic<-as.factor(bm.p$anthropogenic)
+bm.p$grazed<-as.factor(as.character(bm.p$grazed))
+bm.p$managed<-as.factor(as.character(bm.p$managed))
+bm.p$burned<-as.factor(as.character(bm.p$burned))
 
-rich.p$site_rich_range <- ifelse(rich.p$site_richness >= 2 & rich.p$site_richness <= 44, '2-40 species',
-                               ifelse(rich.p$site_richness >=45 & rich.p$site_richness <=69, '45-69',
-                                      ifelse(rich.p$site_richness >=70 & rich.p$site_richness <=90, '70-90',    
-                                             ifelse(rich.p$site_richness >=91 & rich.p$site_richness <=119, '90-119',
-                                                    ifelse(rich.p$site_richness >=120 & rich.p$site_richness <=144, '120-144',
-                                                           ifelse(rich.p$site_richness >=145, '>145', 'other'))))))
+bm.p$site_rich_range <- ifelse(bm.p$site_richness >= 2 & bm.p$site_richness <= 44, '2-40 species',
+                               ifelse(bm.p$site_richness >=45 & bm.p$site_richness <=69, '45-69',
+                                      ifelse(bm.p$site_richness >=70 & bm.p$site_richness <=90, '70-90',    
+                                             ifelse(bm.p$site_richness >=91 & bm.p$site_richness <=119, '90-119',
+                                                    ifelse(bm.p$site_richness >=120 & bm.p$site_richness <=144, '120-144',
+                                                           ifelse(bm.p$site_richness >=145, '>145', 'other'))))))
+
+write.csv(bm.p,"~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv")
 
 
-write.csv(rich.p,"~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv")
+
 rich.p <- read.csv("~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
@@ -586,20 +549,6 @@ ggplot() +
 rf
 
 
-bm.p$starting.richness <- factor(bm.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-bm.p$anthropogenic<-as.factor(bm.p$anthropogenic)
-bm.p$grazed<-as.factor(as.character(bm.p$grazed))
-bm.p$managed<-as.factor(as.character(bm.p$managed))
-bm.p$burned<-as.factor(as.character(bm.p$burned))
-
-bm.p$site_rich_range <- ifelse(bm.p$site_richness >= 2 & bm.p$site_richness <= 44, '2-40 species',
-                               ifelse(bm.p$site_richness >=45 & bm.p$site_richness <=69, '45-69',
-                                      ifelse(bm.p$site_richness >=70 & bm.p$site_richness <=90, '70-90',    
-                                             ifelse(bm.p$site_richness >=91 & bm.p$site_richness <=119, '90-119',
-                                                    ifelse(bm.p$site_richness >=120 & bm.p$site_richness <=144, '120-144',
-                                                           ifelse(bm.p$site_richness >=145, '>145', 'other'))))))
-
-write.csv(bm.p,"~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv")
 bm.p <- read.csv("~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 

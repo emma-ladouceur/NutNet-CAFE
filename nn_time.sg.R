@@ -13,12 +13,10 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 
-sg.s.t <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+sg.s <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                 data = p.all, family=student(),cores = 4,iter=15000, warmup = 1000, chains = 4, 
               control = list(adapt_delta = 0.99) )
 
-# sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-#                 data = p.all, cores = 4, chains = 4)
 
 
 save(sg.s.t,

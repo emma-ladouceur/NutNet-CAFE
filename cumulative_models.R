@@ -14,7 +14,6 @@ library(priceTools)
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-#p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 #shanes links
@@ -23,224 +22,61 @@ p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",n
 p.all  <- read.csv('~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv', sep=',') %>% 
   as_tibble() 
 
-View(p.all)
-levels(p.all3$trt_year)
-
 p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
 
 p.all$f.year.y<-as.factor(p.all$year.y)
 p.all$plot<-as.factor(p.all$plot)
 p.all$site_code<-as.factor(p.all$site_code)
 
-dat<-distinct(plot, site_code, continent,habitat)
+dat<-distinct(p, site_code, continent,habitat)
 p.dat2<-inner_join(p.all,dat)
-
-nrow(p.dat)
-#p.dat2<-p.dat[complete.cases(p.dat), ]
-nrow(p.dat2)
 View(p.dat2)
 
-
-# p.dat2<-p.dat2[p.dat2$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
-# p.dat2<-unite_(p.dat2, "trt.xy", c("trt.x","trt.y"), remove=FALSE)
-# p.dat2<-p.dat2[p.dat2$trt.xy %in% c('Control_Control','NPK_NPK'),]
-
-nrow(p.dat2)
-
-View(p.dat2)
-
-colnames(p.dat2)
-head(p.dat2)
-summary(p.dat2)
-View(p.dat2)
-
-#write.csv(p.all4,"~/Desktop/pricel.csv")
-
-p.dat2$year.y.m<-p.dat2$year.y-mean(p.dat2$year.y)
-
-p.dat2$SL.p<-abs(p.dat2$SL)
-p.dat2$SL.p.log1<-log1p(p.dat2$SL.p)
-
-is.numeric(p.dat2$SG)
-
-p.dat2$SG.log1<-log1p(p.dat2$SG)
-p.dat2$CDE.log<-log1p(p.dat2$CDE)
-
-#try shanes funky custom transformation for cde
-p.dat2$CDE.t<- sign(p.dat2$CDE)*sqrt(abs(p.dat2$CDE))
-
-
-par(mfrow=c(1,1))
-hist(p.dat2$CDE.t, breaks=40, main="CDE Funky Transformed", xlab= "CDE FT")
-
-
-#histograms of sl & sg
-par(mfrow=c(2,3))
-hist(p.dat2$SL,breaks =40, main="Species Loss", xlab= "Species Loss")
-hist(p.dat2$SG, breaks=40, main="Species Gains", xlab= "Species Gains")
-hist(p.dat2$CDE, breaks=40, main="CDE", xlab= "CDE")
-
-hist(p.dat2$SL.p.log1,breaks=40, main="Log Species Loss +1", xlab= "Log Species Loss +1")
-hist(p.dat2$SG.log1, breaks=40, main="Log Species Gains +1", xlab= "Log Species Gains +1")
-hist(p.dat2$CDE.log, breaks=40, main="CDE log + 1", xlab= "CDE log + 1")
-
-par(mfrow=c(1,1))
-hist(p.dat2$c.func,breaks =40, main="Biomass Change", xlab= "Biomass Change")
-
+#p.dat2$year.y.m<-p.dat2$year.y-mean(p.dat2$year.y)
+#p.dat2$SL.p<-abs(p.dat2$SL)
 
 # s loss, gain and change metrics
-p.dat2$s.loss <- -1*(p.dat2$x.rich - p.dat2$c.rich)
-p.dat2$s.gain <- p.dat2$y.rich - p.dat2$c.rich
-p.dat2$s.change <- p.dat2$y.rich - p.dat2$x.rich
-
-p.dat2$s.loss.p<-abs(p.dat2$s.loss)
-p.dat2$s.loss.p.log <- log1p(abs(p.dat2$s.loss.p))
-p.dat2$s.gain.log<-log1p(p.dat2$s.gain)
-p.dat2$c.rich.log<-log1p(p.dat2$c.rich)
-
-par(mfrow=c(2,2))
-hist(p.dat2$s.loss.p,breaks =10, main="Species Loss", xlab= "Species Loss")
-hist(p.dat2$s.gain, breaks=10, main="Species Gains", xlab= "Species Gains")
-hist(p.dat2$s.change, breaks=10, main="Species Change", xlab= "Species Change")
-hist(p.dat2$c.rich, breaks=10, main="Rich Change", xlab= "Rich Change")
-
-par(mfrow=c(2,2))
-hist(p.dat2$s.loss.p.log,breaks =10, main="Log Species Loss", xlab= "Log Species Loss")
-hist(p.dat2$s.gain.log, breaks=10, main="Log Species Gains", xlab= "Log Species Gains")
-hist(p.dat2$s.change.log, breaks=10, main="Log Species Change", xlab= "Log Species Change")
-hist(p.dat2$c.rich.log, breaks=10, main="Rich Change", xlab= "Rich Change")
-
-
-summary(p.dat2)
-p.dat2$site_code<-as.factor(p.dat2$site_code)
-p.dat2$site.year.id<-as.factor(p.dat2$site.year.id)
-
-write.csv(p.dat2,"~/Desktop/price_time_only.csv")
-
-#try out models on a sample of data?
-#levels(p.dat5$site_code)
-#samp<-p.dat5[p.dat5$site_code %in% c('arch.us','azi.cn'),]
-
-colnames(p.dat5) 
+# p.dat2$s.loss <- -1*(p.dat2$x.rich - p.dat2$c.rich)
+# p.dat2$s.gain <- p.dat2$y.rich - p.dat2$c.rich
+# p.dat2$s.change <- p.dat2$y.rich - p.dat2$x.rich
 # 
-# sl.trt <- brm(SL.p ~  trt.y * year.y.m + ( year.y.m |  site_code/site.year.id), 
-#             data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
-# 
-# #, control = list(adapt_delta = 0.999, max_treedepth = 15))
-# 
-# sg.trt <- brm(SG ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-#             data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4, control = list(adapt_delta = 0.999, max_treedepth = 15))
-# 
-# 
-# CDE.trt <- brm(CDE ~  trt.y * year.y.m + (year.y.m |  site_code/site.year.id), 
-#              data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
-# 
-# #treat interaction
-# sl.trt.i <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-#               data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
-# 
-# #, control = list(adapt_delta = 0.999, max_treedepth = 15)
-# 
-# sg.trt.i <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-#               data = p.dat5, family=hurdle_lognormal(),cores = 4, chains = 4)
-# 
-# 
-# CDE.trt.i <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/site.year.id/block/plot), 
-#                data = p.dat5, family=asym_laplace(),cores = 4, chains = 4)
+# p.dat2$s.loss.p<-abs(p.dat2$s.loss)
 
+# models
+load('~/Dropbox/Projects/NutNet/Model_fits/biomass4.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
-summary(CDE.trt.i)
+load('~/Dropbox/Projects/NutNet/Model_fits/sl6.Rdata') # sl.s.t
+# load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
+load('~/Dropbox/Projects/NutNet/Model_fits/cde5.Rdata') # CDE.s.t
 
-setwd('~/Dropbox/Projects/NutNet/Model_fits/')
-
-
-#setwd('~/Dropbox/NutNet/Model_fits/')
-#save(sl.trt,sg.trt,CDE.trt,file = 'price_trt_time.Rdata')
-#load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_time.Rdata')
-
-
-#load('~/Dropbox/NutNet/Model_fits/price_trt_time.Rdata')
-
-#save(sl.trt.i,sg.trt.i,CDE.trt.i,file = 'price_trt_interact_time.Rdata')
-#emma
-#!!!!!!!!
-#we now call these the old cumulative models 
-#where we compare everything to year 0
-load('~/Dropbox/Projects/NutNet/Model_fits/price_trt_interact_time.Rdata')
-
-#!!!!!!!!
-#we call this new cumulative models
-#where  everything is pruned to be only time#random effects are site/block/plot
-#model objects are much smaller
-#not sure theres any purpose for a non independent random variable anymore
-#but to discuss
-load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
-load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
-load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
-
-#shane
-load('~/Dropbox/NutNet/Model_fits/nn_time.sl-cumulative.Rdata')
-load('~/Dropbox/NutNet/Model_fits/nn_time.sg-cumulative.Rdata')
-load('~/Dropbox/NutNet/Model_fits/nn_time.cde-cumulative.Rdata')
-
-summary(CDE.trt.i)
-
-summary(sg.trt.i)
-
-summary(sl.trt.i)
-
-color_scheme_set("purple")
-plot(sl.trt.i)
-pp_check(sl.trt.i)+ scale_x_continuous(trans="log") +theme_bw()
-
-plot(sg.trt.i)
-pp_check(sg.trt.i)+ scale_x_continuous(trans="log")+theme_bw()
-
-plot(CDE.trt.i)
-pp_check(CDE.trt.i)
-
-
-
-
-levels(p.dat3$f.year.y)
-#residuals
-sl.trtm1<-residuals(sl.trt.i)
-sl.trtm1<-as.data.frame(sl.trtm1)
-View(sl.trtm1)
-nrow(sl.trtm1)
-nrow(p.dat2)
-#p.dat4<-p.dat2[complete.cases(p.dat2$SL.p), ]
-nrow(p.dat4)
-sl.trt.plot<-cbind(p.dat2,sl.trtm1$Estimate)
-sl.trt.plot2<-inner_join(sl.trt.plot,dat)
-
-View(sl.trt.plot2)
-p.dat2$habitat<-as.character(as.factor(p.dat2$habitat))
-is.character(p.dat2$habitat)
-is.character(p.dat2$site_code)
-
-par(mfrow=c(3,2))
-with(sl.trt.plot2, plot(continent, sl.trtm1$Estimate))
-with(sl.trt.plot2, plot(habitat, sl.trtm1$Estimate))
-with(sl.trt.plot2, plot(site_code, sl.trtm1$Estimate))
-with(sl.trt.plot2, plot(block, sl.trtm1$Estimate))
-with(sl.trt.plot2, plot(plot, sl.trtm1$Estimate))
-with(sl.trt.plot2, plot(f.year.y, sl.trtm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-sl.trt_fitted <- cbind(sl.trt.h.t$data,
+sl.trt_fitted <- cbind(sl.s.t$data,
                      # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                     fitted(sl.trt.h.t, re_formula = NA)) %>% 
+                     fitted(sl.s.t, re_formula = NA)) %>% 
   as_tibble()
 
-View(sl.trt_fitted)
-nrow(sl.trt_fitted)
+
 p.dat3<-p.dat2 %>% 
-  group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
+  group_by(site_code,continent,block,plot,trt.y,year.x,year.y,year.y.m) %>% 
   summarise(s.rich = mean(x.rich),
             r.rich = round(s.rich))
-sl.trt_fitted3<-inner_join(sl.trt_fitted,p.dat3)
+
+View(p.dat2)
+View(p.dat3)
+View(sl.trt_fitted)
+
+sl.trt_fitted$plot<-as.factor(as.character(sl.trt_fitted$plot))
+sl.trt_fitted$block<-as.factor(as.character(sl.trt_fitted$block))
+sl.trt_fitted$trt.y<-as.factor(as.character(sl.trt_fitted$trt.y))
+p.dat3$plot<-as.factor(as.character(p.dat3$plot))
+p.dat3$block<-as.factor(as.character(p.dat3$block))
+p.dat3$trt.y<-as.factor(as.character(p.dat3$trt.y))
+
+sl.trt_fitted3<-left_join(sl.trt_fitted,p.dat3)
+
 View(sl.trt_fitted3)
 
 sl.trt_fitted3$starting.richness <- ifelse(sl.trt_fitted3$r.rich >= 1 & sl.trt_fitted3$r.rich <= 5, '1-5 species',
@@ -252,19 +88,13 @@ sl.trt_fitted3$starting.richness <- ifelse(sl.trt_fitted3$r.rich >= 1 & sl.trt_f
 
 sl.trt_fitted.npk<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('NPK'),]
 sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
-sl.trt_fitted.npk
-
-#either subset NPK and/or have two seperate lines for NPK and control
-
-
+View(sl.trt_fitted.npk)
 
 # fixed effect coefficients -coefficient plot
-sl.trt_fixef <- fixef(sl.trt.h.t)
+sl.trt_fixef <- fixef(sl.s.t)
 
 # coefficients for experiment-level (random) effects
-sl.trt_coef
-sl.trt_coef <- coef(sl.trt.h.t)
-View(sl.trt_coef)
+sl.trt_coef <- coef(sl.s.t)
 
 sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>% 
                            as_tibble() %>% 
@@ -318,9 +148,9 @@ dat<-distinct(p.dat2, site_code, continent,habitat)
 sl.trt_coef3<-inner_join(sl.trt_coef2,dat)
 View(sl.trt_coef3)
 
-rm(sl.trt.i)
-save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef3,file = 'sl_dat.new.Rdata')
-load('~/Desktop/Academic/R code/NutNet/sl_dat.Rdata')
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef3,file = 'sl.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/sl.mod.dat.Rdata')
 
 
 
@@ -352,23 +182,22 @@ View(sl.trt_coef3)
 
 sl.trt_coef3$xs<-1
 
-sl.trtm<-ggplot() +
-  # data
+View(sl.trt_coef3)
+#sl.trtm<-
+ggplot() +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL.p,
-                 colour = starting.richness, alpha=0.01),
+                  colour = factor(starting.richness),
+                 alpha=0.01),
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
-  # geom_jitter(data=sl.trt_fitted.npk,
-  #             aes(x = year.y, y = SL.p,
-  #                 colour = starting.richness), height=0.45,width = 0.45)+
-  # experiment (random) effects
   geom_segment(data = sl.trt_coef3,
                aes(x = xs, 
                    xend = xmax,
-                   y = exp(Intercept + TE  + (ISlope+TESlope) * cxmin),
-                   yend = exp(Intercept + TE + (ISlope+TESlope) * cxmax),
-                   #group = site_code,
-                   colour = factor(starting.richness)),
+                   y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope) * cxmax),
+                   # group = site_code,
+                    colour = factor(starting.richness)
+                   ),
                size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = sl.trt_fitted.npk,
@@ -385,8 +214,9 @@ sl.trtm<-ggplot() +
   geom_line(data = sl.trt_fitted.ctl,
             aes(x = year.y, y = Estimate),
             size = 1.5,  linetype= "dashed") +
-  scale_y_continuous(trans = reverselog_trans(), breaks=c(1,2,4,6,8,16,24,64,512,1024,2048,4096)) +
+  #scale_y_continuous(#trans = reverselog_trans(), breaks=c(1,2,4,6,8,16,24,64,512,1024)) +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
+  ylim(0,400) +
   labs(x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b) Change in Biomass due to SL') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
@@ -738,8 +568,9 @@ cde_coef3<-full_join(cde_coef2,dat)
 
 
 rm(cde.trt.i)
-save(cde_fitted.npk,cde_fitted.ctl,cde_coef3,file = 'cde_dat.Rdata')
-load('~/Desktop/Academic/R code/NutNet/sg_dat.Rdata')
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(cde_fitted.npk,cde_fitted.ctl,cde_coef3,file = 'cde.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
 
 
 # cde_fitted.npk<-cde_fitted.npk[complete.cases(cde_fitted.npk$starting.richness), ]
@@ -751,10 +582,10 @@ cde_coef3$starting.richness <- factor(cde_coef3$starting.richness , levels=c("1-
 
 
 
-library(scales)
-sign_sqrt <- scales::trans_new('sign_sqrt',
-                               transform = function(x) {sign(x) * sqrt(abs(x))},
-                               inverse = function(x){sign(x) * abs(x)^2})
+# library(scales)
+# sign_sqrt <- scales::trans_new('sign_sqrt',
+#                                transform = function(x) {sign(x) * sqrt(abs(x))},
+#                                inverse = function(x){sign(x) * abs(x)^2})
 
 
 View(cde_fitted.npk)
@@ -810,7 +641,7 @@ cdem<-ggplot() +
 cdem
 
 
-grid_arrange_shared_legend(c.rich.im,cdem,nrow=1)
+grid_arrange_shared_legend(sl.,cdem,nrow=1)
 
 
 
