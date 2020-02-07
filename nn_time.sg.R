@@ -5,6 +5,7 @@ library(brms)
 path <- '/gpfs1/data/idiv_chase/emmala/NutNet'
 p.all <- read.csv(paste0(path, '/cumulative_time_only2.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+p.all <- droplevels( p.all[-which(p.all$year.y == "0"), ] )
 
 p.all$site_code<-as.factor(p.all$site_code)
 p.all$site.year.id<-as.factor(p.all$site.year.id)
@@ -18,7 +19,6 @@ sg.s <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
               control = list(adapt_delta = 0.99) )
 
 
-
-save(sg.s.t,
+save(sg.s,
      file=Sys.getenv('OFILE'))
 

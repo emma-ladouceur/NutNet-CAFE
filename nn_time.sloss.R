@@ -18,7 +18,7 @@ p.all$plot<-as.factor(p.all$plot)
                  data = p.all,family=student(), cores = 4, iter = 15000, warmup = 1000,chains = 4,
                  control = list(adapt_delta = 0.99))
 
-save(s.loss.s.t,
+save(s.loss.s,
      file=Sys.getenv('OFILE'))
 
 

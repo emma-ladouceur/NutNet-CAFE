@@ -19,7 +19,7 @@ p.all$plot<-as.factor(p.all$plot)
 CDE.s <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                   data = p.all, family = student(),cores = 4, iter = 6000, warmup = 1000, chains = 4)
 
-save(CDE.s.t,
+save(CDE.s,
      file=Sys.getenv('OFILE'))
 
 

@@ -18,7 +18,7 @@ sl.s <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot
                  data = p.all, family=student(), cores = 4, iter=10000,warmup = 1000, chains = 4)
 
 
-save(sl.s.t,
+save(sl.s,
      file=Sys.getenv('OFILE'))
 
 
