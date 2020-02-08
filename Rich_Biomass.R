@@ -12,6 +12,9 @@ library(bayesplot)
 
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
+plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
@@ -22,21 +25,13 @@ plot$log.live.mass<-log(plot$live_mass)
 
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.bm.Rdata') # plot.bm.im 
-load('~/Dropbox/Projects/NutNet/Model_fits/nn_time.rich.Rdata') # plot.rich.im
-
-load('~/Desktop/Model Fits/nn_time.bm.Rdata') # plot.bm.im 
-load('~/Desktop/Model Fits/nn_time.rich.Rdata') # plot.rich.im
-
-# log transform, gauss distribution
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
-# gaussian distribution 
-load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
 
-summary(plot.bm.im )
+summary(plot.bm.s )
 summary(plot.rich.g )
-pp_check(plot.bm.im)
+pp_check(plot.bm.s)
 
 # inspection of chain diagnostic
 plot(plot.rich.g)
@@ -132,16 +127,32 @@ plot.rich_coef3<-full_join(plot.rich_coef2,dat)
 
 View(plot.rich_fitted)
 summary(plot.rich_fitted)
-plot.rich_fitted$starting.richness <- ifelse(plot.rich_fitted$rich >= 1 & plot.rich_fitted$rich <= 5, '1-5 species',
-                                             ifelse(plot.rich_fitted$rich >=6 & plot.rich_fitted$rich <=10, '6-10',
-                                                    ifelse(plot.rich_fitted$rich >=11 & plot.rich_fitted$rich <=15, '11-15',    
-                                                           ifelse(plot.rich_fitted$rich >=16 & plot.rich_fitted$rich <=20, '16-20',
-                                                                  ifelse(plot.rich_fitted$rich >=21 & plot.rich_fitted$rich <=25, '21-25',
-                                                                         ifelse(plot.rich_fitted$rich >=26, '>26', 'other'))))))
-plot.rich_fitted2<-full_join(plot.rich_fitted,dat)
+colnames(startrich)
+
+startrich2<-startrich %>% 
+  group_by(site_code) %>% 
+  summarise(m.rich = mean(rich),
+            r.rich = round(m.rich))
+View(startrich2)
+plot.rich_fitted2<-left_join(plot.rich_fitted,startrich2)
+View(plot.rich_fitted2)
+
+plot.rich_fitted2$starting.richness <- ifelse(plot.rich_fitted2$rich >= 1 & plot.rich_fitted2$rich <= 5, '1-5 species',
+                                             ifelse(plot.rich_fitted2$rich >=6 & plot.rich_fitted2$rich <=10, '6-10',
+                                                    ifelse(plot.rich_fitted2$rich >=11 & plot.rich_fitted2$rich <=15, '11-15',    
+                                                           ifelse(plot.rich_fitted2$rich >=16 & plot.rich_fitted2$rich <=20, '16-20',
+                                                                  ifelse(plot.rich_fitted2$rich >=21 & plot.rich_fitted2$rich <=25, '21-25',
+                                                                         ifelse(plot.rich_fitted2$rich >=26, '>26', 'other'))))))
+#plot.rich_fitted2<-full_join(plot.rich_fitted,dat)
 plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
 # View(plot.rich_fitted2)
+
+
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(plot.rich_fitted.npk,plot.rich_fitted.ctl,plot.rich_coef3,file = 'rich.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
+
 
 # View(plot.rich_coef3)
 View(plot.rich_fitted.npk)
@@ -151,8 +162,8 @@ View(plot.rich_fitted.npk)
 # levels(plot.rich_fitted.npk$rich.cat)
 # levels(plot.rich_coef3$rich.cat)
 
-plot.rich_fitted.npk<-plot.rich_fitted.npk[complete.cases(plot.rich_fitted.npk$starting.richness), ]
-plot.rich_coef3<-plot.rich_coef3[complete.cases(plot.rich_coef3$starting.richness), ]
+#plot.rich_fitted.npk<-plot.rich_fitted.npk[complete.cases(plot.rich_fitted.npk$starting.richness), ]
+#plot.rich_coef3<-plot.rich_coef3[complete.cases(plot.rich_coef3$starting.richness), ]
 
 plot.rich_fitted.npk$starting.richness <- factor(plot.rich_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
@@ -247,16 +258,16 @@ with(rb.plot, plot(f.year_trt, bm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-plot.bm_fitted <- cbind(plot.bm.logt$data,
+plot.bm_fitted <- cbind(plot.bm.s$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(plot.bm.logt, re_formula = NA)) %>% 
+                        fitted(plot.bm.s, re_formula = NA)) %>% 
   as_tibble() 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(plot.bm.logt)
+plot.bm_fixef <- fixef(plot.bm.s)
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(plot.bm.logt)
+plot.bm_coef <- coef(plot.bm.s)
 plot.bm_coef 
 
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
@@ -321,28 +332,33 @@ dat2$plot<-as.numeric(dat2$plot)
 plot.bm_fitted$plot<-as.numeric(plot.bm_fitted$plot)
 head(plot)
 
-
-dat2<-distinct(plot,habitat, continent,site_code, year_trt, block, plot,log.live.mass,live_mass,rich)
-plot.bm_fitted2<-full_join(plot.bm_fitted,dat2)
-# View(plot.bm_fitted)
+startrich2<-startrich %>% 
+  group_by(site_code) %>% 
+  summarise(m.rich = mean(rich),
+            r.rich = round(m.rich))
+View(startrich2)
+plot.bm_fitted2<-left_join(plot.bm_fitted,startrich2)
 View(plot.bm_fitted2)
 
 
-plot.bm_fitted2$starting.richness <- ifelse(plot.bm_fitted2$rich >= 1 & plot.bm_fitted2$rich <= 5, '1-5 species',
-                                            ifelse(plot.bm_fitted2$rich >=6 & plot.bm_fitted2$rich <=10, '6-10',
-                                                   ifelse(plot.bm_fitted2$rich >=11 & plot.bm_fitted2$rich <=15, '11-15',    
-                                                          ifelse(plot.bm_fitted2$rich >=16 & plot.bm_fitted2$rich <=20, '16-20',
-                                                                 ifelse(plot.bm_fitted2$rich >=21 & plot.bm_fitted2$rich <=25, '21-25',
-                                                                        ifelse(plot.bm_fitted2$rich >=26, '>26', 'other'))))))
+plot.bm_fitted2$starting.richness <- ifelse(plot.bm_fitted2$r.rich >= 1 & plot.bm_fitted2$r.rich <= 5, '1-5 species',
+                                            ifelse(plot.bm_fitted2$r.rich >=6 & plot.bm_fitted2$r.rich <=10, '6-10',
+                                                   ifelse(plot.bm_fitted2$r.rich >=11 & plot.bm_fitted2$r.rich <=15, '11-15',    
+                                                          ifelse(plot.bm_fitted2$r.rich >=16 & plot.bm_fitted2$r.rich <=20, '16-20',
+                                                                 ifelse(plot.bm_fitted2$r.rich >=21 & plot.bm_fitted2$r.rich <=25, '21-25',
+                                                                        ifelse(plot.bm_fitted2$r.rich >=26, '>26', 'other'))))))
 
 plot.bm_fitted.npk<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('NPK'),]
 plot.bm_fitted.ctl<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('Control'),]
 
 
 
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(plot.bm_fitted.npk,plot.bm_fitted.ctl,plot.bm_coef3,file = 'bm.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
 
-plot.bm_fitted.npk<-plot.bm_fitted.npk[complete.cases(plot.bm_fitted.npk$starting.richness), ]
-plot.bm_coef3<-plot.bm_coef3[complete.cases(plot.bm_coef3$starting.richness), ]
+# plot.bm_fitted.npk<-plot.bm_fitted.npk[complete.cases(plot.bm_fitted.npk$starting.richness), ]
+# plot.bm_coef3<-plot.bm_coef3[complete.cases(plot.bm_coef3$starting.richness), ]
 
 
 plot.bm_fitted.npk$starting.richness <- factor(plot.bm_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
@@ -350,38 +366,39 @@ plot.bm_coef3$starting.richness <- factor(plot.bm_coef3$starting.richness , leve
 
 
 View(plot.bm_fitted.npk)
+View(plot.bm_fitted.ctl)
+View(plot.bm_coef3)
+
+
+
 b1<-ggplot() +
-  # data
   geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = live_mass,
                  colour = starting.richness, alpha=0.1),
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
-  #experiment (random) effects
   geom_segment(data = plot.bm_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = exp(Intercept + TE  + (ISlope+TESlope) * xmin),
-                   yend = exp(Intercept + TE + (ISlope+TESlope) * xmax),
+                   y = (Intercept + TE  + (ISlope+TESlope) * xmin),
+                   yend = (Intercept + TE + (ISlope+TESlope) * xmax),
                    group = site_code,
-                   colour = factor(starting.richness)),
+                   colour = starting.richness),
                size = 0.7) +
   # uncertainy in fixed effect
   geom_ribbon(data = plot.bm_fitted.npk,
-              aes(x = year_trt, ymin = exp(Q2.5), ymax = exp(Q97.5)),
+              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   # fixed effect
   geom_line(data = plot.bm_fitted.npk,
-            aes(x = year_trt, y = exp(Estimate)),
+            aes(x = year_trt, y = Estimate),
             size = 1.5) +
   geom_ribbon(data = plot.bm_fitted.ctl,
-              aes(x = year_trt, ymin = exp(Q2.5), ymax = exp(Q97.5)),
+              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   # fixed effect
   geom_line(data = plot.bm_fitted.ctl,
-            aes(x = year_trt, y = exp(Estimate)),
+            aes(x = year_trt, y = Estimate),
             size = 1.5,linetype= "dashed") +
-  scale_y_continuous(trans = 'log10', breaks = c(8, 64, 512, 1024, 2048, 4096)
-                     ) +
   labs(x = 'Years',
        y = expression(paste('Biomass (g/',m^2, ')')), title= 'b) Plot Biomass') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
@@ -391,7 +408,6 @@ b1<-ggplot() +
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"))
-#+ theme(legend.position="bottom")
 
 b1
 
@@ -557,7 +573,7 @@ b2<-ggplot() +
                                  ">26" = "#E0363AFF", drop =FALSE))+
   coord_flip() + 
   labs(x = 'Site',
-       y = 'Slope', title= 'b) Plot Biomass') +
+       y = 'Slope', title= 'Plot Biomass') +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                    axis.title.y = element_blank(),#axis.text.y = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
