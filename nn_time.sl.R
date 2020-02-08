@@ -15,7 +15,8 @@ p.all$plot<-as.factor(p.all$plot)
 
 
 sl.s <- brm(SL.p ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all, family=student(), cores = 4, iter=10000,warmup = 1000, chains = 4)
+                 data = p.all, family=student(), cores = 4, iter=15000,warmup = 1000, chains = 4,
+            control = list(adapt_delta = 0.99) )
 
 
 save(sl.s,
