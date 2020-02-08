@@ -53,6 +53,10 @@ plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TR
 plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
 plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
 
+
+distinct(plot,site_code)
+# 72 sites for analysis
+
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
@@ -142,10 +146,8 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 
 
 # price data
-price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-
-price <- droplevels( price[-which(price$year.y == "0"), ] )
 
 summary(price)
 head(price)
@@ -162,6 +164,10 @@ hist(pplot$rich,breaks =40, main="Richness") # richness (compare to loss and gai
 # SL - effect of species loss on biomass
 #  student-t dist, 10,000 iterations, 1000 warm, converged!! :)
 load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
+# re run
+#  student-t dist, 15,000 iterations, 1000 warm, 0.99 adapt_delta
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
+
 
 summary(sl.s)
 # Some Rhats are still quite high
@@ -200,10 +206,8 @@ plot(CDE.s)
 # predicted values vs observed
 pp_check(CDE.s)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
 
-
-
 # sloss - species loss
-
+# student, 15,000 iterations, 1000 warmup, 0.99 delat
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s
 
 summary(s.loss.s)
@@ -213,7 +217,6 @@ plot(s.loss.s)
 
 # predicted values vs observed
 pp_check(s.loss.s)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
-
 
 
 # sgain - species gain

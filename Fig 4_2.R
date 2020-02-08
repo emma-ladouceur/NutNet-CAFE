@@ -10,12 +10,12 @@ library("scales")
 # POSTERIORS ACROSS GROUPS
 
 # models
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass4.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl6.Rdata') # sl.s.t
-# load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
-load('~/Dropbox/Projects/NutNet/Model_fits/cde5.Rdata') # CDE.s.t
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
 
 # site level meta data for posrteriors
@@ -23,6 +23,10 @@ load('~/Dropbox/Projects/NutNet/Model_fits/cde5.Rdata') # CDE.s.t
 # latitude and longitude dont match due to decimal rounding
 # lat.x long.x is nutnet site, lat.y long.y is world clim
 meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+colnames(meta)
+View(meta)
+
 
 #  mods study level dat
 study_levels <- plot.rich.g$data %>% 
@@ -33,17 +37,17 @@ study_levels <- plot.rich.g$data %>%
 
 parnames(plot.rich.g)
 study_sample_posterior <- study_levels %>%
-  mutate(sl.ctl = purrr::map(data, ~posterior_samples(sl.s.t,
+  mutate(sl.ctl = purrr::map(data, ~posterior_samples(sl.s,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,
                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         # sg.ctl = purrr::map(data, ~posterior_samples(sg.trt.d,
-         #                                              pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
-         #                                              exact = TRUE,
-         #                                              subset = floor(runif(n = 1000,
-         #                                                                   min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          cde.ctl = purrr::map(data, ~posterior_samples(CDE.s.t,
+          sg.ctl = purrr::map(data, ~posterior_samples(sg.s,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
+                                                       exact = TRUE,
+                                                       subset = floor(runif(n = 1000,
+                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+          cde.ctl = purrr::map(data, ~posterior_samples(CDE.s,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
@@ -55,16 +59,16 @@ study_sample_posterior <- study_levels %>%
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         sl.trt = purrr::map(data, ~posterior_samples(sl.s.t, 
+         sl.trt = purrr::map(data, ~posterior_samples(sl.s, 
                                                       pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         # sg.trt = purrr::map(data, ~posterior_samples(sg.trt.d, 
-         #                                              pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
-         #                                              exact = TRUE,
-         #                                              subset = floor(runif(n = 1000,
-         #                                                                   min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         cde.trt = purrr::map(data, ~posterior_samples(CDE.s.t,
+          sg.trt = purrr::map(data, ~posterior_samples(sg.s,
+                                                       pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
+                                                       exact = TRUE,
+                                                       subset = floor(runif(n = 1000,
+                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+         cde.trt = purrr::map(data, ~posterior_samples(CDE.s,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
@@ -79,9 +83,9 @@ study_sample_posterior <- study_levels %>%
 
 
 
-sl.trt.i_fixef <- fixef(sl.s.t)
-#sg.trt.i_fixef <- fixef(sg.s.t)
-CDE.trt.i_fixef <- fixef(CDE.s.t)
+sl.trt.i_fixef <- fixef(sl.s)
+sg.trt.i_fixef <- fixef(sg.s)
+CDE.trt.i_fixef <- fixef(CDE.s)
 plot.rich.im_fixef <- fixef(plot.rich.g)
 plot.bm.im_fixef <- fixef(plot.bm.s)
 
@@ -246,26 +250,31 @@ colnames(sl.p)
   #                     scale = 1, alpha = 0.6,
   #                     linetype = 0) +
   geom_density_ridges(data = sl.p,
-                      aes(x = sl + unique(sl.global), 
-                          y = anthropogenic,
-                          # y = grazed, 
-                          #y= managed,
+                      aes(x = sl.trt + unique(sl.trt_global_slope), 
+                          y = anthropogenic ,
+                          # y = grazed , 
+                          # y= managed ,
                           # fill = starting.richness
-                           #fill = site_dom
-                          fill= site_rich_range
+                          # fill = site_dom
+                          # fill= site_rich_range
+                          # fill= NDep.cat
+                          fill= Realm
                           ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis_d(name = #'site_rich_range'
                       # 'starting.richness'   
-                       'site_rich_range') +
+                      # 'site_rich_range'
+                      # 'NDep.cat'
+                      'Realm' 
+                      ) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
   #                              "11-15" ="#5AC2F1FF",
   #                              "16-20"= "#0C5BB0FF",
   #                              "21-25" = "#972C8DFF",
   #                              ">26" = "#E0363AFF", drop =FALSE))+
-  geom_vline(data = sl_posterior,
+  geom_vline(data = sl.p,
              aes(xintercept = sl.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
@@ -278,10 +287,11 @@ colnames(sl.p)
         legend.key = element_blank(),
         legend.position="bottom")
 
-slf
+#slf
 
 sg.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+View(sg.p)
 #sgf<-
 ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
@@ -296,26 +306,28 @@ ggplot() +
   #                     scale = 1, alpha = 0.6,
   #                     linetype = 0) +
   geom_density_ridges(data = sg.p,
-                      aes(x = sg + unique(sg.global), 
+                      aes(x = sg.trt + unique(sg.trt_global_slope), 
                           y = anthropogenic,
                           # y = grazed, 
                           #y= managed,
                           # fill = starting.richness
                           #fill = site_dom
-                          fill= site_rich_range
+                          #fill= site_rich_range
+                          fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis_d(name = #'site_dom'
                          # 'starting.richness' 
-                       'site_rich_range') +
+                       #'site_rich_range'
+                       'Realm') +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
   #                              "11-15" ="#5AC2F1FF",
   #                              "16-20"= "#0C5BB0FF",
   #                              "21-25" = "#972C8DFF",
   #                              ">26" = "#E0363AFF", drop =FALSE))+
-  geom_vline(data = sg_posterior,
+  geom_vline(data = sg.p,
              aes(xintercept = sg.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
@@ -348,20 +360,24 @@ ggplot() +
   #                     scale = 1, alpha = 0.6,
   #                     linetype = 0) +
   geom_density_ridges(data = cde.p,
-                      aes(x = cde + unique(cde.global), 
-                          y = interaction(anthropogenic,site_dom),
-                          #y = anthropogenic,
-                          # y = grazed, 
-                          #y = managed,
+                      aes(x = cde.trt + unique(cde.trt_global_slope), 
+                          #y = interaction(anthropogenic,site_dom),
+                          y = anthropogenic,
+                          # y = grazed , 
+                          # y = managed ,
                           # fill = starting.richness
-                          #fill = site_dom
-                          fill= site_rich_range
+                          # fill = site_dom
+                          # fill= site_rich_range
+                          # fill = NDep.cat
+                          fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis_d(name = #'site_dom'
-                        # 'starting.richness' 
-                       'site_rich_range'
+                       # 'starting.richness' 
+                       # 'site_rich_range'
+                       # 'NDep.cat'
+                         'Realm'
                       ) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
@@ -369,7 +385,7 @@ ggplot() +
   #                              "16-20"= "#0C5BB0FF",
   #                              "21-25" = "#972C8DFF",
   #                              ">26" = "#E0363AFF", drop =FALSE))+
-  geom_vline(data = cde_posterior,
+  geom_vline(data = cde.p,
              aes(xintercept = cde.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
@@ -386,11 +402,11 @@ cdef
 
 grid_arrange_shared_legend(slf,sgf,cdef,nrow=1)
 
-
+#########################
 #########################
 # BIOMASS RICHNESS MODELS
 #########################
-
+#########################
 
 #plot.rich.im_fixef
 rich_posterior <- study_sample_posterior  %>% 
@@ -516,26 +532,31 @@ ggplot() +
   #                     scale = 1, alpha = 0.6,
   #                     linetype = 0) +
   geom_density_ridges(data = rich.p,
-                      aes(x = rich + unique(rich.global), 
+                      aes(x = rich.trt + unique(rich.trt_global_slope), 
                           y = anthropogenic,
                           # y = grazed, 
-                          #y= managed,
+                          # y= managed,
                           # fill = starting.richness
-                          #fill = site_dom
-                          fill= site_rich_range
+                          # fill = site_dom
+                          # fill = site_rich_range
+                          # fill = NDep.cat
+                          fill = Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis_d(name = #'site_dom'
                          # 'starting.richness' 
-                       'site_rich_range') +
+                         # 'site_rich_range'
+                         # 'NDep.cat'
+                         'Realm'
+                       ) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
   #                              "11-15" ="#5AC2F1FF",
   #                              "16-20"= "#0C5BB0FF",
   #                              "21-25" = "#972C8DFF",
   #                              ">26" = "#E0363AFF", drop =FALSE))+
-  geom_vline(data = rich_posterior,
+  geom_vline(data = rich.p,
              aes(xintercept = rich.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
@@ -567,19 +588,24 @@ ggplot() +
   #                     scale = 1, alpha = 0.6,
   #                     linetype = 0) +
   geom_density_ridges(data = bm.p,
-                      aes(x = bm + unique(bm.global), 
+                      aes(x = bm.trt + unique(bm.trt_global_slope), 
                           y = anthropogenic,
-                          # y = grazed, 
-                          #y= managed,
+                          # y = grazed , 
+                          # y= managed ,
                           # fill = starting.richness
-                          #fill = site_dom
-                          fill= site_rich_range
+                          # fill = site_dom
+                          # fill= site_rich_range
+                          # fill= NDep.cat
+                          fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis_d(name = #'site_dom'
                          # 'starting.richness' 
-                         'site_rich_range') +
+                         #'site_rich_range'
+                         #'NDep.cat'
+                         'Realm'
+                         ) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
   #                              "11-15" ="#5AC2F1FF",
@@ -602,192 +628,15 @@ bf
 grid_arrange_shared_legend(rf,bf,nrow=1)
 
 
-
-
-
-
-#THESE WERE OLD PLOTS, PLOTTED BY CONTINENT
-
-
-slf2<-ggplot() +
-  #facet_grid( ~ continent, scale = 'free') +
-  geom_rect(data = sl_posterior %>% distinct(sl.trt_lower_slope, sl.trt_upper_slope),
-            aes(xmin = sl.trt_lower_slope, xmax =  sl.trt_upper_slope), ymin = -Inf, ymax = Inf,
-            alpha = 0.3) +
-  geom_density_ridges(data = sl_posterior,
-                      aes(x = sl.trt + unique(sl.trt_global_slope), 
-                          y = continent,
-                          fill = continent
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = sl_posterior,
-                      aes(x = sl.ctl + unique(sl.ctl_global_slope), 
-                          y = continent,
-                          color= "grey"
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  scale_fill_viridis_d(name = 'continent') +
-  geom_vline(data = sl_posterior,
-             aes(xintercept = sl.trt_global_slope)) +
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
-  labs(y = 'continent',
-       x = 'Biomass change due to Species Loss') +
-  xlim(-0.50,0.50) +
-  scale_x_continuous(trans = reverse_trans()) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        legend.position="bottom")
-
-
-
-
-sgf2<-ggplot() +
-  #facet_grid( ~ continent, scale = 'free') +
-  geom_rect(data = sg_posterior %>% distinct(sg.trt_lower_slope, sg.trt_upper_slope),
-            aes(xmin = sg.trt_lower_slope, xmax =  sg.trt_upper_slope), ymin = -Inf, ymax = Inf,
-            alpha = 0.3) +
-  geom_density_ridges(data = sg_posterior,
-                      aes(x = sg.trt + unique(sg.trt_global_slope), 
-                          y = continent,
-                          fill= continent
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  # geom_density_ridges(data = sg_posterior,
-  #                     aes(x = sg.ctl + unique(sg.ctl_global_slope), 
-  #                         y = continent,
-  #                         color = "grey"
-  #                     ),
-  #                     scale = 1, alpha = 0.6,
-  #                     linetype = 0) +
-  scale_fill_viridis_d(name = 'continent') +
-  geom_vline(data = sg_posterior,
-             aes(xintercept = sg.trt_global_slope)) +
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
-  labs(y = 'continent',
-       x = 'Biomass change due to Species Gains') +
-  xlim(-0.50,0.50) +
-  theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        legend.key = element_blank(),
-        legend.position="bottom")
-
-
-cdef2<-ggplot() +
-  #facet_grid( ~ continent, scale = 'free') +
-  geom_rect(data = cde_posterior %>% distinct(cde.trt_lower_slope, cde.trt_upper_slope),
-            aes(xmin = cde.trt_lower_slope, xmax =  cde.trt_upper_slope), ymin = -Inf, ymax = Inf,
-            alpha = 0.3) +
-  geom_density_ridges(data = cde_posterior,
-                      aes(x = cde.trt + unique(cde.trt_global_slope), 
-                          y = continent,
-                          fill= continent
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = cde_posterior,
-                      aes(x = cde.ctl + unique(cde.ctl_global_slope), 
-                          y = continent,
-                          color = "grey"
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  scale_fill_viridis_d(name = 'continent') +
-  geom_vline(data = cde_posterior,
-             aes(xintercept = cde.trt_global_slope)) +
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
-  labs(y = 'continent',
-       x = 'Biomass change in Persistent Species') +
-  xlim(-150,150) +
-  theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        legend.key = element_blank(),
-        legend.position="bottom")
-
-grid_arrange_shared_legend(slf2,sgf2,cdef2,nrow=1)
-
-
-
-
-rf2<-ggplot() +
-  #facet_grid( ~ continent, scale = 'free') +
-  geom_rect(data = rich_posterior %>% distinct(rich.trt_lower_slope, rich.trt_upper_slope),
-            aes(xmin = rich.trt_lower_slope, xmax =  rich.trt_upper_slope), ymin = -Inf, ymax = Inf,
-            alpha = 0.3) +
-  geom_density_ridges(data = rich_posterior,
-                      aes(x = rich.trt + unique(rich.trt_global_slope), 
-                          y = continent,
-                          fill = continent
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = rich_posterior,
-                      aes(x = rich.ctl + unique(rich.ctl_global_slope), 
-                          y = continent,
-                          color= "grey"
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  scale_fill_viridis_d(name = 'continent') +
-  geom_vline(data = rich_posterior,
-             aes(xintercept = rich.trt_global_slope)) +
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
-  labs(y = 'continent',
-       x = 'continent-level Richness') +
-  #xlim(-0.50,0.50) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        legend.position="bottom")
-
-
-
-bf2<-ggplot() +
-  #facet_grid( ~ continent, scale = 'free') +
-  geom_rect(data = bm_posterior %>% distinct(bm.trt_lower_slope, bm.trt_upper_slope),
-            aes(xmin = bm.trt_lower_slope, xmax =  bm.trt_upper_slope), ymin = -Inf, ymax = Inf,
-            alpha = 0.3) +
-  geom_density_ridges(data = bm_posterior,
-                      aes(x = bm.ctl + unique(bm.ctl_global_slope), 
-                          y = continent,
-                          color= "grey"
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  geom_density_ridges(data = bm_posterior,
-                      aes(x = bm.trt + unique(bm.trt_global_slope), 
-                          y = continent,
-                          fill = continent
-                      ),
-                      scale = 1, alpha = 0.6,
-                      linetype = 0) +
-  scale_fill_viridis_d(name = 'continent') +
-  geom_vline(data = bm_posterior,
-             aes(xintercept = bm.trt_global_slope)) +
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
-  labs(y = 'continent',
-       x = 'continent-level Biomass') +
-  #xlim(-0.50,0.50) +
-  theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        legend.key = element_blank(),
-        legend.position="bottom")
-
-grid_arrange_shared_legend(rf2,bf2,nrow=1)
-
 # SITE DIVERSITY
 # EXOTIC VS. NATIVE DOMINATED
 # HERBIVORY
 
-# CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
 # BIOGEO / CLIMATE
 # N. DEPOSITION
+
+# CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT
+
 
 # FACETED AS LOSSES, GAINS, CDE? WITH POSTERIORS GROUPED AS ABOVE IN DIFF COLOURS
 # CONTROLS GREY IN THE BACKGROUND

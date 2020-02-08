@@ -15,19 +15,21 @@ library(ggplot2)
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
+plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+
 
 #price partition data
-pp <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
+pp <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 head(pp)
 
 # models
-load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
-load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
-load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss4.Rdata') # s.loss.p.d
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain4.Rdata') # s.gain.p.d
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl..s
+load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 #load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
 
@@ -36,11 +38,11 @@ s.loss.p.d
 CDE.s.t
 sloss_fixef
 
-sloss_fixef <- fixef(s.loss.p.d)
-sgain_fixef <- fixef(s.gain.p.d)
-sl_fixef <- fixef(sl.trt.h.t)
-sg_fixef <- fixef(sg.trt.d)
-cde_fixef <- fixef(CDE.s.t)
+sloss_fixef <- fixef(s.loss.s)
+sgain_fixef <- fixef(s.gain.s)
+sl_fixef <- fixef(sl.s)
+sg_fixef <- fixef(sg.s)
+cde_fixef <- fixef(CDE.s)
 
 sgain_fixef<-as.data.frame(sgain_fixef)
 sloss_fixef<-as.data.frame(sloss_fixef)
@@ -81,7 +83,7 @@ sl_fixef$Model<-'SL'
 sg_fixef$Model<-'SG'
 cde_fixef$Model<-'CDE'
 fixedf_pp<-bind_rows(sl_fixef,sg_fixef,cde_fixef,sloss_fixef,sgain_fixef)
-fixedf_pp
+View(fixedf_pp)
 
 
 ggplot(data = fixedf_pp)+
@@ -111,7 +113,7 @@ ggplot(data = fixedf_pp)+
                aes(x = Estimate[16]+Estimate[20], #losses + gains
                    xend = Estimate[16]+Estimate[20], # losses + gains
                    y = Estimate[8],   # effect of sl + effect of sg on bm
-                   yend = Estimate[4]+Estimate[8]+Estimate[12]), # effect of sl + sg + cde on biomass
+                   yend = Estimate[8]+Estimate[12]), # effect of sl + sg + cde on biomass
                colour= "purple",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
@@ -131,10 +133,13 @@ ggplot(data = fixedf_pp)+
                             colour= "red",
                             size = 1.5,
                             arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-   labs(x = 'Effect on Species',
-       y = 'Effect on Biomass',
+   labs(x = 'Effect on Species Richness Over Time',
+       y = 'Effect on Biomass Change Over Time',
        title= 'CAFE Bayes Vector Plot') +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+
+
 
 
 #you could also start them all from 0?

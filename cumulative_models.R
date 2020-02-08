@@ -13,15 +13,13 @@ library(priceTools)
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
 plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
 summary(plot)
 
-View(plot)
-p.all <- droplevels( p.all[-which(p.all$year.y == "0"), ] )
 
 
 #shanes links
@@ -53,19 +51,19 @@ View(p.dat2)
 # p.dat2$s.loss.p<-abs(p.dat2$s.loss)
 
 # models
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass4.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl6.Rdata') # sl.s.t
-# load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
-load('~/Dropbox/Projects/NutNet/Model_fits/cde5.Rdata') # CDE.s.t
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
+# load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
 
 # #------plot richness model all sp----------------
 # fixed effects
-sl.trt_fitted <- cbind(sl.s.t$data,
+sl.trt_fitted <- cbind(sl.s$data,
                      # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                     fitted(sl.s.t, re_formula = NA)) %>% 
+                     fitted(sl.s, re_formula = NA)) %>% 
   as_tibble()
 
 
@@ -101,10 +99,10 @@ sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
 View(sl.trt_fitted.npk)
 
 # fixed effect coefficients -coefficient plot
-sl.trt_fixef <- fixef(sl.s.t)
+sl.trt_fixef <- fixef(sl.s)
 
 # coefficients for experiment-level (random) effects
-sl.trt_coef <- coef(sl.s.t)
+sl.trt_coef <- coef(sl.s)
 
 sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>% 
                            as_tibble() %>% 
@@ -153,6 +151,7 @@ sl.trt_coef2$starting.richness <- ifelse(sl.trt_coef2$r.rich >= 1 & sl.trt_coef2
                                                       ifelse(sl.trt_coef2$r.rich >=21 & sl.trt_coef2$r.rich <=25, '21-25',
                                                              ifelse(sl.trt_coef2$r.rich >=26, '>26', 'other'))))))
 
+
 dat<-distinct(p.dat2, site_code, continent,habitat)
 
 sl.trt_coef3<-inner_join(sl.trt_coef2,dat)
@@ -196,8 +195,7 @@ View(sl.trt_coef3)
 sl.trtm<-ggplot() +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL.p,
-                  colour = factor(starting.richness),
-                 alpha=0.01),
+                  colour = starting.richness),
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = sl.trt_coef3,
                aes(x = xs, 
@@ -205,7 +203,7 @@ sl.trtm<-ggplot() +
                    y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
                    yend = (Intercept + TE + (ISlope+TESlope) * cxmax),
                    # group = site_code,
-                    colour = factor(starting.richness)
+                    colour = starting.richness
                    ),
                size = .7) +
   # uncertainy in fixed effect
@@ -275,10 +273,11 @@ with(sg.trt.plot2, plot(f.year.y, sg.trtm1$Estimate))
 # #------plot richness model all sp----------------
 # fixed effects
 
-sg.trt_fitted <- cbind(sg.trt.d$data,
+sg.trt_fitted <- cbind(sg.s$data,
                      # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                     fitted(sg.trt.d, re_formula = NA)) %>% 
+                     fitted(sg.s, re_formula = NA)) %>% 
   as_tibble() 
+
 as.data.frame(sg.trt_fitted)
 p.dat3<-p.dat2 %>% 
   group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
@@ -306,10 +305,10 @@ View(sg.trt_fitted3)
 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-sg.trt_fixef <- fixef(sg.trt.d)
+sg.trt_fixef <- fixef(sg.s)
 
 # coefficients for experiment-level (random) effects
-sg.trt_coef <- coef(sg.trt.d)
+sg.trt_coef <- coef(sg.s)
 sg.trt_coef 
 sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -366,10 +365,9 @@ sg.trt_coef3<-full_join(sg.trt_coef2,dat)
 
 
 rm(sg.trt.i)
+setwd('~/Dropbox/Projects/NutNet/Data/')
 save(sg.trt_fitted.npk,sg.trt_fitted.ctl,sg.trt_coef3,file = 'sg_dat.Rdata')
 load('~/Desktop/Academic/R code/NutNet/sg_dat.Rdata')
-
-
 
 
 summary(sg.trt_fitted3)
@@ -380,7 +378,7 @@ is.factor(sg.trt_coef3$starting.richness)
 
 sg.trt_fitted.npk<-sg.trt_fitted.npk[complete.cases(sg.trt_fitted.npk$starting.richness), ]
 sg.trt_coef3<-sg.trt_coef3[complete.cases(sg.trt_coef3$starting.richness), ]
-
+View(sg.trt_coef3)
 
 sg.trt_fitted.npk$starting.richness <- factor(sg.trt_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 sg.trt_coef3$starting.richness <- factor(sg.trt_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
@@ -391,7 +389,7 @@ sg.trtm<-ggplot()  +
   # data
   geom_point(data = sg.trt_fitted.npk,
              aes(x = year.y, y = SG,
-                 colour = starting.richness, alpha=0.1),
+                 colour = starting.richness),
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   # geom_jitter(data=sg.trt_fitted.npk,
   #             aes(x = year.y, y = SG,
@@ -401,8 +399,8 @@ sg.trtm<-ggplot()  +
     geom_segment(data = sg.trt_coef3,
                  aes(x = xs,
                      xend = xmax,
-                     y = exp(Intercept + TE + (ISlope+TESlope) *  cxmin),
-                     yend = exp(Intercept + TE + (ISlope+TESlope)  * cxmax),
+                     y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
+                     yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                      # group = starting.richness,
                      colour = starting.richness),
                  size = .7) +
@@ -420,8 +418,9 @@ sg.trtm<-ggplot()  +
   geom_line(data = sg.trt_fitted.ctl,
             aes(x = year.y, y = Estimate),
             size = 1.5,  linetype= "dashed") +
-  scale_y_continuous(trans = 'log', breaks=c(1,2,4,6,8,16,24,64,512,1024,2048,4096)) +
+  #scale_y_continuous(trans = 'log', breaks=c(1,2,4,6,8,16,24,64,512,1024,2048,4096)) +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
+  ylim(0,400) +
   labs(x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'd) Change in Biomass due to SG') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
@@ -486,9 +485,9 @@ with(cde.plot2, plot(f.year.y, cm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-cde_fitted <- cbind(CDE.s.t$data,
+cde_fitted <- cbind(CDE.s$data,
                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                    fitted(CDE.s.t, re_formula = NA)) %>% 
+                    fitted(CDE.s, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(cde_fitted)
 
@@ -519,11 +518,9 @@ cde_fitted.ctl<-cde_fitted3[cde_fitted3$trt.y %in% c('Control'),]
 View(cde_fitted.npk)
 View(cde_fitted.ctl)
 
-# fixed effect coefficients (I want these for the coefficient plot)
-cde_fixef <- fixef(CDE.s.t)
+cde_fixef <- fixef(CDE.s)
 
-# coefficients for experiment-level (random) effects
-cde_coef <- coef(CDE.s.t)
+cde_coef <- coef(CDE.s)
 cde_coef
 cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -582,8 +579,8 @@ save(cde_fitted.npk,cde_fitted.ctl,cde_coef3,file = 'cde.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
 
 
-# cde_fitted.npk<-cde_fitted.npk[complete.cases(cde_fitted.npk$starting.richness), ]
-# cde_coef3<-cde_coef3[complete.cases(cde_coef3$starting.richness), ]
+cde_fitted.npk<-cde_fitted.npk[complete.cases(cde_fitted.npk$starting.richness), ]
+cde_coef3<-cde_coef3[complete.cases(cde_coef3$starting.richness), ]
 
 cde_fitted.npk$starting.richness <- factor(cde_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 cde_coef3$starting.richness <- factor(cde_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
@@ -591,14 +588,14 @@ cde_coef3$starting.richness <- factor(cde_coef3$starting.richness , levels=c("1-
 
 
 
-View(cde_fitted.npk)
+View(cde_coef3)
 cde_coef3$xs<-1
 #cde
 cdem<-ggplot() +
   # data
   geom_point(data = cde_fitted.npk,
              aes(x = year.y, y = CDE,
-                 colour = starting.richness, alpha=0.1),
+                 colour = starting.richness),
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = cde_coef3,
                aes(x = xs, 
@@ -626,9 +623,9 @@ cdem<-ggplot() +
   #scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
   #) +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
-  ylim(-1000,1000)+
+  ylim(-500,1000)+
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'c)Biomass Change in Persistent Species') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'c) Biomass Change in Persistent Species') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -641,7 +638,7 @@ cdem<-ggplot() +
 cdem
 
 
-grid_arrange_shared_legend(sl.trtm,cdem,nrow=1)
+grid_arrange_shared_legend(sl.trtm,sg.trtm,cdem,nrow=1)
 
 
 

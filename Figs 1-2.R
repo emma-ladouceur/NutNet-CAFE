@@ -18,10 +18,10 @@ library(sjstats)
 
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-#shanes links
-sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
+plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
 
 dat2<-distinct(p, continent, site_code, year_trt)
 
@@ -34,7 +34,7 @@ View(dat2)
 
 #plot<-p[p$trt %in% c('NPK'),]
 #or
-plot<-p[p$trt %in% c('NPK', 'Control'),]
+plot<-plot[plot$trt %in% c('NPK', 'Control'),]
 nrow(plot)
 
 colnames(plot)
@@ -205,8 +205,8 @@ startrich<-plot[plot$year_trt %in% c('0'),]
 
 
 #models
-load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
-load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
 #RICHNESS
 
@@ -289,7 +289,7 @@ plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , 
 
 
 #BIOMASS
-plot.bm_coef <- coef(plot.bm.logt)
+plot.bm_coef <- coef(plot.bm.s)
 plot.bm_coef 
 colnames(plot.bm_coef)
 plot.bm_coef<-as.data.frame(plot.bm_coef$site_code)

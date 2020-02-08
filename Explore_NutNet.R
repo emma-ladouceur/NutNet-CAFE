@@ -3,25 +3,24 @@
 # Email: emmala@gmail.com
 
 
-
-
-
 library(ggplot2)
 library(tidyr)
 library(dplyr)
 library(gridExtra)
+library(priceTools)
 
 
-#just use the here package to locate data
-# you can update this script with new comb-by-plot versions just by changing this line
-nn <- read.csv("~/Dropbox/Projects/NutNet/Data/comb-by-plot-01-November-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+nn <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+nn <- droplevels( nn[-which(nn$year.zero.only == "1"), ] )
+nn <- droplevels( nn[-which(nn$no.year.zero == "1"), ] )
 
 # SOME DATA WRANGLING FIRST
 # create a new dataset of some basics from comb-by-plot
 
 # get a list of unique sites, continent, habitat, year_trt year and experiment type
 colnames(nn)
-unique.sites <- unique(nn[c("site_name","country","continent","habitat","year_trt","year","experiment_type")])
+unique.sites <- unique(nn[c("site_code","country","continent","habitat","year_trt","year","experiment_type")])
 # add a column to count the number of sites
 unique.sites$site_n<-"1"
 #write to a new file
@@ -31,7 +30,7 @@ write.csv(unique.sites, "~/Dropbox/Projects/NutNet/Data/basics_1.csv", row.names
 # and a second dataset that summarizes sites, by only their max year
 nn_agg <- read.csv("~/Dropbox/Projects/NutNet/Data/basics_1.csv", sep=",",header=T, strip.white=T)
 # take only the max year of every site
-nn_agg_2<-nn_agg %>% group_by(site_name) %>% top_n(1, year_trt)
+nn_agg_2<-nn_agg %>% group_by(site_code) %>% top_n(1, year_trt)
 View(nn_agg_2)
 ??group_by
 write.csv(nn_agg_2, "~/Dropbox/Projects/NutNet/Data/basics_2.csv", row.names=F)
@@ -54,67 +53,6 @@ write.csv(nnr4, "~/Dropbox/Projects/NutNet/Data/basics_3.csv", row.names=F)
 
 
 
-# Okay now ready to plot descriptive statistics
-# PLOT 1: YEAR X SITE
-nn_agg <- read.csv("~/Dropbox/Projects/NutNet/Data/basics_1.csv", sep=",",header=T, strip.white=T)
-
-# !!!!!!! ATTENTION: Optional to remove observational sites, 
-# if you want to exclude them just remove the # and run this line
-#nn_agg <- nnr[nnr$experiment_type != "Observational",]
-#aggregate data
-nn_agg <- nn_agg[nn_agg$year_trt != "-2",]
-nn_agg$current_year<-"2018"
-nn_agg$current_year<-as.numeric(nn_agg$current_year)
-nn_agg$year<-as.numeric(nn_agg$year)
-nn_agg$year_start<-(nn_agg$current_year-nn_agg$year)
-nn_agg$f.year_start<-as.factor(as.character(nn_agg$year_start))
-
-nn_agg$f.year_start<-as.factor(nn_agg$f.year_start)
-nngroup <- group_by(nn_agg, f.year_start)
-year_site <- summarize(nngroup, site_n = n())
-year_site$f.year_start<- factor(year_site$f.year_start, levels=c("0","1","2","3","4","5","6","7","8","9","10","11"))
-
-# plot total number of sites, and years 
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-
-year_site$site_n<-as.numeric(year_site$site_n)
-YearSiteFig <- ggplot(year_site, aes(x = f.year_start, y = site_n))+ geom_bar(aes(color = f.year_start),
-                                                                              stat="identity", fill="white",show.legend=F)+
-  labs(x = 'Years of Treatment',
-       y = 'Number of Sites', title= 'The Number of Sites per Years of Treatment in the Nutrient Network') +theme_classic()
-YearSiteFig
-
-
-# PLOT 2: EXPERIMENT TYPE
-nn_agg <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", sep=",",header=T, strip.white=T)
-# Again, below is optional to remove observational sites, or whatever you want...
-nn_agg2 <- nn_agg[nn_agg$year_trt != "-2",]
-#nn_agg2 <- nn_agg[nn_agg$experiment_type != "Observational",]
-#nn_agg2 <- nn_agg2[nn_agg2$experiment_type != "Experimental (Other modification)",]
-#aggregate data
-nn_agg2$current_year<-"2018"
-nn_agg2$current_year<-as.numeric(nn_agg2$current_year)
-nn_agg2$year<-as.numeric(nn_agg2$year)
-nn_agg2$year_start<-(nn_agg2$current_year-nn_agg2$year)
-nn_agg2$f.year_start<-as.factor(as.character(nn_agg2$year_start))
-
-View(nn_agg2)
-nn_agg2$year_start<-as.numeric(nn_agg2$year_start)
-nngroup2 <- group_by(nn_agg2, f.year_start,year_start, experiment_type)
-year_site_s <- summarize(nngroup2, site_n = n())
-View(year_site_s)
-# stack & color by experimental type
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-year_site_s$site_n<-as.numeric(year_site_s$site_n)
-year_site_s$f.year_start<- factor(year_site_s$f.year_start, levels=c("0","1","2","3","4","5","6","7","8","9","10","11"))
-
-YearSiteStackFig <- ggplot(year_site_s, aes(x = f.year_start, y = site_n, fill=experiment_type))+geom_bar(aes(color = experiment_type),
-                                                                                                          stat="identity", fill="white")+
-  labs(x = 'Years Since Start of Experiment/Observation',
-       y = 'Number of Sites', title= 'The Number of Sites per Years of Treatment in the Nutrient Network') +theme_classic()+ theme(legend.position="bottom")
-YearSiteStackFig
-
-
 
 #I LIKE THIS ONE
 
@@ -132,14 +70,14 @@ ggplot(data = nnr2, aes(x = continent, y = site_n, color=habitat)) +scale_x_disc
 
 
 colnames(nnr2)
-
+#and this
 nnr2$year_trt<-as.factor(as.character(nnr2$year_trt))
 nnr2$year_trt<- factor(nnr2$year_trt, levels=c("0","1","2","3","4","5","6","7","8","9","10","11"))
 
 ggplot(data = nnr2, aes(x = year_trt, y = site_n, color=continent)) +
   geom_col(fill = "white") +
-  # geom_text(aes(label = year_trt),
-  #           position = position_stack(vjust = .5))+ 
+   geom_text(aes(label = site_code),
+             position = position_stack(vjust = .5))+ 
   labs(x = 'Number of Years',
        y = 'Number of Sites', title= 'The Number of Experimental Sites ') +
   #facet_grid(experiment_type ~ .)
@@ -147,229 +85,194 @@ ggplot(data = nnr2, aes(x = year_trt, y = site_n, color=continent)) +
 
 
 
-###########################################################
-#OLD PLOTS###########################################################
-###########################################################
-
-library(ggplot2)
-library(tidyr)
-library(dplyr)
-library(gridExtra)
-
-
-#just use the here package to locate data
-# you can update this script with new comb-by-plot versions just by changing this line
-nn <- read.csv("~/Dropbox/NutNet data/comb-by-plot-25-January-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-# SOME DATA WRANGLING FIRST
-# create a new dataset of some basics from comb-by-plot
-
-# get a list of unique sites, continent, habitat, year_trt year and experiment type
-colnames(nn)
-unique.sites <- unique(nn[c("site_name","country","continent","habitat","year_trt","year","experiment_type")])
-# add a column to count the number of sites
-unique.sites$site_n<-"1"
-#write to a new file
-View(unique.sites)
-write.csv(unique.sites, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", row.names=F)
-
-# and a second dataset that summarizes sites, by only their max year
-nn_agg <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", sep=",",header=T, strip.white=T)
-# take only the max year of every site
-nn_agg_2<-nn_agg %>% group_by(site_name) %>% top_n(1, year_trt)
-View(nn_agg_2)
-??group_by
-write.csv(nn_agg_2, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", row.names=F)
+# price plots raw
+price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
-nnr2 <- droplevels(subset(nnr, experiment_type == "Experimental (Full Factorial)"| experiment_type == "Experimental (Nutrients Only)"))
+summary(price)
+head(price)
 
-colnames(nnr2)
-nnr2$year_trt<-as.factor(nnr2$year_trt)
-nnr3<- nnr2[nnr2$year_trt != "0" ,]
-nnr4<- nnr3[nnr3$year_trt != "1" ,]
-levels(nnr3$year_trt)
-View(nnr4)
+price<-price[complete.cases(price$SG),]
+price<-price[complete.cases(price$SL),]
+dat1<-price[price$trt.xy %in% c('Control_Control'),] # control
+dat2<-price[price$trt.xy %in% c('NPK_NPK'),] # npk treatments
 
-write.csv(nnr4, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_3.csv", row.names=F)
+# heres a quick lil plot
+p1 <- leap.zig(dat1,type='cafe',xlim=c(0,17),ylim=c(0,700),standardize = FALSE,raw.points = F)+ 
+  annotate("text", x = mean(dat1$x.rich), y = mean(dat1$x.func), 
+           label = "*",size=8)+ggtitle('Control')+theme_classic()
+p2 <- leap.zig(dat2,type='cafe',xlim=c(0,17),ylim=c(0,700),standardize = FALSE,raw.points = F)+ 
+  annotate("text", x = mean(dat2$x.rich), y = mean(dat2$x.func), 
+           label = "*",size=8)+ggtitle('NPK')+theme_classic()
+p3 <- leap.zig(dat1,type='cafe',xlim=c(0,17),ylim=c(0,700),standardize = FALSE,raw.points = T)+ 
+  annotate("text", x = mean(dat1$x.rich), y = mean(dat1$x.func), 
+           label = "*",size=8)+ggtitle('Control')+theme_classic()
+p4 <- leap.zig(dat2,type='cafe',xlim=c(0,17),ylim=c(0,700),standardize = FALSE,raw.points = T)+ 
+  annotate("text", x = mean(dat2$x.rich), y = mean(dat2$x.func), 
+           label = "*",size=8)+ggtitle('NPK')+theme_classic()
 
+grid_arrange_shared_legend(p1,p2,p3,p4,ncol=2,nrow=2)
 
+View(price)
+# Heres colins summary statistics func
+test.partitions(price,type='cafe',treat.var = 'trt.xy',control = 'Control_Control',print=F,plot=T)
+# this  uses raw species gains and losses as a metric
 
+# Here's species gains and losses are calculated
+# p.dat2$s.loss <- -1*(p.dat2$x.rich - p.dat2$c.rich)
+# p.dat2$s.gain <- p.dat2$y.rich - p.dat2$c.rich
+# p.dat2$s.change <- p.dat2$y.rich - p.dat2$x.rich
 
+# some raw plots
+s.loss<-ggplot(price, aes(x=trt.y, y=s.loss, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=trt.y)) +
+  labs(title= 'c) Species Loss') +
+  ylim(-10,2)+
+  scale_color_manual(values = c("#00AFBB","#E7B800"))+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+s.loss
 
-# Okay now ready to plot descriptive statistics
-# PLOT 1: YEAR X SITE
-nn_agg <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", sep=",",header=T, strip.white=T)
+s.gain<-ggplot(price, aes(x=trt.y, y=s.gain, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=trt.y)) +
+  labs(title= 'd) Species Gains') +
+  ylim(-2,10)+
+  scale_color_manual(values = c("#00AFBB","#E7B800"))+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+s.gain
 
-# !!!!!!! ATTENTION: Optional to remove observational sites, 
-# if you want to exclude them just remove the # and run this line
-#nn_agg <- nnr[nnr$experiment_type != "Observational",]
-#aggregate data
-nn_agg$year_trt<-as.factor(nn_agg$year_trt)
-nngroup <- group_by(nn_agg, year_trt)
-year_site <- summarize(nngroup, site_n = n())
+SL<-ggplot(price, aes(x=trt.y, y=SL, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=trt.y)) +
+  labs(title= 'e) EF : Species Loss') +
+  ylim(-300,10)+
+  scale_color_manual(values = c("#00AFBB","#E7B800"))+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+SL
+SG<-ggplot(price, aes(x=trt.y, y=SG, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=trt.y)) +
+  labs( title= 'f) EF: Species Gains') +
+  ylim(-10,300)+
+  scale_color_manual(values = c("#00AFBB","#E7B800"))+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+SG
+CDE<-ggplot(price, aes(x=trt.y, y=CDE, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=trt.y)) +
+  labs( title= 'g) Context Dependent Effect') +
+  ylim(-300,1000)+
+  scale_color_manual(values = c("#00AFBB","#E7B800"))+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+CDE
 
-# plot total number of sites, and years 
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-year_site$year_trt<-as.factor(year_site$year_trt)
-year_site$site_n<-as.numeric(year_site$site_n)
-YearSiteFig <- ggplot(year_site, aes(x = year_trt, y = site_n))+ geom_bar(aes(color = year_trt),
-                                                                          stat="identity", fill="white",show.legend=F)+theme_classic()
-YearSiteFig
+rich<-ggplot(price, aes(x=trt.y, y=y.rich, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=trt.y)) +
+  labs(title= 'a) Richness') +
+  ylim(0,40)+
+  scale_color_manual(values = c("#00AFBB","#E7B800"))+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+rich
+bm<-ggplot(price, aes(x=trt.y, y=y.func, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=trt.y)) +
+  labs( title= 'b) Live Biomass') +
+  ylim(0,2000)+
+  scale_color_manual(values = c("#00AFBB","#E7B800"))+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+bm
 
-
-# PLOT 2: EXPERIMENT TYPE
-nn_agg <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_1.csv", sep=",",header=T, strip.white=T)
-# Again, below is optional to remove observational sites, or whatever you want...
-nn_agg2 <- nn_agg[nn_agg$experiment_type != "Observational",]
-#aggregate data
-nn_agg2$year_trt<-as.factor(nn_agg2$year_trt)
-nngroup2 <- group_by(nn_agg2, year_trt, experiment_type)
-year_site_s <- summarize(nngroup2, site_n = n())
-
-# stack & color by experimental type
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-year_site_s$year_trt<-as.factor(year_site_s$year_trt)
-year_site_s$site_n<-as.numeric(year_site_s$site_n)
-YearSiteStackFig <- ggplot(year_site_s, aes(x = year_trt, y = site_n, fill=experiment_type))+geom_bar(aes(color = experiment_type),
-                                                                                                      stat="identity", fill="white")+theme_classic()+ theme(legend.position="bottom")
-YearSiteStackFig
-
-#vertical
-grid.arrange(YearSiteFig,YearSiteStackFig,nrow=2)
-#horizontal
-grid.arrange(YearSiteFig,YearSiteStackFig,nrow=1)
-
-# PLOT 3: 
-# continent x experimental type x habitat x number of years
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
-
-# no numbers, faceted by experiment type
-#you can facet anything you want, like year
-nnr$year_trt<-as.factor(nnr$year_trt)
-nnr$site_n<-as.numeric(nnr$site_n)
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-ConHab <- ggplot(nnr, aes(x = continent, y = site_n))+scale_x_discrete(limits = rev(levels(nnr$continent)))+ geom_bar(aes(color = habitat),
-                                                                                                                      stat="identity", fill="white")+coord_flip() + facet_grid(experiment_type ~ .)+theme_classic()+ theme(legend.position="bottom")
-ConHab
-
-#PLOT 4:
-# same same but all new now with numbers
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
-
-ggplot(data = nnr, aes(x = continent, y = site_n, color=habitat)) +scale_x_discrete(limits = rev(levels(nnr$continent)))+
-  geom_col(fill = "white") +
-  geom_text(aes(label = year_trt),
-            position = position_stack(vjust = .5))+coord_flip()+facet_grid(experiment_type ~ .)+theme_classic()+ theme(legend.position="bottom")
-
-#PLOT 5:
-# subset just  the full factorial experimental sites
-
-nnr2 <- droplevels(subset(nnr, experiment_type == "Experimental (Full Factorial)"))
-
-View(nnr2)
-
-nnr2$year_trt<-as.factor(nnr2$year_trt)
-nnr2$site_n<-as.numeric(nnr2$site_n)
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-f <- ggplot(nnr2, aes(x = continent, y = site_n))+scale_x_discrete(limits = rev(levels(nnr$continent)))+ggtitle("Experimental (Full Factorial) Plots") 
-# Change bar plot line colors by groups
-f + geom_bar(aes(color = habitat),
-             stat="identity", fill="white")+coord_flip() +theme_classic()+ theme(legend.position="bottom")
-
-
-
-
-#PLOT 6:
-# change y axis to habitats and colors to continents
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
-
-ggplot(data = nnr, aes(x = habitat, y = site_n, color=continent)) +scale_x_discrete(limits = rev(levels(nnr$habitat)))+
-  geom_col(fill = "white") +
-  geom_text(aes(label = year_trt),
-            position = position_stack(vjust = .5))+coord_flip()+facet_grid(experiment_type ~ .)+theme_classic()+ theme(legend.position="bottom")
-
-#PLOT 7:
-# drop observational and look at all experimental sites together
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
-nnr <- nnr[nnr$experiment_type != "Observational",]
-
-ggplot(data=nnr, aes(x=habitat, y=site_n, color=continent)) +scale_x_discrete(limits = rev(levels(nnr$habitat)))+
-  geom_col(fill = "white") +
-  geom_text(aes(label = year_trt),
-            position = position_stack(vjust = .5))+coord_flip()+theme_classic()+ theme(legend.position="bottom")
+grid_arrange_shared_legend(rich,bm,s.loss,s.gain,SL,SG,CDE,nrow=3,ncol=3)
 
 
+#raw plots across years for npk only
+dat2$f.year_trt<-as.factor(as.character(dat2$year.y))
+levels(dat2$f.year_trt)
+dat2$f.year_trt <- factor(dat2$f.year_trt, levels = c("0","1","2","3","4","5","6","7","8","9","10","11"))
 
-# I LIKE THIS ONE
+rich<-ggplot(dat2, aes(x=f.year_trt, y=y.rich, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs(title= 'a) Richness') +
+  ylim(0,40)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
 
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
-nnr2 <- droplevels(subset(nnr, experiment_type == "Experimental (Full Factorial)"))
-
-ggplot(data = nnr2, aes(x = continent, y = site_n, color=habitat)) +scale_x_discrete(limits = rev(levels(nnr2$continent)))+
-  geom_col(fill = "white") +
-  geom_text(aes(label = year_trt),
-            position = position_stack(vjust = .5))+coord_flip()+
-  #facet_grid(experiment_type ~ .)
-  theme_classic()+ theme(legend.position="bottom")
-
-
-
-#montane
-nn <- read.csv("~/Dropbox/NutNet data/comb-by-plot-31-August-2018.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-colnames(nn)
-levels(nn$habitat)
-nnm <- droplevels(subset(nn, habitat=="montane grassland"))
-View(nnm)
-
-unique.sites <- unique(nnm[c("site_name","country","continent","habitat","year_trt","year","experiment_type","elevation","longitude","latitude")])
-# add a column to count the number of sites
-unique.sites$site_n<-"1"
-View(unique.sites)
-
-nnm2<-unique.sites %>% group_by(site_name) %>% top_n(1, year_trt)
-nnm2$year_trt<-as.factor(nnm2$year_trt)
-
-ggplot(data = nnm2, aes(x = site_name, y = elevation, color=year_trt)) +scale_x_discrete(limits = rev(levels(nnr$csite_name)))+
-  geom_col(fill = "white") +
-  geom_text(aes(label = year_trt),
-            position = position_stack(vjust = .5))+coord_flip()+theme_classic()+ theme(legend.position="bottom")
+bm<-ggplot(dat2, aes(x=f.year_trt, y=y.func, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs( title= 'b) Live Biomass') +
+  ylim(0,2000)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
 
 
-nnm.dat <- droplevels(subset(nnm, trt=="Control"))
-View(nnm.dat)
+s.loss<-ggplot(dat2, aes(x=f.year_trt, y=s.loss, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs( title= 'c) Species Loss') +
+  ylim(-10,2)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+s.loss
+
+s.gain<-ggplot(dat2, aes(x=f.year_trt, y=s.gain, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs( title= 'd) Species Gains') +
+  ylim(-2,10)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+
+SL<-ggplot(dat2, aes(x=f.year_trt, y=SL, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs(title= 'e) EF : Species Loss') +
+  ylim(-300,10)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+
+SG<-ggplot(dat2, aes(x=f.year_trt, y=SG, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs(title= 'f) EF: Species Gains') +
+  ylim(-10,300)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+
+c.rich<-ggplot(dat2, aes(x=f.year_trt, y=c.rich, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs(title= 'g) Persistent Species') +
+  # ylim(-300,1000)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+
+CDE<-ggplot(dat2, aes(x=f.year_trt, y=CDE, variable)) +
+  stat_summary(fun.y=mean, geom="point", 
+               size=0.2)+
+  geom_boxplot(aes(color=f.year_trt)) +
+  labs( title= 'g) Biomass Change in Persistent Species') +
+  ylim(-300,1000)+
+  theme_bw() + theme(axis.text.x=element_blank()) 
+
+
+grid_arrange_shared_legend(rich,bm,nrow=1,ncol=2)
+
+grid_arrange_shared_legend(s.loss,s.gain,SL,SG,CDE,nrow=2,ncol=3)
+
+grid_arrange_shared_legend(rich,bm,s.loss,s.gain,SL,SG,CDE,nrow=3,ncol=3)
 
 
 
-#practical plot, how many sites will i have for specific years
-
-nnr <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/basics_2.csv", sep=",",header=T, strip.white=T)
-
-nnr2 <- droplevels(subset(nnr, experiment_type == "Experimental (Full Factorial)"| experiment_type == "Experimental (Nutrients Only)"))
-
-nnr2$year_trt<-as.factor(nnr2$year_trt)
-nnr3<- nnr2[nnr2$year_trt != "0" ,]
-nnr4<- nnr3[nnr3$year_trt != "1" ,]
-nnr5<- nnr4[nnr4$year_trt != "2" ,]
-nnr5<- nnr5[nnr5$year_trt != "3" ,]
-nnr5<- nnr5[nnr5$year_trt != "4" ,]
-View(nnr5)
-
-nnr5$year_trt<-as.factor(nnr5$year_trt)
-nnr5$site_n<-as.numeric(nnr5$site_n)
-theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-f <- ggplot(nnr5, aes(x = continent, y = site_n))+scale_x_discrete(limits = rev(levels(nnr$continent)))+ggtitle("Experimental  Plots (Full Factorial & Nutrients Only)") 
-# Change bar plot line colors by groups
-f + geom_bar(aes(color = habitat),
-             stat="identity", fill="white")+coord_flip() +theme_classic()+ theme(legend.position="bottom")
-
-nrow(nnr5)
-# 3 years = 62 sites
-# 4 years =51
-# 5 years =45
-
-
-write.csv(nnr5, "/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/sites_3.csv", row.names=F)
 
