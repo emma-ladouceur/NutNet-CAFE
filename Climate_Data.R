@@ -34,6 +34,10 @@ summary(clim)
 #plot dat
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+
+plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
+plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+
 pdeets<-distinct(plot,site_code,block,plot,trt,year_trt,rich,NAT_rich,INT_rich,UNK_rich,live_mass)
 p.x<-pdeets[pdeets$year_trt %in% c('0'),]
 p.y<-pdeets[pdeets$year_trt != "0",]

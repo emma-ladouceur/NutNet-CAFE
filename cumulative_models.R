@@ -12,8 +12,16 @@ library(priceTools)
 
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
+plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+summary(plot)
+
+View(plot)
+p.all <- droplevels( p.all[-which(p.all$year.y == "0"), ] )
 
 
 #shanes links
@@ -22,13 +30,15 @@ p <- read.csv("~/Dropbox/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",n
 p.all  <- read.csv('~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv', sep=',') %>% 
   as_tibble() 
 
+
+
 p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
 
 p.all$f.year.y<-as.factor(p.all$year.y)
 p.all$plot<-as.factor(p.all$plot)
 p.all$site_code<-as.factor(p.all$site_code)
 
-dat<-distinct(p, site_code, continent,habitat)
+dat<-distinct(plot, site_code, continent,habitat)
 p.dat2<-inner_join(p.all,dat)
 View(p.dat2)
 
@@ -183,8 +193,7 @@ View(sl.trt_coef3)
 sl.trt_coef3$xs<-1
 
 View(sl.trt_coef3)
-#sl.trtm<-
-ggplot() +
+sl.trtm<-ggplot() +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL.p,
                   colour = factor(starting.richness),
@@ -218,7 +227,7 @@ ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   ylim(0,400) +
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b) Change in Biomass due to SL') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in Biomass due to SL') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -582,12 +591,6 @@ cde_coef3$starting.richness <- factor(cde_coef3$starting.richness , levels=c("1-
 
 
 
-# library(scales)
-# sign_sqrt <- scales::trans_new('sign_sqrt',
-#                                transform = function(x) {sign(x) * sqrt(abs(x))},
-#                                inverse = function(x){sign(x) * abs(x)^2})
-
-
 View(cde_fitted.npk)
 cde_coef3$xs<-1
 #cde
@@ -597,10 +600,6 @@ cdem<-ggplot() +
              aes(x = year.y, y = CDE,
                  colour = starting.richness, alpha=0.1),
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
-  # geom_jitter(data=cde_fitted.npk,
-  #             aes(x = year.y, y = CDE,
-  #                 colour = starting.richness), height=0.25,width = 0.25)+
-  #experiment (random) effects
   geom_segment(data = cde_coef3,
                aes(x = xs, 
                    xend = xmax,
@@ -627,8 +626,9 @@ cdem<-ggplot() +
   #scale_y_continuous(trans = sign_sqrt #, breaks=c(8,64,512,1024,2048,4096)
   #) +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
+  ylim(-1000,1000)+
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'Biomass Change in Persistent Species') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'c)Biomass Change in Persistent Species') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -641,7 +641,7 @@ cdem<-ggplot() +
 cdem
 
 
-grid_arrange_shared_legend(sl.,cdem,nrow=1)
+grid_arrange_shared_legend(sl.trtm,cdem,nrow=1)
 
 
 

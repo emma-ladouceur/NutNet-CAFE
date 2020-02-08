@@ -50,6 +50,9 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 # plot data
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
+plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
@@ -69,27 +72,15 @@ summa
 summary(pplot)
 
 # richness models
-# no transform, poisson distribution
-#load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.p
-# no transform, lognormal distribution
-#load('~/Dropbox/Projects/NutNet/Model_fits/rich2.Rdata') # plot.rich.log
 # gaussian distribution 
-load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
-summary(plot.rich.p)
-summary(plot.rich.log)
 summary(plot.rich.g)
 
-plot(plot.rich.p) 
-plot(plot.rich.log) # catepillars are wonky
 plot(plot.rich.g)
 
 color_scheme_set("darkgray")
-pr1<-pp_check(plot.rich.p)+ theme_classic()
-pr2<-pp_check(plot.rich.log)+ theme_classic()
-pr3<-pp_check(plot.rich.g)+ theme_classic()
-pr3
-grid_arrange_shared_legend(pr1,pr2,pr3,ncol=3) 
+pp_check(plot.rich.g)+ theme_classic()
 
 m1<-residuals(plot.rich.g)
 m1<-as.data.frame(m1)
@@ -122,53 +113,20 @@ plot$seed.rich<-as.factor(plot$seed.rich)
 with(rr.plot, plot(seed.rich, m1$Estimate))
 
 
-#biomass
-# no transform, gaussian distribution, converges, but not a great fit
-load('~/Dropbox/Projects/NutNet/Model_Fits/biomass.Rdata') # plot.bm
-# log transform, gauss distribution
-#load('~/Dropbox/Projects/NutNet/Model_fits/biomass2.Rdata') # plot.bm.logt
-# no transform, lognormal distribution # small ESS
-#load('~/Dropbox/Projects/NutNet/Model_fits/biomass3.Rdata') # plot.bm.logd
+# biomass
 # student t, 6000 iterations, 1000 warmup
-load('~/Dropbox/Projects/NutNet/Model_Fits/biomass4.Rdata') # plot.bm.s
-# skew normal, 6000 iterartions, 1000 warm up
-load('~/Dropbox/Projects/NutNet/Model_Fits/biomass5.Rdata') # plot.bm.sk
+load('~/Dropbox/Projects/NutNet/Model_Fits/bm.Rdata') # plot.bm.s
 
-summary(plot.bm)
 summary(plot.bm.s)
-summary(plot.bm.sk)
 
-
-summary(plot.bm.logt)
-summary(plot.bm.logd)
-
-# compare two models using loo (but should use waic or loo criterion?)
-# must have same number of observations
-plot.bm.logt <- add_criterion(plot.bm.logt, "waic")
-plot.bm.logt <- add_criterion(plot.bm.logt, "loo")
-plot.bm.logd <- add_criterion(plot.bm.logd, "waic")
-plot.bm.logd <- add_criterion(plot.bm.logd, "loo")
-loo_compare(plot.bm.logt, plot.bm.logd, criterion = "waic")
-loo_compare(plot.bm.logt, plot.bm.logd, criterion = "loo")
-
-# inspection of chain diagnostics
-plot(plot.bm) 
 plot(plot.bm.s) 
-plot(plot.bm.sk) 
-
 
 # predicted values vs observed
-pb1<-pp_check(plot.bm)+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))
-pb1
-pb2<-pp_check(plot.bm.s)+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))
-pb2
-pb3<-pp_check(plot.bm.sk)+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))
-pb3
-grid_arrange_shared_legend(pb2,pb3,ncol=2)
+pp_check(plot.bm.s)+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))
 
 
 #residuals
-m2<-residuals(biomass.new)
+m2<-residuals(plot.bm.s)
 m2<-as.data.frame(m2)
 rb.plot<-cbind(plot,m2$Estimate)
 View(rb.plot)
@@ -186,6 +144,9 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 # price data
 price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+
+price <- droplevels( price[-which(price$year.y == "0"), ] )
+
 summary(price)
 head(price)
 
@@ -198,150 +159,72 @@ hist(price$s.loss.p,breaks =40, main="Sp Loss")  # species loss (positive)
 hist(price$s.gain,breaks =40, main="Gain Sp") # species gains
 hist(pplot$rich,breaks =40, main="Richness") # richness (compare to loss and gains)
 
-# SL- effect of species loss on biomass
-# no transform, hurdle lognormal dist, non convergence
-#load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.trt.h
-# no transform, hurdle lognormal dist, 4000 iterations, non convergence
-load('~/Dropbox/Projects/NutNet/Model_fits/sl2.Rdata') # sl.trt.h.d
-# no transform, hurdle lognormal dist, 6000 iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sl3.Rdata') # sl.trt.h.t
-# no transform, student-t dist, 6000 iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sl4.Rdata') # sl.s.t
-# no transform, student-t dist, 6000 iterations, 1000 warm
-load('~/Dropbox/Projects/NutNet/Model_fits/sl5.Rdata') # sl.s.t
+# SL - effect of species loss on biomass
+#  student-t dist, 10,000 iterations, 1000 warm, converged!! :)
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
 
-summary(sl.trt.h.d)
-summary(sl.trt.h.t)
-summary(sl.s.t)
+summary(sl.s)
+# Some Rhats are still quite high
+# some ESS are low
 
-
-plot(sl.trt.h.d)
-plot(sl.trt.h.t)
-plot(sl.s.t)
+plot(sl.s)
 
 # predicted values vs observed
-pp_check(sl.trt.h.d)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
-pp_check(sl.trt.h.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
-pp_check(sl.s.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
+pp_check(sl.s)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
+
 
 # SG - effect of species gains on biomass
-# no transform, hurdle lognormal dist
-#load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.trt.h
-# no transform, hurdle lognormal dist, 4000 iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sg2.Rdata') # sg.trt.d
-# no transform, student-t dist, 6000 iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sg3.Rdata') # sg..s.t
-# no transform, student-t dist, 6000 iterations, 1000 warmup
-load('~/Dropbox/Projects/NutNet/Model_fits/sg4.Rdata') # sg..s.t
+# student, 15,000 iteration, 1000 warmup , delta_adapt .99
+load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 
-summary(sg.trt.d)
-summary(sg.s.t)
 
-plot(sg.trt.h)
-plot(sg.s.t)
+summary(sg.s)
+
+
+plot(sg.s.)
+
 
 # predicted values vs observed
-pp_check(sg.trt.d)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
-pp_check(sg.s.t)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
+pp_check(sg.s)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 
 # CDE - biomass change in persistent species
-# no transform, gaussian, non convergence
-#load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # p.CDE.trt.i
-# student-t distribution, not converged
-load('~/Dropbox/Projects/NutNet/Model_fits/cde2.Rdata') # CDE.s
-# student-t distribution, double the iterations (4000), not converged
-load('~/Dropbox/Projects/NutNet/Model_fits/cde3.Rdata') # CDE.s.d
-# student-t distribution,  triple the iterations (6000)
-load('~/Dropbox/Projects/NutNet/Model_fits/cde4.Rdata') # CDE.s.t
+
 # student-t distribution,  triple the iterations (6000), 1000 warm up
-load('~/Dropbox/Projects/NutNet/Model_fits/cde5.Rdata') # CDE.s.t
+load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
+summary(CDE.s)
 
-summary(p.CDE.trt.i)
-summary(CDE.s.d)
-summary(CDE.s.t)
-
-plot(p.CDE.trt.i)
-plot(CDE.s.d)
-plot(CDE.s.t)
+plot(CDE.s)
 
 # predicted values vs observed
-c1<-pp_check(p.CDE.trt.i)+ theme_classic()
-pp_check(CDE.s.d)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
-pp_check(CDE.s.t)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
+pp_check(CDE.s)+ theme_classic() + scale_x_continuous(limits = c(-1000, 1000))
 
-
-grid_arrange_shared_legend(c1,c2,ncol=2) 
 
 
 # sloss - species loss
-# gaussian, not converged
-#load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.i
-# hurdle log normal distribution  does not converge
-#load('~/Dropbox/Projects/NutNet/Model_fits/sloss2.Rdata') # s.loss.h
-# no transform, poission distribution 
-#load('~/Dropbox/Projects/NutNet/Model_fits/sloss3.Rdata') # s.loss.p
-# no transform, poission distribution , double iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss4.Rdata') # s.loss.p.d
-# no transform, student-t distribution , 6000 iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss5.Rdata') # s.loss.s.t
-# no transform, student-t distribution , 6000 iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss6.Rdata') # s.loss.s.t
 
-summary(s.loss.i)
-summary(s.loss.h)
-summary(s.loss.p.d)
-summary(s.loss.s.t)
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s
 
-plot(s.loss.i)
-plot(s.loss.h)
-plot(s.loss.p)
-plot(s.loss.s.t)
+summary(s.loss.s)
+
+plot(s.loss.s)
 
 
 # predicted values vs observed
-sloss1<-pp_check(s.loss.i)+ theme_classic()
-sloss2<-pp_check(s.loss.h)+ theme_classic()
-sloss3<-pp_check(s.loss.p.d)+ theme_classic()
-sloss3
-sloss4<-pp_check(s.loss.s.t)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
-sloss4
-grid_arrange_shared_legend(sloss1,sloss2,sloss3,ncol=3) 
+pp_check(s.loss.s)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
+
 
 
 # sgain - species gain
-# gaussian, not converged
-#load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.i
-# no transform, hurdle lognormal distribution  does not converge
-#load('~/Dropbox/Projects/NutNet/Model_fits/sgain2.Rdata') # s.gain.h
-# poisson, not converged
-#load('~/Dropbox/Projects/NutNet/Model_fits/sgain3.Rdata') # s.gain.p
-# poisson, double iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain4.Rdata') # s.gain.p.d
-# student-t, 6000 iterations
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain5.Rdata') # s.gain.s.t
-# student, 6000 iterations, 1000 warm up- converged!!!!
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain6.Rdata') # s.gain.s.t
+# student, 6000 iterations, 1000 warm up-
+load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 
+summary(s.gain.s)
 
-summary(s.gain.h)
-summary(s.gain.i)
-summary(s.gain.p.d)
-summary(s.gain.s.t)
-
-plot(s.gain.i)
-plot(s.gain.h)
-plot(s.gain.p.d)
-plot(s.gain.s.t)
+plot(s.gain.s)
 
 # predicted values vs observed
-sgain1<-pp_check(s.gain.i)+ theme_classic()
-sgain2<-pp_check(s.gain.h)+ theme_classic()
-sgain3<-pp_check(s.gain.p.d)+ theme_classic()
-sgain3
-sgain4<-pp_check(s.gain.s.t)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
-sgain4
-grid_arrange_shared_legend(sgain1,sgain2,sgain3,ncol=3) 
+pp_check(s.gain.s)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
 
 
