@@ -148,8 +148,13 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 # price data
 price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+distinct(price,site_code)
+#65 sites
 
 summary(price)
+
+
+
 head(price)
 
 
@@ -191,7 +196,6 @@ pp_check(sg.s)+ theme_classic() + scale_x_continuous(limits = c(0, 700))
 
 
 # CDE - biomass change in persistent species
-
 # student-t distribution,  triple the iterations (6000), 1000 warm up
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 

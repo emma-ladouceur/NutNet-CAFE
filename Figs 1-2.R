@@ -44,6 +44,7 @@ plot$habitat<-as.factor(plot$habitat)
 plot$site<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
+
 plot$f.year_trt<-as.factor(as.character(plot$year_trt))
 
 #log
@@ -193,7 +194,11 @@ ggplot() +
                                  "11-15" ="#5AC2F1FF",
                                  "16-20"= "#0C5BB0FF",
                                  "21-25" = "#972C8DFF",
-                                 ">26" = "#E0363AFF", drop =FALSE))+theme_classic()
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+labs(x = 'Species Richness',
+     y = expression(paste('Biomass (g/' ,m^2, ')')), 
+     title= 'Change in Species Richness & Biomass in NPK Plots') +
+  theme_classic()
 
 
 

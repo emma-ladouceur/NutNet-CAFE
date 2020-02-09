@@ -13,7 +13,7 @@ library(priceTools)
 #emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
@@ -223,7 +223,7 @@ sl.trtm<-ggplot() +
             size = 1.5,  linetype= "dashed") +
   #scale_y_continuous(#trans = reverselog_trans(), breaks=c(1,2,4,6,8,16,24,64,512,1024)) +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
-  ylim(0,400) +
+  #ylim(0,400) +
   labs(x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in Biomass due to SL') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
@@ -586,8 +586,6 @@ cde_fitted.npk$starting.richness <- factor(cde_fitted.npk$starting.richness , le
 cde_coef3$starting.richness <- factor(cde_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 
-
-
 View(cde_coef3)
 cde_coef3$xs<-1
 #cde
@@ -640,7 +638,7 @@ cdem
 
 grid_arrange_shared_legend(sl.trtm,sg.trtm,cdem,nrow=1)
 
-
+grid_arrange_shared_legend(sl.trtm,cdem,nrow=1)
 
 
 

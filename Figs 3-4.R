@@ -20,7 +20,7 @@ plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
 
 
 #price partition data
-pp <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+pp <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 head(pp)
 
@@ -55,7 +55,9 @@ sloss_fixef$names <- rownames(sloss_fixef)
 sl_fixef$names <- rownames(sl_fixef)
 sg_fixef$names <- rownames(sg_fixef)
 cde_fixef$names <- rownames(cde_fixef)
+sgain_fixef
 sloss_fixef
+sl_fixef
 
 # 
 sloss_fixef$Estimate<- -abs(sloss_fixef$Estimate)
@@ -67,14 +69,9 @@ sl_fixef$Q2.5<- -abs(sl_fixef$Q2.5)
 sl_fixef$Q97.5<- -abs(sl_fixef$Q97.5)
 sl_fixef
 
-sgain_fixef$Estimate<- abs(sgain_fixef$Estimate)
-sgain_fixef$Q2.5<- abs(sgain_fixef$Q2.5)
-sgain_fixef$Q97.5<- abs(sgain_fixef$Q97.5)
-sgain_fixef
 
-# sg_fixef$Estimate<- -abs(sg_fixef$Estimate)
-# sg_fixef$Q2.5<- -abs(sg_fixef$Q2.5)
-# sg_fixef$Q97.5<- -abs(sg_fixef$Q97.5)
+ sgain_fixef
+
 sg_fixef
 
 sgain_fixef$Model<-'Sgain'

@@ -334,7 +334,7 @@ ggplot() +
   labs(y = 'Anthropogenic',
        x = 'Species Gains',
        title= 'Biomass Change') +
-  xlim(-0.50,0.50) +
+  #xlim(-0.50,0.50) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         legend.key = element_blank(),
