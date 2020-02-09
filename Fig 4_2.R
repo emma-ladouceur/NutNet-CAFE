@@ -516,10 +516,14 @@ write.csv(bm.p,"~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv")
 
 rich.p <- read.csv("~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+colnames(rich.p)
 
 
-#f<-
-ggplot() +
+levels(rich.p$NDep.cats)
+
+rich.p$NDep.cats <- factor(rich.p$NDep.cats , levels=c("30.01-35.91","20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1'))
+
+rh<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = rich.p %>% distinct(rich.trt_lower_slope, rich.trt_upper_slope),
             aes(xmin = rich.trt_lower_slope, xmax =  rich.trt_upper_slope), ymin = -Inf, ymax = Inf,
@@ -533,22 +537,23 @@ ggplot() +
   #                     linetype = 0) +
   geom_density_ridges(data = rich.p,
                       aes(x = rich.trt + unique(rich.trt_global_slope), 
-                          y = anthropogenic,
-                          # y = grazed, 
+                          #y = anthropogenic,
+                           y = grazed, 
                           # y= managed,
-                          # fill = starting.richness
-                          # fill = site_dom
-                          # fill = site_rich_range
-                          # fill = NDep.cat
-                          fill = Realm
+                          #y = site_dom,
+                           fill = starting.richness
+                           #fill = site_dom
+                           #fill = site_rich_range
+                           #fill = NDep.cats
+                          #fill = Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis_d(name = #'site_dom'
-                         # 'starting.richness' 
-                         # 'site_rich_range'
-                         # 'NDep.cat'
-                         'Realm'
+                          'starting.richness' 
+                          #'site_rich_range'
+                          #'NDep.cats'
+                         #'Realm'
                        ) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
@@ -560,10 +565,11 @@ ggplot() +
              aes(xintercept = rich.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs(y = 'Anthropogenic',
+  labs(y = 'Grazed',
        x = 'Richness') +
   #xlim(-0.50,0.50) +
   theme(panel.grid = element_blank(),
+        axis.text.y = element_blank(),
         legend.key = element_blank(),
         legend.position="bottom")
 
@@ -572,10 +578,12 @@ rf
 
 bm.p <- read.csv("~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+bm.p$NDep.cats <- factor(bm.p$NDep.cats , levels=c("30.01-35.91","20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1'))
+View(bm.p)
 
 
-#bf<-
-ggplot() +
+colnames(bm.p)
+bh<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = bm.p %>% distinct(bm.trt_lower_slope, bm.trt_upper_slope),
             aes(xmin = bm.trt_lower_slope, xmax =  bm.trt_upper_slope), ymin = -Inf, ymax = Inf,
@@ -589,22 +597,23 @@ ggplot() +
   #                     linetype = 0) +
   geom_density_ridges(data = bm.p,
                       aes(x = bm.trt + unique(bm.trt_global_slope), 
-                          y = anthropogenic,
-                          # y = grazed , 
+                          #y = anthropogenic,
+                           y = grazed , 
                           # y= managed ,
-                          # fill = starting.richness
+                          #y= site_dom,
+                           fill = starting.richness
                           # fill = site_dom
-                          # fill= site_rich_range
-                          # fill= NDep.cat
-                          fill= Realm
+                           #fill= site_rich_range
+                           #fill= NDep.cats
+                          #fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis_d(name = #'site_dom'
-                         # 'starting.richness' 
+                          'starting.richness' 
                          #'site_rich_range'
-                         #'NDep.cat'
-                         'Realm'
+                         #'NDep.cats'
+                         #'Realm'
                          ) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
@@ -616,7 +625,7 @@ ggplot() +
              aes(xintercept = bm.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs(y = 'Anthropogenic',
+  labs(y = 'Grazed',
        x = 'Biomass') +
   #xlim(-0.50,0.50) +
   theme(panel.grid = element_blank(),
@@ -625,14 +634,15 @@ ggplot() +
         legend.position="bottom")
 bf
 
-grid_arrange_shared_legend(rf,bf,nrow=1)
+grid_arrange_shared_legend(ra,rh,rs,ba,bh,bs,nrow=2,ncol=3)
 
-
-# SITE DIVERSITY
-# EXOTIC VS. NATIVE DOMINATED
+# ANTHROPOGENIC
 # HERBIVORY
+# EXOTIC VS. NATIVE DOMINATED
 
-# BIOGEO / CLIMATE
+# Starting Richness
+# SITE DIVERSITY
+# BIOGEO / CLIMATE REALM
 # N. DEPOSITION
 
 # CO-LIMITED (STAN'S PAPER--show him coef effects and ask how he would determine) PLOTS WITH EFFECT VS. PLOTS WITH NO EFFECT

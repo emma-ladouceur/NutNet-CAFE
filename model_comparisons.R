@@ -146,7 +146,7 @@ with(rb.plot, plot(seed.rich, m2$Estimate));abline(h=0, lty=2)
 
 
 # price data
-price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 summary(price)
@@ -162,16 +162,12 @@ hist(price$s.gain,breaks =40, main="Gain Sp") # species gains
 hist(pplot$rich,breaks =40, main="Richness") # richness (compare to loss and gains)
 
 # SL - effect of species loss on biomass
-#  student-t dist, 10,000 iterations, 1000 warm, converged!! :)
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
 # re run
 #  student-t dist, 15,000 iterations, 1000 warm, 0.99 adapt_delta
 load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
 
 
 summary(sl.s)
-# Some Rhats are still quite high
-# some ESS are low
 
 plot(sl.s)
 
@@ -222,6 +218,7 @@ pp_check(s.loss.s)+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))
 # sgain - species gain
 # student, 6000 iterations, 1000 warm up-
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
+
 
 summary(s.gain.s)
 

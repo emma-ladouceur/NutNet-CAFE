@@ -100,20 +100,20 @@ ggplot(data = fixedf_pp)+
                  colour="blue",size=0.7)+
   geom_errorbar(aes(x=Estimate[16]+Estimate[20],
                 ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "blue", size = 0.35,alpha=0.3) +
-  geom_errorbarh(aes(y=Estimate[8],
-                    xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "blue", size = 0.35,alpha=0.3) +
-  geom_point(aes(x=Estimate[16]+Estimate[20], #persistent
-                 y=Estimate[8]+Estimate[12]),
+  # geom_errorbarh(aes(y=Estimate[8],
+  #                   xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "blue", size = 0.35,alpha=0.3) +
+   geom_point(aes(x=Estimate[16]+Estimate[20], #persistent
+                 y=Estimate[12]),
              colour="purple",size=0.7)+
   geom_errorbar(aes(x=Estimate[16]+Estimate[20],
                     ymin = Q2.5[8]+Q2.5[12], ymax = Q97.5[4]+Q97.5[8]+Q97.5[12]),width=0,colour = "purple", size = 0.35,alpha=0.3) +
-  geom_errorbarh(aes(y=Estimate[8]+Estimate[12],
-                     xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "purple", size = 0.35,alpha=0.3) +
+  # geom_errorbarh(aes(y=Estimate[8]+Estimate[12],
+  #                    xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "purple", size = 0.35,alpha=0.3) +
   geom_segment(data = fixedf_pp, # cde
                aes(x = Estimate[16]+Estimate[20], #losses + gains
                    xend = Estimate[16]+Estimate[20], # losses + gains
                    y = Estimate[8],   # effect of sl + effect of sg on bm
-                   yend = Estimate[8]+Estimate[12]), # effect of sl + sg + cde on biomass
+                   yend = Estimate[12]), # effect of sl + sg + cde on biomass
                colour= "purple",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
@@ -125,7 +125,7 @@ ggplot(data = fixedf_pp)+
                colour= "blue",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  geom_segment(data = fixedf_pp, # losses
+   geom_segment(data = fixedf_pp, # losses
                             aes(x = 0,
                                 xend = Estimate[16], # species losses
                                 y = 0,
@@ -140,10 +140,63 @@ ggplot(data = fixedf_pp)+
 
 
 
+# Try 2
+ggplot(data = fixedf_pp)+
+  geom_point(aes(x=Estimate[16], #losses
+                 y=Estimate[4]),
+             colour="red",
+             size=0.7)+
+  geom_errorbar(aes(x=Estimate[16],
+                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "red", size = 0.35,alpha=0.3) +
+  geom_errorbarh(aes(y=Estimate[4],
+                     xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "red", size = 0.35,alpha=0.3) +
+  geom_point(aes(x=Estimate[20], #gains
+                 y= Estimate[8]),
+             colour="blue",size=0.7)+
+  geom_errorbar(aes(x=Estimate[20],
+                    ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "blue", size = 0.35,alpha=0.3) +
+  geom_errorbarh(aes(y=Estimate[8],
+                     xmin = Q2.5[20], xmax = Q97.5[20]), height=0, colour = "blue", size = 0.35,alpha=0.3) +
+  geom_point(aes(x=Estimate[20], #persistent
+                 y=Estimate[12]),
+             colour="purple",size=0.7)+
+   geom_errorbar(aes(x=Estimate[20],
+                     ymin = Q2.5[12], ymax = Q97.5[12]),width=0,colour = "purple", size = 0.35,alpha=0.3) +
+   #geom_errorbarh(aes(y=Estimate[8]+Estimate[12],
+     #                xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "purple", size = 0.35,alpha=0.3) +
+  geom_segment(data = fixedf_pp, # cde
+               aes(x = Estimate[20], #gains
+                   xend = Estimate[20], # gains
+                   y = Estimate[8],   # effect of  sg on bm
+                   yend = Estimate[12]), # effect of cde on biomass
+               colour= "purple",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_segment(data = fixedf_pp, # gains
+               aes(x = Estimate[16], # start at losses
+                   xend = Estimate[20], # species gains effect
+                   y = Estimate[4],    # effect of sl on biomass
+                   yend = Estimate[8]),  # effect of sl + effect of sg on bm
+               colour= "blue",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_segment(data = fixedf_pp, # losses
+               aes(x = 0,
+                   xend = Estimate[16], # species losses
+                   y = 0,
+                   yend = Estimate[4]), # effect of sl on biomass
+               colour= "red",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  labs(x = 'Effect on Species Richness Over Time',
+       y = 'Effect on Biomass Change Over Time',
+       title= 'CAFE Bayes Vector Plot') +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 
 #you could also start them all from 0?
 ggplot()+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_segment(data = fixedf_pp,
                aes(x = 0,
                    xend = 0,
@@ -152,24 +205,44 @@ ggplot()+
                colour= "purple",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  geom_segment(data = fixedf_pp,
+  geom_point(data = fixedf_pp,aes(x=0, #persistent
+                 y=Estimate[12]),
+             colour="purple",size=0.7)+
+  geom_errorbar(data = fixedf_pp,aes(x=0,
+                    ymin = Q2.5[12], ymax = Q97.5[12]),width=0,colour = "purple", size = 0.55,alpha=0.3) +
+   geom_segment(data = fixedf_pp,
                aes(x = 0,
-                   xend = Estimate[8],
+                   xend = Estimate[20],
                    y = 0,
                    yend = Estimate[8]),
                colour= "blue",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  geom_segment(data = filter(fixedf_pp, Model=='SL'),
+  geom_point(data = fixedf_pp,aes(x=Estimate[20], #gains
+                 y= Estimate[8]),
+             colour="blue",size=0.7)+
+  geom_errorbar(data = fixedf_pp,aes(x=Estimate[20],
+                    ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "blue", size = 0.35,alpha=0.3) +
+  geom_errorbarh(data = fixedf_pp,aes(y=Estimate[8],
+                     xmin = Q2.5[20], xmax = Q97.5[20]), height=0, colour = "blue", size = 0.35,alpha=0.3) +
+  geom_segment(data = fixedf_pp,
                aes(x = 0,
-                   xend = Estimate[4],
+                   xend = Estimate[16],
                    y = 0,
                    yend = Estimate[4]),
                colour= "red",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+  geom_point(data = fixedf_pp,aes(x=Estimate[16], #losses
+                 y=Estimate[4]),
+             colour="red",
+             size=0.7)+
+  geom_errorbar(data = fixedf_pp,aes(x=Estimate[16],
+                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "red", size = 0.35,alpha=0.3) +
+  geom_errorbarh(data = fixedf_pp,aes(y=Estimate[4],
+                     xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "red", size = 0.35,alpha=0.3) 
 
+  
 
 
 ##########################################
