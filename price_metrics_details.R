@@ -40,7 +40,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 # i refer to this as cumulative time
 # the 'baseline' plot is the starting point always referred to as x, and comparioson plot is y
 # so x.func is year 0 biomass, and y.func is year 1 biomass etc, all columns labelled as such
-price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 summary(price)
 head(price)
@@ -65,6 +65,10 @@ p4 <- leap.zig(dat2,type='cafe',xlim=c(0,17),ylim=c(0,700),standardize = FALSE,r
            label = "*",size=8)+ggtitle('NPK')+theme_classic()
 
 grid_arrange_shared_legend(p1,p2,p3,p4,ncol=2,nrow=2)
+
+p2
+
+
 
 View(price)
 # Heres colins summary statistics func

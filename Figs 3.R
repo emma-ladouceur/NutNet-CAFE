@@ -60,13 +60,13 @@ sloss_fixef
 sl_fixef
 
 # 
-sloss_fixef$Estimate<- -abs(sloss_fixef$Estimate)
-sloss_fixef$Q2.5<- -abs(sloss_fixef$Q2.5)
-sloss_fixef$Q97.5<- -abs(sloss_fixef$Q97.5)
+sloss_fixef$Estimate<- (sloss_fixef$Estimate)
+sloss_fixef$Q2.5<- (sloss_fixef$Q2.5)
+sloss_fixef$Q97.5<- (sloss_fixef$Q97.5)
 
-sl_fixef$Estimate<- -abs(sl_fixef$Estimate)
-sl_fixef$Q2.5<- -abs(sl_fixef$Q2.5)
-sl_fixef$Q97.5<- -abs(sl_fixef$Q97.5)
+sl_fixef$Estimate<- (sl_fixef$Estimate)
+sl_fixef$Q2.5<- (sl_fixef$Q2.5)
+sl_fixef$Q97.5<- (sl_fixef$Q97.5)
 sl_fixef
 
 
@@ -187,7 +187,7 @@ ggplot(data = fixedf_pp)+
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   labs(x = 'Effect on Species Richness Over Time',
        y = 'Effect on Biomass Change Over Time',
-       title= 'CAFE Bayes Vector Plot') +
+       title= 'CAFE Vector Plot') +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 
@@ -320,6 +320,212 @@ ggplot() +
                      strip.background = element_rect(colour="black", fill="white"))
 
 
+
+
+
+
+# posteriors
+
+
+meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+colnames(meta)
+View(meta)
+
+
+#  mods study level dat
+study_levels <- plot.rich.g$data %>% 
+  as_tibble() %>% 
+  distinct(site_code) %>% 
+  mutate(level =  site_code) %>%
+  nest_legacy(level)
+
+parnames(plot.rich.g)
+study_sample_posterior <- study_levels %>%
+  mutate(sloss.ctl = purrr::map(data, ~posterior_samples(s.loss.s,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000,
+                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+         sgain.ctl = purrr::map(data, ~posterior_samples(s.gain.s,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000,
+                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+                 sloss.trt = purrr::map(data, ~posterior_samples(s.loss.s, 
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+         sgain.trt = purrr::map(data, ~posterior_samples(s.gain.s,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000,
+                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()))
+        
+
+
+sloss.trt.i_fixef <- fixef(s.loss.s)
+sgain.trt.i_fixef <- fixef(s.gain.s)
+
+
+
+
+sloss_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(sloss.ctl,sloss.trt) %>% 
+  mutate(response = 'sloss',
+         sloss.ctl_global_slope = sloss.trt.i_fixef['year.y.m','Estimate'],
+         sloss.ctl_upper_slope = sloss.trt.i_fixef['year.y.m','Q97.5'],
+         sloss.ctl_lower_slope = sloss.trt.i_fixef['year.y.m','Q2.5'],
+         sloss.trt_global_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
+         sloss.trt_upper_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
+         sloss.trt_lower_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Q2.5']) 
+
+
+head(sl_posterior)
+# sl_posterior$sl<-sl_posterior$sl.ctl+sl_posterior$sl.trt
+# sl_posterior$sl.global<-sl_posterior$sl.ctl_global_slope + sl_posterior$sl.trt_global_slope
+# sl_posterior$sl.upper<-sl_posterior$sl.ctl_upper_slope + sl_posterior$sl.trt_upper_slope
+# sl_posterior$sl.lower<-sl_posterior$sl.ctl_lower_slope + sl_posterior$sl.trt_lower_slope
+sloss.p<-sloss_posterior %>% inner_join(meta, by = 'site_code')
+
+sloss.p$starting.richness <- ifelse(sloss.p$r.rich >= 1 & sloss.p$r.rich <= 5, '1-5 species',
+                                 ifelse(sloss.p$r.rich >=6 & sloss.p$r.rich <=10, '6-10',
+                                        ifelse(sloss.p$r.rich >=11 & sloss.p$r.rich <=15, '11-15',    
+                                               ifelse(sloss.p$r.rich >=16 & sloss.p$r.rich <=20, '16-20',
+                                                      ifelse(sloss.p$r.rich >=21 & sloss.p$r.rich <=25, '21-25',
+                                                             ifelse(sloss.p$r.rich >=26, '>26', 'other'))))))
+
+sloss.p$starting.richness <- factor(sloss.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+sloss.p$anthropogenic<-as.factor(sloss.p$anthropogenic)
+sloss.p$grazed<-as.factor(as.character(sloss.p$grazed))
+sloss.p$managed<-as.factor(as.character(sloss.p$managed))
+sloss.p$burned<-as.factor(as.character(sloss.p$burned))
+
+sloss.p$site_rich_range <- ifelse(sloss.p$site_richness >= 2 & sloss.p$site_richness <= 44, '2-40 species',
+                               ifelse(sloss.p$site_richness >=45 & sloss.p$site_richness <=69, '45-69',
+                                      ifelse(sloss.p$site_richness >=70 & sloss.p$site_richness <=90, '70-90',    
+                                             ifelse(sloss.p$site_richness >=91 & sloss.p$site_richness <=119, '90-119',
+                                                    ifelse(sloss.p$site_richness >=120 & sloss.p$site_richness <=144, '120-144',
+                                                           ifelse(sloss.p$site_richness >=145, '>145', 'other'))))))
+
+
+write.csv(sloss.p,"~/Dropbox/Projects/NutNet/Data/sloss_posteriors.csv")
+
+
+
+
+sgain_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(sgain.ctl,sgain.trt) %>% 
+  mutate(response = 'sgain',
+         sgain.ctl_global_slope = sgain.trt.i_fixef['year.y.m','Estimate'],
+         sgain.ctl_upper_slope = sgain.trt.i_fixef['year.y.m','Q97.5'],
+         sgain.ctl_lower_slope = sgain.trt.i_fixef['year.y.m','Q2.5'],
+         sgain.trt_global_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
+         sgain.trt_upper_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
+         sgain.trt_lower_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Q2.5']) 
+
+
+head(sl_posterior)
+# sl_posterior$sl<-sl_posterior$sl.ctl+sl_posterior$sl.trt
+# sl_posterior$sl.global<-sl_posterior$sl.ctl_global_slope + sl_posterior$sl.trt_global_slope
+# sl_posterior$sl.upper<-sl_posterior$sl.ctl_upper_slope + sl_posterior$sl.trt_upper_slope
+# sl_posterior$sl.lower<-sl_posterior$sl.ctl_lower_slope + sl_posterior$sl.trt_lower_slope
+sgain.p<-sgain_posterior %>% inner_join(meta, by = 'site_code')
+
+sgain.p$starting.richness <- ifelse(sgain.p$r.rich >= 1 & sgain.p$r.rich <= 5, '1-5 species',
+                                    ifelse(sgain.p$r.rich >=6 & sgain.p$r.rich <=10, '6-10',
+                                           ifelse(sgain.p$r.rich >=11 & sgain.p$r.rich <=15, '11-15',    
+                                                  ifelse(sgain.p$r.rich >=16 & sgain.p$r.rich <=20, '16-20',
+                                                         ifelse(sgain.p$r.rich >=21 & sgain.p$r.rich <=25, '21-25',
+                                                                ifelse(sgain.p$r.rich >=26, '>26', 'other'))))))
+
+sgain.p$starting.richness <- factor(sgain.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+sgain.p$anthropogenic<-as.factor(sgain.p$anthropogenic)
+sgain.p$grazed<-as.factor(as.character(sgain.p$grazed))
+sgain.p$managed<-as.factor(as.character(sgain.p$managed))
+sgain.p$burned<-as.factor(as.character(sgain.p$burned))
+
+sgain.p$site_rich_range <- ifelse(sgain.p$site_richness >= 2 & sgain.p$site_richness <= 44, '2-40 species',
+                                  ifelse(sgain.p$site_richness >=45 & sgain.p$site_richness <=69, '45-69',
+                                         ifelse(sgain.p$site_richness >=70 & sgain.p$site_richness <=90, '70-90',    
+                                                ifelse(sgain.p$site_richness >=91 & sgain.p$site_richness <=119, '90-119',
+                                                       ifelse(sgain.p$site_richness >=120 & sgain.p$site_richness <=144, '120-144',
+                                                              ifelse(sgain.p$site_richness >=145, '>145', 'other'))))))
+
+
+write.csv(sgain.p,"~/Dropbox/Projects/NutNet/Data/sgain_posteriors.csv")
+
+
+
+
+
+
+
+
+
+cde.p <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sg.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sgain.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sloss.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+loss<- bind_cols(sl.p,sloss.p)
+
+gains<- bind_cols(sg.p,sgain.p)
+
+head(gains)
+
+
+ggplot()+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+  geom_segment(data = cde.p,
+               aes(x = 0,
+                   xend = 0,
+                   y = 0,
+                   yend = cde.trt + unique(cde.trt_global_slope) ), 
+               colour= "purple",
+               size = 0.2,  alpha = .1,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = cde.p,aes(x=0, #persistent
+                              y= cde.trt + unique(cde.trt_global_slope), ),
+             colour="purple",size=0.1,alpha = .1) +
+# geom_errorbar(data = cde.p,aes(x=0,
+#                                ymin = cde.trt_lower_slope, ymax = cde.trt_upper_slope), width=0,colour = "purple", size = 0.55,alpha=0.3) 
+  geom_segment(data = loss,
+               aes(x = 0,
+                   xend = (sloss.trt + unique(sloss.trt_global_slope)),
+                   y = 0,
+                   yend = (sl.trt + unique(sl.trt_global_slope)) ),
+               colour= "red",
+               size = 0.2,  alpha = .1,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = loss, aes(x= (sloss.trt + unique(sloss.trt_global_slope)), #loss
+                                  y=  (sl.trt + unique(sl.trt_global_slope)) ),
+             colour="red",size=0.2,alpha = .1)+
+  # geom_errorbar(data = fixedf_pp,aes(x=Estimate[20],
+  #                                    ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "blue", size = 0.35,alpha=0.3) +
+  # geom_errorbarh(data = fixedf_pp,aes(y=Estimate[8],
+  #                                     xmin = Q2.5[20], xmax = Q97.5[20]), height=0, colour = "blue", size = 0.35,alpha=0.3) +
+geom_segment(data = gains,
+             aes(x = 0,
+                 xend = sgain.trt + unique(sgain.trt_global_slope),
+                 y = 0,
+                 yend = sg.trt + unique(sg.trt_global_slope) ),
+             colour= "blue",
+             size = 0.2,  alpha = .1,
+             arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+geom_point(data = gains,aes(x=sgain.trt + unique(sgain.trt_global_slope), #losses
+                                y=sg.trt + unique(sg.trt_global_slope) ),
+           colour="blue",
+           size=0.2,alpha = .1)
+# geom_errorbar(data = fixedf_pp,aes(x=Estimate[16],
+#                                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "red", size = 0.35,alpha=0.3) +
+# geom_errorbarh(data = fixedf_pp,aes(y=Estimate[4],
+#                                     xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "red", size = 0.35,alpha=0.3) 
+# 
 
 
 

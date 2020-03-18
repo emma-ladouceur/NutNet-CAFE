@@ -401,6 +401,7 @@ b1<-ggplot() +
             size = 1.5,linetype= "dashed") +
   labs(x = 'Years',
        y = expression(paste('Biomass (g/',m^2, ')')), title= 'b) Plot Biomass') +
+  ylim(0,1900)+
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",

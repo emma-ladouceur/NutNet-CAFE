@@ -2,35 +2,82 @@
 
 
 
+
+meta <- read.csv("~/Dropbox/NutNet data/comb-by-plot-clim-soil-diversity-01-Nov-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 clim <- read.csv("~/Dropbox/Projects/NutNet/Data/site-worldclim-2-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+
+meta2<- distinct(meta, site_code, country, region, habitat, MAT_v2, MAP_VAR_v2)
+
+clim2<-distinct(clim,site_code,NDep,latitude,latitude.p,longitude)
+
+meta3<-left_join(meta2, clim2)
 
 
-View(clim)
+meta3$Realm <- ifelse(meta3$latitude.p > 23.5 & meta3$latitude.p < 60, 'Temperate',
+                      ifelse(meta3$latitude.p >23.5 , 'Tropical',
+                             ifelse(meta3$latitude.p  < 60, 'Polar', 'other')))
 
 
-clim$Realm <- ifelse(clim$latitude.p > 23.5 & clim$latitude.p < 60, 'Temperate',
-                                 ifelse(clim$latitude.p >23.5 , 'Tropical',
-                                        ifelse(clim$latitude.p  < 60, 'Polar', 'other')))
+meta3$NDep.cats <- ifelse(meta3$NDep >= 30.01 & meta3$NDep <= 35.91, '30.01-35.91',
+                          ifelse(meta3$NDep >= 25.01 & meta3$NDep <= 30.00, '25.01-30.00',
+                                 ifelse(meta3$NDep >= 20.01 & meta3$NDep <= 25.00, '20.01-25.00',
+                                        ifelse(meta3$NDep >= 15.01 & meta3$NDep <= 20.00, '15.01-20.00',
+                                               ifelse(meta3$NDep >= 10.01 & meta3$NDep <= 15.00, '10.01-15.00',
+                                                      ifelse(meta3$NDep >= 5.01 & meta3$NDep <= 10.00, '5.01-10.00',
+                                                             ifelse(meta3$NDep >= 2.51 & meta3$NDep <= 5.00, '2.51-5.00',
+                                                                    ifelse(meta3$NDep >= 1.00 & meta3$NDep <= 2.50, '1.00-2.50',
+                                                                           ifelse(meta3$NDep <1.0 , '< 1', 'other')))))))))
+
+head(biogeo)
+head(meta3)
+as.factor(as.character(meta3$NDep.cats))
+View(meta3)
+
+write.csv(meta3,"~/Dropbox/Projects/NutNet/Data/clim_dat.csv")
+
+clim_dat <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat.csv", stringsAsFactors = FALSE)
+
+# In order to intersect the study points with the Whittaker biomes polygons, we
+# need to transform the climate data to spatial point object, forcing
+# temperature and precipitation (cm) data as coordinates without a CRS.
+points_sp <- sp::SpatialPoints(coords = clim_dat[, c("MAT_v2", "MAP")])
+
+
+# Extract biomes for each study location. # Whittaker biomes as polygons (comes
+# with the plotbiomes package)
+Whittaker_biomes_df <- sp::over(x = points_sp,
+                                y = plotbiomes::Whittaker_biomes_poly)
+
+clim_dat <- cbind(clim_dat, Whittaker_biomes_df)
+
+write.csv(clim_dat, file = "~/Dropbox/Projects/NutNet/Data/clim_dat_with_Whittaker_biomes.csv", row.names = FALSE)
 
 
 
-clim$NDep.cats <- ifelse(clim$NDep >= 30.01 & clim$NDep <= 35.91, '30.01-35.91',
-                     ifelse(clim$NDep >= 25.01 & clim$NDep <= 30.00, '25.01-30.00',
-                            ifelse(clim$NDep >= 20.01 & clim$NDep <= 25.00, '20.01-25.00',
-                                   ifelse(clim$NDep >= 15.01 & clim$NDep <= 20.00, '15.01-20.00',
-                                          ifelse(clim$NDep >= 10.01 & clim$NDep <= 15.00, '10.01-15.00',
-                                                 ifelse(clim$NDep >= 5.01 & clim$NDep <= 10.00, '5.01-10.00',
-                                                        ifelse(clim$NDep >= 2.51 & clim$NDep <= 5.00, '2.51-5.00',
-                                                               ifelse(clim$NDep >= 1.00 & clim$NDep <= 2.50, '1.00-2.50',
-                                                                      ifelse(clim$NDep < 1.0 , '< 1', 'other')))))))))
-View(clim)
+library(tidyverse)
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+country_codes <- read.csv("~/Dropbox/Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
+biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv", stringsAsFactors = FALSE)
+clim_dat <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat_with_Whittaker_biomes.csv", stringsAsFactors = FALSE)
 
-clim$NDep.cats<-as.factor(as.character(clim$NDep.cats))
-
-summary(clim)
+head(clim_dat)
 
 
+biogeo2 <- left_join(biogeo,country_codes)
 
+View(biogeo2)
+
+
+clim_dat2 <- left_join(clim_dat,biogeo2)
+
+
+View(clim_dat2)
+
+write.csv(clim_dat2,"~/Dropbox/Projects/NutNet/Data/clim_dat_3.csv" )
+
+
+clim <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat_3.csv", stringsAsFactors = FALSE)
 #plot dat
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
@@ -92,6 +139,3 @@ plot_clim <- left_join(meta,clim, by="site_code")
 View(plot_clim)
 
 write.csv(plot_clim,"~/Dropbox/Projects/NutNet/Data/plot_clim.csv" )
-
-
-

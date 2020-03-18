@@ -49,7 +49,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only3.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 pp3<-pp3[complete.cases(pp3$SG),]
@@ -78,13 +78,13 @@ p4 <- leap.zig(dat2,type='cafe',xlim=c(0,17),ylim=c(0,700),standardize = FALSE,r
 grid_arrange_shared_legend(p1,p2,p3,p4,ncol=2,nrow=2)
 
 
-# MATRIX OF EVERY GODDAMNED SITE FOR STUPID OOOOO FACTOR
+# MATRIX OF EVERY SITE
 dat1$site_code<-as.factor(dat1$site_code)
 levels(dat1$site_code)
 
-dat1<-pp3[pp3$trt.xy %in% c('NPK_NPK'),]
+dat1<-p.all[p.all$trt.xy %in% c('NPK_NPK'),]
 levels(dat1$site_code)
-# 66 total
+# 65 total
 View(dat1)
 
 
@@ -137,8 +137,9 @@ dat39<-dat1[dat1$site_code %in% c('mcla.us'),]
 dat40<-dat1[dat1$site_code %in% c( 'msla.us'),]
 dat41<-dat1[dat1$site_code %in% c('msum.us'),]
 dat42<-dat1[dat1$site_code %in% c('mtca.au'),]
-dat43<-dat1[dat1$site_code %in% c('nilla.au'),]
+#dat43<-dat1[dat1$site_code %in% c('nilla.au'),]
 dat44<-dat1[dat1$site_code %in% c('nioo.nl'),]
+
 
 dat45<-dat1[dat1$site_code %in% c('pape.de'),]
 #dat46<-dat1[dat1$site_code %in% c('pich.ec'),]
@@ -302,9 +303,9 @@ p40 <- leap.zig(dat41,type='cafe', standardize = FALSE,raw.points = F)+
 p41 <- leap.zig(dat42,type='cafe', standardize = FALSE,raw.points = F)+ 
   annotate("text", x = mean(dat42$x.rich), y = mean(dat42$x.func), 
            label = "*",size=8)+ggtitle('mtca.au')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
-p42 <- leap.zig(dat43,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat43$x.rich), y = mean(dat43$x.func), 
-           label = "*",size=8)+ggtitle('nilla.au')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
+# p42 <- leap.zig(dat43,type='cafe', standardize = FALSE,raw.points = F)+ 
+#   annotate("text", x = mean(dat43$x.rich), y = mean(dat43$x.func), 
+#            label = "*",size=8)+ggtitle('nilla.au')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
  p43 <- leap.zig(dat44,type='cafe', standardize = FALSE,raw.points = F)+ 
    annotate("text", x = mean(dat44$x.rich), y = mean(dat44$x.func), 
            label = "*",size=8)+ggtitle('nioo.nl')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
@@ -313,75 +314,75 @@ p44 <- leap.zig(dat45,type='cafe', standardize = FALSE,raw.points = F)+
            label = "*",size=8)+ggtitle('pape.de')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 
  p45 <- leap.zig(dat47,type='cafe', standardize = FALSE,raw.points = F)+ 
-   annotate("text", x = mean(dat46$x.rich), y = mean(dat46$x.func), 
+   annotate("text", x = mean(dat47$x.rich), y = mean(dat47$x.func), 
             label = "*",size=8)+ggtitle('ping.au')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p46 <- leap.zig(dat48,type='cafe', standardize = FALSE,raw.points = F)+ 
-   annotate("text", x = mean(dat47$x.rich), y = mean(dat47$x.func), 
+   annotate("text", x = mean(dat48$x.rich), y = mean(dat48$x.func), 
             label = "*",size=8)+ggtitle('pinj.au')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p47 <- leap.zig(dat49,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat48$x.rich), y = mean(dat48$x.func), 
+  annotate("text", x = mean(dat49$x.rich), y = mean(dat49$x.func), 
            label = "*",size=8)+ggtitle('potrok.ar')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p48 <- leap.zig(dat50,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat49$x.rich), y = mean(dat49$x.func), 
+  annotate("text", x = mean(dat50$x.rich), y = mean(dat50$x.func), 
            label = "*",size=8)+ggtitle('saana.fi')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
  p49 <- leap.zig(dat51,type='cafe', standardize = FALSE,raw.points = F)+ 
-   annotate("text", x = mean(dat50$x.rich), y = mean(dat50$x.func), 
+   annotate("text", x = mean(dat51$x.rich), y = mean(dat51$x.func), 
             label = "*",size=8)+ggtitle('sage.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p50 <- leap.zig(dat52,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat51$x.rich), y = mean(dat51$x.func), 
+  annotate("text", x = mean(dat52$x.rich), y = mean(dat52$x.func), 
            label = "*",size=8)+ggtitle('sava.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
  p51 <- leap.zig(dat53,type='cafe', standardize = FALSE,raw.points = F)+ 
-   annotate("text", x = mean(dat52$x.rich), y = mean(dat52$x.func), 
+   annotate("text", x = mean(dat53$x.rich), y = mean(dat53$x.func), 
             label = "*",size=8)+ggtitle('sedg.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p52 <- leap.zig(dat54,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat53$x.rich), y = mean(dat53$x.func), 
+  annotate("text", x = mean(dat54$x.rich), y = mean(dat54$x.func), 
            label = "*",size=8)+ggtitle('sereng.tz')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p53 <- leap.zig(dat55,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat54$x.rich), y = mean(dat54$x.func), 
+  annotate("text", x = mean(dat55$x.rich), y = mean(dat55$x.func), 
            label = "*",size=8)+ggtitle('sevi.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p54 <- leap.zig(dat56,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat55$x.rich), y = mean(dat55$x.func), 
+  annotate("text", x = mean(dat56$x.rich), y = mean(dat56$x.func), 
            label = "*",size=8)+ggtitle('sgs.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p55 <- leap.zig(dat57,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat56$x.rich), y = mean(dat56$x.func), 
+  annotate("text", x = mean(dat57$x.rich), y = mean(dat57$x.func), 
            label = "*",size=8)+ggtitle('shps.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 
 p56 <- leap.zig(dat58,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat57$x.rich), y = mean(dat57$x.func), 
+  annotate("text", x = mean(dat58$x.rich), y = mean(dat58$x.func), 
            label = "*",size=8)+ggtitle('sier.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6),)
 p57 <- leap.zig(dat59,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat58$x.rich), y = mean(dat58$x.func), 
+  annotate("text", x = mean(dat59$x.rich), y = mean(dat59$x.func), 
            label = "*",size=8)+ggtitle('smith.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p58 <- leap.zig(dat60,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat59$x.rich), y = mean(dat59$x.func), 
+  annotate("text", x = mean(dat60$x.rich), y = mean(dat60$x.func), 
            label = "*",size=8)+ggtitle('spin.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p59 <- leap.zig(dat61,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat60$x.rich), y = mean(dat60$x.func), 
+  annotate("text", x = mean(dat61$x.rich), y = mean(dat61$x.func), 
            label = "*",size=8)+ggtitle('summ.za')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p60 <- leap.zig(dat62,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat61$x.rich), y = mean(dat61$x.func), 
+  annotate("text", x = mean(dat62$x.rich), y = mean(dat62$x.func), 
            label = "*",size=8)+ggtitle('temple.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p61 <- leap.zig(dat63,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat62$x.rich), y = mean(dat62$x.func), 
+  annotate("text", x = mean(dat63$x.rich), y = mean(dat63$x.func), 
            label = "*",size=8)+ggtitle('tyso.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p62 <- leap.zig(dat64,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat63$x.rich), y = mean(dat63$x.func), 
+  annotate("text", x = mean(dat64$x.rich), y = mean(dat64$x.func), 
            label = "*",size=8)+ggtitle('ufrec.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p63 <- leap.zig(dat65,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat64$x.rich), y = mean(dat64$x.func), 
+  annotate("text", x = mean(dat65$x.rich), y = mean(dat65$x.func), 
            label = "*",size=8)+ggtitle('ukul.za')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
  p64 <- leap.zig(dat66,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat65$x.rich), y = mean(dat65$x.func), 
+  annotate("text", x = mean(dat66$x.rich), y = mean(dat66$x.func), 
             label = "*",size=8)+ggtitle('unc.us')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p65 <- leap.zig(dat67,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat66$x.rich), y = mean(dat66$x.func), 
+  annotate("text", x = mean(dat67$x.rich), y = mean(dat67$x.func), 
            label = "*",size=8)+ggtitle('valm.ch')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 p66 <- leap.zig(dat68,type='cafe', standardize = FALSE,raw.points = F)+ 
-  annotate("text", x = mean(dat67$x.rich), y = mean(dat67$x.func), 
+  annotate("text", x = mean(dat68$x.rich), y = mean(dat68$x.func), 
            label = "*",size=8)+ggtitle('yarra.au ')+theme_classic()+ theme(plot.title = element_text(size=9),axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text=element_text(size=6))
 
 
-grid_arrange_shared_legend(p1,p2,p3,p4,p5,p7,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p24,p25,p27,p28,p29,p30,p31,p32,p33,p34,p35,p36,p37,p38,p39,p40,p41,p42,p43,p44,p45,p46,p47,p48,p49,p50,p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61,p62,p63,p64,p65,p66,ncol=11,nrow=6)
+grid_arrange_shared_legend(p1,p2,p3,p4,p5,p7,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p24,p25,p27,p28,p29,p30,p31,p32,p33,p34,p35,p36,p37,p38,p39,p40,p41,p43,p44,p45,p46,p47,p48,p49,p50,p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61,p62,p63,p64,p65,p66,ncol=11,nrow=6)
 
 #Standard axes
 #inner

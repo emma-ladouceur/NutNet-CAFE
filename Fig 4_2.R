@@ -13,7 +13,7 @@ library("scales")
 load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
@@ -131,6 +131,8 @@ sl.p$site_rich_range <- ifelse(sl.p$site_richness >= 2 & sl.p$site_richness <= 4
                                                            ifelse(sl.p$site_richness >=145, '>145', 'other'))))))
 
 View(sl.p)
+
+levels(sl.p$NDep.cats)
 write.csv(sl.p,"~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv")
 
 # SG
@@ -163,6 +165,7 @@ sg.p$starting.richness <- ifelse(sg.p$r.rich >= 1 & sg.p$r.rich <= 5, '1-5 speci
 
 
 sg.p$starting.richness <- factor(sg.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+
 sg.p$anthropogenic<-as.factor(sg.p$anthropogenic)
 
 sg.p$grazed<-as.factor(as.character(sg.p$grazed))
@@ -176,6 +179,7 @@ sg.p$site_rich_range <- ifelse(sg.p$site_richness >= 2 & sg.p$site_richness <= 4
                                                     ifelse(sg.p$site_richness >=120 & sg.p$site_richness <=144, '120-144',
                                                            ifelse(sg.p$site_richness >=145, '>145', 'other'))))))
 
+View(sg.p)
 write.csv(sg.p,"~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv")
 
 # CDE
@@ -233,9 +237,15 @@ summary(sl.p)
 View(sl.p)
 colnames(sl.p)
 
+sl.p$anthropogenic<-as.factor(sl.p$anthropogenic)
+sl.p$grazed<-as.factor(as.character(sl.p$grazed))
+sl.p$managed<-as.factor(as.character(sl.p$managed))
+sl.p$burned<-as.factor(as.character(sl.p$burned))
+sl.p$NDep.cats <- factor(sl.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1','NA'))
+sl.p$starting.richness <- factor(sl.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+sl.p$site_rich_range <- factor(sl.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
 
-#slf<-
-  ggplot() +
+sl<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = sl.p %>% distinct(sl.trt_lower_slope, sl.trt_upper_slope),
             aes(xmin = sl.trt_lower_slope, xmax =  sl.trt_upper_slope), ymin = -Inf, ymax = Inf,
@@ -251,23 +261,30 @@ colnames(sl.p)
   #                     linetype = 0) +
   geom_density_ridges(data = sl.p,
                       aes(x = sl.trt + unique(sl.trt_global_slope), 
-                          y = anthropogenic ,
-                          # y = grazed , 
-                          # y= managed ,
-                          # fill = starting.richness
-                          # fill = site_dom
-                          # fill= site_rich_range
-                          # fill= NDep.cat
-                          fill= Realm
-                          ),
+                          #y = anthropogenic ,
+                           #y = grazed , 
+                          #y= managed ,
+                          y = site_dom,
+                          #y = Realm,
+                          #y = bioregion,
+                          #y = biome,
+                           #fill = starting.richness
+                          #fill = site_dom
+                           #fill= site_rich_range
+                           fill= NDep.cats
+                          #fill= Realm
+                          #fill= biome
+                          ), 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = #'site_rich_range'
-                      # 'starting.richness'   
-                      # 'site_rich_range'
-                      # 'NDep.cat'
-                      'Realm' 
-                      ) +
+  scale_fill_viridis(name = #'site_rich_range',
+                       #'starting.richness' ,  
+                       #'site_rich_range',
+                       'NDep.cats',
+                      #'biome' ,
+                      #'site_dom',
+                      #'Realm',
+                      discrete=TRUE) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
   #                              "11-15" ="#5AC2F1FF",
@@ -278,22 +295,34 @@ colnames(sl.p)
              aes(xintercept = sl.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs(y = 'Anthropogenic',
+  labs(
        x = 'Species Loss',
        title= 'Biomass Change') +
   xlim(-0.50,0.50) +
   scale_x_continuous(trans = reverse_trans()) +
   theme(panel.grid = element_blank(),
+        #axis.text.y = element_blank(),
         legend.key = element_blank(),
-        legend.position="bottom")
+        legend.position="none")
 
-#slf
+sl
 
 sg.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+colnames(sg.p)
 View(sg.p)
-#sgf<-
-ggplot() +
+sg.p$starting.richness <- factor(sg.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+sg.p$anthropogenic<-as.factor(sg.p$anthropogenic)
+sg.p$grazed<-as.factor(as.character(sg.p$grazed))
+sg.p$managed<-as.factor(as.character(sg.p$managed))
+sg.p$burned<-as.factor(as.character(sg.p$burned))
+sg.p$NDep.cats <- factor(sg.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1','NA'))
+sg.p$site_rich_range <- factor(sg.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
+  
+levels(sg.p$NDep.cats)
+head(sg.p)
+
+sg<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = sg.p %>% distinct(sg.trt_lower_slope, sg.trt_upper_slope),
             aes(xmin = sg.trt_lower_slope, xmax =  sg.trt_upper_slope), ymin = -Inf, ymax = Inf,
@@ -307,20 +336,27 @@ ggplot() +
   #                     linetype = 0) +
   geom_density_ridges(data = sg.p,
                       aes(x = sg.trt + unique(sg.trt_global_slope), 
-                          y = anthropogenic,
-                          # y = grazed, 
+                           #y = anthropogenic,
+                           #y = grazed, 
                           #y= managed,
-                          # fill = starting.richness
+                          y = site_dom,
+                          #y = Realm,
+                          #y = bioregion,
+                          #y = biome,
+                           #fill = starting.richness
                           #fill = site_dom
                           #fill= site_rich_range
-                          fill= Realm
+                          fill= NDep.cats,
+                          #fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = #'site_dom'
-                         # 'starting.richness' 
-                       #'site_rich_range'
-                       'Realm') +
+  scale_fill_viridis(name = #'site_dom'
+                          #'starting.richness' ,
+                       #'site_rich_range',
+                         'NDep.cats',
+                       #'Realm',
+                       discrete=TRUE) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
   #                              "11-15" ="#5AC2F1FF",
@@ -331,23 +367,34 @@ ggplot() +
              aes(xintercept = sg.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs(y = 'Anthropogenic',
+  labs(y='',
        x = 'Species Gains',
-       title= 'Biomass Change') +
+       title= '') +
   #xlim(-0.50,0.50) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         legend.key = element_blank(),
-        legend.position="bottom")
+        legend.position="bottom"
+        )
 
-sgf
+sg
 
 cde.p <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+head(cde.p)
+cde.p$starting.richness <- factor(cde.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+cde.p$anthropogenic<-as.factor(cde.p$anthropogenic)
+
+cde.p$grazed<-as.factor(as.character(cde.p$grazed))
+cde.p$managed<-as.factor(as.character(cde.p$managed))
+cde.p$burned<-as.factor(as.character(cde.p$burned))
+cde.p$NDep.cats <- factor(cde.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1','NA'))
+cde.p$site_rich_range <- factor(cde.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
+
+levels(cde.p$NDep.cats)
 
 View(cde.p)
-#cdef<-
-ggplot() +
+cde<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = cde.p %>% distinct(cde.trt_lower_slope, cde.trt_upper_slope),
             aes(xmin = cde.trt_lower_slope, xmax =  cde.trt_upper_slope), ymin = -Inf, ymax = Inf,
@@ -362,23 +409,30 @@ ggplot() +
   geom_density_ridges(data = cde.p,
                       aes(x = cde.trt + unique(cde.trt_global_slope), 
                           #y = interaction(anthropogenic,site_dom),
-                          y = anthropogenic,
-                          # y = grazed , 
-                          # y = managed ,
-                          # fill = starting.richness
+                          #y = anthropogenic,
+                           #y = grazed , 
+                          y = site_dom,
+                          #y = managed ,
+                          #y = Realm,
+                          #y = bioregion,
+                          #y = biome,
+                          #y = starting.richness
+                          #fill = site_rich_range
+                           #y = NDep.cats
+                           #fill = starting.richness
                           # fill = site_dom
-                          # fill= site_rich_range
-                          # fill = NDep.cat
-                          fill= Realm
+                           #fill= site_rich_range
+                           fill = NDep.cats
+                          #fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis_d(name = #'site_dom'
-                       # 'starting.richness' 
-                       # 'site_rich_range'
-                       # 'NDep.cat'
-                         'Realm'
-                      ) +
+  scale_fill_viridis(name = #'site_dom'
+                        #'starting.richness' ,
+                        #'site_rich_range',
+                        'NDep.cats',
+                         #'Realm',
+                       discrete=TRUE) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
   #                              "11-15" ="#5AC2F1FF",
@@ -389,18 +443,38 @@ ggplot() +
              aes(xintercept = cde.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs(y = 'Anthropogenic',
+  labs( y = '' ,
        x = 'Persistent Species',
-       title= 'Biomass Change') +
+       title= ''
+       ) +
   xlim(-150,150) +
   theme(panel.grid = element_blank(),
-        #axis.text.y = element_blank(),
+        axis.text.y = element_blank(),
         legend.key = element_blank(),
-        legend.position="bottom")
+        legend.position="none")
 
-cdef
+cde
 
-grid_arrange_shared_legend(slf,sgf,cdef,nrow=1)
+grid_arrange_shared_legend(sl,sg,cde,nrow=1,ncol=3)
+
+
+get_legend<-function(myggplot){
+  tmp <- ggplot_gtable(ggplot_build(myggplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+
+legend <- get_legend(sg)
+# 3. Remove the legend from the plot
+#+++++++++++++++++++++++
+sg <- sg + theme(legend.position="none")
+# 4. Arrange ggplot2 graphs with a specific width
+grid.arrange(sl, sg, cde, ncol=3, widths=c(3.2, 2.3, 2.3))
+
+grid.arrange(sl, sg, cde, legend, ncol=3, nrow = 2, 
+             layout_matrix = rbind(c(1,2,3), c(4,4,4)),
+             widths = c(3.4, 2.3, 2.3), heights = c(3.5, 0.4))
 
 #########################
 #########################
@@ -650,4 +724,5 @@ grid_arrange_shared_legend(ra,rh,rs,ba,bh,bs,nrow=2,ncol=3)
 
 # FACETED AS LOSSES, GAINS, CDE? WITH POSTERIORS GROUPED AS ABOVE IN DIFF COLOURS
 # CONTROLS GREY IN THE BACKGROUND
+
 
