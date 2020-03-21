@@ -54,8 +54,8 @@ View(p.dat2)
 load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
-# load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
 
