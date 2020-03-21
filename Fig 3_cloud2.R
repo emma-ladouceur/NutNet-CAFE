@@ -67,16 +67,120 @@ cde_coef4$IX.Slope_lower<-0
 m.coefs<-bind_rows(loss.coefs,gain.coefs,cde_coef4)
 head(m.coefs)
 
-vec.slope.fig<-ggplot(data= m.coefs, aes(x= IX.Slope+X.Slope, y= IY.Slope+Y.Slope,color=group)) +
+
+
+sloss.trt_fitted.npk
+sl.trt_fitted.npk
+
+
+# Simplest Version
+# all going from 0
+# vec.slope.fig<-ggplot(data= m.coefs, aes(x= IX.Slope+X.Slope, y= IY.Slope+Y.Slope,color=group)) +
+#   geom_point(alpha=0.3,size=2) +
+#   geom_errorbar(data= m.coefs, aes(ymin = IY.Slope_lower+Y.Slope_lower, ymax = IY.Slope_upper+Y.Slope_upper, color=group), width = 0, size = 0.45,alpha=0.3) +
+#   geom_errorbarh(data= m.coefs, aes(xmin = IX.Slope_lower+X.Slope_lower, xmax = IX.Slope_upper+X.Slope_upper,color=group), width = 0, size = 0.45,alpha=0.3) +
+#   geom_segment(data=. %>% filter(group == "Losses"),aes(x=0,
+#                                xend=IX.Slope+X.Slope,
+#                                y=0,
+#                                yend=IY.Slope+Y.Slope,
+#                                colour=group), alpha=0.3,
+#                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+#   geom_segment(data=. %>% filter(group == "Gains"),aes(x= 0,
+#                                                         xend=IX.Slope+X.Slope,
+#                                                         y=0,
+#                                                         yend=IY.Slope+Y.Slope,
+#                                                         colour=group), alpha=0.3,
+#                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+#   geom_segment(data=. %>% filter(group == "Persistent Sp."),aes(x= 0,
+#                                                        xend=IX.Slope+X.Slope,
+#                                                        y=0,
+#                                                        yend=IY.Slope+Y.Slope,
+#                                                        colour=group), alpha=0.3,
+#                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+#   scale_color_manual(values=c("#3B9AB2","#B40F20","#35274A"))+
+#   labs(x = 'Species Change Slope',
+#        y = 'Biomass Change Slope',
+#        title= 'Vector 4.0') +
+#     ylim(-50,50)+
+#   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+# 
+# vec.slope.fig
+
+
+
+# Simplest Version
+# all going from 0
+vec.slope.fig<-ggplot(data= m.coefs, aes(x= X.Slope, y= Y.Slope,color=group)) +
   geom_point(alpha=0.3,size=2) +
-  geom_errorbar(data= m.coefs, aes(ymin = IY.Slope_lower+Y.Slope_lower, ymax = IY.Slope_upper+Y.Slope_upper, color=group), width = 0, size = 0.45,alpha=0.3) +
-  geom_errorbarh(data= m.coefs, aes(xmin = IX.Slope_lower+X.Slope_lower, xmax = IX.Slope_upper+X.Slope_upper,color=group), width = 0, size = 0.45,alpha=0.3) +
+  geom_errorbar(data= m.coefs, aes(ymin = Y.Slope_lower, ymax = Y.Slope_upper, color=group), width = 0, size = 0.45,alpha=0.3) +
+  geom_errorbarh(data= m.coefs, aes(xmin = X.Slope_lower, xmax = X.Slope_upper,color=group), width = 0, size = 0.45,alpha=0.3) +
+  geom_segment(data=. %>% filter(group == "Losses"),aes(x=0,
+                                                        xend=X.Slope,
+                                                        y=0,
+                                                        yend=Y.Slope,
+                                                        colour=group), alpha=0.3,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_segment(data=. %>% filter(group == "Gains"),aes(x= 0,
+                                                       xend=X.Slope,
+                                                       y=0,
+                                                       yend=Y.Slope,
+                                                       colour=group), alpha=0.3,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_segment(data=. %>% filter(group == "Persistent Sp."),aes(x= 0,
+                                                                xend=X.Slope,
+                                                                y=0,
+                                                                yend=Y.Slope,
+                                                                colour=group), alpha=0.3,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   scale_color_manual(values=c("#3B9AB2","#B40F20","#35274A"))+
-  labs(x = 'Richness Slope',
-       y = 'Biomass Slope',
+  labs(x = 'Species Change Slope',
+       y = 'Biomass Change Slope',
        title= 'Vector 4.0') +
-    ylim(-50,50)+
+  ylim(-50,50)+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 vec.slope.fig
- 
+
+
+
+
+# all going from 0
+# plus fixed effect
+vec.slope.fig<-ggplot(data= m.coefs, aes(x= X.Slope, y= Y.Slope,color=group)) +
+  geom_point(alpha=0.3,size=2) +
+  geom_errorbar(data= m.coefs, aes(ymin = Y.Slope_lower, ymax = Y.Slope_upper, color=group), width = 0, size = 0.45,alpha=0.3) +
+  geom_errorbarh(data= m.coefs, aes(xmin = X.Slope_lower, xmax = X.Slope_upper,color=group), width = 0, size = 0.45,alpha=0.3) +
+  geom_segment(data=. %>% filter(group == "Losses"),aes(x=0,
+                                                        xend=X.Slope,
+                                                        y=0,
+                                                        yend=Y.Slope,
+                                                        colour=group), alpha=0.3,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_segment(data=. %>% filter(group == "Gains"),aes(x= 0,
+                                                       xend=X.Slope,
+                                                       y=0,
+                                                       yend=Y.Slope,
+                                                       colour=group), alpha=0.3,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_segment(data=. %>% filter(group == "Persistent Sp."),aes(x= 0,
+                                                                xend=X.Slope,
+                                                                y=0,
+                                                                yend=Y.Slope,
+                                                                colour=group), alpha=0.3,
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_line(data = sloss.trt_fitted.npk,
+            aes(x = year.y, y = Estimate),
+            size = 1.5) +
+  
+  scale_color_manual(values=c("#3B9AB2","#B40F20","#35274A"))+
+  labs(x = 'Species Change Slope',
+       y = 'Biomass Change Slope',
+       title= 'Vector 4.0') +
+  ylim(-50,50)+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+vec.slope.fig
+
+
+
+
