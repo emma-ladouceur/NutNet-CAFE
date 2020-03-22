@@ -10,7 +10,7 @@ library(ggplot2)
 # DERIVATIVES DELTA OVER TIME
 # CAFE BAYES VECTORS
 
-# SP LOSS VECTOR, SP GAIN VECTOR, CDE VECTOR... but what about....transformations?
+# SP LOSS VECTOR, SP GAIN VECTOR, CDE VECTOR... 
 # data
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -25,10 +25,10 @@ pp <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header
 head(pp)
 
 # models
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl..s
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl..s
 load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 #load('~/Dropbox/Projects/NutNet/Model_fits/rich3.Rdata') # plot.rich.g
 
@@ -50,6 +50,12 @@ sl_fixef<-as.data.frame(sl_fixef)
 sg_fixef<-as.data.frame(sg_fixef)
 cde_fixef<-as.data.frame(cde_fixef)
 
+
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(sgain_fixef,sloss_fixef,sl_fixef,sg_fixef,cde_fixef,file = 'fixedef.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/fixedef.Rdata')
+
+
 sgain_fixef$names <- rownames(sgain_fixef)
 sloss_fixef$names <- rownames(sloss_fixef)
 sl_fixef$names <- rownames(sl_fixef)
@@ -59,15 +65,7 @@ sgain_fixef
 sloss_fixef
 sl_fixef
 
-# 
-sloss_fixef$Estimate<- (sloss_fixef$Estimate)
-sloss_fixef$Q2.5<- (sloss_fixef$Q2.5)
-sloss_fixef$Q97.5<- (sloss_fixef$Q97.5)
 
-sl_fixef$Estimate<- (sl_fixef$Estimate)
-sl_fixef$Q2.5<- (sl_fixef$Q2.5)
-sl_fixef$Q97.5<- (sl_fixef$Q97.5)
-sl_fixef
 
 
  sgain_fixef
@@ -136,37 +134,37 @@ ggplot(data = fixedf_pp)+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 
-
+#"#3B9AB2","#B40F20","#35274A"
 # Try 2
-ggplot(data = fixedf_pp)+
+fix2<-ggplot(data = fixedf_pp)+
   geom_point(aes(x=Estimate[16], #losses
                  y=Estimate[4]),
-             colour="red",
+             colour="#B40F20",
              size=0.7)+
   geom_errorbar(aes(x=Estimate[16],
-                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "red", size = 0.35,alpha=0.3) +
+                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "#B40F20", size = 0.35,alpha=0.3) +
   geom_errorbarh(aes(y=Estimate[4],
-                     xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "red", size = 0.35,alpha=0.3) +
+                     xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "#B40F20", size = 0.35,alpha=0.3) +
   geom_point(aes(x=Estimate[20], #gains
                  y= Estimate[8]),
-             colour="blue",size=0.7)+
+             colour="#3B9AB2",size=0.7)+
   geom_errorbar(aes(x=Estimate[20],
-                    ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "blue", size = 0.35,alpha=0.3) +
+                    ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "#3B9AB2", size = 0.35,alpha=0.3) +
   geom_errorbarh(aes(y=Estimate[8],
-                     xmin = Q2.5[20], xmax = Q97.5[20]), height=0, colour = "blue", size = 0.35,alpha=0.3) +
+                     xmin = Q2.5[20], xmax = Q97.5[20]), height=0, colour = "#3B9AB2", size = 0.35,alpha=0.3) +
   geom_point(aes(x=Estimate[20], #persistent
                  y=Estimate[12]),
-             colour="purple",size=0.7)+
+             colour="#35274A",size=0.7)+
    geom_errorbar(aes(x=Estimate[20],
-                     ymin = Q2.5[12], ymax = Q97.5[12]),width=0,colour = "purple", size = 0.35,alpha=0.3) +
+                     ymin = Q2.5[12], ymax = Q97.5[12]),width=0,colour = "#35274A", size = 0.35,alpha=0.3) +
    #geom_errorbarh(aes(y=Estimate[8]+Estimate[12],
-     #                xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "purple", size = 0.35,alpha=0.3) +
+     #                xmin = Q2.5[16]+Q2.5[20], xmax = Q97.5[16]+Q97.5[20]), height=0, colour = "#35274A", size = 0.35,alpha=0.3) +
   geom_segment(data = fixedf_pp, # cde
                aes(x = Estimate[20], #gains
                    xend = Estimate[20], # gains
                    y = Estimate[8],   # effect of  sg on bm
                    yend = Estimate[12]), # effect of cde on biomass
-               colour= "purple",
+               colour= "#35274A",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   geom_segment(data = fixedf_pp, # gains
@@ -174,7 +172,7 @@ ggplot(data = fixedf_pp)+
                    xend = Estimate[20], # species gains effect
                    y = Estimate[4],    # effect of sl on biomass
                    yend = Estimate[8]),  # effect of sl + effect of sg on bm
-               colour= "blue",
+               colour= "#3B9AB2",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   geom_segment(data = fixedf_pp, # losses
@@ -182,7 +180,7 @@ ggplot(data = fixedf_pp)+
                    xend = Estimate[16], # species losses
                    y = 0,
                    yend = Estimate[4]), # effect of sl on biomass
-               colour= "red",
+               colour= "#B40F20",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   labs(x = 'Effect on Species Richness Over Time',
@@ -192,55 +190,58 @@ ggplot(data = fixedf_pp)+
 
 
 #you could also start them all from 0?
-ggplot()+
+fix<-ggplot()+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_segment(data = fixedf_pp,
                aes(x = 0,
                    xend = 0,
                    y = 0,
                    yend = Estimate[12]),
-               colour= "purple",
+               colour= "#35274A",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   geom_point(data = fixedf_pp,aes(x=0, #persistent
                  y=Estimate[12]),
-             colour="purple",size=0.7)+
+             colour="#35274A",size=0.7)+
   geom_errorbar(data = fixedf_pp,aes(x=0,
-                    ymin = Q2.5[12], ymax = Q97.5[12]),width=0,colour = "purple", size = 0.55,alpha=0.3) +
+                    ymin = Q2.5[12], ymax = Q97.5[12]),width=0,colour = "#35274A", size = 0.55,alpha=0.3) +
    geom_segment(data = fixedf_pp,
                aes(x = 0,
                    xend = Estimate[20],
                    y = 0,
                    yend = Estimate[8]),
-               colour= "blue",
+               colour= "#3B9AB2",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   geom_point(data = fixedf_pp,aes(x=Estimate[20], #gains
                  y= Estimate[8]),
-             colour="blue",size=0.7)+
+             colour="#3B9AB2",size=0.7)+
   geom_errorbar(data = fixedf_pp,aes(x=Estimate[20],
-                    ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "blue", size = 0.35,alpha=0.3) +
+                    ymin = Q2.5[8], ymax = Q97.5[8]),width=0, colour = "#3B9AB2", size = 0.35,alpha=0.3) +
   geom_errorbarh(data = fixedf_pp,aes(y=Estimate[8],
-                     xmin = Q2.5[20], xmax = Q97.5[20]), height=0, colour = "blue", size = 0.35,alpha=0.3) +
+                     xmin = Q2.5[20], xmax = Q97.5[20]), height=0, colour = "#3B9AB2", size = 0.35,alpha=0.3) +
   geom_segment(data = fixedf_pp,
                aes(x = 0,
                    xend = Estimate[16],
                    y = 0,
                    yend = Estimate[4]),
-               colour= "red",
+               colour= "#B40F20",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
   geom_point(data = fixedf_pp,aes(x=Estimate[16], #losses
                  y=Estimate[4]),
-             colour="red",
+             colour="#B40F20",
              size=0.7)+
   geom_errorbar(data = fixedf_pp,aes(x=Estimate[16],
-                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "red", size = 0.35,alpha=0.3) +
+                    ymin = Q2.5[4], ymax = Q97.5[4]),width=0,colour = "#B40F20", size = 0.35,alpha=0.3) +
   geom_errorbarh(data = fixedf_pp,aes(y=Estimate[4],
-                     xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "red", size = 0.35,alpha=0.3) 
-
+                     xmin = Q2.5[16], xmax = Q97.5[16]),height=0,colour = "#B40F20", size = 0.35,alpha=0.3) +
+labs(x = 'Effect on Species Richness Over Time',
+     y = 'Effect on Biomass Change Over Time',
+     title= 'Vector Plot') 
   
 
+grid.arrange(fix,fix2,ncol=2,nrow=1)
 
 ##########################################
 ######SCRATCH THAT , GOING DOWN WRONG PATH

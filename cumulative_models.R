@@ -158,8 +158,8 @@ sl.trt_coef3<-inner_join(sl.trt_coef2,dat)
 View(sl.trt_coef3)
 
 setwd('~/Dropbox/Projects/NutNet/Data/')
-save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef3,file = 'sl.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sl.mod.dat.Rdata')
+save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef3,file = 'sl.n.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
 
 
 
@@ -217,26 +217,26 @@ sl.trtm<-ggplot() +
   geom_segment(data = sl.trt_coef3,
                aes(x = xs, 
                    xend = xmax,
-                   y = (Intercept.n + TE.n  + (ISlope.n+TESlope.n) * cxmin),
-                   yend = (Intercept.n + TE.n + (ISlope.n+TESlope.n) * cxmax),
+                   y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope) * cxmax),
                    # group = site_code,
                     colour = starting.richness
                    ),
                size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = sl.trt_fitted.npk,
-              aes(x = year.y, ymin = Q2.5.n, ymax = Q97.5.n),
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   # fixed effect
   geom_line(data = sl.trt_fitted.npk,
-            aes(x = year.y, y = Estimate.n),
+            aes(x = year.y, y = Estimate),
             size = 1.5) +
   geom_ribbon(data = sl.trt_fitted.ctl,
-              aes(x = year.y, ymin = Q2.5.n, ymax = Q97.5.n),
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   # fixed effect
   geom_line(data = sl.trt_fitted.ctl,
-            aes(x = year.y, y = Estimate.n),
+            aes(x = year.y, y = Estimate),
             size = 1.5,  linetype= "dashed") +
   #scale_y_reverse()+
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
@@ -705,7 +705,7 @@ grid_arrange_shared_legend(sl.trtm,cdem,nrow=1)
 
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 
 
@@ -974,8 +974,8 @@ sloss.trt_coef3<-inner_join(sloss.trt_coef2,dat)
 View(sloss.trt_coef3)
 
 setwd('~/Dropbox/Projects/NutNet/Data/')
-save(sloss.trt_fitted.npk,sloss.trt_fitted.ctl,sloss.trt_coef3,file = 'sloss.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sloss.mod.dat.Rdata')
+save(sloss.trt_fitted.npk,sloss.trt_fitted.ctl,sloss.trt_coef3,file = 'sloss.n.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
 
@@ -1033,26 +1033,26 @@ sloss.trtm<-ggplot() +
   geom_segment(data = sloss.trt_coef3,
                aes(x = xs, 
                    xend = xmax,
-                   y = (Intercept.n + TE.n  + (ISlope.n+TESlope.n) * cxmin),
-                   yend = (Intercept.n + TE.n + (ISlope.n+TESlope.n) * cxmax),
+                   y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope) * cxmax),
                    # group = site_code,
                    colour = starting.richness
                ),
                size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = sloss.trt_fitted.npk,
-              aes(x = year.y, ymin = Q2.5.n, ymax = Q97.5.n),
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   # fixed effect
   geom_line(data = sloss.trt_fitted.npk,
-            aes(x = year.y, y = Estimate.n),
+            aes(x = year.y, y = Estimate),
             size = 1.5) +
   geom_ribbon(data = sloss.trt_fitted.ctl,
-              aes(x = year.y, ymin = Q2.5.n, ymax = Q97.5.n),
+              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   # fixed effect
   geom_line(data = sloss.trt_fitted.ctl,
-            aes(x = year.y, y = Estimate.n),
+            aes(x = year.y, y = Estimate),
             size = 1.5,  linetype= "dashed") +
   #scale_y_reverse()+
   scale_x_continuous(breaks=c(1,3,6,9,11)) +

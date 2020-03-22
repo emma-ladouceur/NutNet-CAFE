@@ -466,9 +466,9 @@ coef.all<-coef.all[complete.cases(coef.all$TESlope),]
 coef.all$starting.richness <- factor(coef.all$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 ggplot() + 
-  geom_point(data = coef.all, aes(x = reorder(site_code, ISlope+TESlope), y = ISlope+TESlope,colour = starting.richness),size = 4) +
-  geom_errorbar(data = coef.all, aes(x = site_code,ymin = ISlope_lower+TESlope_lower,
-                                     ymax = ISlope_upper+TESlope_upper,colour = starting.richness),
+  geom_point(data = coef.all, aes(x = reorder(site_code, TESlope), y = TESlope,colour = starting.richness),size = 4) +
+  geom_errorbar(data = coef.all, aes(x = site_code,ymin = TESlope_lower,
+                                     ymax = TESlope_upper,colour = starting.richness),
                 width = 0, size = 1.5) + facet_grid(~Model,scales="free")+
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = filter(fixedf_df, Model=='_Richness'),
@@ -510,9 +510,9 @@ plot.rich_coef4$starting.richness <- factor(plot.rich_coef4$starting.richness , 
 plot.rich_coef4<-plot.rich_coef4[complete.cases(plot.rich_coef4$TESlope),]
 
 r2<-ggplot() + 
-  geom_point(data = plot.rich_coef4, aes(x = reorder(site_code,ISlope+TESlope), y = ISlope+TESlope, colour= starting.richness),size = 2) +
-  geom_errorbar(data = plot.rich_coef4, aes(x = reorder(site_code,ISlope+TESlope),ymin = ISlope_lower+TESlope_lower,
-                                            ymax = ISlope_upper+TESlope_upper,colour= starting.richness),
+  geom_point(data = plot.rich_coef4, aes(x = reorder(site_code,TESlope), y = TESlope, colour= starting.richness),size = 2) +
+  geom_errorbar(data = plot.rich_coef4, aes(x = reorder(site_code,TESlope),ymin = TESlope_lower,
+                                            ymax = TESlope_upper,colour= starting.richness),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
   #facet_grid(continent~., scales= 'free', space='free')+
@@ -550,9 +550,9 @@ plot.bm_coef4$starting.richness <- factor(plot.bm_coef4$starting.richness , leve
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
 b2<-ggplot() + 
-  geom_point(data = plot.bm_coef4, aes(x = reorder(site_code, ISlope + TESlope), y = ISlope+ TESlope, colour = starting.richness),size = 2) +
-  geom_errorbar(data = plot.bm_coef4, aes(x = reorder(site_code, ISlope+TESlope),ymin = ISlope_lower+TESlope_lower,
-                                          ymax = ISlope_upper + TESlope_upper,colour = starting.richness),
+  geom_point(data = plot.bm_coef4, aes(x = reorder(site_code,TESlope), y = TESlope, colour = starting.richness),size = 2) +
+  geom_errorbar(data = plot.bm_coef4, aes(x = reorder(site_code, TESlope),ymin = TESlope_lower,
+                                          ymax = TESlope_upper,colour = starting.richness),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
   #facet_grid(continent~., scales= 'free', space='free')+
