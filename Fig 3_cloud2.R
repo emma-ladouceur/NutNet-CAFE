@@ -9,11 +9,12 @@ library(gridExtra)
 library(grid)
 
 # models
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
+# not needed, just load model derivatives below
+# load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl.s
+# load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
+# load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
+# load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
+# load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 
 
 # coeffiecients for experiment level (random) effects, fitted values, fixed effects
@@ -193,7 +194,7 @@ View(fixedf_pp)
 # plus fixed effects, also starting from 0
 vec.cloud<-ggplot() +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  ylim(-50,50)+
+  #ylim(-50,50)+
   geom_point(data=m.coefs,aes(x= L.Slope, y=BL.Slope),alpha=0.3,size=2, colour="#B40F20") +
   geom_errorbar(data=m.coefs,aes(x=L.Slope, ymin = BL.Slope_lower, ymax = BL.Slope_upper), width = 0, size = 0.45,alpha=0.3,colour="#B40F20") +
   geom_errorbarh(data= m.coefs, aes(y=BL.Slope,xmin = L.Slope_lower, xmax = L.Slope_upper), width = 0, size = 0.45,alpha=0.3,colour="#B40F20") +
@@ -300,7 +301,7 @@ vec.cloud<-ggplot() +
        y = 'Biomass Change Slope',
        title= 'Vector 4.1') 
  
-  
+ vec.cloud 
 
 
 View(fixedf_pp)
@@ -421,9 +422,14 @@ cafe.vec.cloud<-ggplot() +
        title= 'Vector 4.2') 
 
 
+cafe.vec.cloud
+
+colnames(m.coefs)
+
 cafe.vec.cloud2<-ggplot() +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  ylim(-50,50)+
+  ylim(-50,50)+ 
+  #facet_wrap(~site_code, ncol=11)+
   geom_point(data=m.coefs,aes(x= L.Slope, y=BL.Slope),alpha=0.3,size=2, colour="#B40F20") +
   geom_errorbar(data=m.coefs,aes(x=L.Slope, ymin = BL.Slope_lower, ymax = BL.Slope_upper), width = 0, size = 0.45,alpha=0.3,colour="#B40F20") +
   geom_errorbarh(data= m.coefs, aes(y=BL.Slope,xmin = L.Slope_lower, xmax = L.Slope_upper), width = 0, size = 0.45,alpha=0.3,colour="#B40F20") +
@@ -452,6 +458,48 @@ cafe.vec.cloud2<-ggplot() +
        y = 'Biomass Change Slope',
        title= 'Vector 4.2') 
 
+cafe.vec.cloud2
+
 
 grid_arrange_shared_legend(vec.slope.fig,cafe.vec.cloud2,vec.cloud,cafe.vec.cloud,ncol=2,nrow=2)
+
+
+
+
+
+cafe.matrix2<-ggplot() +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+  ylim(-35,35)+ xlim(-0.9,0.6) +
+  facet_wrap(~site_code, ncol=11)+
+  geom_point(data=m.coefs,aes(x= L.Slope, y=BL.Slope),alpha=0.7,size=2, colour="#B40F20") +
+  geom_errorbar(data=m.coefs,aes(x=L.Slope, ymin = BL.Slope_lower, ymax = BL.Slope_upper), width = 0, size = 0.45,alpha=0.7,colour="#B40F20") +
+  geom_errorbarh(data= m.coefs, aes(y=BL.Slope,xmin = L.Slope_lower, xmax = L.Slope_upper), width = 0, size = 0.45,alpha=0.7,colour="#B40F20") +
+  geom_segment(data=m.coefs,aes(x=0,
+                                xend= L.Slope,
+                                y=0,
+                                yend= BL.Slope), alpha=0.7,colour="#B40F20",
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_point(data=m.coefs, aes(x= G.Slope, y=BG.Slope),alpha=0.7,size=2,colour="#3B9AB2") +
+  geom_errorbar(data= m.coefs, aes(x=G.Slope,ymin = BG.Slope_lower, ymax = BG.Slope_upper), width = 0, size = 0.45,alpha=0.7,colour="#3B9AB2") +
+  geom_errorbarh(data= m.coefs, aes(y=BG.Slope,xmin = G.Slope_lower, xmax = G.Slope_upper), width = 0, size = 0.45,alpha=0.7,colour="#3B9AB2") +
+  geom_segment(data=m.coefs,aes(x= L.Slope,
+                                xend=G.Slope,
+                                y=BL.Slope,
+                                yend=BG.Slope), alpha=0.7,colour="#3B9AB2",
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  geom_point(data=m.coefs, aes(x= G.Slope, y=P.Slope),alpha=0.7,size=2, colour="#35274A") +
+  geom_errorbar(data= m.coefs, aes(x=G.Slope,ymin = P.Slope_lower, ymax = P.Slope_upper), width = 0, size = 0.45,alpha=0.7) +
+  geom_segment(data=m.coefs,aes(x= G.Slope,
+                                xend=G.Slope,
+                                y=BG.Slope,
+                                yend=P.Slope), alpha=0.7,colour="#35274A",
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  
+  labs(x = 'Species Change Slope',
+       y = 'Biomass Change Slope',
+       title= 'Vector Matrix 2.0') 
+
+cafe.matrix2
+
+
 
