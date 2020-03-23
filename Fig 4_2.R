@@ -5,6 +5,7 @@ library(ggridges)
 library(gridExtra)
 library(grid)
 library("scales")
+library(viridis)
 
 # FIGURE 4
 # POSTERIORS ACROSS GROUPS
@@ -133,7 +134,7 @@ sl.p$site_rich_range <- ifelse(sl.p$site_richness >= 2 & sl.p$site_richness <= 4
 View(sl.p)
 
 levels(sl.p$NDep.cats)
-write.csv(sl.p,"~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv")
+write.csv(sl.p,"~/Dropbox/Projects/NutNet/Data/sl.n_posteriors.csv")
 
 # SG
 sg_posterior <- study_sample_posterior  %>% 
@@ -229,11 +230,15 @@ write.csv(cde.p,"~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv")
 
 
 
-sl.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sl.n_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+colims <- read.csv("~/Dropbox/Projects/NutNet/Data/colims.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-
+sl.p<-left_join(sl.p,colims,by="site_code")
 summary(sl.p)
 
+
+sl.p<-na.omit(sl.p, cols="NDep.cats")
+summary(sl.p.n)
 View(sl.p)
 colnames(sl.p)
 
@@ -244,6 +249,8 @@ sl.p$burned<-as.factor(as.character(sl.p$burned))
 sl.p$NDep.cats <- factor(sl.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1','NA'))
 sl.p$starting.richness <- factor(sl.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 sl.p$site_rich_range <- factor(sl.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
+
+levels(sl.p$NDep.cats)
 
 sl<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
@@ -264,26 +271,32 @@ sl<-ggplot() +
                           #y = anthropogenic ,
                            #y = grazed , 
                           #y= managed ,
-                          y = site_dom,
+                         #y = site_dom,
                           #y = Realm,
                           #y = bioregion,
                           #y = biome,
+                          #y= colimitation,
+                          y= NDep.cats,
+                         #fill=anthropogenic
                            #fill = starting.richness
                           #fill = site_dom
                            #fill= site_rich_range
-                           fill= NDep.cats
+                           #fill= NDep.cats
                           #fill= Realm
                           #fill= biome
+                          fill=colimitation
                           ), 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis(name = #'site_rich_range',
-                       #'starting.richness' ,  
+                      # 'starting.richness' ,  
                        #'site_rich_range',
-                       'NDep.cats',
+                       #'anthropogenic',
+                       #'NDep.cats',
                       #'biome' ,
                       #'site_dom',
                       #'Realm',
+                     'colimitation',
                       discrete=TRUE) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
@@ -298,8 +311,8 @@ sl<-ggplot() +
   labs(
        x = 'Species Loss',
        title= 'Biomass Change') +
-  xlim(-0.50,0.50) +
-  scale_x_continuous(trans = reverse_trans()) +
+  #xlim(-0.50,0.50) +
+  #scale_x_continuous(trans = reverse_trans()) +
   theme(panel.grid = element_blank(),
         #axis.text.y = element_blank(),
         legend.key = element_blank(),
@@ -308,6 +321,10 @@ sl<-ggplot() +
 sl
 
 sg.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+colims <- read.csv("~/Dropbox/Projects/NutNet/Data/colims.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+sg.p<-left_join(sg.p,colims,by="site_code")
+
 
 colnames(sg.p)
 View(sg.p)
@@ -321,6 +338,8 @@ sg.p$site_rich_range <- factor(sg.p$site_rich_range, levels=c("2-40 species","45
   
 levels(sg.p$NDep.cats)
 head(sg.p)
+
+sg.p<-na.omit(sg.p, cols="NDep.cats")
 
 sg<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
@@ -339,23 +358,31 @@ sg<-ggplot() +
                            #y = anthropogenic,
                            #y = grazed, 
                           #y= managed,
-                          y = site_dom,
+                          #y = site_dom,
                           #y = Realm,
                           #y = bioregion,
                           #y = biome,
-                           #fill = starting.richness
+                          y= NDep.cats,
+                          #y=colimitation,
+                          #fill=anthropogenic
+                          fill=colimitation
+                          # fill = starting.richness
                           #fill = site_dom
                           #fill= site_rich_range
-                          fill= NDep.cats,
+                          #fill= NDep.cats
                           #fill= Realm
+                          #fill=biome
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis(name = #'site_dom'
-                          #'starting.richness' ,
+                         # 'starting.richness' ,
+                      # 'colimitation',
                        #'site_rich_range',
-                         'NDep.cats',
+                        # 'NDep.cats',
                        #'Realm',
+                       'biome',
+                       #'anthropogenic',
                        discrete=TRUE) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                              "6-10" = "#75B41EFF",
@@ -380,6 +407,10 @@ sg<-ggplot() +
 sg
 
 cde.p <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+colims <- read.csv("~/Dropbox/Projects/NutNet/Data/colims.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+cde.p<-left_join(cde.p,colims,by="site_code")
+
 
 head(cde.p)
 cde.p$starting.richness <- factor(cde.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
@@ -394,6 +425,8 @@ cde.p$site_rich_range <- factor(cde.p$site_rich_range, levels=c("2-40 species","
 levels(cde.p$NDep.cats)
 
 View(cde.p)
+cde.p<-na.omit(cde.p, cols="NDep.cats")
+
 cde<-ggplot() +
   #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = cde.p %>% distinct(cde.trt_lower_slope, cde.trt_upper_slope),
@@ -411,26 +444,31 @@ cde<-ggplot() +
                           #y = interaction(anthropogenic,site_dom),
                           #y = anthropogenic,
                            #y = grazed , 
-                          y = site_dom,
+                          #y = site_dom,
                           #y = managed ,
                           #y = Realm,
                           #y = bioregion,
                           #y = biome,
+                          #y=colimitation,
+                          y=NDep.cats,
                           #y = starting.richness
+                          fill=colimitation
                           #fill = site_rich_range
-                           #y = NDep.cats
                            #fill = starting.richness
                           # fill = site_dom
-                           #fill= site_rich_range
-                           fill = NDep.cats
+                          # fill= site_rich_range
+                           #fill = NDep.cats
+                          #fill=biome
                           #fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis(name = #'site_dom'
                         #'starting.richness' ,
-                        #'site_rich_range',
-                        'NDep.cats',
+                      'colimitation',
+                       # 'site_rich_range',
+                       #'biome', 
+                       #'NDep.cats',
                          #'Realm',
                        discrete=TRUE) +
   # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",

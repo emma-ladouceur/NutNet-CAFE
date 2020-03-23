@@ -545,14 +545,29 @@ r2
 summary(plot.bm_coef4)
 colnames(plot.bm_coef4)
 
+plot.bm_fitted2$starting.richness <- ifelse(plot.bm_fitted2$r.rich >= 1 & plot.bm_fitted2$r.rich <= 5, '1-5 species',
+                                            ifelse(plot.bm_fitted2$r.rich >=6 & plot.bm_fitted2$r.rich <=10, '6-10',
+                                                   ifelse(plot.bm_fitted2$r.rich >=11 & plot.bm_fitted2$r.rich <=15, '11-15',    
+                                                          ifelse(plot.bm_fitted2$r.rich >=16 & plot.bm_fitted2$r.rich <=20, '16-20',
+                                                                 ifelse(plot.bm_fitted2$r.rich >=21 & plot.bm_fitted2$r.rich <=25, '21-25',
+                                                                        ifelse(plot.bm_fitted2$r.rich >=26, '>26', 'other'))))))
+
+
+plot.bm_coef4$colimitation <- ifelse(plot.bm_coef4$TESlope_lower >0,  'co-limited',
+                                            ifelse(plot.bm_coef4$TESlope_lower <=0, 'not co-limited', 'other'))
+
+colims<- plot.bm_coef4 %>% select(site_code,colimitation)
+
+write.csv(colims, '~/Dropbox/Projects/NutNet/Data/colims.csv' )
+
 plot.bm_coef4<-plot.bm_coef4[complete.cases(plot.bm_coef4$TESlope),]
 plot.bm_coef4$starting.richness <- factor(plot.bm_coef4$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
 b2<-ggplot() + 
-  geom_point(data = plot.bm_coef4, aes(x = reorder(site_code,TESlope), y = TESlope, colour = starting.richness),size = 2) +
+  geom_point(data = plot.bm_coef4, aes(x = reorder(site_code,TESlope), y = TESlope, colour = colimitation),size = 2) +
   geom_errorbar(data = plot.bm_coef4, aes(x = reorder(site_code, TESlope),ymin = TESlope_lower,
-                                          ymax = TESlope_upper,colour = starting.richness),
+                                          ymax = TESlope_upper,colour = colimitation),
                 width = 0, size = 0.7) + 
   facet_wrap(Model~.)+
   #facet_grid(continent~., scales= 'free', space='free')+
@@ -566,12 +581,13 @@ b2<-ggplot() +
   #ylim(-0.3, 0.3) +
   labs(x = 'Site',
        y = 'Slope') +
-  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
-                                 "6-10" = "#75B41EFF",
-                                 "11-15" ="#5AC2F1FF",
-                                 "16-20"= "#0C5BB0FF",
-                                 "21-25" = "#972C8DFF",
-                                 ">26" = "#E0363AFF", drop =FALSE))+
+  scale_color_manual(values= c("#FF0000", "#00A08A"))+
+  # scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                                "6-10" = "#75B41EFF",
+  #                                "11-15" ="#5AC2F1FF",
+  #                                "16-20"= "#0C5BB0FF",
+  #                                "21-25" = "#972C8DFF",
+  #                                ">26" = "#E0363AFF", drop =FALSE))+
   coord_flip() + 
   labs(x = 'Site',
        y = 'Slope', title= 'Plot Biomass') +
