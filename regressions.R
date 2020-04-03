@@ -28,6 +28,7 @@ plot$log.live.mass<-log(plot$live_mass)
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
 
+plot.rich_fitted.npk
 
 plot.rich_fitted.npk$starting.richness <- factor(plot.rich_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
@@ -81,7 +82,7 @@ r1<-ggplot() +
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                      plot.title = element_text(size=12),
-                     plot.margin= margin(t = 0.2, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+                     plot.margin= margin(t = 0.1, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
 
 r1
 
@@ -141,7 +142,7 @@ b1<-ggplot() +
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                      plot.title = element_text(size=12),
-                     plot.margin= margin(t = 0.2, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+                     plot.margin= margin(t = 0.1, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
 
 b1
 
@@ -370,7 +371,7 @@ sl.trtm<-ggplot() +
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.margin= margin(t = -0.5, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+                     plot.margin= margin(t = -0.5, r = 0.1, b = -0.5, l = 0, unit = "cm"))
 
 
 sl.trtm
@@ -437,7 +438,7 @@ sg.trtm<-ggplot()  +
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="bottom", plot.margin= margin(t = -0.5, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+                     legend.position="bottom", plot.margin= margin(t = -0.5, r = 0, b = -0.5, l = 0, unit = "cm"))
 
 
 sg.trtm
@@ -460,8 +461,8 @@ cde_fitted.ctl
 
 cde_coef3$xs<-1
 
-cde_fitted.npk$Model<-"Change in Biomass in Persistent Species"
-cde_fitted.ctl$Model<-"Change in Biomass in Persistent Species"
+cde_fitted.npk$Model<-"Persistent Species Change in Biomass"
+cde_fitted.ctl$Model<-"Persistent Species Change in Biomass"
 cde_fitted.npk <- cde_fitted.npk %>% rename(Treatment = trt.y) 
 cde_fitted.ctl <- cde_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
@@ -511,7 +512,7 @@ cdem<-ggplot() +
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="none", plot.margin= margin(t = -0.5, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+                     legend.position="none", plot.margin= margin(t = -0.5, r = 0.2, b = -0.5, l = 0, unit = "cm"))
 
 cdem
 

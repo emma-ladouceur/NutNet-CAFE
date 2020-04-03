@@ -99,8 +99,8 @@ sloss.fixed.p2 <-sloss.fixed.p %>%
 nrow(sloss.fixed.p2)
 
 sgain.fixed.p2 <-sgain.fixed.p %>% 
-  filter(`b_Intercept` > quantile(sgain.fixed.p$`b_Intercept`, probs=0.025),
-         `b_Intercept` < quantile(sgain.fixed.p$`b_Intercept`, probs=0.975)) %>%
+  filter(`b_Intercept` > quantile(sgain.fixed.p$`b_Intercept`, probs=0.026),
+         `b_Intercept` < quantile(sgain.fixed.p$`b_Intercept`, probs=0.976)) %>%
   mutate(sgain.trt.p=`b_Intercept`) %>%
   mutate(response = 'sl',
          sgain.trt_global_slope = sgain.trt.i_fixef['Intercept','Estimate'],

@@ -50,7 +50,7 @@ sgain.fixed.p<-posterior_samples(s.gain.s, "^b",subset = floor(runif(n = 1000, 1
 colnames(sl.fixed.p)
 sl.fixed.p2 <-sl.fixed.p %>% 
   filter(`b_trt.yNPK:year.y.m` > quantile(sl.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.025),
-                                    `b_trt.yNPK:year.y.m` < quantile(sl.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.973)) %>%
+                                    `b_trt.yNPK:year.y.m` < quantile(sl.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.975)) %>%
   mutate(sl.trt.p=`b_trt.yNPK:year.y.m`) %>%
   mutate(response = 'sl',
          sl.trt_global_slope = sl.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
@@ -157,6 +157,8 @@ cloud1<-ggplot()+
          y = 'Rate of Change on Biomass Over Time',
          title= 'Varitaion in Overall Effect (95% CI of 1000 samples)')
 
+
+cloud1
 View(loss.ss)
 loss.ss <- loss.s %>% sample_n(50)
 gains.ss <- gains.s  %>% sample_n(50)
@@ -397,6 +399,8 @@ cloud4<-ggplot()+
 grid.arrange(cloud1,cloud2,cloud3,cloud4,nrow=2,ncol=2)
 
 grid_arrange_shared_legend(cloud1,cloud2,cloud3,cloud4,nrow=2,ncol=2)
+
+
 
 
 
@@ -787,3 +791,7 @@ cloud4<-ggplot()+
 
 grid.arrange(cloud2,cloud4,nrow=1,ncol=2)
 
+
+
+
+cloud4
