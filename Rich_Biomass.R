@@ -28,6 +28,7 @@ plot$log.live.mass<-log(plot$live_mass)
 load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
+summary(plot.rich.g)
 
 summary(plot.bm.s )
 summary(plot.rich.g )
@@ -73,37 +74,51 @@ View(plot.rich_fitted)
 plot.rich_fixef <- fixef(plot.rich.g)
 
 # coefficients for experiment-level (random) effects
-plot.rich_coeff <- coef(plot.rich.g)
-
-plot.rich_coef<-as.data.frame(plot.rich_coeff$site_code)
-#names(plot.rich_coef) <- gsub(":", ".", names(plot.rich_coef), fixed = TRUE)
+plot.rich_coef <- coef(plot.rich.g)
 
 
 startrich<-plot[plot$year_trt %in% c('0'),]
 # View(startrich)
 
-plot.rich_coef2 <-  bind_cols(plot.rich_coef %>% 
-                                as_tibble() %>% 
-                                mutate(
-                                  # Estimate.trtNPK.year_trt = "Estimate.trtNPK:year_trt",
-                                  #trtNPK.year_trt_lower = "Q2.5.trtNPK:year_trt",
-                                  #trtNPK.year_trt_upper = "Q97.5.trtNPK:year_trt",
-                                  #    Slope = Estimate.year_trt ,
-                                  #   Slope_lower =Q2.5.year_trt ,
-                                  #  Slope_upper = Q97.5.year_trt,
-                                  site_code = rownames(plot.rich_coef)) %>% 
-                                as_tibble() %>%
-                                # join with min and max of the x-values
-                                inner_join(plot %>% 
-                                             group_by(site_code) %>% 
-                                             summarise(xmin = min(year_trt),
-                                                       xmax = max(year_trt)),
-                                           by = 'site_code') %>%
-                                inner_join(startrich %>%
-                                             group_by(site_code) %>%
-                                             summarise(m.rich = mean(rich),
-                                                       r.rich = round(m.rich)),
-                                           by = 'site_code'))
+
+View(plot.rich_coef)
+plot.rich_coef2 <-  bind_cols(plot.rich_coef$site_code[,,'Intercept'] %>% 
+                              as_tibble() %>% 
+                              mutate(Intercept = Estimate,
+                                     Intercept_lower = Q2.5,
+                                     Intercept_upper = Q97.5,
+                                     site_code = rownames(plot.rich_coef$site_code[,,'Intercept'])) %>% 
+                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                            plot.rich_coef$site_code[,,'year_trt'] %>% 
+                              as_tibble() %>% 
+                              mutate(ISlope = Estimate,
+                                     ISlope_lower = Q2.5,
+                                     ISlope_upper = Q97.5) %>% 
+                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                            plot.rich_coef$site_code[,,'trtNPK'] %>% 
+                              as_tibble() %>% 
+                              mutate(TE = Estimate,
+                                     TE_lower = Q2.5,
+                                     TE_upper = Q97.5) %>% 
+                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                            plot.rich_coef$site_code[,,'trtNPK:year_trt'] %>% 
+                              as_tibble() %>% 
+                              mutate(TESlope = Estimate,
+                                     TESlope_lower = Q2.5,
+                                     TESlope_upper = Q97.5) %>% 
+                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
+  # join with min and max of the x-values
+  inner_join(plot %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year_trt),
+                         xmax = max(year_trt)),
+             by = 'site_code') %>%
+  inner_join(startrich %>%
+               group_by(site_code) %>%
+               summarise(m.rich = mean(rich),
+                         r.rich = round(m.rich)),
+             by = 'site_code')
+
 
 
 View(plot.rich_coef2)
@@ -174,7 +189,7 @@ r1<-ggplot() +
   # data
   geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich,
-                 colour = starting.richness, alpha=0.1),
+                 colour = starting.richness), alpha=0.6,
              size = 1.3, position = position_jitter(width = 0.45, height = 0.45)) +
   # geom_jitter(data=plot.rich_fitted.npk,
   #          aes(x = year_trt, y = rich,
@@ -210,7 +225,7 @@ r1<-ggplot() +
   #                 slope = plot.rich_fixef2['year_trt', 'Estimate']),
   #             colour = 'pink') +
   labs(x = 'Years',
-       y = 'Species richness', title= 'a) Plot Richness') +
+       y = 'Species richness', title= 'a) ', color= 'Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -307,6 +322,7 @@ plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>%
                          r.rich = round(m.rich)),
              by = 'site_code')
 
+View(plot.bm_coef2)
 
 plot.bm_coef2$starting.richness <- ifelse(plot.bm_coef2$r.rich >= 1 & plot.bm_coef2$r.rich <= 5, '1-5 species',
                                           ifelse(plot.bm_coef2$r.rich >=6 & plot.bm_coef2$r.rich <=10, '6-10',
@@ -374,7 +390,7 @@ View(plot.bm_coef3)
 b1<-ggplot() +
   geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = live_mass,
-                 colour = starting.richness, alpha=0.1),
+                 colour = starting.richness), alpha=0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = plot.bm_coef3,
                aes(x = xmin, 
@@ -400,7 +416,7 @@ b1<-ggplot() +
             aes(x = year_trt, y = Estimate),
             size = 1.5,linetype= "dashed") +
   labs(x = 'Years',
-       y = expression(paste('Biomass (g/',m^2, ')')), title= 'b) Plot Biomass') +
+       y = expression(paste('Biomass (g/',m^2, ')')), title= 'b) ', color='Starting Richness') +
   ylim(0,1900)+
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
@@ -553,23 +569,77 @@ plot.bm_fitted2$starting.richness <- ifelse(plot.bm_fitted2$r.rich >= 1 & plot.b
                                                                         ifelse(plot.bm_fitted2$r.rich >=26, '>26', 'other'))))))
 
 
-plot.bm_coef4$colimitation <- ifelse(plot.bm_coef4$TESlope_lower >0,  'co-limited',
-                                            ifelse(plot.bm_coef4$TESlope_lower <=0, 'not co-limited', 'other'))
+plot.bm_coef3
+plot.bm_coef3$colimitation <- ifelse(plot.bm_coef3$TE_lower >0,  'co-limited',
+                                            ifelse(plot.bm_coef3$TE_lower <=0, 'not co-limited', 'other'))
 
-colims<- plot.bm_coef4 %>% select(site_code,colimitation)
+plot.bm_coef3$colimitation_both <- ifelse(plot.bm_coef3$TESlope_lower >0 & plot.bm_coef3$TE_lower >0,  'co-limited both',
+                                     ifelse(plot.bm_coef3$TESlope_lower <=0 & plot.bm_coef3$TE_lower <=0,  'not co-limited both',
+                                            ifelse(plot.bm_coef3$TESlope_lower >0 & plot.bm_coef3$TE_lower <=0,  'co-limited time',
+                                                   ifelse(plot.bm_coef3$TESlope_lower <=0 & plot.bm_coef3$TE_lower >0,  'co-limited trt',  'other'))))
 
+
+plot.bm_coef3$colimitation_time <- ifelse(plot.bm_coef3$TESlope_lower >0,  'co-limited',
+                                          ifelse(plot.bm_coef3$TESlope_lower <=0, 'not co-limited', 'other'))
+
+
+colims<- plot.bm_coef3 %>% select(site_code,colimitation,colimitation_time,colimitation_both)
+
+View(colims)
 write.csv(colims, '~/Dropbox/Projects/NutNet/Data/colims.csv' )
 
-plot.bm_coef4<-plot.bm_coef4[complete.cases(plot.bm_coef4$TESlope),]
-plot.bm_coef4$starting.richness <- factor(plot.bm_coef4$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+plot.bm_coef3<-plot.bm_coef3[complete.cases(plot.bm_coef3$TE),]
+plot.bm_coef3$starting.richness <- factor(plot.bm_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+
+
+View(plot.bm_coef3)
+fixef_b
 
 #theme_update(panel.border = element_rect(linetype = "solid", colour = "black"))
-b2<-ggplot() + 
-  geom_point(data = plot.bm_coef4, aes(x = reorder(site_code,TESlope), y = TESlope, colour = colimitation),size = 2) +
-  geom_errorbar(data = plot.bm_coef4, aes(x = reorder(site_code, TESlope),ymin = TESlope_lower,
-                                          ymax = TESlope_upper,colour = colimitation),
+
+b1<-ggplot() + 
+  geom_point(data = plot.bm_coef3, aes(x = reorder(site_code,TE), y = TE, colour = colimitation_both),size = 2) +
+  geom_errorbar(data = plot.bm_coef3, aes(x = reorder(site_code, TE),ymin = TE_lower,
+                                          ymax = TE_upper,colour = colimitation_both),
                 width = 0, size = 0.7) + 
-  facet_wrap(Model~.)+
+  #facet_wrap(Model~.)+
+  #facet_grid(continent~., scales= 'free', space='free')+
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = filter(fixef_b,),
+             aes(yintercept = Estimate[2]), size = 1.2) +
+  geom_rect(data = filter(fixef_b, ),
+            aes(xmin = -Inf, xmax = Inf,
+                ymin = Q2.5[2], ymax = Q97.5[2]),
+            alpha = 0.3) +
+  #ylim(-0.3, 0.3) +
+  labs(x = 'Site',
+       y = 'Slope') +
+  #scale_color_manual(values= c("#FF0000", "#00A08A"))+
+  # scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                                "6-10" = "#75B41EFF",
+  #                                "11-15" ="#5AC2F1FF",
+  #                                "16-20"= "#0C5BB0FF",
+  #                                "21-25" = "#972C8DFF",
+  #                                ">26" = "#E0363AFF", drop =FALSE))+
+  coord_flip() + 
+  labs(x = 'Site',
+       #y='',
+      #y= expression(paste('Effect of NPK on Biomass (g/' ,m^2, ') ')), 
+      title='a)', color= 'Colimitation') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   axis.title.x = element_blank(),#axis.text.y = element_blank(),
+                  axis.text.y = element_text(size=6),
+                  title=element_text(size=8),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+b1
+
+b2<-ggplot() + 
+  geom_point(data = plot.bm_coef3, aes(x = reorder(site_code,TE), y = TESlope, colour = colimitation_both),size = 2) +
+  geom_errorbar(data = plot.bm_coef3, aes(x = reorder(site_code, TESlope),ymin = TESlope_lower,
+                                          ymax = TESlope_upper,colour = colimitation_both),
+                width = 0, size = 0.7) + 
+  #facet_wrap(Model~.)+
   #facet_grid(continent~., scales= 'free', space='free')+
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = filter(fixef_b,),
@@ -581,7 +651,43 @@ b2<-ggplot() +
   #ylim(-0.3, 0.3) +
   labs(x = 'Site',
        y = 'Slope') +
-  scale_color_manual(values= c("#FF0000", "#00A08A"))+
+  #scale_color_manual(values= c("#FF0000", "#00A08A"))+
+  # scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                                "6-10" = "#75B41EFF",
+  #                                "11-15" ="#5AC2F1FF",
+  #                                "16-20"= "#0C5BB0FF",
+  #                                "21-25" = "#972C8DFF",
+  #                                ">26" = "#E0363AFF", drop =FALSE))+
+  coord_flip() + 
+  labs(
+       #y= expression(paste('Effect of NPK on Biomass (g/' ,m^2, ') / Year ')), 
+       title='b)', color= 'Colimitation') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                   axis.title.x = element_blank(),axis.title.y = element_blank(),
+                   axis.text.y = element_text(size=6),
+                   title=element_text(size=8),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+
+
+b3<-ggplot() + 
+  geom_point(data = plot.bm_coef3, aes(x = reorder(site_code,TESlope), y = TE, colour = colimitation_both),size = 2) +
+  geom_errorbar(data = plot.bm_coef3, aes(x = reorder(site_code, TE),ymin = TE_lower,
+                                          ymax = TE_upper,colour = colimitation_both),
+                width = 0, size = 0.7) + 
+  #facet_wrap(Model~.)+
+  #facet_grid(continent~., scales= 'free', space='free')+
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = filter(fixef_b,),
+             aes(yintercept = Estimate[2]), size = 1.2) +
+  geom_rect(data = filter(fixef_b, ),
+            aes(xmin = -Inf, xmax = Inf,
+                ymin = Q2.5[2], ymax = Q97.5[2]),
+            alpha = 0.3) +
+  #ylim(-0.3, 0.3) +
+  labs(x = 'Site',
+       y = 'Slope') +
+  #scale_color_manual(values= c("#FF0000", "#00A08A"))+
   # scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
   #                                "6-10" = "#75B41EFF",
   #                                "11-15" ="#5AC2F1FF",
@@ -590,14 +696,55 @@ b2<-ggplot() +
   #                                ">26" = "#E0363AFF", drop =FALSE))+
   coord_flip() + 
   labs(x = 'Site',
-       y = 'Slope', title= 'Plot Biomass') +
+       y= expression(paste('Effect of NPK on Biomass (g/' ,m^2, ') ')),   title='c)', color= 'Colimitation') +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                   axis.title.y = element_blank(),#axis.text.y = element_blank(),
+                   # axis.title.y = element_blank(),#axis.text.y = element_blank(),
+                   axis.text.y = element_text(size=6),
+                   axis.title.x = element_text(size=8),
+                   title=element_text(size=8),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
-b2
 
-grid_arrange_shared_legend(r2,b2,nrow=1)
+b4<-ggplot() + 
+  geom_point(data = plot.bm_coef3, aes(x = reorder(site_code,TESlope), y = TESlope, colour = colimitation_both),size = 2) +
+  geom_errorbar(data = plot.bm_coef3, aes(x = reorder(site_code, TESlope),ymin = TESlope_lower,
+                                          ymax = TESlope_upper,colour = colimitation_both),
+                width = 0, size = 0.7) + 
+  #facet_wrap(Model~.)+
+  #facet_grid(continent~., scales= 'free', space='free')+
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = filter(fixef_b,),
+             aes(yintercept = Estimate[4]), size = 1.2) +
+  geom_rect(data = filter(fixef_b, ),
+            aes(xmin = -Inf, xmax = Inf,
+                ymin = Q2.5[4], ymax = Q97.5[4]),
+            alpha = 0.3) +
+  #ylim(-0.3, 0.3) +
+  labs(x = 'Site',
+       y = 'Slope') +
+  #scale_color_manual(values= c("#FF0000", "#00A08A"))+
+  # scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                                "6-10" = "#75B41EFF",
+  #                                "11-15" ="#5AC2F1FF",
+  #                                "16-20"= "#0C5BB0FF",
+  #                                "21-25" = "#972C8DFF",
+  #                                ">26" = "#E0363AFF", drop =FALSE))+
+  coord_flip() + 
+  labs(x = '',
+       y= expression(paste('Effect of NPK on Biomass (g/' ,m^2, ') / Year ')),  title='d)',  color= 'Colimitation') +
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
+                   axis.text.y = element_text(size=6),
+                   axis.title.x = element_text(size=8),
+                   title=element_text(size=8),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+b4
+
+summary(rich.)
+
+grid_arrange_shared_legend(b1,b2,nrow=1, ncol=2)
+grid_arrange_shared_legend(b1,b2,b3,b4,nrow=2, ncol=2)
 
 #grid_arrange_shared_legend(r1,b1,r2,b2,nrow=2,ncol=2)
 

@@ -37,6 +37,9 @@ study_levels <- plot.rich.g$data %>%
   nest_legacy(level)
 
 parnames(plot.rich.g)
+
+summary(plot.rich.g)
+
 study_sample_posterior <- study_levels %>%
   mutate(sl.ctl = purrr::map(data, ~posterior_samples(sl.s,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
@@ -83,28 +86,34 @@ study_sample_posterior <- study_levels %>%
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()))
 
 
-
+#fixed effects
 sl.trt.i_fixef <- fixef(sl.s)
 sg.trt.i_fixef <- fixef(sg.s)
 CDE.trt.i_fixef <- fixef(CDE.s)
 plot.rich.im_fixef <- fixef(plot.rich.g)
 plot.bm.im_fixef <- fixef(plot.bm.s)
 
+# overall posteriors
+sl.fixed.p<-posterior_samples(sl.s, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sg.fixed.p<-posterior_samples(sg.s, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+CDE.fixed.p<-posterior_samples(CDE.s, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+rich.fixed.p<-posterior_samples(plot.rich.g, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
+bm.fixed.p<-posterior_samples(plot.bm.s, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
 
 
 sl_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
-  unnest_legacy(sl.ctl,sl.trt) %>% 
+  unnest_legacy(sl.ctl,sl.trt) %>%
   mutate(response = 'sl',
-         sl.ctl_global_slope = sl.trt.i_fixef['year.y.m','Estimate'],
-         sl.ctl_upper_slope = sl.trt.i_fixef['year.y.m','Q97.5'],
-         sl.ctl_lower_slope = sl.trt.i_fixef['year.y.m','Q2.5'],
          sl.trt_global_slope = sl.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
          sl.trt_upper_slope = sl.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
-         sl.trt_lower_slope = sl.trt.i_fixef['trt.yNPK:year.y.m','Q2.5']) 
+         sl.trt_lower_slope = sl.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
+  group_by(site_code) %>%
+  mutate(response = 'sl',
+         sl.trt_global_p = sl.fixed.p[,'b_trt.yNPK:year.y.m'],
+ )
 
-
-head(sl_posterior)
+View(sl_posterior)
 # sl_posterior$sl<-sl_posterior$sl.ctl+sl_posterior$sl.trt
 # sl_posterior$sl.global<-sl_posterior$sl.ctl_global_slope + sl_posterior$sl.trt_global_slope
 # sl_posterior$sl.upper<-sl_posterior$sl.ctl_upper_slope + sl_posterior$sl.trt_upper_slope
@@ -141,14 +150,17 @@ sg_posterior <- study_sample_posterior  %>%
   select(-data) %>% 
   unnest_legacy(sg.ctl,sg.trt) %>% 
   mutate(response = 'sg',
-         sg.ctl_global_slope = sg.trt.i_fixef['year.y.m','Estimate'],
-         sg.ctl_upper_slope = sg.trt.i_fixef['year.y.m','Q97.5'],
-         sg.ctl_lower_slope = sg.trt.i_fixef['year.y.m','Q2.5'],
          sg.trt_global_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
          sg.trt_upper_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sg.trt_lower_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],
-  ) 
+  ) %>%
+  group_by(site_code) %>%
+  mutate(response = 'sg',
+         sg.trt_global_p = sg.fixed.p[,'b_trt.yNPK:year.y.m'],
+  )
 
+
+View(sg_posterior)
 
 # sg_posterior$sg<-sg_posterior$sg.ctl+sg_posterior$sg.trt
 # sg_posterior$sg.global<-sg_posterior$sg.ctl_global_slope + sg_posterior$sg.trt_global_slope
@@ -188,13 +200,14 @@ cde_posterior <- study_sample_posterior  %>%
   select(-data) %>% 
   unnest_legacy(cde.ctl,cde.trt) %>% 
   mutate(response = 'cde',
-         cde.ctl_global_slope = CDE.trt.i_fixef['year.y.m','Estimate'],
-         cde.ctl_upper_slope = CDE.trt.i_fixef['year.y.m','Q97.5'],
-         cde.ctl_lower_slope = CDE.trt.i_fixef['year.y.m','Q2.5'],
          cde.trt_global_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
          cde.trt_upper_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          cde.trt_lower_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],
-  ) 
+  ) %>%
+  group_by(site_code) %>%
+  mutate(response = 'cde',
+         cde.trt_global_p = CDE.fixed.p[,'b_trt.yNPK:year.y.m'],
+  )
 
 # cde_posterior$cde<-cde_posterior$cde.ctl+cde_posterior$cde.trt
 # cde_posterior$cde.global<-cde_posterior$cde.ctl_global_slope + cde_posterior$cde.trt_global_slope
@@ -237,7 +250,26 @@ sl.p<-left_join(sl.p,colims,by="site_code")
 summary(sl.p)
 
 
-sl.p<-na.omit(sl.p, cols="NDep.cats")
+sl.p$NDep.cats3 <- ifelse(sl.p$NDep >= 10.01 & sl.p$NDep <= 35.91, '10.01-35.91',
+                                 ifelse(sl.p$NDep >=0.8 & sl.p$NDep <= 10.00, '< 1-10.00','NA'))
+
+sl.p<-na.omit(sl.p, cols="NDep.cats3")
+
+sl.p$NDep.cats3 <- factor(sl.p$NDep.cats3 , levels=c("10.01-35.91","< 1-10.00"))
+
+distinct(sl.p,site_code,NDep.cats3)
+View(sl.p)
+
+sl.p$NDep.cats2 <- ifelse(sl.p$NDep >= 20.01 & sl.p$NDep <= 35.91, '20.01-35.91',
+                                        ifelse(sl.p$NDep >= 10.01 & sl.p$NDep <= 20.00, '10.01-20.00',
+                                                      ifelse(sl.p$NDep >= 2.51 & sl.p$NDep <= 10.00, '2.51-10.00',
+                                                                    ifelse(sl.p$NDep <1.0 & sl.p$NDep <= 2.50, '< 1.00-2.50','other'))))
+
+sl.p<-na.omit(sl.p, cols="NDep.cats2")
+
+sl.p$NDep.cats2 <- factor(sl.p$NDep.cats2 , levels=c("20.01-35.91","10.01-20.00","2.51-10.00","< 1.00-2.50",'< 1','NA'))
+
+
 summary(sl.p.n)
 View(sl.p)
 colnames(sl.p)
@@ -247,72 +279,73 @@ sl.p$grazed<-as.factor(as.character(sl.p$grazed))
 sl.p$managed<-as.factor(as.character(sl.p$managed))
 sl.p$burned<-as.factor(as.character(sl.p$burned))
 sl.p$NDep.cats <- factor(sl.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1','NA'))
+sl.p$NDep.cats2 <- factor(sl.p$NDep.cats2 , levels=c("20.01-35.91","10.01-20.00","2.51-10.00","< 1.00-2.50",'< 1','NA'))
+
 sl.p$starting.richness <- factor(sl.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 sl.p$site_rich_range <- factor(sl.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
 
 levels(sl.p$NDep.cats)
 
+ colnames(sl.p)
+ 
 sl<-ggplot() +
-  #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = sl.p %>% distinct(sl.trt_lower_slope, sl.trt_upper_slope),
             aes(xmin = sl.trt_lower_slope, xmax =  sl.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
-  # geom_density_ridges(data = sl.p,
-  #                     aes(x = sl.ctl + unique(sl.ctl_global_slope),
-  #                         # y = anthropogenic ,
-  #                         # y = managed,
-  #                         y = grazed,
-  #                         color= "grey"
-  #                     ),
-  #                     scale = 1, alpha = 0.6,
-  #                     linetype = 0) +
   geom_density_ridges(data = sl.p,
-                      aes(x = sl.trt + unique(sl.trt_global_slope), 
-                          #y = anthropogenic ,
+                      aes(x = sl.trt + sl.trt_global_p, 
+                         # y = anthropogenic ,
                            #y = grazed , 
                           #y= managed ,
-                         #y = site_dom,
-                          #y = Realm,
+                        # y = site_dom,
+                         # y = Realm,
                           #y = bioregion,
                           #y = biome,
-                          #y= colimitation,
-                          y= NDep.cats,
+                         # y= colimitation_both,
+                          #y= NDep.cats,
+                        # y= site_rich_range,
+                         y= starting.richness,
                          #fill=anthropogenic
-                           #fill = starting.richness
+                          fill = starting.richness
                           #fill = site_dom
-                           #fill= site_rich_range
-                           #fill= NDep.cats
+                          # fill= site_rich_range
+                         # fill= NDep.cats
                           #fill= Realm
                           #fill= biome
-                          fill=colimitation
+                         #fill=colimitation
                           ), 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   scale_fill_viridis(name = #'site_rich_range',
-                      # 'starting.richness' ,  
-                       #'site_rich_range',
-                       #'anthropogenic',
-                       #'NDep.cats',
+                      'starting.richness' ,  
+                      # 'site_rich_range',
+                      # 'anthropogenic',
+                      #'NDep.cats',
                       #'biome' ,
-                      #'site_dom',
+                     # 'site_dom',
                       #'Realm',
-                     'colimitation',
+                      #'colimitation',
                       discrete=TRUE) +
-  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-  #                              "6-10" = "#75B41EFF",
-  #                              "11-15" ="#5AC2F1FF",
-  #                              "16-20"= "#0C5BB0FF",
-  #                              "21-25" = "#972C8DFF",
-  #                              ">26" = "#E0363AFF", drop =FALSE))+
   geom_vline(data = sl.p,
              aes(xintercept = sl.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs(
-       x = 'Species Loss',
-       title= 'Biomass Change') +
-  #xlim(-0.50,0.50) +
-  #scale_x_continuous(trans = reverse_trans()) +
+  labs( x='',
+    #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
+       title= 'a) Species Loss',
+       #y=expression(paste('N (kg.' ,ha^-1,yr^-1, ')'))
+    y= ' Starting Richness '
+    #color= 'Starting Richness'
+    )+
+  # geom_text(data = sl.p %>%
+  #             group_by(NDep.cats) %>% 
+  #             mutate(n_study = n_distinct(site_code)) %>% 
+  #             ungroup() %>% 
+  #             distinct(NDep.cats, n_study, .keep_all = T),
+  #           aes(x=25, y=NDep.cats, 
+  #               label=paste('n[study] == ', n_study)),
+  #           size=3.5,
+  #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
         #axis.text.y = element_blank(),
         legend.key = element_blank(),
@@ -324,6 +357,24 @@ sg.p <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fil
 colims <- read.csv("~/Dropbox/Projects/NutNet/Data/colims.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sg.p<-left_join(sg.p,colims,by="site_code")
+
+
+sg.p$NDep.cats3 <- ifelse(sg.p$NDep >= 10.01 & sg.p$NDep <= 35.91, '10.01-35.91',
+                          ifelse(sg.p$NDep <1.0 & sg.p$NDep <= 10.00, '< 1-10.00','NA'))
+
+sg.p<-na.omit(sg.p, cols="NDep.cats3")
+
+sg.p$NDep.cats3 <- factor(sg.p$NDep.cats3 , levels=c("10.01-35.91","< 1-10.00"))
+
+
+sg.p$NDep.cats2 <- ifelse(sg.p$NDep >= 20.01 & sg.p$NDep <= 35.91, '20.01-35.91',
+                          ifelse(sg.p$NDep >= 10.01 & sg.p$NDep <= 20.00, '10.01-20.00',
+                                 ifelse(sg.p$NDep >= 2.51 & sg.p$NDep <= 10.00, '2.51-10.00',
+                                        ifelse(sg.p$NDep <1.0 & sg.p$NDep <= 2.50, '< 1.00-2.50','other'))))
+
+sg.p<-na.omit(sg.p, cols="NDep.cats2")
+
+sg.p$NDep.cats2 <- factor(sg.p$NDep.cats2 , levels=c("20.01-35.91","10.01-20.00","2.51-10.00","< 1.00-2.50",'< 1','NA'))
 
 
 colnames(sg.p)
@@ -342,19 +393,11 @@ head(sg.p)
 sg.p<-na.omit(sg.p, cols="NDep.cats")
 
 sg<-ggplot() +
-  #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = sg.p %>% distinct(sg.trt_lower_slope, sg.trt_upper_slope),
             aes(xmin = sg.trt_lower_slope, xmax =  sg.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
-  # geom_density_ridges(data = sg.p,
-  #                     aes(x = sg.ctl + unique(sg.ctl_global_slope),
-  #                         y = anthropogenic,
-  #                         color = "grey"
-  #                     ),
-  #                     scale = 1, alpha = 0.6,
-  #                     linetype = 0) +
   geom_density_ridges(data = sg.p,
-                      aes(x = sg.trt + unique(sg.trt_global_slope), 
+                      aes(x = sg.trt + sg.trt_global_p, 
                            #y = anthropogenic,
                            #y = grazed, 
                           #y= managed,
@@ -362,42 +405,49 @@ sg<-ggplot() +
                           #y = Realm,
                           #y = bioregion,
                           #y = biome,
-                          y= NDep.cats,
-                          #y=colimitation,
+                         # y= NDep.cats,
+                          #y= site_rich_range,
+                         y= starting.richness,
+                         # y=colimitation,
                           #fill=anthropogenic
-                          fill=colimitation
-                          # fill = starting.richness
+                         # fill=colimitation
+                          fill = starting.richness
                           #fill = site_dom
                           #fill= site_rich_range
-                          #fill= NDep.cats
+                          #fill= NDep.cats2
                           #fill= Realm
                           #fill=biome
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis(name = #'site_dom'
-                         # 'starting.richness' ,
-                      # 'colimitation',
+  scale_fill_viridis(name = #'site_dom',
+                         'starting.richness' ,
+                     # 'colimitation',
                        #'site_rich_range',
-                        # 'NDep.cats',
-                       #'Realm',
-                       'biome',
-                       #'anthropogenic',
+                       # 'NDep.cats2',
+                      # 'Realm',
+                       #'biome',
+                      #'anthropogenic',
                        discrete=TRUE) +
-  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-  #                              "6-10" = "#75B41EFF",
-  #                              "11-15" ="#5AC2F1FF",
-  #                              "16-20"= "#0C5BB0FF",
-  #                              "21-25" = "#972C8DFF",
-  #                              ">26" = "#E0363AFF", drop =FALSE))+
   geom_vline(data = sg.p,
-             aes(xintercept = sg.trt_global_slope)) +
+             aes(xintercept =  sg.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
   labs(y='',
-       x = 'Species Gains',
-       title= '') +
-  #xlim(-0.50,0.50) +
+       x=expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ') / Year')),
+       title= 'b) Species Gains',
+       fill= 'Starting Richness'
+       #y=expression(paste('N (kg.' ,ha^-1,yr^-1, ')'))
+       )+ 
+    # geom_text(data = sg.p %>%
+    #             group_by(NDep.cats) %>% 
+    #             mutate(n_study = n_distinct(site_code)) %>% 
+    #             ungroup() %>% 
+    #             distinct(NDep.cats, n_study, .keep_all = T),
+    #           aes(x=25, y=NDep.cats, 
+    #               label=paste('n[study] == ', n_study)),
+    #           size=3.5,
+    #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         legend.key = element_blank(),
@@ -410,6 +460,26 @@ cde.p <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,f
 colims <- read.csv("~/Dropbox/Projects/NutNet/Data/colims.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 cde.p<-left_join(cde.p,colims,by="site_code")
+
+cde.p$NDep.cats3 <- ifelse(cde.p$NDep >= 10.01 & cde.p$NDep <= 35.91, '10.01-35.91',
+                          ifelse(cde.p$NDep <1.0 & cde.p$NDep <= 10.00, '< 1-10.00','NA'))
+
+cde.p<-na.omit(cde.p, cols="NDep.cats3")
+
+cde.p$NDep.cats3 <- factor(cde.p$NDep.cats3 , levels=c("10.01-35.91","< 1-10.00"))
+
+
+
+cde.p$NDep.cats2 <- ifelse(cde.p$NDep >= 20.01 & cde.p$NDep <= 35.91, '20.01-35.91',
+                          ifelse(cde.p$NDep >= 10.01 & cde.p$NDep <= 20.00, '10.01-20.00',
+                                 ifelse(cde.p$NDep >= 2.51 & cde.p$NDep <= 10.00, '2.51-10.00',
+                                        ifelse(cde.p$NDep <1.0 & cde.p$NDep <= 2.50, '< 1.00-2.50','other'))))
+
+cde.p$NDep.cats2 <- factor(cde.p$NDep.cats2 , levels=c("20.01-35.91","10.01-20.00","2.51-10.00","< 1.00-2.50"))
+
+cde.p<-na.omit(cde.p, cols="NDep.cats2")
+
+
 
 
 head(cde.p)
@@ -428,63 +498,62 @@ View(cde.p)
 cde.p<-na.omit(cde.p, cols="NDep.cats")
 
 cde<-ggplot() +
-  #facet_grid( ~ habitat, scale = 'free') +
   geom_rect(data = cde.p %>% distinct(cde.trt_lower_slope, cde.trt_upper_slope),
             aes(xmin = cde.trt_lower_slope, xmax =  cde.trt_upper_slope), ymin = -Inf, ymax = Inf,
             alpha = 0.3) +
-  # geom_density_ridges(data = cde.p,
-  #                     aes(x = cde.ctl + unique(cde.ctl_global_slope),
-  #                         y = anthropogenic,
-  #                         color = "grey"
-  #                     ),
-  #                     scale = 1, alpha = 0.6,
-  #                     linetype = 0) +
   geom_density_ridges(data = cde.p,
-                      aes(x = cde.trt + unique(cde.trt_global_slope), 
+                      aes(x = cde.trt + cde.trt_global_p, 
                           #y = interaction(anthropogenic,site_dom),
                           #y = anthropogenic,
                            #y = grazed , 
                           #y = site_dom,
                           #y = managed ,
-                          #y = Realm,
+                         # y = Realm,
                           #y = bioregion,
                           #y = biome,
                           #y=colimitation,
-                          y=NDep.cats,
+                          #y=NDep.cats,
+                         # y= site_rich_range,
+                          y= starting.richness,
                           #y = starting.richness
-                          fill=colimitation
+                          #fill=anthropogenic
+                          #fill=colimitation
                           #fill = site_rich_range
-                           #fill = starting.richness
-                          # fill = site_dom
-                          # fill= site_rich_range
-                           #fill = NDep.cats
+                          fill = starting.richness
+                           #fill = site_dom
+                           #fill = NDep.cats2
                           #fill=biome
-                          #fill= Realm
+                         # fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis(name = #'site_dom'
-                        #'starting.richness' ,
-                      'colimitation',
-                       # 'site_rich_range',
+  scale_fill_viridis(name = #'site_dom',
+                        'starting.richness' ,
+                      #'colimitation',
+                      # 'site_rich_range',
+                      # 'anthropogenic',
                        #'biome', 
-                       #'NDep.cats',
-                         #'Realm',
+                       #'NDep.cats2',
+                       # 'Realm',
                        discrete=TRUE) +
-  # scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
-  #                              "6-10" = "#75B41EFF",
-  #                              "11-15" ="#5AC2F1FF",
-  #                              "16-20"= "#0C5BB0FF",
-  #                              "21-25" = "#972C8DFF",
-  #                              ">26" = "#E0363AFF", drop =FALSE))+
   geom_vline(data = cde.p,
              aes(xintercept = cde.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs( y = '' ,
-       x = 'Persistent Species',
-       title= ''
-       ) +
+  labs(y='', x='',
+       #x=expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
+       title= 'c) Persistent Species'
+       #y=expression(paste('N (kg.' ,ha^-1,yr^-1, ')'))
+  )+ 
+  geom_text(data = cde.p %>%
+              group_by(starting.richness) %>%
+              mutate(n_study = n_distinct(site_code)) %>%
+              ungroup() %>%
+              distinct(starting.richness, n_study, .keep_all = T),
+            aes(x=100, y=starting.richness,
+                label=paste('n[study] == ', n_study)),
+            size=3.5,
+            nudge_y = 0.1, parse = T) +
   xlim(-150,150) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),

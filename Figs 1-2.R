@@ -50,6 +50,7 @@ plot$f.year_trt<-as.factor(as.character(plot$year_trt))
 #log
 plot$log.rich<-log(plot$rich)
 plot$log.live.mass<-log(plot$live_mass)
+
 plot$log.year.trt<-log(plot$year_trt + 1)
 
 
@@ -80,6 +81,8 @@ plot5<-bind_rows(plotmax,plotzero)
 
 ggplot(plot5, aes(x=rich, y=live_mass, group=unique.id))+
   geom_point(size=2,shape=1)+ geom_line()+theme_classic()
+
+
 
 plot6<-plot5 %>%
   group_by(site_code,year_trt) %>%
@@ -143,7 +146,7 @@ plot9 <- plot8 %>%
   select(-start, -end)
 View(plot9)
 
-plot10 <- plot8 %>%
+ plot10 <- plot8 %>%
   select(site_code,m.mass,startend) %>%
   spread(startend,m.mass) %>%
   as_tibble() %>% 
@@ -197,10 +200,100 @@ ggplot() +
                                  ">26" = "#E0363AFF", drop =FALSE))+
 labs(x = 'Species Richness',
      y = expression(paste('Biomass (g/' ,m^2, ')')), 
-     title= 'Change in Species Richness & Biomass in NPK Plots') +
+     title= '', color=" Starting Richness") +
   theme_classic()
 
 
+# Supplementary figure s1 plot level version of fig 1
+
+ggplot(plot5, aes(x=rich, y=live_mass, group=unique.id))+
+  geom_point(size=2,shape=1)+ geom_line()+theme_classic()
+
+plot5$unique.id<- as.character(with(plot5, paste(site_code,block,plot, sep="_")))
+
+View(plot5)
+head(plot5)
+zerorich<-plot5[plot5$year_trt %in% c('0'),]
+
+zerorich$starting.richness <- ifelse(zerorich$rich >= 1 & zerorich$rich <= 5, '1-5 species',
+                                     ifelse(zerorich$rich >=6 & zerorich$rich <=10, '6-10',
+                                            ifelse(zerorich$rich >=11 & zerorich$rich <=15, '11-15',    
+                                                   ifelse(zerorich$rich >=16 & zerorich$rich <=20, '16-20',
+                                                          ifelse(zerorich$rich >=21 & zerorich$rich <=25, '21-25',
+                                                                 ifelse(zerorich$rich >=26, '>26', 'other'))))))
+View(zerorich)
+zrich<-zerorich %>% 
+  select(unique.id,site_code,block,plot,starting.richness)
+
+View(zrich)
+plot7<-inner_join(plot5,zrich)
+
+plot7$starting.richness <- factor(plot7$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+
+View(plot7)
+
+yrdat <- plot7 %>% filter(year_trt > 1) %>% 
+  droplevels() %>% 
+  select(unique.id,site_code,year_trt)
+
+yrdat$maxyr<-as.factor(yrdat$year_trt)
+yrdat2 <- yrdat %>%
+  select(unique.id,site_code,maxyr)
+plot8<-inner_join(plot7,yrdat2)
+View(plot8)
+
+plot8$startend <- ifelse(plot8$year_trt < 1 , 'start',
+                         ifelse(plot8$year_trt >=1, 'end', 'other'))
+
+View(plot8)
+head(plot8)
+plot8$unique.id<- as.character(with(plot8, paste(site_code,block,plot,year_trt, sep="_")))
+
+plot9 <- plot8 %>%
+  select(unique.id,rich,startend) %>%
+  spread(startend,rich) %>%
+  as_tibble() %>% 
+  mutate(rich.start = start,
+         rich.end = end ) %>% 
+  select(-start, -end)
+View(plot9)
+
+plot10 <- plot8 %>%
+  select(unique.id,site_code,live_mass,startend) %>%
+  spread(startend,live_mass) %>%
+  as_tibble() %>% 
+  mutate(mass.start = start,
+         mass.end = end ) %>% 
+  select(-start, -end)
+
+plot11<-inner_join(plot9,plot10)
+plot12<-inner_join(plot11,yrdat2)
+View(plot13)
+
+plot13<-inner_join(plot12,zrich)
+
+
+ggplot() +
+  geom_point(data=plot13,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
+  geom_point(data=plot13,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
+  #geom_point(size=1.5, fill="white", shape=2)+
+  geom_segment(data=plot13,aes(x=rich.start,
+                               xend=rich.end,
+                               y=mass.start,
+                               yend=mass.end,
+                               group = site_code,
+                               colour=starting.richness), 
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  labs(x = 'Species Richness',
+       y = expression(paste('Biomass (g/' ,m^2, ')')), 
+       title= '', color=" Starting Richness") +
+  theme_classic()
 
 
 # FIGURE 2
@@ -374,9 +467,9 @@ mod.fig<-ggplot(data=delta.coefs, aes(x= IR.Slope+R.Slope, y= IB.Slope+B.Slope,c
                                  "16-20"= "#0C5BB0FF",
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
-  labs(x = 'Richness Slope',
-       y = 'Biomass Slope',
-       title= 'Model') +
+  labs(x = 'Effect of NPK on Change in Species / Year',
+       y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ') / Year')),
+       title= '', color= "Starting Richness") +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 mod.fig

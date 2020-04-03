@@ -91,6 +91,12 @@ plot.rich.im_fixef <- fixef(plot.rich.g)
 plot.bm.im_fixef <- fixef(plot.bm.s)
 
 
+sl.fixed.p<-posterior_samples(sl.s, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sg.fixed.p<-posterior_samples(sg.s, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+CDE.fixed.p<-posterior_samples(CDE.s, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+rich.fixed.p<-posterior_samples(plot.rich.g, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
+bm.fixed.p<-posterior_samples(plot.bm.s, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
+
 
 sl_posterior.s <- study_sample_posterior.s  %>% 
   select(-data) %>% 
