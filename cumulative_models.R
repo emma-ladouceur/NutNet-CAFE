@@ -190,29 +190,29 @@ View(sl.trt_fitted.npk)
 View(sl.trt_coef3)
 
 
-sl.trt_fitted.npk$SL<- -abs(sl.trt_fitted.npk$SL.p)
-sl.trt_coef3$Intercept.n<- -(sl.trt_coef3$Intercept)
-sl.trt_coef3$TE.n<- -(sl.trt_coef3$TE)
-sl.trt_coef3$ISlope.n<- -(sl.trt_coef3$ISlope)
-sl.trt_coef3$TESlope.n<- -(sl.trt_coef3$TESlope)
-sl.trt_fitted.npk$Estimate.n<- -(sl.trt_fitted.npk$Estimate)
-
-sl.trt_fitted.npk$Q2.5.n<- -abs(sl.trt_fitted.npk$Q2.5)
-sl.trt_fitted.npk$Q97.5.n<- -abs(sl.trt_fitted.npk$Q97.5)
-sl.trt_fitted.ctl$Estimate.n<- -(sl.trt_fitted.ctl$Estimate)
-
-sl.trt_fitted.ctl$Q2.5.n<- -abs(sl.trt_fitted.ctl$Q2.5)
-sl.trt_fitted.ctl$Q97.5.n<- -abs(sl.trt_fitted.ctl$Q97.5)
+# sl.trt_fitted.npk$SL<- -abs(sl.trt_fitted.npk$SL.p)
+# sl.trt_coef3$Intercept.n<- -(sl.trt_coef3$Intercept)
+# sl.trt_coef3$TE.n<- -(sl.trt_coef3$TE)
+# sl.trt_coef3$ISlope.n<- -(sl.trt_coef3$ISlope)
+# sl.trt_coef3$TESlope.n<- -(sl.trt_coef3$TESlope)
+# sl.trt_fitted.npk$Estimate.n<- -(sl.trt_fitted.npk$Estimate)
+# 
+# sl.trt_fitted.npk$Q2.5.n<- -abs(sl.trt_fitted.npk$Q2.5)
+# sl.trt_fitted.npk$Q97.5.n<- -abs(sl.trt_fitted.npk$Q97.5)
+# sl.trt_fitted.ctl$Estimate.n<- -(sl.trt_fitted.ctl$Estimate)
+# 
+# sl.trt_fitted.ctl$Q2.5.n<- -abs(sl.trt_fitted.ctl$Q2.5)
+# sl.trt_fitted.ctl$Q97.5.n<- -abs(sl.trt_fitted.ctl$Q97.5)
 
 
 
 sl.trt_coef3$xs<-1
 
-View(sl.trt_coef3)
+#View(sl.trt_coef3)
 sl.trtm<-ggplot() +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL,
-                  colour = starting.richness),
+                  colour = starting.richness),alpha=0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = sl.trt_coef3,
                aes(x = xs, 
@@ -242,7 +242,7 @@ sl.trtm<-ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   ylim(-400,0) +
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in Biomass due to SL') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Species Loss', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -259,7 +259,7 @@ sl.trtm
 sl.trtm<-ggplot() +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL.p,
-                 colour = starting.richness),
+                 colour = starting.richness),alpha=0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = sl.trt_coef3,
                aes(x = xs, 
@@ -289,7 +289,7 @@ sl.trtm<-ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   ylim(0,400) +
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'a) Change in Biomass due to SL') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'b)  Species Gain',  color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -452,7 +452,7 @@ sg.trtm<-ggplot()  +
   # data
   geom_point(data = sg.trt_fitted.npk,
              aes(x = year.y, y = SG,
-                 colour = starting.richness),
+                 colour = starting.richness), alpha =0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   # geom_jitter(data=sg.trt_fitted.npk,
   #             aes(x = year.y, y = SG,
@@ -485,7 +485,9 @@ sg.trtm<-ggplot()  +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   ylim(0,400) +
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'd) Change in Biomass due to SG') +
+       y='',
+       #y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
+       title= 'b) Species Gain', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                   "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -656,7 +658,7 @@ cdem<-ggplot() +
   # data
   geom_point(data = cde_fitted.npk,
              aes(x = year.y, y = CDE,
-                 colour = starting.richness),
+                 colour = starting.richness), alpha=0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = cde_coef3,
                aes(x = xs, 
@@ -686,7 +688,9 @@ cdem<-ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   ylim(-500,1000)+
   labs(x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'c) Biomass Change in Persistent Species') +
+       y= '',
+      # y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
+       title= 'c) Persistent Species',  color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -829,7 +833,7 @@ sgain.trtm<-ggplot()  +
   # data
   geom_point(data = sgain.trt_fitted.npk,
              aes(x = year.y, y = s.gain,
-                 colour = starting.richness),
+                 colour = starting.richness), alpha=0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   # geom_jitter(data=sgain.trt_fitted.npk,
   #             aes(x = year.y, y = SG,
@@ -862,7 +866,7 @@ sgain.trtm<-ggplot()  +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   #ylim(0,400) +
   labs(x = 'Years',
-       y = expression(paste('Species Gains')), title= 'b) Species Gains') +
+       y = expression(paste('Species Gain')), title= 'b) Species Gain', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -1006,20 +1010,20 @@ View(sloss.trt_fitted.npk)
 View(sloss.trt_coef3)
 
 
-sloss.trt_fitted.npk$s.loss<- -abs(sloss.trt_fitted.npk$s.loss.p)
-sloss.trt_coef3$Intercept.n<- -(sloss.trt_coef3$Intercept)
-sloss.trt_coef3$TE.n<- -(sloss.trt_coef3$TE)
-sloss.trt_coef3$ISlope.n<- -(sloss.trt_coef3$ISlope)
-sloss.trt_coef3$TESlope.n<- -(sloss.trt_coef3$TESlope)
-sloss.trt_fitted.npk$Estimate.n<- -(sloss.trt_fitted.npk$Estimate)
-
-sloss.trt_fitted.npk$Q2.5.n<- -abs(sloss.trt_fitted.npk$Q2.5)
-sloss.trt_fitted.npk$Q97.5.n<- -abs(sloss.trt_fitted.npk$Q97.5)
-sloss.trt_fitted.ctl$Estimate.n<- -(sloss.trt_fitted.ctl$Estimate)
-
-sloss.trt_fitted.ctl$Q2.5.n<- -abs(sloss.trt_fitted.ctl$Q2.5)
-sloss.trt_fitted.ctl$Q97.5.n<- -abs(sloss.trt_fitted.ctl$Q97.5)
-
+# sloss.trt_fitted.npk$s.loss<- -abs(sloss.trt_fitted.npk$s.loss.p)
+# sloss.trt_coef3$Intercept.n<- -(sloss.trt_coef3$Intercept)
+# sloss.trt_coef3$TE.n<- -(sloss.trt_coef3$TE)
+# sloss.trt_coef3$ISlope.n<- -(sloss.trt_coef3$ISlope)
+# sloss.trt_coef3$TESlope.n<- -(sloss.trt_coef3$TESlope)
+# sloss.trt_fitted.npk$Estimate.n<- -(sloss.trt_fitted.npk$Estimate)
+# 
+# sloss.trt_fitted.npk$Q2.5.n<- -abs(sloss.trt_fitted.npk$Q2.5)
+# sloss.trt_fitted.npk$Q97.5.n<- -abs(sloss.trt_fitted.npk$Q97.5)
+# sloss.trt_fitted.ctl$Estimate.n<- -(sloss.trt_fitted.ctl$Estimate)
+# 
+# sloss.trt_fitted.ctl$Q2.5.n<- -abs(sloss.trt_fitted.ctl$Q2.5)
+# sloss.trt_fitted.ctl$Q97.5.n<- -abs(sloss.trt_fitted.ctl$Q97.5)
+# 
 
 
 sloss.trt_coef3$xs<-1
@@ -1028,7 +1032,7 @@ View(sloss.trt_coef3)
 sloss.trtm<-ggplot() +
   geom_point(data = sloss.trt_fitted.npk,
              aes(x = year.y, y = s.loss,
-                 colour = starting.richness),
+                 colour = starting.richness), alpha=0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = sloss.trt_coef3,
                aes(x = xs, 
@@ -1058,7 +1062,7 @@ sloss.trtm<-ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   #ylim(-400,0) +
   labs(x = 'Years',
-       y = expression(paste('Species Loss')), title= 'a) Species Loss') +
+       y = expression(paste('Species Loss')), title= 'a) Species Loss', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
