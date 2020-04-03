@@ -198,8 +198,8 @@ r1<-ggplot() +
   geom_segment(data = plot.rich_coef3,
                aes(x = xmin, 
                    xend = xmax,
-                   y = (Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmin),
-                   yend = (Estimate.Intercept + Estimate.trtNPK + (Estimate.year_trt + Estimate.trtNPK.year_trt) * xmax),
+                   y = (Intercept + TE  + (ISlope+TESlope) * xmin),
+                   yend = (Intercept + TE + (ISlope+TESlope) * xmax),
                    group = site_code,
                    colour = starting.richness),
                size = .7) +
