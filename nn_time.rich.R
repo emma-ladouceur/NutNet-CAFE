@@ -4,7 +4,7 @@ library(brms)
 
 
 path <- '/gpfs1/data/idiv_chase/emmala/NutNet'
-plot <- read.csv(paste0(path, '/plot_calc.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv(paste0(path, '/smol.plot.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )

@@ -173,8 +173,8 @@ bm.effs
 # gain "#3B9AB2",
 # persistent "#35274A"
 
-r.bm.effs$Model<-
-  r.bm.effs$Model<- factor(  r.bm.effs$Model , levels=c("Species Richness","Biomass"))
+
+r.bm.effs$Model<- factor(  r.bm.effs$Model , levels=c("Species Richness","Biomass"))
 
 rich.bm.eff<-ggplot() + 
   geom_point(data =r.bm.effs, aes(x = response, y = eff, color=Model),size = 2) +

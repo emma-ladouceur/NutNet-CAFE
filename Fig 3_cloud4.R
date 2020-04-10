@@ -159,6 +159,7 @@ cloud1<-ggplot()+
 
 
 cloud1
+
 View(loss.ss)
 loss.ss <- loss.s %>% sample_n(50)
 gains.ss <- gains.s  %>% sample_n(50)
@@ -252,7 +253,7 @@ cloud2<-ggplot()+
        y = '',
        title= 'Overall Effect (+ Variation in 50 samples-95% CI)')
 
-
+cloud2
 # bind data sets togeher for this one-
 
 loss.ss <- loss.s %>% sample_n(50) 
@@ -396,16 +397,15 @@ cloud4<-ggplot()+
        y = '',
        title= 'Vector Style - Overall Effect (+ Variation in 50 samples-95% CI)')
 
+
+cloud4
 grid.arrange(cloud1,cloud2,cloud3,cloud4,nrow=2,ncol=2)
 
 grid_arrange_shared_legend(cloud1,cloud2,cloud3,cloud4,nrow=2,ncol=2)
 
 
 
-
-
-
-#VERSION 2
+# Version 2
 
 
 
@@ -582,6 +582,8 @@ cloud4<-ggplot()+
        title= 'Vector Style - Overall Effect (+ Variation in 50 samples-95% CI)')
 
 
+cloud4
+
 grid_arrange_shared_legend(cloud2,cloud4,nrow=1,ncol=2)
 
 
@@ -651,6 +653,7 @@ sgain.fixed.p2 <-sgain.fixed.p %>%
   sample_n(50)
 
 head(sgain.fixed.p2)
+
 nrow(sgain.fixed.p2)
 
 loss <-sl.fixed.p2 %>% bind_cols(sloss.fixed.p2 )
@@ -788,6 +791,8 @@ cloud4<-ggplot()+
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
        title= 'Vector Style - Overall Effect (+ Variation in 50 samples-95% CI)')
 
+
+cloud4
 
 grid.arrange(cloud2,cloud4,nrow=1,ncol=2)
 

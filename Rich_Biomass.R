@@ -25,6 +25,8 @@ plot$log.live.mass<-log(plot$live_mass)
 
 
 
+View(plot)
+
 load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
@@ -142,7 +144,7 @@ plot.rich_coef3<-full_join(plot.rich_coef2,dat)
 
 View(plot.rich_fitted)
 summary(plot.rich_fitted)
-colnames(startrich)
+View(startrich)
 
 startrich2<-startrich %>% 
   group_by(site_code) %>% 
@@ -152,12 +154,21 @@ View(startrich2)
 plot.rich_fitted2<-left_join(plot.rich_fitted,startrich2)
 View(plot.rich_fitted2)
 
-plot.rich_fitted2$starting.richness <- ifelse(plot.rich_fitted2$rich >= 1 & plot.rich_fitted2$rich <= 5, '1-5 species',
+plot.rich_fitted2$current.richness <- ifelse(plot.rich_fitted2$rich >= 1 & plot.rich_fitted2$rich <= 5, '1-5 species',
                                              ifelse(plot.rich_fitted2$rich >=6 & plot.rich_fitted2$rich <=10, '6-10',
                                                     ifelse(plot.rich_fitted2$rich >=11 & plot.rich_fitted2$rich <=15, '11-15',    
                                                            ifelse(plot.rich_fitted2$rich >=16 & plot.rich_fitted2$rich <=20, '16-20',
                                                                   ifelse(plot.rich_fitted2$rich >=21 & plot.rich_fitted2$rich <=25, '21-25',
                                                                          ifelse(plot.rich_fitted2$rich >=26, '>26', 'other'))))))
+
+plot.rich_fitted2$starting.richness <- ifelse(plot.rich_fitted2$r.rich >= 1 & plot.rich_fitted2$r.rich <= 5, '1-5 species',
+                                             ifelse(plot.rich_fitted2$r.rich >=6 & plot.rich_fitted2$r.rich <=10, '6-10',
+                                                    ifelse(plot.rich_fitted2$r.rich >=11 & plot.rich_fitted2$r.rich <=15, '11-15',    
+                                                           ifelse(plot.rich_fitted2$r.rich >=16 & plot.rich_fitted2$r.rich <=20, '16-20',
+                                                                  ifelse(plot.rich_fitted2$r.rich >=21 & plot.rich_fitted2$r.rich <=25, '21-25',
+                                                                         ifelse(plot.rich_fitted2$r.rich >=26, '>26', 'other'))))))
+
+
 #plot.rich_fitted2<-full_join(plot.rich_fitted,dat)
 plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
@@ -355,7 +366,6 @@ startrich2<-startrich %>%
 View(startrich2)
 plot.bm_fitted2<-left_join(plot.bm_fitted,startrich2)
 View(plot.bm_fitted2)
-
 
 plot.bm_fitted2$starting.richness <- ifelse(plot.bm_fitted2$r.rich >= 1 & plot.bm_fitted2$r.rich <= 5, '1-5 species',
                                             ifelse(plot.bm_fitted2$r.rich >=6 & plot.bm_fitted2$r.rich <=10, '6-10',

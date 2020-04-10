@@ -44,13 +44,27 @@ fitted.rich
 fitted.rich$Treatment <- factor(fitted.rich$Treatment , levels=c("NPK","Control"))
 
 
+
+
+plot.bm_fitted.npk
+sgain.trt_fitted.npk
+sloss.trt_fitted.npk
+cde_fitted.npk
+sl.trt_fitted.npk
+sg.trt_fitted.npk
+
+View(rich.s)
+
+
+
+
+
 r1<-ggplot() +
-  # data
-  facet_grid(~Model) +
+  facet_wrap(~Model) +
   geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich,
                  colour = starting.richness), alpha=0.6,
-             size = 1.3, position = position_jitter(width = 0.45, height = 0.45)) +
+             size = 1.3, position = position_jitter(width = 0.45 )) +
   geom_segment(data = plot.rich_coef3,
                aes(x = xmin, 
                    xend = xmax,
@@ -60,20 +74,20 @@ r1<-ggplot() +
                    colour = starting.richness),
                size = .7) +
   # uncertainy in fixed effect
-  geom_ribbon(data = plot.rich_fitted.npk,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.5) +
-  # fixed effect
-  geom_line(data = fitted.rich,
-            aes(x = year_trt, y = Estimate, linetype= Treatment),
-            size = 1.5) +
-  geom_ribbon(data = plot.rich_fitted.ctl,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.5) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,11)) +
+  # geom_ribbon(data = plot.rich_fitted.npk,
+  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+  #             alpha = 0.5) +
+  # # fixed effect
+  # geom_line(data = fitted.rich,
+  #           aes(x = year_trt, y = Estimate, linetype= Treatment),
+  #           size = 1.5) +
+  # geom_ribbon(data = plot.rich_fitted.ctl,
+  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+  #             alpha = 0.5) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,10)) +
   labs(x='',
     x = 'Years',
-       y = 'Species richness', title= 'a) ', color= 'Starting Richness') +
+       y = 'Species richness', title= 'a)  ', color= 'Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -108,7 +122,7 @@ b1<-ggplot() +
   geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = live_mass,
                  colour = starting.richness), alpha=0.6,
-             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+             size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = plot.bm_coef3,
                aes(x = xmin, 
                    xend = xmax,
@@ -143,6 +157,7 @@ b1<-ggplot() +
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                      plot.title = element_text(size=12),
                      plot.margin= margin(t = 0.1, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+
 
 b1
 
@@ -195,7 +210,7 @@ sgain.trtm<-ggplot()  +
   geom_point(data = sgain.trt_fitted.npk,
              aes(x = year.y, y = s.gain,
                  colour = starting.richness), alpha=0.6,
-             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+             size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sgain.trt_coef3,
                aes(x = xs,
                    xend = xmax,
@@ -261,7 +276,7 @@ sloss.trtm<-ggplot() +
   geom_point(data = sloss.trt_fitted.npk,
              aes(x = year.y, y = s.loss,
                  colour = starting.richness), alpha=0.6,
-             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+             size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sloss.trt_coef3,
                aes(x = xs, 
                    xend = xmax,
@@ -338,7 +353,7 @@ sl.trtm<-ggplot() +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL,
                  colour = starting.richness),alpha=0.6,
-             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+             size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sl.trt_coef3,
                aes(x = xs, 
                    xend = xmax,
@@ -405,7 +420,7 @@ sg.trtm<-ggplot()  +
   geom_point(data = sg.trt_fitted.npk,
              aes(x = year.y, y = SG,
                  colour = starting.richness), alpha =0.6,
-             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+             size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sg.trt_coef3,
                aes(x = xs,
                    xend = xmax,
@@ -478,7 +493,7 @@ cdem<-ggplot() +
   geom_point(data = cde_fitted.npk,
              aes(x = year.y, y = CDE,
                  colour = starting.richness), alpha=0.6,
-             size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
+             size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = cde_coef3,
                aes(x = xs, 
                    xend = xmax,
@@ -542,7 +557,7 @@ r.combine <- grid.arrange(arrangeGrob(r1 ,
 
 r.combine
 
-
+# patchwork solution
 library(devtools)
 install_github("thomasp85/patchwork")
 library(patchwork)
