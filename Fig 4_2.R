@@ -19,6 +19,12 @@ load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
 
+summary(sg.s)
+
+
+
+
+
 # site level meta data for posrteriors
 # calculated to site level details found in Climate_Data.R
 # latitude and longitude dont match due to decimal rounding
@@ -133,12 +139,10 @@ sl.p$grazed<-as.factor(as.character(sl.p$grazed))
 sl.p$managed<-as.factor(as.character(sl.p$managed))
 sl.p$burned<-as.factor(as.character(sl.p$burned))
 
-sl.p$site_rich_range <- ifelse(sl.p$site_richness >= 2 & sl.p$site_richness <= 44, '2-40 species',
-                               ifelse(sl.p$site_richness >=45 & sl.p$site_richness <=69, '45-69',
-                                      ifelse(sl.p$site_richness >=70 & sl.p$site_richness <=90, '70-90',    
-                                             ifelse(sl.p$site_richness >=91 & sl.p$site_richness <=119, '90-119',
-                                                    ifelse(sl.p$site_richness >=120 & sl.p$site_richness <=144, '120-144',
-                                                           ifelse(sl.p$site_richness >=145, '>145', 'other'))))))
+summary(sl.p$site_richness)
+sl.p$site_rich_range <- ifelse(sl.p$site_richness >= 2 & sl.p$site_richness <= 50, '2-50 species',
+                               ifelse(sl.p$site_richness >=51 & sl.p$site_richness <=100, '51-100',
+                                      ifelse(sl.p$site_richness >=101 & sl.p$site_richness <=176, '101 - >150', 'other')))
 
 View(sl.p)
 
@@ -185,13 +189,9 @@ sg.p$grazed<-as.factor(as.character(sg.p$grazed))
 sg.p$managed<-as.factor(as.character(sg.p$managed))
 sg.p$burned<-as.factor(as.character(sg.p$burned))
 
-sg.p$site_rich_range <- ifelse(sg.p$site_richness >= 2 & sg.p$site_richness <= 44, '2-40 species',
-                               ifelse(sg.p$site_richness >=45 & sg.p$site_richness <=69, '45-69',
-                                      ifelse(sg.p$site_richness >=70 & sg.p$site_richness <=90, '70-90',    
-                                             ifelse(sg.p$site_richness >=91 & sg.p$site_richness <=119, '90-119',
-                                                    ifelse(sg.p$site_richness >=120 & sg.p$site_richness <=144, '120-144',
-                                                           ifelse(sg.p$site_richness >=145, '>145', 'other'))))))
-
+sg.p$site_rich_range <- ifelse(sg.p$site_richness >= 2 & sg.p$site_richness <= 50, '2-50 species',
+                               ifelse(sg.p$site_richness >=51 & sg.p$site_richness <=100, '51-100',
+                                      ifelse(sg.p$site_richness >=101 & sg.p$site_richness <=176, '101 - >150', 'other')))
 View(sg.p)
 write.csv(sg.p,"~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv")
 
@@ -231,14 +231,13 @@ cde.p$anthropogenic<-as.factor(cde.p$anthropogenic)
 cde.p$grazed<-as.factor(as.character(cde.p$grazed))
 cde.p$burned<-as.factor(as.character(cde.p$burned))
 
-cde.p$site_rich_range <- ifelse(cde.p$site_richness >= 2 & cde.p$site_richness <= 44, '2-40 species',
-                                ifelse(cde.p$site_richness >=45 & cde.p$site_richness <=69, '45-69',
-                                       ifelse(cde.p$site_richness >=70 & cde.p$site_richness <=90, '70-90',    
-                                              ifelse(cde.p$site_richness >=91 & cde.p$site_richness <=119, '90-119',
-                                                     ifelse(cde.p$site_richness >=120 & cde.p$site_richness <=144, '120-144',
-                                                            ifelse(cde.p$site_richness >=145, '>145', 'other'))))))
+cde.p$site_rich_range <- ifelse(cde.p$site_richness >= 2 & cde.p$site_richness <= 50, '2-50 species',
+                               ifelse(cde.p$site_richness >=51 & cde.p$site_richness <=100, '51-100',
+                                      ifelse(cde.p$site_richness >=101 & cde.p$site_richness <=176, '101 - >150', 'other')))
 
+cdt<-cde.p%>% distinct(site_richness,site_rich_range)
 
+View(cdt)
 write.csv(cde.p,"~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv")
 
 
@@ -253,7 +252,7 @@ summary(sl.p)
 sl.p$NDep.cats3 <- ifelse(sl.p$NDep >= 10.01 & sl.p$NDep <= 35.91, '10.01-35.91',
                                  ifelse(sl.p$NDep >=0.8 & sl.p$NDep <= 10.00, '< 1-10.00','NA'))
 
-sl.p<-na.omit(sl.p, cols="NDep.cats3")
+#sl.p<-na.omit(sl.p, cols="NDep.cats3")
 
 sl.p$NDep.cats3 <- factor(sl.p$NDep.cats3 , levels=c("10.01-35.91","< 1-10.00"))
 
@@ -282,12 +281,18 @@ sl.p$NDep.cats <- factor(sl.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"
 sl.p$NDep.cats2 <- factor(sl.p$NDep.cats2 , levels=c("20.01-35.91","10.01-20.00","2.51-10.00","< 1.00-2.50",'< 1','NA'))
 
 sl.p$starting.richness <- factor(sl.p$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-sl.p$site_rich_range <- factor(sl.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
+sl.p$site_rich_range <- factor(sl.p$site_rich_range, levels=c("2-50 species","51-100","101 - >150"))
 
-levels(sl.p$NDep.cats)
+sl.p %>% distinct(site_richness ,site_rich_range)
 
- colnames(sl.p)
+
+sl.p<-sl.p %>%  mutate(site_dom = recode(site_dom, 
+                                  'native dominated' = "Native",
+                                  'introduced dominated' = "Introduced"))
  
+
+levels(sl.p$site_dom)
+
 sl<-ggplot() +
   geom_rect(data = sl.p %>% distinct(sl.trt_lower_slope, sl.trt_upper_slope),
             aes(xmin = sl.trt_lower_slope, xmax =  sl.trt_upper_slope), ymin = -Inf, ymax = Inf,
@@ -303,11 +308,11 @@ sl<-ggplot() +
                           #y = biome,
                          # y= colimitation_both,
                           #y= NDep.cats,
-                        #y= site_rich_range,
-                        #y= starting.richness,
+                       # y= site_rich_range,
+                        y= starting.richness,
                          #fill=anthropogenic
-                         # fill = starting.richness
-                          fill = site_dom
+                          fill = starting.richness
+                         # fill = site_dom
                           # fill= site_rich_range
                          # fill= NDep.cats
                           #fill= Realm
@@ -316,16 +321,22 @@ sl<-ggplot() +
                           ), 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis(name = #'site_rich_range',
-                      #'starting.richness' ,  
-                      # 'site_rich_range',
-                      # 'anthropogenic',
-                      #'NDep.cats',
-                      #'biome' ,
-                      'site_dom',
-                      #'Realm',
-                      #'colimitation',
-                      discrete=TRUE) +
+  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  #' scale_fill_viridis(name = #'site_rich_range',
+  #'                     #'starting.richness' ,  
+  #'                      'site_rich_range',
+  #'                     # 'anthropogenic',
+  #'                     #'NDep.cats',
+  #'                     #'biome' ,
+  #'                    #'site_dom',
+  #'                     #'Realm',
+  #'                     #'colimitation',
+  #'                     discrete=TRUE) +
   geom_vline(data = sl.p,
              aes(xintercept = sl.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -334,7 +345,7 @@ sl<-ggplot() +
     #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
        title= 'a) Species Loss Effect on Biomass',
        #y=expression(paste('N (kg.' ,ha^-1,yr^-1, ')'))
-    y= ' '
+    y= ' Site Dominated'
     #color= 'Starting Richness'
     )+
   # geom_text(data = sl.p %>%
@@ -347,7 +358,9 @@ sl<-ggplot() +
   #           size=3.5,
   #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
         legend.key = element_blank(),
         legend.position="none")
 
@@ -362,7 +375,7 @@ sg.p<-left_join(sg.p,colims,by="site_code")
 sg.p$NDep.cats3 <- ifelse(sg.p$NDep >= 10.01 & sg.p$NDep <= 35.91, '10.01-35.91',
                           ifelse(sg.p$NDep <1.0 & sg.p$NDep <= 10.00, '< 1-10.00','NA'))
 
-sg.p<-na.omit(sg.p, cols="NDep.cats3")
+#sg.p<-na.omit(sg.p, cols="NDep.cats3")
 
 sg.p$NDep.cats3 <- factor(sg.p$NDep.cats3 , levels=c("10.01-35.91","< 1-10.00"))
 
@@ -385,10 +398,14 @@ sg.p$grazed<-as.factor(as.character(sg.p$grazed))
 sg.p$managed<-as.factor(as.character(sg.p$managed))
 sg.p$burned<-as.factor(as.character(sg.p$burned))
 sg.p$NDep.cats <- factor(sg.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1','NA'))
-sg.p$site_rich_range <- factor(sg.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
+sg.p$site_rich_range <- factor(sg.p$site_rich_range, levels=c("2-50 species","51-100","101 - >150"))
   
-levels(sg.p$NDep.cats)
+levels(sg.p$site_rich_range)
 head(sg.p)
+
+sg.p<-sg.p %>%  mutate(site_dom = recode(site_dom, 
+                                         'native dominated' = "Native",
+                                         'introduced dominated' = "Introduced"))
 
 #sg.p<-na.omit(sg.p, cols="NDep.cats")
 
@@ -401,18 +418,18 @@ sg<-ggplot() +
                            #y = anthropogenic,
                            #y = grazed, 
                           #y= managed,
-                          y = site_dom,
+                          #y = site_dom,
                           #y = Realm,
                           #y = bioregion,
                           #y = biome,
                          # y= NDep.cats,
                           #y= site_rich_range,
-                        # y= starting.richness,
+                       y= starting.richness,
                          # y=colimitation,
                           #fill=anthropogenic
                          # fill=colimitation
-                          #fill = starting.richness
-                          fill = site_dom
+                          fill = starting.richness
+                         # fill = site_dom
                           #fill= site_rich_range
                           #fill= NDep.cats2
                           #fill= Realm
@@ -420,15 +437,21 @@ sg<-ggplot() +
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis(name = 'site_dom',
-                       #  'starting.richness' ,
-                     # 'colimitation',
-                       #'site_rich_range',
-                       # 'NDep.cats2',
-                      # 'Realm',
-                       #'biome',
-                      #'anthropogenic',
-                       discrete=TRUE) +
+  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  #' scale_fill_viridis(name =# 'site_dom',
+  #'                       # 'starting.richness' ,
+  #'                    # 'colimitation',
+  #'                      'site_rich_range',
+  #'                      # 'NDep.cats2',
+  #'                     # 'Realm',
+  #'                      #'biome',
+  #'                     #'anthropogenic',
+  #'                      discrete=TRUE) +
   geom_vline(data = sg.p,
              aes(xintercept =  sg.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -436,7 +459,7 @@ sg<-ggplot() +
   labs(y='',
        x=expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ') / Year')),
        title= 'b) Species Gains Effect on Biomass',
-       fill= 'Site Dominated'
+      color= 'Starting Richness'
        #y=expression(paste('N (kg.' ,ha^-1,yr^-1, ')'))
        )+ 
     # geom_text(data = sg.p %>%
@@ -451,6 +474,8 @@ sg<-ggplot() +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         #legend.key = element_blank(),
+        axis.title.x = element_text(size=9),
+        title=element_text(size=9),
         legend.position="bottom"
         )
 
@@ -458,6 +483,8 @@ sg
 
 cde.p <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 colims <- read.csv("~/Dropbox/Projects/NutNet/Data/colims.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+cde.p %>% distinct(site_code, site_rich_range)
 
 cde.p<-left_join(cde.p,colims,by="site_code")
 
@@ -490,12 +517,16 @@ cde.p$grazed<-as.factor(as.character(cde.p$grazed))
 cde.p$managed<-as.factor(as.character(cde.p$managed))
 cde.p$burned<-as.factor(as.character(cde.p$burned))
 cde.p$NDep.cats <- factor(cde.p$NDep.cats , levels=c("30.01-35.91",'25.01-30.00',"20.01-25.00","15.01-20.00","10.01-15.00","5.01-10.00","2.51-5.00","1.00-2.50",'< 1','NA'))
-cde.p$site_rich_range <- factor(cde.p$site_rich_range, levels=c("2-40 species","45-69","70-90","90-119","120-144",">145"))
+cde.p$site_rich_range <- factor(cde.p$site_rich_range, levels=c("2-50 species","51-100","101 - >150"))
 
-levels(cde.p$NDep.cats)
+cde.p %>% distinct(site_code,site_rich_range)
+levels(cde.p$site_rich_range )
 
 View(cde.p)
 #cde.p<-na.omit(cde.p, cols="NDep.cats")
+cde.p<-cde.p %>%  mutate(site_dom = recode(site_dom, 
+                                         'native dominated' = "Native",
+                                         'introduced dominated' = "Introduced"))
 
 cde<-ggplot() +
   geom_rect(data = cde.p %>% distinct(cde.trt_lower_slope, cde.trt_upper_slope),
@@ -506,36 +537,42 @@ cde<-ggplot() +
                           #y = interaction(anthropogenic,site_dom),
                           #y = anthropogenic,
                            #y = grazed , 
-                          y = site_dom,
+                         # y = site_dom,
                           #y = managed ,
                          # y = Realm,
                           #y = bioregion,
                           #y = biome,
                           #y=colimitation,
                           #y=NDep.cats,
-                         # y= site_rich_range,
-                          #y= starting.richness,
+                        # y= site_rich_range,
+                          y= starting.richness,
                           #y = starting.richness
                           #fill=anthropogenic
                           #fill=colimitation
                           #fill = site_rich_range
-                          #fill = starting.richness
-                           fill = site_dom
+                          fill = starting.richness
+                          # fill = site_dom
                            #fill = NDep.cats2
                           #fill=biome
                          # fill= Realm
                       ),
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
-  scale_fill_viridis(name = 'site_dom',
-                        #'starting.richness' ,
-                      #'colimitation',
-                      # 'site_rich_range',
-                      # 'anthropogenic',
-                       #'biome', 
-                       #'NDep.cats2',
-                       # 'Realm',
-                       discrete=TRUE) +
+  scale_fill_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  #' scale_fill_viridis(name = #'site_dom',
+  #'                       #'starting.richness' ,
+  #'                     #'colimitation',
+  #'                      'site_rich_range',
+  #'                     # 'anthropogenic',
+  #'                      #'biome', 
+  #'                      #'NDep.cats2',
+  #'                      # 'Realm',
+  #'                      discrete=TRUE) +
   geom_vline(data = cde.p,
              aes(xintercept = cde.trt_global_slope)) +
   geom_vline(xintercept = 0, lty = 2) +
@@ -546,23 +583,27 @@ cde<-ggplot() +
        #y=expression(paste('N (kg.' ,ha^-1,yr^-1, ')'))
   )+ 
   geom_text(data = cde.p %>%
-              group_by(site_dom) %>%
+              group_by( starting.richness) %>%
               mutate(n_study = n_distinct(site_code)) %>%
               ungroup() %>%
-              distinct(site_dom, n_study, .keep_all = T),
-            aes(x=100, y=site_dom,
+              distinct(starting.richness, n_study, .keep_all = T),
+            aes(x=100, y=starting.richness,
                 label=paste('n[study] == ', n_study)),
             size=3.5,
             nudge_y = 0.1, parse = T) +
-  xlim(-150,150) +
+  #xlim(-150,150) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         legend.key = element_blank(),
+        axis.title.x = element_text(size=9),
+        title=element_text(size=9),
         legend.position="none")
 
 cde
 
 grid_arrange_shared_legend(sl,sg,cde,nrow=1,ncol=3)
+
+
 
 
 get_legend<-function(myggplot){
@@ -573,6 +614,12 @@ get_legend<-function(myggplot){
 }
 
 legend <- get_legend(sg)
+
+
+(sl|sg+ theme(legend.position="none")|cde )/(legend) +
+  plot_layout(heights = c(10,2))
+
+
 # 3. Remove the legend from the plot
 #+++++++++++++++++++++++
 sg <- sg + theme(legend.position="none")

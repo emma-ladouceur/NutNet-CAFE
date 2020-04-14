@@ -24,13 +24,27 @@ par(mfrow=c(1,2))
 hist(comb$rich)
 hist(comb$live_mass)
 
-
-View(cover)
-#THIS ONE
-
 datnn2<- cover %>% group_by(year,site_name,site_code,block,plot,subplot,trt)
+
+# remove NA's in 'Family'
+# this removes litter, rocks, bryophytes with no species name....etc.
 datnn3<-datnn2[complete.cases(datnn2$Family),]
 datnn3$max_cover<-as.numeric(datnn3$max_cover)
+
+# reduce to only relevant functional groups.....
+levels(datnn3$functional_group)
+levels(biomass$category)
+
+cover.r<-datnn3 %>% filter(functional_group %in% c("FERN",'FORB',"GRAMINOID","GRASS","LEGUME","WOODY")) 
+
+biomass.r<-biomass %>%  filter(category %in% c("ANNUAL","FORB","GRAMINOID","LEGUME","LIVE","PERENNIAL","PTERIDOPHYTE","VASCULAR", "WOODY")) 
+
+
+# recalculate live mass....
+
+head(biomass.r)
+datnn_bm<- biomass.r%>% group_by(year,site_name,site_code,block,plot,trt,year_trt) %>% summarise(live.cover=sum(max_cover))
+
 datnn_cover<- datnn3 %>% group_by(year,site_name,site_code,block,plot,trt,year_trt) %>% summarise(live.cover=sum(max_cover))
 View(datnn_cover)
 

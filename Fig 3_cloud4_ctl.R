@@ -64,7 +64,7 @@ nrow(sl.fixed.p2)
 
 sg.fixed.p2 <-sg.fixed.p %>% 
   filter(`b_Intercept` > quantile(sg.fixed.p$`b_Intercept`, probs=0.025),
-         `b_Intercept` < quantile(sg.fixed.p$`b_Intercept`, probs=0.975)) %>%
+         `b_Intercept` < quantile(sg.fixed.p$`b_Intercept`, probs=0.976)) %>%
   mutate(sg.trt.p=`b_Intercept`) %>%
   mutate(response = 'sl',
          sg.trt_global_slope = sg.trt.i_fixef['Intercept','Estimate'],
@@ -516,7 +516,7 @@ ctl.vec.cloud<-ggplot()+
                                      xmin = sgain.ctl_lower_slope, xmax = sgain.ctl_upper_slope),height=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
   labs(x = 'Change in Species in Control Plots',
        y = expression(paste('Change in Biomass (g/' ,m^2, ') in Control Plots')),
-       title= 'a)')
+       title= 'a) Control (Intercept)')
 
 
 ctl.vec.cloud
@@ -610,10 +610,204 @@ trt.vec.cloud<-ggplot()+
                                      xmin = sgain.trt_lower_slope, xmax = sgain.trt_upper_slope),height=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
   labs(x = 'Effect of NPK on Change in Species',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
-       title= 'b)')
+       title= 'b) Treatment Effects')
 
 
 trt.vec.cloud
 
 grid.arrange(ctl.vec.cloud,trt.vec.cloud,nrow=1,ncol=2)
 
+
+
+
+#add
+
+ctl.vec.cloud.add<-ggplot()+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),  plot.margin = margin(0.3, 0.3, 1.5, 0.3, "cm"),)+
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.ctl.p ,
+                   y = 0,
+                   yend = sl.ctl.p  ),
+               colour= "#B40F20",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.p, #loss
+                                  y=  sl.ctl.p  ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl.p,
+                   xend =  sloss.ctl.p+sgain.ctl.p ,
+                   y = sl.ctl.p,
+                   yend = sl.ctl.p+ sg.ctl.p ),
+               colour= "#3B9AB2",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.p+ sgain.ctl.p , #losses
+                                  y=  sl.ctl.p+sg.ctl.p ) ,
+             colour="#3B9AB2",
+             size=0.2,alpha = 0.4)+
+  
+  geom_segment(data = all.effs,
+               aes(x =  sloss.ctl.p+sgain.ctl.p,
+                   xend =  sloss.ctl.p+sgain.ctl.p,
+                   y =  sl.ctl.p+sg.ctl.p,
+                   yend = sl.ctl.p+sg.ctl.p+cde.ctl.p ), 
+               colour= "#35274A",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                              y= sl.ctl.p+sg.ctl.p+cde.ctl.p ),
+             colour="#35274A",size=0.1,alpha = 0.4) +
+  
+  # Fiexed effects section
+  # black thick arrow background so we can see the arrows
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.ctl_global_slope,
+                   y = 0,
+                   yend = sl.ctl_global_slope),
+               colour= "#B40F20",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl_global_slope, #loss
+                                  y=  sl.ctl_global_slope ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sloss.ctl_global_slope,
+                                    ymin = sl.ctl_lower_slope, ymax = sl.ctl_upper_slope),width=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sl.ctl_global_slope,
+                                     xmin = sloss.ctl_lower_slope, xmax = sloss.ctl_upper_slope),height=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl_global_slope,
+                   xend = sloss.ctl_global_slope +  sgain.ctl_global_slope,
+                   y = sl.ctl_global_slope,
+                   yend =  sl.ctl_global_slope+sg.ctl_global_slope),
+               colour= "#3B9AB2",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl_global_slope+sgain.ctl_global_slope, #losses
+                                  y= sl.ctl_global_slope+ sg.ctl_global_slope ) ,
+             colour="#3B9AB2",
+             size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sloss.ctl_global_slope+sgain.ctl_global_slope,
+                                    ymin = sl.ctl_lower_slope+sg.ctl_lower_slope, ymax = sl.ctl_upper_slope+sg.ctl_upper_slope),width=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sl.ctl_global_slope+sg.ctl_global_slope,
+                                     xmin = sloss.ctl_lower_slope+sgain.ctl_lower_slope, xmax = sloss.ctl_upper_slope+sgain.ctl_upper_slope),height=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl_global_slope+sgain.ctl_global_slope,
+                   xend = sloss.ctl_global_slope+sgain.ctl_global_slope,
+                   y = sl.ctl_global_slope+sg.ctl_global_slope,
+                   yend = sl.ctl_global_slope+sg.ctl_global_slope+cde.ctl_global_slope ), 
+               colour= "#35274A",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                                 y=  sloss.ctl_global_slope+sgain.ctl_global_slope+cde.ctl_global_slope),
+             colour="#35274A",size=0.1,alpha = 0.4) +
+  geom_errorbar(data = all.effs,aes(x=sloss.ctl_global_slope+sgain.ctl_global_slope,
+                                    ymin = sl.ctl_lower_slope+sg.ctl_lower_slope+cde.ctl_lower_slope, ymax = sl.ctl_upper_slope+sg.ctl_upper_slope+cde.ctl_upper_slope),width=0,colour = "#35274A", size = 0.55,alpha=0.3) +
+   labs(x = 'Change in Species in Control Plots',
+       y = expression(paste('Change in Biomass (g/' ,m^2, ') in Control Plots')),
+       title= 'c) Control (Intercept) Added')
+
+
+ctl.vec.cloud.add
+
+
+
+#TRT
+
+# cloud with fixed effects, vector style
+trt.vec.cloud.add<-ggplot()+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),  plot.margin = margin(0.3, 0.3, 1.5, 0.3, "cm"),)+
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.trt.p ,
+                   y = 0,
+                   yend = sl.trt.p  ),
+               colour= "#B40F20",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.trt.p, #loss
+                                  y=  sl.trt.p  ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_segment(data = all.effs,
+               aes(x = sloss.trt.p,
+                   xend =sloss.trt.p+ sgain.trt.p ,
+                   y = sl.trt.p,
+                   yend =sl.trt.p+ sg.trt.p ),
+               colour= "#3B9AB2",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x=sloss.trt.p+ sgain.trt.p , #losses
+                                  y= sl.trt.p+sg.trt.p ) ,
+             colour="#3B9AB2",
+             size=0.2,alpha = 0.4)+
+  
+   geom_segment(data = all.effs,
+               aes(x =sloss.trt.p+ sgain.trt.p,
+                   xend = sloss.trt.p+sgain.trt.p,
+                   y = sl.trt.p+sg.trt.p,
+                   yend =sl.trt.p+sg.trt.p+ cde.trt.p ), 
+               colour= "#35274A",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                              y= sl.trt.p+sg.trt.p+cde.trt.p ),
+             colour="#35274A",size=0.1,alpha = 0.4) +
+ 
+  # Fiexed effects section
+  # black thick arrow background so we can see the arrows
+  
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.trt_global_slope,
+                   y = 0,
+                   yend = sl.trt_global_slope),
+               colour= "#B40F20",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.trt_global_slope, #loss
+                                  y=  sl.trt_global_slope ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sloss.trt_global_slope,
+                                    ymin = sl.trt_lower_slope, ymax = sl.trt_upper_slope),width=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sl.trt_global_slope,
+                                     xmin = sloss.trt_lower_slope, xmax = sloss.trt_upper_slope),height=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.trt_global_slope,
+                   xend = sloss.trt_global_slope+  sgain.trt_global_slope,
+                   y = sl.trt_global_slope,
+                   yend =  sl.trt_global_slope+sg.trt_global_slope),
+               colour= "#3B9AB2",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.trt_global_slope+sgain.trt_global_slope, #losses
+                                  y=  sl.trt_global_slope+sg.trt_global_slope ) ,
+             colour="#3B9AB2",
+             size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sloss.trt_global_slope+sgain.trt_global_slope,
+                                    ymin = sl.trt_lower_slope+sg.trt_lower_slope, ymax = sl.trt_upper_slope+sg.trt_upper_slope),width=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sl.trt_global_slope+sg.trt_global_slope,
+                                     xmin = sloss.trt_lower_slope+sgain.trt_lower_slope, xmax = sloss.trt_upper_slope+sgain.trt_upper_slope),height=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.trt_global_slope+sgain.trt_global_slope,
+                   xend = sloss.trt_global_slope+sgain.trt_global_slope,
+                   y = sl.trt_global_slope+sg.trt_global_slope,
+                   yend = sl.trt_global_slope+sg.trt_global_slope+cde.trt_global_slope ), 
+               colour= "#35274A",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                                 y= sl.trt_global_slope+sg.trt_global_slope+ cde.trt_global_slope),
+             colour="#35274A",size=0.1,alpha = 0.4) +
+  geom_errorbar(data = all.effs,aes(x=sloss.trt_global_slope+sgain.trt_global_slope,
+                                    ymin = sl.trt_lower_slope+sg.trt_lower_slope+cde.trt_lower_slope, ymax = sl.trt_upper_slope+sg.trt_upper_slope+cde.trt_upper_slope),width=0,colour = "#35274A", size = 0.55,alpha=0.3) +
+  labs(x = 'Effect of NPK on Change in Species',
+       y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
+       title= 'd) Treatment Effects Added')
+
+
+trt.vec.cloud.add
+
+grid.arrange(ctl.vec.cloud,trt.vec.cloud,ctl.vec.cloud.add,trt.vec.cloud.add,nrow=2,ncol=2)

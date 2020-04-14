@@ -201,7 +201,7 @@ plot13$Experiment.Length2 <- factor(plot13$Experiment.Length2 , levels=c("1-3 ye
 # FIGURE 1
 # BIOMASS RICHNESS DIRECTIONAL ARROWS / VARIATION
 ggplot() +
-  facet_wrap(~Experiment.Length2, scales="free")+
+  #facet_wrap(~Experiment.Length2, scales="free")+
   geom_point(data=plot13,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data=plot13,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
   #geom_point(size=1.5, fill="white", shape=2)+

@@ -52,7 +52,7 @@ rich.f <-bind_rows(
 )
 
 
-rich.f$Model <- "Species Richness"
+rich.f$Model <- "i) Species Richness"
 rich.f
 
 bm.f <-bind_rows(
@@ -70,7 +70,7 @@ bm.f <-bind_rows(
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
-bm.f$Model <- "Biomass"
+bm.f$Model <- "ii) Biomass"
 
 sl.f <-bind_rows(
   sl.trt.i_fixef['trt.yNPK',] %>% 
@@ -88,7 +88,7 @@ sl.f <-bind_rows(
 )
 
 
-sl.f$Model <- "Species Loss Effect on Biomass"
+sl.f$Model <- "v) Species Loss Effect on Biomass"
 
 sg.f <-bind_rows(
   sg.trt.i_fixef['trt.yNPK',] %>% 
@@ -105,7 +105,7 @@ sg.f <-bind_rows(
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
-sg.f$Model <- "Species Gain Effect on Biomass"
+sg.f$Model <- "vi) Species Gain Effect on Biomass"
 cde.f <-bind_rows(
   CDE.trt.i_fixef['trt.yNPK',] %>% 
     mutate(response='Treatment Effect',
@@ -121,7 +121,7 @@ cde.f <-bind_rows(
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
-cde.f$Model <- "Persistent Species Change in Biomass"
+cde.f$Model <- "vii) Persistent Species Change in Biomass"
 sloss.f <-bind_rows(
   sloss.trt.i_fixef['trt.yNPK',] %>% 
     mutate(response='Treatment Effect',
@@ -137,7 +137,7 @@ sloss.f <-bind_rows(
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
-sloss.f$Model <- "Species Loss"
+sloss.f$Model <- "iii) Species Loss"
 
 sgain.f <-bind_rows(
   sgain.trt.i_fixef['trt.yNPK',] %>% 
@@ -154,7 +154,7 @@ sgain.f <-bind_rows(
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
-sgain.f$Model <- "Species Gain"
+sgain.f$Model <- "iv) Species Gain"
 
 r.bm.effs<-bind_rows(rich.f,bm.f)
 
@@ -174,7 +174,7 @@ bm.effs
 # persistent "#35274A"
 
 
-r.bm.effs$Model<- factor(  r.bm.effs$Model , levels=c("Species Richness","Biomass"))
+r.bm.effs$Model<- factor(  r.bm.effs$Model , levels=c("i) Species Richness","ii) Biomass"))
 
 rich.bm.eff<-ggplot() + 
   geom_point(data =r.bm.effs, aes(x = response, y = eff, color=Model),size = 2) +
@@ -201,7 +201,7 @@ rich.bm.eff<-ggplot() +
 rich.bm.eff
 
 
-sp.effs$Model<- factor( sp.effs$Model , levels=c("Species Loss","Species Gain"))
+sp.effs$Model<- factor( sp.effs$Model , levels=c("iii) Species Loss","iv) Species Gain"))
 
 sp.eff<-ggplot() + 
   geom_point(data =sp.effs, aes(x = response, y = eff, color=Model),size = 2) +
@@ -217,7 +217,7 @@ sp.eff<-ggplot() +
       ) +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-1.2,0.2) +
-  scale_color_manual(values = c("#B40F20","#3B9AB2")) +
+  scale_color_manual(values = c("#B40F20","#046C9A")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),
@@ -230,7 +230,7 @@ sp.eff
 
 bm.effs$Model<-as.factor(as.character(bm.effs$Model))
 levels(bm.effs$Model)
-bm.effs$Model<- factor( bm.effs$Model , levels=c("Species Loss Effect on Biomass","Species Gain Effect on Biomass","Persistent Species Change in Biomass"))
+bm.effs$Model<- factor( bm.effs$Model , levels=c("v) Species Loss Effect on Biomass","vi) Species Gain Effect on Biomass","vii) Persistent Species Change in Biomass"))
 
 bm.eff<-ggplot() + 
   geom_point(data =bm.effs, aes(x = response, y = eff, color=Model),size = 2) +
@@ -246,7 +246,7 @@ bm.eff<-ggplot() +
        ) +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-1.2,0.2) +
-  scale_color_manual(values = c("#B40F20","#3B9AB2","#35274A")) +
+  scale_color_manual(values = c("#B40F20","#046C9A","#816687")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),

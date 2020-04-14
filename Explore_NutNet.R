@@ -129,70 +129,115 @@ s.loss<-ggplot(price, aes(x=trt.y, y=s.loss, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=trt.y)) +
-  labs(title= 'c) Species Loss') +
+  geom_point(aes(color=trt.y), alpha=0.1,size = .7, position = position_jitter(width = 0.2))+
+  labs(title= 'c) Species Loss',
+       y = 'Species Loss',
+       x="",color="Treatment"
+       ) +
   ylim(-10,2)+
   scale_color_manual(values = c("#00AFBB","#E7B800"))+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",  plot.title = element_text(size=12)) 
 s.loss
 
 s.gain<-ggplot(price, aes(x=trt.y, y=s.gain, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=trt.y)) +
-  labs(title= 'd) Species Gains') +
+  geom_point(aes(color=trt.y), alpha=0.1,size = .7, position = position_jitter(width = 0.2))+
+  labs(title= 'd) Species Gains',
+       y = 'Species Gains',
+       x="",color="Treatment") +
   ylim(-2,10)+
   scale_color_manual(values = c("#00AFBB","#E7B800"))+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",  plot.title = element_text(size=12)) 
 s.gain
 
 SL<-ggplot(price, aes(x=trt.y, y=SL, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=trt.y)) +
-  labs(title= 'e) EF : Species Loss') +
+  geom_point(aes(color=trt.y), alpha=0.1,size = .7, position = position_jitter(width = 0.2))+
+  labs(title= 'e) Effect of Species Loss on Biomass',
+       y = expression(paste('Biomass Change (g/',m^2, ')')),
+       x="",color="Treatment") +
   ylim(-300,10)+
   scale_color_manual(values = c("#00AFBB","#E7B800"))+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",   plot.title = element_text(size=12)) 
 SL
+
 SG<-ggplot(price, aes(x=trt.y, y=SG, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=trt.y)) +
-  labs( title= 'f) EF: Species Gains') +
+  geom_point(aes(color=trt.y), alpha=0.1,size = .7, position = position_jitter(width = 0.2))+
+  labs( title= 'f) Effect of Species Gains on Biomass',
+        y = expression(paste('Biomass Change (g/',m^2, ')')),
+        x="",color="Treatment") +
   ylim(-10,300)+
   scale_color_manual(values = c("#00AFBB","#E7B800"))+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="bottom",  plot.title = element_text(size=12)) 
 SG
 CDE<-ggplot(price, aes(x=trt.y, y=CDE, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=trt.y)) +
-  labs( title= 'g) Context Dependent Effect') +
+  geom_point(aes(color=trt.y), alpha=0.1,size = .7, position = position_jitter(width = 0.2))+
+  labs( title= 'g) Persistent Species Change in Biomass',
+        y = expression(paste('Biomass Change (g/',m^2, ')')),
+        x="",color="Treatment") +
   ylim(-300,1000)+
   scale_color_manual(values = c("#00AFBB","#E7B800"))+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",   plot.title = element_text(size=12)) 
 CDE
 
 rich<-ggplot(price, aes(x=trt.y, y=y.rich, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=trt.y)) +
-  labs(title= 'a) Richness') +
+  geom_point(aes(color=trt.y), alpha=0.1,size = .7, position = position_jitter(width = 0.2))+
+  labs(title= 'a) Species Richness',
+       y='Species Richness', x='',color="Treatment") +
   ylim(0,40)+
   scale_color_manual(values = c("#00AFBB","#E7B800"))+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none", plot.title = element_text(size=12)) 
 rich
 bm<-ggplot(price, aes(x=trt.y, y=y.func, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=trt.y)) +
-  labs( title= 'b) Live Biomass') +
+  geom_point(aes(color=trt.y), alpha=0.1,size = .7, position = position_jitter(width = 0.2))+
+  labs( title= 'b) Live Biomass',
+        y = expression(paste('Biomass (g/',m^2, ')')),
+        x="",color="Treatment") +
   ylim(0,2000)+
   scale_color_manual(values = c("#00AFBB","#E7B800"))+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",     plot.title = element_text(size=12)) 
 bm
 
 grid_arrange_shared_legend(rich,bm,s.loss,s.gain,SL,SG,CDE,nrow=3,ncol=3)
+
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+rlegend<-g_legend(SG)
+
+
+
+# patchwork solution
+library(patchwork)
+
+(rich | bm)/(s.loss|s.gain)/(SL|SG+ theme(legend.position="none")|CDE )/(rlegend) +
+  plot_layout(heights = c(10, 10,10,3.5))
 
 
 #raw plots across years for npk only
@@ -200,79 +245,100 @@ dat2$f.year_trt<-as.factor(as.character(dat2$year.y))
 levels(dat2$f.year_trt)
 dat2$f.year_trt <- factor(dat2$f.year_trt, levels = c("0","1","2","3","4","5","6","7","8","9","10","11"))
 
+
+View(dat2)
 rich<-ggplot(dat2, aes(x=f.year_trt, y=y.rich, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=f.year_trt)) +
-  labs(title= 'a) Richness') +
+  labs(title= 'a) Richness',
+       y = 'Species Richness',
+       x="",color="Year") +
   ylim(0,40)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",     plot.title = element_text(size=12)) 
+
 
 bm<-ggplot(dat2, aes(x=f.year_trt, y=y.func, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=f.year_trt)) +
-  labs( title= 'b) Live Biomass') +
+  labs( title= 'b) Biomass',
+        y = expression(paste('Biomass (g/',m^2, ')')),
+        x="",color="Year") +
   ylim(0,2000)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",     plot.title = element_text(size=12)) 
 
 
 s.loss<-ggplot(dat2, aes(x=f.year_trt, y=s.loss, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=f.year_trt)) +
-  labs( title= 'c) Species Loss') +
+  labs( title= 'c) Species Loss',
+        y = 'Species Loss',
+        x="",color="Year") +
   ylim(-10,2)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",     plot.title = element_text(size=12)) 
 s.loss
 
 s.gain<-ggplot(dat2, aes(x=f.year_trt, y=s.gain, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=f.year_trt)) +
-  labs( title= 'd) Species Gains') +
+  labs( title= 'd) Species Gains',
+        y = 'Species Gain',
+        x="",color="Year") +
   ylim(-2,10)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",     plot.title = element_text(size=12)) 
 
 SL<-ggplot(dat2, aes(x=f.year_trt, y=SL, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=f.year_trt)) +
-  labs(title= 'e) EF : Species Loss') +
+  labs(title= 'e) Effect of Species Loss on Biomass',
+       y = expression(paste('Biomass Change (g/',m^2, ')')),
+       x="",color="Year") +
   ylim(-300,10)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",     plot.title = element_text(size=12)) 
 
 SG<-ggplot(dat2, aes(x=f.year_trt, y=SG, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=f.year_trt)) +
-  labs(title= 'f) EF: Species Gains') +
+  labs(title= 'f) Effect of Species Gains on Biomass',
+       y = expression(paste('Biomass Change (g/',m^2, ')')),
+       x="",color="Year") +
   ylim(-10,300)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="bottom",     plot.title = element_text(size=12)) 
 
-c.rich<-ggplot(dat2, aes(x=f.year_trt, y=c.rich, variable)) +
-  stat_summary(fun.y=mean, geom="point", 
-               size=0.2)+
-  geom_boxplot(aes(color=f.year_trt)) +
-  labs(title= 'g) Persistent Species') +
-  # ylim(-300,1000)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
 
 CDE<-ggplot(dat2, aes(x=f.year_trt, y=CDE, variable)) +
   stat_summary(fun.y=mean, geom="point", 
                size=0.2)+
   geom_boxplot(aes(color=f.year_trt)) +
-  labs( title= 'g) Biomass Change in Persistent Species') +
+  labs( title= 'g) Biomass Change in Persistent Species',
+        y = expression(paste('Biomass Change (g/',m^2, ')')),
+        x="",color="Year") +
   ylim(-300,1000)+
-  theme_bw() + theme(axis.text.x=element_blank()) 
-
-
-grid_arrange_shared_legend(rich,bm,nrow=1,ncol=2)
-
-grid_arrange_shared_legend(s.loss,s.gain,SL,SG,CDE,nrow=2,ncol=3)
-
-grid_arrange_shared_legend(rich,bm,s.loss,s.gain,SL,SG,CDE,nrow=3,ncol=3)
+  theme_bw() + theme(axis.text.x=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="none",     plot.title = element_text(size=12)) 
 
 
 
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+rlegend<-g_legend(SG)
+
+
+(rich | bm)/(s.loss|s.gain)/(SL|SG+ theme(legend.position="none")|CDE )/(rlegend) +
+  plot_layout(heights = c(10, 10,10,3.5))
 

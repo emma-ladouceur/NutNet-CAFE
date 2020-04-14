@@ -713,6 +713,9 @@ load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 
 
+summary(s.gain.s)
+
+
 
 
 sgain.trt_fitted <- cbind(s.gain.s$data,

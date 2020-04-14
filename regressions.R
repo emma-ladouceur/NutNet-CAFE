@@ -33,8 +33,8 @@ plot.rich_fitted.npk
 plot.rich_fitted.npk$starting.richness <- factor(plot.rich_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
-plot.rich_fitted.npk$Model<-"Species Richness"
-plot.rich_fitted.ctl$Model<-"Species Richness"
+plot.rich_fitted.npk$Model<-"i) Species Richness"
+plot.rich_fitted.ctl$Model<-"i) Species Richness"
 plot.rich_fitted.npk <- plot.rich_fitted.npk %>% rename(Treatment = trt) 
 plot.rich_fitted.ctl <- plot.rich_fitted.ctl %>% rename(Treatment = trt) 
 fitted.rich<-bind_rows(plot.rich_fitted.npk,plot.rich_fitted.ctl)
@@ -73,21 +73,21 @@ r1<-ggplot() +
                    group = site_code,
                    colour = starting.richness),
                size = .7) +
-  # uncertainy in fixed effect
-  # geom_ribbon(data = plot.rich_fitted.npk,
-  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-  #             alpha = 0.5) +
-  # # fixed effect
-  # geom_line(data = fitted.rich,
-  #           aes(x = year_trt, y = Estimate, linetype= Treatment),
-  #           size = 1.5) +
-  # geom_ribbon(data = plot.rich_fitted.ctl,
-  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-  #             alpha = 0.5) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,10)) +
+ # uncertainy in fixed effect
+  geom_ribbon(data = plot.rich_fitted.npk,
+              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  # fixed effect
+  geom_line(data = fitted.rich,
+            aes(x = year_trt, y = Estimate, linetype= Treatment),
+            size = 1.5) +
+  geom_ribbon(data = plot.rich_fitted.ctl,
+              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,10,11)) +
   labs(x='',
-    x = 'Years',
-       y = 'Species richness', title= 'a)  ', color= 'Starting Richness') +
+    #x = 'Years',
+       y = ' Species richness', title= 'a)  ', color= ' Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -107,8 +107,8 @@ r1
 plot.bm_fitted.npk$starting.richness <- factor(plot.bm_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 plot.bm_coef3$starting.richness <- factor(plot.bm_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
-plot.bm_fitted.npk$Model<-"Biomass"
-plot.bm_fitted.ctl$Model<-"Biomass"
+plot.bm_fitted.npk$Model<-"ii) Biomass"
+plot.bm_fitted.ctl$Model<-"ii) Biomass"
 plot.bm_fitted.npk <- plot.bm_fitted.npk %>% rename(Treatment = trt) 
 plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% rename(Treatment = trt) 
 fitted.bm<-bind_rows(plot.bm_fitted.npk,plot.bm_fitted.ctl)
@@ -193,8 +193,8 @@ sgain.trt_coef3$starting.richness <- factor(sgain.trt_coef3$starting.richness , 
 
 sgain.trt_coef3$xs<-1
 
-sgain.trt_fitted.npk$Model<-"Species Gain"
-sgain.trt_fitted.ctl$Model<-"Species Gain"
+sgain.trt_fitted.npk$Model<-"iv) Species Gain"
+sgain.trt_fitted.ctl$Model<-"iv) Species Gain"
 sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sgain<-bind_rows(sgain.trt_fitted.npk,sgain.trt_fitted.ctl)
@@ -232,7 +232,7 @@ sgain.trtm<-ggplot()  +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   ylim(0,20) +
   labs(x='',
-    #x = 'Years',
+   # x = 'Years',
        y = expression(paste('Species Gain')), title= '', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
@@ -260,8 +260,8 @@ sloss.trt_coef3$starting.richness <- factor(sloss.trt_coef3$starting.richness , 
 
 sloss.trt_coef3$xs<-1
 
-sloss.trt_fitted.npk$Model<-"Species Loss"
-sloss.trt_fitted.ctl$Model<-"Species Loss"
+sloss.trt_fitted.npk$Model<-"iii) Species Loss"
+sloss.trt_fitted.ctl$Model<-"iii) Species Loss"
 sloss.trt_fitted.npk <- sloss.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sloss.trt_fitted.ctl <- sloss.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sloss<-bind_rows(sloss.trt_fitted.npk,sloss.trt_fitted.ctl)
@@ -300,7 +300,7 @@ sloss.trtm<-ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,11)) +
   ylim(-20,0) +
   labs(x='',
-    #x = 'Years',
+   # x = 'Years',
        y = expression(paste('Species Loss')), title= '', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
@@ -314,6 +314,9 @@ sloss.trtm<-ggplot() +
 
 
 sloss.trtm
+
+grid.arrange(sloss.trtm,sgain.trtm,nrow=1,ncol=2)
+
 
 
 # BIOMASS PARTITIONS
@@ -338,8 +341,8 @@ sl.trt_coef3$starting.richness <- factor(sl.trt_coef3$starting.richness , levels
 
 sl.trt_coef3$xs<-1
 
-sl.trt_fitted.npk$Model<-"Effect of Species Loss on Biomass"
-sl.trt_fitted.ctl$Model<-"Effect of Species Loss on Biomass"
+sl.trt_fitted.npk$Model<-"v) Effect of Species Loss on Biomass"
+sl.trt_fitted.ctl$Model<-"v) Effect of Species Loss on Biomass"
 sl.trt_fitted.npk <- sl.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sl<-bind_rows(sl.trt_fitted.npk,sl.trt_fitted.ctl)
@@ -403,8 +406,8 @@ sg.trt_coef3$starting.richness <- factor(sg.trt_coef3$starting.richness , levels
 
 sg.trt_coef3$xs<-1
 
-sg.trt_fitted.npk$Model<-"Effect of Species Gain on Biomass"
-sg.trt_fitted.ctl$Model<-"Effect of Species Gain on Biomass"
+sg.trt_fitted.npk$Model<-"vi) Effect of Species Gain on Biomass"
+sg.trt_fitted.ctl$Model<-"vi) Effect of Species Gain on Biomass"
 sg.trt_fitted.npk <- sg.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sg.trt_fitted.ctl <- sg.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sg<-bind_rows(sg.trt_fitted.npk,sg.trt_fitted.ctl)
@@ -476,8 +479,8 @@ cde_fitted.ctl
 
 cde_coef3$xs<-1
 
-cde_fitted.npk$Model<-"Persistent Species Change in Biomass"
-cde_fitted.ctl$Model<-"Persistent Species Change in Biomass"
+cde_fitted.npk$Model<-"vii) Persistent Species Change in Biomass"
+cde_fitted.ctl$Model<-"vii) Persistent Species Change in Biomass"
 cde_fitted.npk <- cde_fitted.npk %>% rename(Treatment = trt.y) 
 cde_fitted.ctl <- cde_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
@@ -565,6 +568,8 @@ library(patchwork)
 (r1 | b1)/(sloss.trtm|sgain.trtm)/(sl.trtm|sg.trtm+ theme(legend.position="none")|cdem )/(rlegend) +
   plot_layout(heights = c(10, 10,10,3.5))
 
+(sl.trtm|sg.trtm+ theme(legend.position="none")|cdem )/(rlegend) +
+  plot_layout(heights = c(10,3.5))
 
 grid.arrange(sp.trt,sp.slope,bm.trt,bm.slope,nrow=2,ncol=2)
 
