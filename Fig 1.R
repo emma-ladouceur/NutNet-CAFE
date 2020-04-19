@@ -233,7 +233,7 @@ library(ggrepel)
 
 ggplot() +
   facet_wrap(~maxyr, scales="free")+
-  geom_text_repel(data=plot13, aes(x=rich.end, y=mass.end,  label = site_code), size=3 ) +
+  #geom_text_repel(data=plot13, aes(x=rich.end, y=mass.end,  label = site_code), size=3 ) +
   geom_point(data=plot13,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data=plot13,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
   #geom_point(size=1.5, fill="white", shape=2)+

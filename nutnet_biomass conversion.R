@@ -35,11 +35,18 @@ datnn3$max_cover<-as.numeric(datnn3$max_cover)
 levels(datnn3$functional_group)
 levels(biomass$category)
 
-cover.r<-datnn3 %>% filter(functional_group %in% c("FERN",'FORB',"GRAMINOID","GRASS","LEGUME","WOODY")) 
+#filter?
+#cover.r<-datnn3 %>% filter(functional_group %in% c("FERN",'FORB',"GRAMINOID","GRASS","LEGUME","WOODY")) 
 
-biomass.r<-biomass %>%  filter(category %in% c("ANNUAL","FORB","GRAMINOID","LEGUME","LIVE","PERENNIAL","PTERIDOPHYTE","VASCULAR", "WOODY")) 
+#biomass.r<-biomass %>%  filter(category %in% c("ANNUAL","FORB","GRAMINOID","LEGUME","LIVE","PERENNIAL","PTERIDOPHYTE","VASCULAR", "WOODY")) 
 
+head(biomass)
 
+head(datnn3)
+
+# or... just match
+
+cov.bm<- 
 # recalculate live mass....
 
 head(biomass.r)
