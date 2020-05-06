@@ -114,7 +114,7 @@ n <- data.c %>%
   geom_label_repel(
     aes(x=longitude, y=latitude, label = site_code),family = 'Times',
     segment.size = 0.5, segment.alpha = 0.5,
-    size = 3, 
+    size = 2,
     box.padding = 0.1, point.padding = 0.3, fill = NA,
     segment.color = 'grey50') +
   scale_color_viridis(discrete=FALSE,name="Length of Study") +

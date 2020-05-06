@@ -61,7 +61,7 @@ sg.fixed.p2 <-sg.fixed.p %>%
   filter(`b_trt.yNPK:year.y.m` > quantile(sg.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.025),
          `b_trt.yNPK:year.y.m` < quantile(sg.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.975)) %>%
   mutate(sg.trt.p=`b_trt.yNPK:year.y.m`) %>%
-  mutate(response = 'sl',
+  mutate(response = 'sg',
          sg.trt_global_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
          sg.trt_upper_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sg.trt_lower_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
@@ -73,7 +73,7 @@ cde.fixed.p2 <-CDE.fixed.p %>%
   filter(`b_trt.yNPK:year.y.m` > quantile(CDE.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.025),
          `b_trt.yNPK:year.y.m` < quantile(CDE.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.975)) %>%
   mutate(cde.trt.p=`b_trt.yNPK:year.y.m`) %>%
-  mutate(response = 'sl',
+  mutate(response = 'cde',
          cde.trt_global_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
          cde.trt_upper_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          cde.trt_lower_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
@@ -82,10 +82,10 @@ cde.fixed.p2 <-CDE.fixed.p %>%
 nrow(cde.fixed.p2)
 
 sloss.fixed.p2 <-sloss.fixed.p %>% 
-  filter(`b_trt.yNPK:year.y.m` > quantile(sloss.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.025),
-         `b_trt.yNPK:year.y.m` < quantile(sloss.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.975)) %>%
+  filter(`b_trt.yNPK:year.y.m` > quantile(sloss.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.027),
+         `b_trt.yNPK:year.y.m` < quantile(sloss.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.977)) %>%
   mutate(sloss.trt.p=`b_trt.yNPK:year.y.m`) %>%
-  mutate(response = 'sl',
+  mutate(response = 'sloss',
          sloss.trt_global_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
          sloss.trt_upper_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sloss.trt_lower_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],)  %>%
@@ -97,7 +97,7 @@ sgain.fixed.p2 <-sgain.fixed.p %>%
   filter(`b_trt.yNPK:year.y.m` > quantile(sgain.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.025),
          `b_trt.yNPK:year.y.m` < quantile(sgain.fixed.p$`b_trt.yNPK:year.y.m`, probs=0.975)) %>%
   mutate(sgain.trt.p=`b_trt.yNPK:year.y.m`) %>%
-  mutate(response = 'sl',
+  mutate(response = 'sgain',
          sgain.trt_global_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Estimate'],
          sgain.trt_upper_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sgain.trt_lower_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
@@ -211,7 +211,7 @@ price.cloud<-ggplot()+
   ylim(-11,30) +
   labs(x = 'Effect of NPK on Species / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'a) Current Figure 3')
+       title= 'b) Price Partitions ')
 
 price.cloud
 
@@ -294,64 +294,75 @@ bef.cloud<-ggplot()+
   geom_errorbarh(data = r.bm.effs,aes(y=bm.trt_global_slope,
                                      xmin = rich.trt_lower_slope, xmax = rich.trt_upper_slope),height=0,colour = "#0B775E", size = 0.55,alpha=0.3) +
   ylim(-11,30) +
-  labs(x = 'Effect of NPK on Species / Year',
+  labs(x = 'Effect of NPK on Species Richness / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'a)')
+       title= 'a) Richness & Biomass')
 
 bef.cloud
 
-grid.arrange(bef.cloud,price.cloud,price.cloud.add,nrow=1,ncol=3)
+grid.arrange(bef.cloud,price.cloud,nrow=1,ncol=2)
 
 
 # price cloud with community effects addition
 
+
+# calculate variance and covariance
+
+# substract variance and covariance from previous CI X 2
+# so,
+# substract variance and covariance of species gains from species loss
+# subtract variance and covariance of cde from species gains
+
+
+
+
 price.cloud.add<-ggplot()+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-geom_segment(data = all.effs,
-             aes(x = 0,
-                 xend = sloss.trt.p ,
-                 y = 0,
-                 yend = sl.trt.p  ),
-             colour= "#B40F20",
-             size = 0.2,  alpha = 0.4,
-             arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-geom_point(data = all.effs, aes(x= sloss.trt.p, #loss
-                                y=  sl.trt.p  ),
-           colour="#B40F20",size=0.2,alpha = 0.4)+
-geom_segment(data = all.effs,
-             aes(x = sloss.trt.p,
-                 xend = sloss.trt.p+sgain.trt.p ,
-                 y = sl.trt.p,
-                 yend = sl.trt.p+sg.trt.p ),
-             colour= "#046C9A",
-             size = 0.2,  alpha = 0.4,
-             arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-geom_point(data = all.effs, aes(x= sloss.trt.p+sgain.trt.p , #losses
-                                y= sl.trt.p+sg.trt.p ) ,
-           colour="#046C9A",
-           size=0.2,alpha = 0.4)+
-geom_segment(data = all.effs,
-             aes(x = sloss.trt.p+sgain.trt.p,
-                 xend = sloss.trt.p+sgain.trt.p,
-                 y = sl.trt.p+sg.trt.p,
-                 yend =sl.trt.p+sg.trt.p+ cde.trt.p ),
-             colour= "#816687",
-             size = 0.2,  alpha = 0.4,
-             arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-geom_point(data = all.effs,aes(x=0, #persistent
-                            y= sl.trt.p+sg.trt.p+cde.trt.p ),
-           colour="#816687",size=0.1,alpha = 0.4) +
- 
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.trt.p ,
+                   y = 0,
+                   yend = sl.trt.p  ),
+               colour= "#B40F20",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.trt.p, #loss
+                                  y=  sl.trt.p  ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_segment(data = all.effs,
+               aes(x = sloss.trt.p,
+                   xend = sloss.trt.p+sgain.trt.p ,
+                   y = sl.trt.p,
+                   yend = sl.trt.p+sg.trt.p ),
+               colour= "#046C9A",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.trt.p+sgain.trt.p , #losses
+                                  y= sl.trt.p+sg.trt.p ) ,
+             colour="#046C9A",
+             size=0.2,alpha = 0.4)+
+  geom_segment(data = all.effs,
+               aes(x = sloss.trt.p+sgain.trt.p,
+                   xend = sloss.trt.p+sgain.trt.p,
+                   y = sl.trt.p+sg.trt.p,
+                   yend =sl.trt.p+sg.trt.p+ cde.trt.p ),
+               colour= "#816687",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                                 y= sl.trt.p+sg.trt.p+cde.trt.p ),
+             colour="#816687",size=0.1,alpha = 0.4) +
+  
   # Fiexed effects section
   # black thick arrow background so we can see the arrows
-geom_segment(data = all.effs,
-             aes(x = 0,
-                 xend = sloss.trt_global_slope,
-                 y = 0,
-                 yend = sl.trt_global_slope),
-             colour= "#B40F20",
-             size = 1.5,
-             arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.trt_global_slope,
+                   y = 0,
+                   yend = sl.trt_global_slope),
+               colour= "#B40F20",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_point(data = all.effs, aes(x= sloss.trt_global_slope, #loss
                                   y=  sl.trt_global_slope ),
              colour="#B40F20",size=0.2,alpha = 0.4)+
@@ -367,14 +378,19 @@ geom_segment(data = all.effs,
                colour= "#046C9A",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.trt_global_slope +sgain.trt_global_slope, #losses
-                                  y=  sl.trt_global_slope+sg.trt_global_slope ) ,
-             colour="#046C9A",
-             size=0.2,alpha = 0.4)+
-  geom_errorbar(data = all.effs,aes(x=sloss.trt_global_slope+sgain.trt_global_slope,
-                                    ymin = sl.trt_lower_slope+sg.trt_lower_slope, ymax = sl.trt_upper_slope+sg.trt_upper_slope),width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
+  geom_point(data = all.effs, aes(x=  (sloss.trt_global_slope + sgain.trt_global_slope)  , #losses
+                                  y=  (sl.trt_global_slope+sg.trt_global_slope) ,
+  ) ,
+  colour="#046C9A",
+  size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs, aes(x= sloss.trt_global_slope+sgain.trt_global_slope,
+                                     ymin =  (sl.trt_lower_slope+sg.trt_lower_slope) , 
+                                     ymax = (sl.trt_upper_slope+sg.trt_upper_slope)),
+                width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
   geom_errorbarh(data = all.effs,aes(y=sl.trt_global_slope+sg.trt_global_slope,
-                                     xmin = sloss.trt_lower_slope+sgain.trt_lower_slope, xmax = sloss.trt_upper_slope+sgain.trt_upper_slope),height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
+                                     xmin =  (sloss.trt_lower_slope+sgain.trt_lower_slope)  ,
+                                     xmax =  (sloss.trt_upper_slope+sgain.trt_upper_slope) ) ,
+                 height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
   geom_segment(data = all.effs,
                aes(x = sloss.trt_global_slope+sgain.trt_global_slope,
                    xend = sloss.trt_global_slope+sgain.trt_global_slope,
@@ -388,12 +404,11 @@ geom_segment(data = all.effs,
              colour="#816687",size=0.1,alpha = 0.4) +
   geom_errorbar(data = all.effs,aes(x=sloss.trt_global_slope+sgain.trt_global_slope,
                                     ymin = sl.trt_lower_slope+sg.trt_lower_slope+cde.trt_lower_slope, ymax = sl.trt_upper_slope+sg.trt_upper_slope+cde.trt_upper_slope),width=0,colour = "#816687", size = 0.55,alpha=0.3) +
-   
+  
   ylim(-11,30) +
   labs(x = 'Effect of NPK on Species / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
        title= 'b) Effects Added')
-
 
 price.cloud.add
 
