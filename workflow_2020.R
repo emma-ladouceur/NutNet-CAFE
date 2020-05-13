@@ -66,8 +66,12 @@ dat_bm <- biomass3 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplo
 # sites that measured total
 biomass.total   <- dat_bm %>% select(id,site_code,year,year_trt,trt,block,plot,subplot,category,mass) %>%
   filter(category %in% c("TOTAL","VASCULAR", "LIVE")) %>% droplevels() %>%
-  rename(plot.mass=mass,
+  rename(orig.bm.cat=category,
          subplot.bm=subplot)
+
+biomass.total$plot.mass<-biomass.total$mass
+
+View(biomass.total)
 # sites that seperated biomass - remove the totals
 sep_dat <- dat_bm %>% filter(!category %in% c("TOTAL","VASCULAR", "LIVE")) %>% droplevels()
 
@@ -88,8 +92,9 @@ total.dat$biomass.sp.plot <- total.dat$biomass.sp.full
 total.dat$biomass.m.full <- "total"
 
 
-total.dat2<-total.dat %>% distinct(id,Taxon,biomass.sp.full, .keep_all=T)
+total.dat2<-total.dat %>% distinct(id,Taxon,mass,orig.bm.cat,biomass.sp.full, .keep_all=T)
 
+View(total.dat2)
 # any duplicates? 
 dup.summary.total <- total.dat2 %>% group_by(id, Taxon,biomass.sp.full, biomass.m.full) %>% filter(n()>1) %>% summarize(n=n()) %>%
   select(id,Taxon, biomass.sp.full, biomass.m.full,n)
@@ -101,11 +106,13 @@ head(dup.summary.total)
 # 2. studies using annual & perennial categories (only one - shps.us)
 ap.bm<-sep_dat %>% filter(category %in% c("ANNUAL", "PERENNIAL") ) %>% droplevels() %>%
   select(id, site_code, year, year_trt, trt, block, plot,subplot,category,mass) %>%
-  rename(cat.mass=mass,
+  rename(
          subplot.bm=subplot)
 
-
+ap.bm$cat.mass<-ap.bm$mass
+ap.bm$orig.bm.cat<-ap.bm$category
 dat_cover$category <- dat_cover$local_lifespan
+
 
 ap.cov<-dat_cover %>% filter(site_code=="shps.us" ) %>% droplevels() %>% # look at onyl site in question
   select(id, site_code, year, year_trt, trt, block, plot,subplot.cov,local_lifespan,category,Taxon,max_cover) %>%
@@ -125,7 +132,7 @@ ap.dat2 <- ap.dat %>% group_by(id,site_code,year,year_trt,trt,block,plot,categor
 ap.dat3 <- ap.dat2 %>% group_by(id,site_code,year,year_trt,trt,block,plot) %>%
   summarise(plot.cover=sum(cat.cover), # sum plant cover by plot
             plot.mass=sum(cat.mass)) %>% # sum biomass by plot
-  left_join(ap.dat2)
+  left_join(ap.dat2) %>% ungroup()
 
 # calculate per species biomass by sorted category
 ap.dat3$biomass.sp.cat <- ap.dat3$max_cover/ap.dat3$cat.cover * ap.dat3$cat.mass
@@ -137,10 +144,12 @@ ap.dat3$biomass.sp.full <- ap.dat3$biomass.sp.cat
 ap.dat3$biomass.m.full <- "ap category"
 
 
-# CALCULATE BIOMASS BY STANDAD BIOMASS CATEGORY
+View(ap.dat3)
+
+# CALCULATE BIOMASS BY STANDARD BIOMASS CATEGORY
 # prepcover data
 # remove previous site from last step
-dat_cover2<-dat_cover %>% filter(!site_code=="shps.us" ) %>% droplevels() 
+dat_cover2<-dat_cover %>%  ungroup() %>% filter(!site_code=="shps.us" ) %>% droplevels() 
 
 # put grass into graminoid catgory to match biomass categories
 dat_cover3<-dat_cover2 %>% mutate( category.mod = fct_recode(functional_group, c("GRAMINOID"="GRASS"))) %>% 
@@ -158,9 +167,10 @@ head(bnch, n=20) # yep all good
 # prep biomass data
 # remove categories from last step
 # this takes a minute - be patient - probably quicker in baser?
-sep_dat2<-sep_dat %>% filter(!category %in% c("ANNUAL", "PERENNIAL") ) %>% droplevels() 
+sep_dat2<-sep_dat %>% ungroup() %>% filter(!category %in% c("ANNUAL", "PERENNIAL") ) %>% droplevels() 
 
 # do some renaming of lifeform categories to match across biomass and cover datasets
+sep_dat2$orig.bm.cat<-sep_dat2$category
 sep_dat3 <-sep_dat2 %>% 
   mutate(category.mod= fct_recode(category, c("FERN" = "PTERIDOPHYTE"  )))
 
@@ -169,7 +179,7 @@ sep_dat4 <- sep_dat3 %>%
   group_by(id,site_code,year,year_trt,trt,block,plot,category.mod) %>% 
   summarise(cat.mass=sum(mass)) %>%
   left_join(sep_dat3) %>%
-  select(id, site_code, year, year_trt, trt, block, plot,subplot,category,category.mod,mass,plot.mass,cat.mass) %>%
+  select(id, site_code, year, year_trt, trt, block, plot,subplot,category,category.mod,orig.bm.cat,mass,plot.mass,cat.mass) %>%
   rename(subplot.bm=subplot)
 
 bnch<-sep_dat4 %>% filter(site_code=="bnch.us" & year=="2018" & trt == "NPK") 
@@ -236,9 +246,10 @@ cat.dat4$biomass.m.cat <- "category"
 
 # join the plot calc'd and the categorized calc lists back together
 cat.dat.cat <- cat.dat4 %>%
-  left_join(cat.dat.na2, by = c("id", "site_code", "year", "year_trt", "trt", "block", "plot", "plot.cover", "category.mod", "cat.cover", "subplot.cov", "local_lifeform", "local_lifespan", "functional_group", "Taxon", "max_cover", "subplot.bm", "category","mass", "cat.mass", "plot.mass", "biomass.sp.plot", "biomass.sp.cat"))
+  left_join(cat.dat.na2, by = c("id", "site_code", "year", "year_trt", "trt", "block", "plot", "plot.cover", "category.mod", "cat.cover", "subplot.cov", "local_lifeform", "local_lifespan", "functional_group", "Taxon", "max_cover", "subplot.bm", "category","orig.bm.cat","mass", "cat.mass", "plot.mass", "biomass.sp.plot", "biomass.sp.cat"))
 
-
+View(cat.dat.cat)
+View(cat.dat.na2)
 # create a column called  biomass.sp.full
 # we replace rows with 'NA's' in biomass.sp (plot level) with biomass.sp.cat to complete the rows
 # biomass.m.full becomes our column that tells us how each row was calculated
@@ -254,10 +265,13 @@ cat.dat.cat2 <- cat.dat.cat %>%
 
 
 # bind thw rows of the special cases together; total.dat and ap.dat
+View(total.dat2)
+View(ap.dat3)
 special.dat <- total.dat2 %>% bind_rows(ap.dat3) %>%
   arrange(id)
 
-
+colnames(special.dat)
+colnames(cat.dat.cat2)
 # any duplicates?
 dup.summary.spec <- special.dat %>% group_by(id, Taxon,biomass.sp.full, biomass.m.full) %>% filter(n()>1) %>% summarize(n=n()) %>%
   select(id,Taxon, biomass.sp.full, biomass.m.full,n)
@@ -286,14 +300,46 @@ dup.summary <- final.dat %>% group_by(id, subplot.cov, Taxon,biomass.sp.full, bi
 
 head(dup.summary)
 
+
+
+final.dat$biomass.sp.diff<-  abs(final.dat$biomass.sp.plot - final.dat$biomass.sp.cat) 
+
+colnames(final.dat)
+samp <- final.dat %>% top_frac(.5) %>% arrange(desc(biomass.sp.diff)) %>%
+  select(id,Taxon,plot.mass,category, mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.diff) 
+  
+
+View(samp)
+
 # join with comb_by_plot data
-total.dat <- comb %>% left_join(final.dat)
+total.dat <- final.dat %>% left_join(comb)
 
-summary(total.dat)
+View(total.dat)
 
 
+sum.m<-total.dat %>% distinct(site_code,biomass.m.full)
+View(sum.m)
+
+sites<-total.dat %>% distinct(site_code, year_trt)
+View(sites)
 
 write.csv(total.dat, "~/Dropbox/Projects/NutNet/Data/biomass_sp.csv")
+
+
+
+
+library(ggplot2)
+
+colnames(final.dat)
+
+ plot.dat <- final.dat %>% select(id, biomass.sp.plot,  biomass.sp.cat) %>%
+gather( key="biomass.m.compare", value="biomass.sp.compare", biomass.sp.plot,biomass.sp.cat)
+
+ 
+ 
+ggplot(plot.dat,aes(x=biomass.m.compare, y=biomass.sp.compare)) +
+geom_boxplot() + ylim(0,50)
+
 
 
 

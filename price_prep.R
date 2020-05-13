@@ -90,8 +90,8 @@ for (i in 1:length(usindex)){
 # }
 
 
-summary(arch.us)
-summary(arch.us_2)
+
+
 View(all_lst)
 folder = "output_new"
 #input RDS files for cluster, price analysis
