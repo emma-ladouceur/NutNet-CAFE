@@ -234,6 +234,8 @@ View(site.inclusion)
 
 write.csv(plot, "~/Dropbox/Projects/NutNet/Data/plot.csv")
 
+colnames(sp)
+colnames(plot)
 
 # have a look at differences in estimates- looks pretty good
 bce5$biomass.sp.diff<-  abs(bce5$biomass.sp.plot - bce5$biomass.sp.cat) 

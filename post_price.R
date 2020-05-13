@@ -15,7 +15,7 @@ library(tidyverse)
 library(data.table)
 library(foreach)
 
-p <- read.csv("/Users/el50nico/Desktop/Academic/Data/NutNet/DataOutput/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_new/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
@@ -29,9 +29,9 @@ price.all <- foreach (file = price.list,.combine=rbind) %do% {
 
 View(price.all)
 
-write.csv(price.all,"~/Desktop/Academic/Data/NutNet/nutnet_price_combine_new.csv")
+write.csv(price.all,"~/Dropbox/Projects/NutNet/Data/nutnet_price_all.csv")
 
-price.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_combine_new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 View(price.all)
@@ -48,22 +48,8 @@ nrow(price.all5)
 price.all5$unique.id<-as.character(with(price.all5, paste(site.year.id,trt_year,block,plot, sep=".")))
 
 
-#price.r<-price.all5 %>% distinct(unique.id, .keep_all = TRUE)
-nrow(price.r)
 
-price.r$year.y<-as.numeric(price.r$year.y)
-is.numeric(price.r$year.y)
-is.numeric(price.r$SL)
-
-write.csv(price.all5,"~/Desktop/Academic/Data/NutNet/nutnet_price_all.csv")
-
-
-#
-price.all <- read.csv("~/Desktop/Academic/Data/NutNet/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-
-View(price.all)
-price.all2<-separate(price.all,trt_year,into=c("trt_year.x","trt_year.y"),sep = " ", remove=FALSE)
+price.all2<-separate(price.all5,trt_year,into=c("trt_year.x","trt_year.y"),sep = " ", remove=FALSE)
 price.all3<-separate(price.all2,trt_year.y,into=c("trt.y","year.y"),sep = "_", remove=FALSE)
 price.all4<-separate(price.all3,trt_year.x,into=c("trt.x","year.x"),sep = "_", remove=FALSE)
 price.all5<-separate(price.all4,site.year.id,into=c("site.year.id.x","site.year.id.y"),sep = " ", remove=FALSE)
@@ -83,6 +69,7 @@ levels(price.reduced2$year.xy)
 price.reduced3<-price.reduced2[price.reduced2$year.xy %in% c('0_0','0_1','0_2','0_3','0_4','0_5','0_6','0_7','0_8','0_9','0_10','0_11'),]
 View(price.reduced3)
 nrow(price.reduced3)
+levels(price.reduced2$year.xy)
 #9633
 
 View(price.reduced3)
