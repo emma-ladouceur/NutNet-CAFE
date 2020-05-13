@@ -11,11 +11,9 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
-plot2<-plot %>% drop_na(plot.mass)
-View(plot2)
 
 plot.bm.s <- brm(plot.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                  data = plot2 , family=student(),  cores = 4,iter=6000, warmup = 1000, chains = 4)
+                  data = plot , family=student(),  cores = 4,iter=6000, warmup = 1000, chains = 4)
 
 
 save(plot.bm.s,
