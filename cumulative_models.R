@@ -10,17 +10,11 @@ library(grid)
 library(bayesplot)
 library(priceTools)
 
-#emmas links
-sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-View(p.all)
-plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
-plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
-summary(plot)
-
-
+# emmas links
+sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+start.rich <-read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 #shanes links
 sp <- read.csv("~/Dropbox/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -54,7 +48,7 @@ View(p.dat2)
 load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
@@ -344,19 +338,11 @@ sg.trt_fitted <- cbind(sg.s$data,
 as.data.frame(sg.trt_fitted)
 p.dat3<-p.dat2 %>% 
   group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
-  summarise(s.rich = mean(x.rich),
-            r.rich = round(s.rich))
+  left_join(start.rich, by="site_code")
 
 View(p.dat3)
 View(sg.trt_fitted)
 sg.trt_fitted3<-left_join(sg.trt_fitted,p.dat3)
-
-sg.trt_fitted3$starting.richness <- ifelse(sg.trt_fitted3$r.rich >= 1 & sg.trt_fitted3$r.rich <= 5, '1-5 species',
-                                  ifelse(sg.trt_fitted3$r.rich >=6 & sg.trt_fitted3$r.rich <=10, '6-10',
-                                         ifelse(sg.trt_fitted3$r.rich >=11 & sg.trt_fitted3$r.rich <=15, '11-15',    
-                                                ifelse(sg.trt_fitted3$r.rich >=16 & sg.trt_fitted3$r.rich <=20, '16-20',
-                                                       ifelse(sg.trt_fitted3$r.rich >=21 & sg.trt_fitted3$r.rich <=25, '21-25',
-                                                              ifelse(sg.trt_fitted3$r.rich >=26, '>26', 'other'))))))
 
 
 sg.trt_fitted.npk<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('NPK'),]
@@ -404,19 +390,9 @@ sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>%
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
-                         cxmax = max(year.y.m),
-                         s.rich = mean(x.rich),
-                         r.rich = round(s.rich)),
-             by = 'site_code')
+                         cxmax = max(year.y.m)),
+             by = 'site_code') %>% left_join(start.rich, by="site_code")
 
-View(sg.trt_coef2)
-
-sg.trt_coef2$starting.richness <- ifelse(sg.trt_coef2$r.rich >= 1 & sg.trt_coef2$r.rich <= 5, '1-5 species',
-                                ifelse(sg.trt_coef2$r.rich >=6 & sg.trt_coef2$r.rich <=10, '6-10',
-                                       ifelse(sg.trt_coef2$r.rich >=11 & sg.trt_coef2$r.rich <=15, '11-15',    
-                                              ifelse(sg.trt_coef2$r.rich >=16 & sg.trt_coef2$r.rich <=20, '16-20',
-                                                     ifelse(sg.trt_coef2$r.rich >=21 & sg.trt_coef2$r.rich <=25, '21-25',
-                                                            ifelse(sg.trt_coef2$r.rich >=26, '>26', 'other'))))))
 
 View(sg.trt_coef3)
 
@@ -426,6 +402,7 @@ dat<-distinct(plot, site_code, continent,habitat)
 
 sg.trt_coef3<-full_join(sg.trt_coef2,dat)
 
+summary(sg.s)
 
 rm(sg.trt.i)
 setwd('~/Dropbox/Projects/NutNet/Data/')
@@ -556,10 +533,10 @@ cde_fitted <- cbind(CDE.s$data,
   as_tibble() 
 as.data.frame(cde_fitted)
 
-p.dat3<-p.dat2 %>% 
+View(p.dat2)
+p.dat3<-p.dat2 %>%  
              group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
-             summarise(s.rich = mean(x.rich),
-                       r.rich = round(s.rich))
+             left_join(start.rich, by="site_code")
 
 View(p.dat3)
 p.dat3$block<-as.factor(p.dat3$block)
@@ -569,13 +546,6 @@ cde_fitted3<-inner_join(cde_fitted,p.dat3)
 View(cde_fitted3)
 nrow(cde_fitted3)
 
-#cde_fitted2<-inner_join(cde_fitted,p.all5,  by = c('site_code', 'year.y'))
-cde_fitted3$starting.richness <- ifelse(cde_fitted3$r.rich >= 1 & cde_fitted3$r.rich <= 5, '1-5 species',
-                                  ifelse(cde_fitted3$r.rich >=6 & cde_fitted3$r.rich <=10, '6-10',
-                                         ifelse(cde_fitted3$r.rich >=11 & cde_fitted3$r.rich <=15, '11-15',    
-                                                ifelse(cde_fitted3$r.rich >=16 & cde_fitted3$r.rich <=20, '16-20',
-                                                       ifelse(cde_fitted3$r.rich >=21 & cde_fitted3$r.rich <=25, '21-25',
-                                                              ifelse(cde_fitted3$r.rich >=26, '>26', 'other'))))))
 
 
 cde_fitted.npk<-cde_fitted3[cde_fitted3$trt.y %in% c('NPK'),]
@@ -613,26 +583,16 @@ cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>%
                                     TESlope_upper = Q97.5) %>% 
                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat2 %>% 
+  inner_join(p.dat3 %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
-                         cxmax = max(year.y.m),
-                         s.rich = mean(x.rich),
-                         r.rich = round(s.rich)),
-             by = 'site_code')
+                         cxmax = max(year.y.m)),
+             by = 'site_code') %>% left_join(start.rich)
 
-cde_coef2$starting.richness <- ifelse(cde_coef2$r.rich >= 1 & cde_coef2$r.rich <= 5, '1-5 species',
-                                ifelse(cde_coef2$r.rich >=6 & cde_coef2$r.rich <=10, '6-10',
-                                       ifelse(cde_coef2$r.rich >=11 & cde_coef2$r.rich <=15, '11-15',    
-                                              ifelse(cde_coef2$r.rich >=16 & cde_coef2$r.rich <=20, '16-20',
-                                                     ifelse(cde_coef2$r.rich >=21 & cde_coef2$r.rich <=25, '21-25',
-                                                            ifelse(cde_coef2$r.rich >=26, '>26', 'other'))))))
 
-View(cde_coef2)
-
-View(cde_fitted)
+View(cde_coef3)
 
 
 cde_coef3<-full_join(cde_coef2,dat)
@@ -651,7 +611,10 @@ cde_fitted.npk$starting.richness <- factor(cde_fitted.npk$starting.richness , le
 cde_coef3$starting.richness <- factor(cde_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 
+
+summary(CDE.s)
 View(cde_coef3)
+
 cde_coef3$xs<-1
 #cde
 cdem<-ggplot() +
