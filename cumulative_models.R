@@ -53,6 +53,8 @@ load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
 
+summary(sl.s)
+
 # #------plot richness model all sp----------------
 # fixed effects
 sl.trt_fitted <- cbind(sl.s$data,
@@ -63,8 +65,7 @@ sl.trt_fitted <- cbind(sl.s$data,
 
 p.dat3<-p.dat2 %>% 
   group_by(site_code,continent,block,plot,trt.y,year.x,year.y,year.y.m) %>% 
-  summarise(s.rich = mean(x.rich),
-            r.rich = round(s.rich))
+  left_join(start.rich,by="site_code")
 
 View(p.dat2)
 View(p.dat3)
@@ -81,12 +82,6 @@ sl.trt_fitted3<-left_join(sl.trt_fitted,p.dat3)
 
 View(sl.trt_fitted3)
 
-sl.trt_fitted3$starting.richness <- ifelse(sl.trt_fitted3$r.rich >= 1 & sl.trt_fitted3$r.rich <= 5, '1-5 species',
-                                   ifelse(sl.trt_fitted3$r.rich >=6 & sl.trt_fitted3$r.rich <=10, '6-10',
-                                          ifelse(sl.trt_fitted3$r.rich >=11 & sl.trt_fitted3$r.rich <=15, '11-15',    
-                                                 ifelse(sl.trt_fitted3$r.rich >=16 & sl.trt_fitted3$r.rich <=20, '16-20',
-                                                        ifelse(sl.trt_fitted3$r.rich >=21 & sl.trt_fitted3$r.rich <=25, '21-25',
-                                                               ifelse(sl.trt_fitted3$r.rich >=26, '>26', 'other'))))))
 
 sl.trt_fitted.npk<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('NPK'),]
 sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
@@ -129,22 +124,15 @@ sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>%
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
-                         cxmax = max(year.y.m),
-                         s.rich = mean(x.rich),
-                         r.rich = round(s.rich)
-                         ),
-             by = 'site_code')
+                         cxmax = max(year.y.m)),
+             by = 'site_code') %>%  left_join(start.rich, by="site_code")
 
 View(p.dat3)
 View(sl.trt_coef2)
 
-sl.trt_coef2$starting.richness <- ifelse(sl.trt_coef2$r.rich >= 1 & sl.trt_coef2$r.rich <= 5, '1-5 species',
-                                 ifelse(sl.trt_coef2$r.rich >=6 & sl.trt_coef2$r.rich <=10, '6-10',
-                                        ifelse(sl.trt_coef2$r.rich >=11 & sl.trt_coef2$r.rich <=15, '11-15',    
-                                               ifelse(sl.trt_coef2$r.rich >=16 & sl.trt_coef2$r.rich <=20, '16-20',
-                                                      ifelse(sl.trt_coef2$r.rich >=21 & sl.trt_coef2$r.rich <=25, '21-25',
-                                                             ifelse(sl.trt_coef2$r.rich >=26, '>26', 'other'))))))
 
+
+summary(sl.s)
 
 dat<-distinct(p.dat2, site_code, continent,habitat)
 
@@ -672,12 +660,12 @@ grid_arrange_shared_legend(sl.trtm,cdem,nrow=1)
 
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 
 
 summary(s.gain.s)
-
+summary(s.loss.s)
 
 
 
@@ -689,20 +677,11 @@ sgain.trt_fitted <- cbind(s.gain.s$data,
 as.data.frame(sgain.trt_fitted)
 p.dat3<-p.dat2 %>% 
   group_by(continent,site_code,block,plot,trt.xy,year.x,year.y,year.y.m) %>% 
-  summarise(s.rich = mean(x.rich),
-            r.rich = round(s.rich))
+  left_join(start.rich, by="site_code")
 
 View(p.dat3)
 View(sgain.trt_fitted)
 sgain.trt_fitted3<-left_join(sgain.trt_fitted,p.dat3)
-
-sgain.trt_fitted3$starting.richness <- ifelse(sgain.trt_fitted3$r.rich >= 1 & sgain.trt_fitted3$r.rich <= 5, '1-5 species',
-                                           ifelse(sgain.trt_fitted3$r.rich >=6 & sgain.trt_fitted3$r.rich <=10, '6-10',
-                                                  ifelse(sgain.trt_fitted3$r.rich >=11 & sgain.trt_fitted3$r.rich <=15, '11-15',    
-                                                         ifelse(sgain.trt_fitted3$r.rich >=16 & sgain.trt_fitted3$r.rich <=20, '16-20',
-                                                                ifelse(sgain.trt_fitted3$r.rich >=21 & sgain.trt_fitted3$r.rich <=25, '21-25',
-                                                                       ifelse(sgain.trt_fitted3$r.rich >=26, '>26', 'other'))))))
-
 
 sgain.trt_fitted.npk<-sgain.trt_fitted3[sgain.trt_fitted3$trt.y %in% c('NPK'),]
 sgain.trt_fitted.ctl<-sgain.trt_fitted3[sgain.trt_fitted3$trt.y %in% c('Control'),]
@@ -750,18 +729,9 @@ sgain.trt_coef2 <-  bind_cols(sgain.trt_coef$site_code[,,'Intercept'] %>%
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
                          cxmax = max(year.y.m),
-                         s.rich = mean(x.rich),
-                         r.rich = round(s.rich)),
-             by = 'site_code')
+             by = 'site_code')) %>% left_join(start.rich,by="site_code")
 
 View(sgain.trt_coef2)
-
-sgain.trt_coef2$starting.richness <- ifelse(sgain.trt_coef2$r.rich >= 1 & sgain.trt_coef2$r.rich <= 5, '1-5 species',
-                                         ifelse(sgain.trt_coef2$r.rich >=6 & sgain.trt_coef2$r.rich <=10, '6-10',
-                                                ifelse(sgain.trt_coef2$r.rich >=11 & sgain.trt_coef2$r.rich <=15, '11-15',    
-                                                       ifelse(sgain.trt_coef2$r.rich >=16 & sgain.trt_coef2$r.rich <=20, '16-20',
-                                                              ifelse(sgain.trt_coef2$r.rich >=21 & sgain.trt_coef2$r.rich <=25, '21-25',
-                                                                     ifelse(sgain.trt_coef2$r.rich >=26, '>26', 'other'))))))
 
 View(sgain.trt_coef3)
 
@@ -845,7 +815,7 @@ sgain.trtm<-ggplot()  +
 sgain.trtm
 
 
-
+summary(s.loss.s)
 
 sloss.trt_fitted <- cbind(s.loss.s$data,
                        # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
@@ -855,8 +825,7 @@ sloss.trt_fitted <- cbind(s.loss.s$data,
 
 p.dat3<-p.dat2 %>% 
   group_by(site_code,continent,block,plot,trt.y,year.x,year.y,year.y.m) %>% 
-  summarise(s.rich = mean(x.rich),
-            r.rich = round(s.rich))
+  left_join(start.rich,by="site_code")
 
 View(p.dat2)
 View(p.dat3)
@@ -872,13 +841,6 @@ p.dat3$trt.y<-as.factor(as.character(p.dat3$trt.y))
 sloss.trt_fitted3<-left_join(sloss.trt_fitted,p.dat3)
 
 View(sloss.trt_fitted3)
-
-sloss.trt_fitted3$starting.richness <- ifelse(sloss.trt_fitted3$r.rich >= 1 & sloss.trt_fitted3$r.rich <= 5, '1-5 species',
-                                           ifelse(sloss.trt_fitted3$r.rich >=6 & sloss.trt_fitted3$r.rich <=10, '6-10',
-                                                  ifelse(sloss.trt_fitted3$r.rich >=11 & sloss.trt_fitted3$r.rich <=15, '11-15',    
-                                                         ifelse(sloss.trt_fitted3$r.rich >=16 & sloss.trt_fitted3$r.rich <=20, '16-20',
-                                                                ifelse(sloss.trt_fitted3$r.rich >=21 & sloss.trt_fitted3$r.rich <=25, '21-25',
-                                                                       ifelse(sloss.trt_fitted3$r.rich >=26, '>26', 'other'))))))
 
 sloss.trt_fitted.npk<-sloss.trt_fitted3[sloss.trt_fitted3$trt.y %in% c('NPK'),]
 sloss.trt_fitted.ctl<-sloss.trt_fitted3[sloss.trt_fitted3$trt.y %in% c('Control'),]
@@ -921,22 +883,11 @@ sloss.trt_coef2 <-  bind_cols(sloss.trt_coef$site_code[,,'Intercept'] %>%
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
-                         cxmax = max(year.y.m),
-                         s.rich = mean(x.rich),
-                         r.rich = round(s.rich)
-               ),
-             by = 'site_code')
+                         cxmax = max(year.y.m)),
+             by = 'site_code') %>% left_join(start.rich, by="site_code")
 
 View(p.dat3)
 View(sloss.trt_coef2)
-
-sloss.trt_coef2$starting.richness <- ifelse(sloss.trt_coef2$r.rich >= 1 & sloss.trt_coef2$r.rich <= 5, '1-5 species',
-                                         ifelse(sloss.trt_coef2$r.rich >=6 & sloss.trt_coef2$r.rich <=10, '6-10',
-                                                ifelse(sloss.trt_coef2$r.rich >=11 & sloss.trt_coef2$r.rich <=15, '11-15',    
-                                                       ifelse(sloss.trt_coef2$r.rich >=16 & sloss.trt_coef2$r.rich <=20, '16-20',
-                                                              ifelse(sloss.trt_coef2$r.rich >=21 & sloss.trt_coef2$r.rich <=25, '21-25',
-                                                                     ifelse(sloss.trt_coef2$r.rich >=26, '>26', 'other'))))))
-
 
 dat<-distinct(p.dat2, site_code, continent,habitat)
 

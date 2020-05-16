@@ -12,6 +12,8 @@ biomass <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp.csv",header=T,fil
 bce <- droplevels(subset(biomass, experiment_type == "Experimental (Full Factorial)"| experiment_type == "Experimental (Nutrients Only)"))
 bce2 <- droplevels(subset(bce, trt=="NPK"|trt=="Control"))
 
+# this site is categorized as full factorial but only has controls
+bce2 <- droplevels(subset(bce2, !site_code=="nilla.au"))
 
 bce3<-bce2 %>% filter(!is.na(biomass.sp.full)) %>% droplevels()
 

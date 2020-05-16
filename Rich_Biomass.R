@@ -77,7 +77,10 @@ plot.rich_coef <- coef(plot.rich.g)
 
 
 startrich<-plot[plot$year_trt %in% c('0'),]
-# View(startrich)
+
+
+write.csv(start.rich)
+colnames(startrich)
 
 
 View(plot.rich_coef)
@@ -147,6 +150,18 @@ startrich2<-startrich %>%
   group_by(site_code) %>% 
   summarise(m.rich = mean(rich),
             r.rich = round(m.rich))
+
+
+startrich2$starting.richness <- ifelse(startrich2$r.rich >= 1 & startrich2$r.rich <= 5, '1-5 species',
+                                              ifelse(startrich2$r.rich >=6 & startrich2$r.rich <=10, '6-10',
+                                                     ifelse(startrich2$r.rich >=11 & startrich2$r.rich <=15, '11-15',    
+                                                            ifelse(startrich2$r.rich >=16 & startrich2$r.rich <=20, '16-20',
+                                                                   ifelse(startrich2$r.rich >=21 & startrich2$r.rich <=25, '21-25',
+                                                                          ifelse(startrich2$r.rich >=26, '>26', 'other'))))))
+
+write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
+
+
 View(startrich2)
 plot.rich_fitted2<-left_join(plot.rich_fitted,startrich2)
 View(plot.rich_fitted2)
@@ -157,6 +172,7 @@ plot.rich_fitted2$current.richness <- ifelse(plot.rich_fitted2$rich >= 1 & plot.
                                                            ifelse(plot.rich_fitted2$rich >=16 & plot.rich_fitted2$rich <=20, '16-20',
                                                                   ifelse(plot.rich_fitted2$rich >=21 & plot.rich_fitted2$rich <=25, '21-25',
                                                                          ifelse(plot.rich_fitted2$rich >=26, '>26', 'other'))))))
+
 
 plot.rich_fitted2$starting.richness <- ifelse(plot.rich_fitted2$r.rich >= 1 & plot.rich_fitted2$r.rich <= 5, '1-5 species',
                                              ifelse(plot.rich_fitted2$r.rich >=6 & plot.rich_fitted2$r.rich <=10, '6-10',
