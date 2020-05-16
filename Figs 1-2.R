@@ -17,24 +17,24 @@ library(sjstats)
 
 
 #emmas links
-sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
-plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+#plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
+#plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
 
 dat2<-distinct(p, continent, site_code, year_trt)
 
 dat2<-distinct(p, continent, site_code, year_trt)
 View(dat2)
 colnames(plot)
-dat2<-distinct(plot, site_code,site_name, country, continent,habitat, latitude, longitude,elevation, experiment_type)
+dat2<-distinct(plot, site_code, country, continent,habitat, latitude, longitude,elevation, experiment_type)
 View(dat2)
 #write.csv(dat2,"~/Dropbox/Projects/NutNet/Data/nutnet_distinct.csv")
 
 #plot<-p[p$trt %in% c('NPK'),]
 #or
-plot<-plot[plot$trt %in% c('NPK', 'Control'),]
+#plot<-plot[plot$trt %in% c('NPK', 'Control'),]
 nrow(plot)
 
 colnames(plot)
@@ -66,20 +66,20 @@ hist(plot$log.live.mass, breaks=40, main="bm", xlab= "bm")
 plot2<-plot[plot$trt %in% c('NPK'),]
 plot2$unique.id<-as.character(with(plot2, paste(site_code,block,plot, sep=".")))
 #remove NAS
-plot3<-plot2 %>% drop_na(live_mass)
+plot3<-plot2 %>% drop_na(plot.mass)
 
-View(plot3)
+colnames(plot3)
 plot4<-plot3 %>% group_by(site_code, block,plot,year_trt) %>%
-  select(continent,unique.id,site_code,block, plot,year_trt,rich,live_mass)
+  select(continent,id,site_code,block, plot,year_trt,rich,plot.mass)
 
-plotzero<-plot4[plot4$year_trt %in% c('0'),]
+plotzero<-plot4[plot3$year_trt %in% c('0'),]
 View(plotzero)
 plotmax<-plot4 %>% group_by(site_code) %>% top_n(1, year_trt)
 View(plotmax)
 plot5<-bind_rows(plotmax,plotzero)
 
-
-ggplot(plot5, aes(x=rich, y=live_mass, group=unique.id))+
+View(plot5)
+ggplot(plot5, aes(x=rich, y=plot.mass, group=id))+
   geom_point(size=2,shape=1)+ geom_line()+theme_classic()
 
 
@@ -89,8 +89,8 @@ plot6<-plot5 %>%
   summarise(m.rich = mean(rich),
             r.rich = round(m.rich),
             sd.rich = sd(rich),
-            m.mass = mean(live_mass),
-            sd.mass = sd(live_mass))
+            m.mass = mean(plot.mass),
+            sd.mass = sd(plot.mass))
 
 View(plot6)
 zerorich<-plot6[plot6$year_trt %in% c('0'),]
@@ -102,7 +102,7 @@ zerorich$starting.richness <- ifelse(zerorich$r.rich >= 1 & zerorich$r.rich <= 5
                                                           ifelse(zerorich$r.rich >=21 & zerorich$r.rich <=25, '21-25',
                                                                  ifelse(zerorich$r.rich >=26, '>26', 'other'))))))
 
-zrich<-zerorich %>% 
+zrich<-zerorich %>% ungroup() %>%
   select(site_code,starting.richness)
 
 plot7<-inner_join(plot6,zrich)
@@ -206,7 +206,7 @@ labs(x = 'Species Richness',
 
 # Supplementary figure s1 plot level version of fig 1
 
-ggplot(plot5, aes(x=rich, y=live_mass, group=unique.id))+
+ggplot(plot5, aes(x=rich, y=plot.mass, group=id))+
   geom_point(size=2,shape=1)+ geom_line()+theme_classic()
 
 plot5$unique.id<- as.character(with(plot5, paste(site_code,block,plot, sep="_")))
@@ -259,8 +259,8 @@ plot9 <- plot8 %>%
 View(plot9)
 
 plot10 <- plot8 %>%
-  select(unique.id,site_code,live_mass,startend) %>%
-  spread(startend,live_mass) %>%
+  select(unique.id,site_code,plot.mass,startend) %>%
+  spread(startend,plot.mass) %>%
   as_tibble() %>% 
   mutate(mass.start = start,
          mass.end = end ) %>% 

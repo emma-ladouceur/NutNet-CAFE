@@ -10,12 +10,9 @@ library(sjstats)
 library(bayesplot)
 
 
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
-plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
 
-colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
@@ -399,7 +396,7 @@ View(plot.bm_coef3)
 
 b1<-ggplot() +
   geom_point(data = plot.bm_fitted.npk,
-             aes(x = year_trt, y = live_mass,
+             aes(x = year_trt, y = plot.mass,
                  colour = starting.richness), alpha=0.6,
              size = .7, position = position_jitter(width = 0.45, height = 0.45)) +
   geom_segment(data = plot.bm_coef3,

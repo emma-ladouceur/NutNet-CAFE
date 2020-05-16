@@ -9,10 +9,7 @@ library(sjstats)
 library(bayesplot)
 
 
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
-plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
@@ -20,7 +17,7 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 plot$log.rich<-log(plot$rich)
 #bm
-plot$log.live.mass<-log(plot$live_mass)
+plot$log.live.mass<-log(plot$plot_mass)
 
 
 
@@ -52,12 +49,12 @@ plot.bm_fitted.npk$Response<- "Biomass"
 plot.bm_fitted.npk <- plot.bm_fitted.npk %>% rename(Treatment = trt) 
 plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% rename(Treatment = trt) 
 fitted.bm<-bind_rows(plot.bm_fitted.npk,plot.bm_fitted.ctl)
-fitted.bm <- fitted.bm%>% rename(Treatment = live_mass) 
 plot.bm_coef3$Response<- "Biomass"
 fitted.bm$block<- as.factor(as.character(fitted.bm$block))
 
 summary(plot.rich_coef3)
 
+View(fitted.bm)
 fitted.all<-bind_rows(fitted.rich,fitted.bm)
 coef.all<-bind_rows(plot.rich_coef3,plot.bm_coef3)
 
