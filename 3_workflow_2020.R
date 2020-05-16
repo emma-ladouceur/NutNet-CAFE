@@ -65,7 +65,7 @@ nrow(price.all7)
 price.reduced<-price.all7[price.all7$trt.xy %in% c('Control_Control','NPK_NPK'),]
 price.reduced2<-price.reduced[price.reduced$block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'),]
 price.reduced2$year.xy<-as.factor(price.reduced2$year.xy)
-View(price.reduced2)
+nrow(price.reduced2)
 
 
 
@@ -95,7 +95,7 @@ price.reduced6$s.loss <- price.reduced6$x.rich - price.reduced6$c.rich
 price.reduced6$s.loss.n<-(price.reduced6$s.loss*-1)
 price.reduced6$s.gain <- price.reduced6$y.rich - price.reduced6$c.rich
 
-View(price.reduced6)
+nrow(price.reduced6)
 sites<-price.reduced6 %>% distinct(site_code)
 
 View(sites)
