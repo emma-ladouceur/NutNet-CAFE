@@ -12,12 +12,9 @@ library(gridExtra)
 library(grid)
 library(sjstats)
 
-#emmas links
-sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_calc2.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
-plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+# emmas links
+sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 dat2<-distinct(plot, site_code,site_name, country, continent,habitat, latitude, longitude,elevation, experiment_type)
 
@@ -31,13 +28,6 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 plot$f.year_trt<-as.factor(as.character(plot$year_trt))
-
-#log
-plot$log.rich<-log(plot$rich)
-plot$log.live.mass<-log(plot$live_mass)
-
-plot$log.year.trt<-log(plot$year_trt + 1)
-
 
 
 # Make Figure 1
