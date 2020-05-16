@@ -12,15 +12,9 @@ library(bayesplot)
 
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
-plot$log.rich<-log(plot$rich)
-#bm
-plot$log.live.mass<-log(plot$plot.mass)
-
-
 
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
@@ -40,15 +34,18 @@ fitted.rich
 
 fitted.rich$Treatment <- factor(fitted.rich$Treatment , levels=c("NPK","Control"))
 
+View(plot.rich_fitted.npk)
+
+View(plot.rich_coef3)
 
 
 r1<-ggplot() +
-  facet_wrap(~Model) +
-  geom_point(data = plot.rich_fitted.npk,
+  #facet_wrap(~Model) +
+  geom_point(data = plot.rich_fitted.npk %>% filter(site_code=="nilla.au"),
              aes(x = year_trt, y = rich,
                  colour = starting.richness), alpha=0.6,
              size = 1.3, position = position_jitter(width = 0.45 )) +
-  geom_segment(data = plot.rich_coef3,
+  geom_segment(data = plot.rich_coef3 %>% filter(site_code=="nilla.au"),
                aes(x = xmin, 
                    xend = xmax,
                    y = (Intercept + TE  + (ISlope+TESlope) * xmin),
@@ -57,16 +54,16 @@ r1<-ggplot() +
                    colour = starting.richness),
                size = .7) +
  # uncertainy in fixed effect
-  geom_ribbon(data = plot.rich_fitted.npk,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.5) +
-  # fixed effect
-  geom_line(data = fitted.rich,
-            aes(x = year_trt, y = Estimate, linetype= Treatment),
-            size = 1.5) +
-  geom_ribbon(data = plot.rich_fitted.ctl,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.5) +
+  # geom_ribbon(data = plot.rich_fitted.npk,
+  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+  #             alpha = 0.5) +
+  # # fixed effect
+  # geom_line(data = fitted.rich,
+  #           aes(x = year_trt, y = Estimate, linetype= Treatment),
+  #           size = 1.5) +
+  # geom_ribbon(data = plot.rich_fitted.ctl,
+  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+  #             alpha = 0.5) +
   scale_x_continuous(breaks=c(0,1,3,6,9,10,11,12)) +
   labs(x='',
     #x = 'Years',

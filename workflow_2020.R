@@ -64,8 +64,9 @@ dat_bm <- biomass3 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplo
 
 # if else statement to seperate total, vascular, live mass (all total values) from those that seperated biomass by group
 # sites that measured total
-biomass.total   <- dat_bm %>% select(id,site_code,year,year_trt,trt,block,plot,subplot,category,mass) %>%
+biomass.total   <- dat_bm %>% ungroup() %>% select(id,site_code,year,year_trt,trt,block,plot,subplot,category,mass) %>%
   filter(category %in% c("TOTAL","VASCULAR", "LIVE")) %>% droplevels() %>%
+  filter(!site_code=="ethamc.au") %>% droplevels() %>%
   rename(orig.bm.cat=category,
          subplot.bm=subplot)
 
@@ -73,7 +74,9 @@ biomass.total$plot.mass<-biomass.total$mass
 
 View(biomass.total)
 # sites that seperated biomass - remove the totals
-sep_dat <- dat_bm %>% filter(!category %in% c("TOTAL","VASCULAR", "LIVE")) %>% droplevels()
+sep_dat <- dat_bm %>% ungroup() %>% filter(!category %in% c("TOTAL","VASCULAR", "LIVE")) %>% droplevels() %>%
+  filter(!site_code=="ethamc.au") %>% droplevels() 
+
 
 
 # SPECIAL CASES
@@ -146,11 +149,88 @@ ap.dat3$biomass.m.full <- "ap category"
 
 View(ap.dat3)
 
+#  ethamc.au
+View(ethamc)
+eth.bm<- dat_bm %>% ungroup() %>% filter(site_code=="ethamc.au") %>% droplevels() 
+
+eth.bm.live<- eth.bm %>% ungroup() %>% filter(category=="LIVE") %>% droplevels() %>%
+  rename(subplot.bm=subplot) %>% select(-live)
+
+View()
+eth.bm.sort<- eth.bm %>% ungroup() %>% filter(!category=="LIVE") %>% droplevels() %>%
+  rename(
+    subplot.bm.sort=subplot,
+    mass.sort=mass,
+    plot.mass.sort=plot.mass) %>% select(-live) 
+
+
+
+eth.bm.sort$category.mod<-eth.bm.sort$category
+
+eth.cov<-dat_cover %>% ungroup() %>% filter(site_code=="ethamc.au" ) %>% droplevels() %>%
+  mutate( category.mod = fct_recode(functional_group, c("GRAMINOID"="GRASS"))) %>%
+  select(-category,-live)
+View(eth.cov)
+  
+#  many plots where species and cover were recorded but biomass is recorded as 0
+# remove all these rows and leave only plots with true 0's
+eth.live<-eth.bm.live %>% left_join(eth.cov) %>% filter(is.na(Taxon)) %>%
+   select(-site_name)
+
+  View(eth.live)
+  
+eth.live$biomass.sp.full <- eth.live$max_cover/eth.live$plot.cover * eth.live$plot.mass
+
+eth.live$biomass.sp.plot <- eth.live$biomass.sp.full
+eth.live$biomass.m.full <- "total"
+  
+  
+  
+eth.sort <- eth.cov %>% left_join(eth.bm.sort, by = c("id", "site_code", "year", "year_trt", "trt", "block", "plot","category.mod")) %>%
+  arrange(id)
+View(eth.sort)
+
+eth.sort$mass.diff<-eth.sort$plot.mass.sort-eth.sort$mass.sort
+eth.sort2 <- eth.sort %>% ungroup() %>%
+  filter(!plot.mass.sort == 0 , !mass.sort == 0, !mass.diff == 0 ) %>%
+  select(-mass.diff) %>%
+  arrange(id) %>%
+  rename(plot.mass=plot.mass.sort,
+         mass=mass.sort,
+         subplot.bm=subplot.bm.sort) %>% select(-site_name.y,-site_name.x) 
+View(eth.sort2)
+
+eth.sort3 <- eth.sort2 %>%
+   group_by(id,site_code,year,year_trt,trt,block,plot,category) %>% 
+  summarise(cat.cover=sum(max_cover),
+            cat.mass=sum(mass)) %>% left_join(eth.sort2)
+
+View(eth.sort3)
+eth.sort3$biomass.sp.cat <- eth.sort3$max_cover/eth.sort3$cat.cover * eth.sort3$cat.mass
+# calculate per species biomass by plot for comparison
+eth.sort3$biomass.sp.plot <- eth.sort3$max_cover/eth.sort3$plot.cover * eth.sort3$plot.mass
+
+eth.sort3$biomass.sp.full <- eth.sort3$biomass.sp.cat
+eth.sort3$biomass.m.full <- "category"
+
+
+eth.dat <- eth.sort3 %>% bind_rows(eth.live) %>%
+  select(-Family,-N_fixer,-ps_path,-local_provenance) %>%
+  rename(orig.bm.cat=category,
+         category=category.mod)
+
+View(eth.dat)
+colnames(eth.dat)
+colnames(special.dat)
+
+
 # CALCULATE BIOMASS BY STANDARD BIOMASS CATEGORY
 # prepcover data
 # remove previous site from last step
-dat_cover2<-dat_cover %>%  ungroup() %>% filter(!site_code=="shps.us" ) %>% droplevels() 
+dat_cover2<-dat_cover %>%  ungroup() %>% filter(!site_code=="shps.us",!site_code=="ethamc.au" ) %>% droplevels() 
 
+test<- dat_cover2%>%distinct(site_code)
+View(test)
 # put grass into graminoid catgory to match biomass categories
 dat_cover3<-dat_cover2 %>% mutate( category.mod = fct_recode(functional_group, c("GRAMINOID"="GRASS"))) %>% 
   select(id, site_code, year, year_trt, trt, block, plot,subplot.cov,local_lifeform,local_lifespan,functional_group,category.mod,Taxon,max_cover) 
@@ -222,9 +302,9 @@ cat.dat4$biomass.sp.cat <- cat.dat4$max_cover/cat.dat4$cat.cover * cat.dat4$cat.
 
 
 # replace Na's with 0's (theres a mixture)
-cat.dat5 <- cat.dat4 %>% 
-  select(id,cat.mass,biomass.sp.cat,biomass.sp.plot,Taxon) %>%
-  replace(is.na(.), 0)
+ cat.dat5 <- cat.dat4 %>% 
+   select(id,cat.mass,biomass.sp.cat,biomass.sp.plot,Taxon) %>%
+   replace(is.na(.), 0)
 
 # filter rows where cat.mass is 0 (because of above mentioned inconsistencies), where biomass.cat is 0,
 # but biomas.plot is >0
@@ -264,6 +344,7 @@ cat.dat.cat2 <- cat.dat.cat %>%
   select(-biomass.sp,-biomass.m.plot,-biomass.m.cat)
 
 
+View(cat.dat.cat2)
 # bind thw rows of the special cases together; total.dat and ap.dat
 View(total.dat2)
 View(ap.dat3)
@@ -271,18 +352,27 @@ special.dat <- total.dat2 %>% bind_rows(ap.dat3) %>%
   arrange(id)
 
 colnames(special.dat)
+colnames(eth.dat)
+special.dat2 <- special.dat %>% bind_rows(eth.dat)
+
+View(special.dat2)
+colnames(special.dat)
+colnames(eth.dat)
+
 colnames(cat.dat.cat2)
 # any duplicates?
-dup.summary.spec <- special.dat %>% group_by(id, Taxon,biomass.sp.full, biomass.m.full) %>% filter(n()>1) %>% summarize(n=n()) %>%
+dup.summary.spec <- special.dat2 %>% group_by(id, Taxon,biomass.sp.full, biomass.m.full) %>% filter(n()>1) %>% summarize(n=n()) %>%
   select(id,Taxon, biomass.sp.full, biomass.m.full,n)
 
 head(dup.summary.spec)
 # phew
 
 # bind cat.dat and special.dat together
-final.dat <- cat.dat.cat2 %>%  bind_rows(special.dat) %>%
+final.dat <- cat.dat.cat2 %>%  bind_rows(special.dat2) %>%
   arrange (id)
 
+
+View(final.dat)
 # we have four categories for how biomas was calculated
 final.dat$biomass.m.full<- as.factor(final.dat$biomass.m.full)
 levels(final.dat$biomass.m.full)
@@ -322,6 +412,7 @@ View(sum.m)
 
 sites<-total.dat %>% distinct(site_code, year_trt)
 View(sites)
+
 
 write.csv(total.dat, "~/Dropbox/Projects/NutNet/Data/biomass_sp.csv")
 

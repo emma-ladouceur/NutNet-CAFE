@@ -30,22 +30,22 @@ p.dat2<-inner_join(p.all,dat)
 
 
 # START RICH
-# startrich<-plot[plot$year_trt %in% c('0'),]
-# 
-# startrich2<-startrich %>% 
-#   group_by(site_code) %>% 
-#   summarise(m.rich = mean(rich),
-#             r.rich = round(m.rich))
-# 
-# 
-# startrich2$starting.richness <- ifelse(startrich2$r.rich >= 1 & startrich2$r.rich <= 5, '1-5 species',
-#                                        ifelse(startrich2$r.rich >=6 & startrich2$r.rich <=10, '6-10',
-#                                               ifelse(startrich2$r.rich >=11 & startrich2$r.rich <=15, '11-15',    
-#                                                      ifelse(startrich2$r.rich >=16 & startrich2$r.rich <=20, '16-20',
-#                                                             ifelse(startrich2$r.rich >=21 & startrich2$r.rich <=25, '21-25',
-#                                                                    ifelse(startrich2$r.rich >=26, '>26', 'other'))))))
-# 
-# write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
+startrich<-plot[plot$year_trt %in% c('0'),]
+
+startrich2<-startrich %>%
+  group_by(site_code) %>%
+  summarise(m.rich = mean(rich),
+            r.rich = round(m.rich))
+
+
+startrich2$starting.richness <- ifelse(startrich2$r.rich >= 1 & startrich2$r.rich <= 5, '1-5 species',
+                                       ifelse(startrich2$r.rich >=6 & startrich2$r.rich <=10, '6-10',
+                                              ifelse(startrich2$r.rich >=11 & startrich2$r.rich <=15, '11-15',
+                                                     ifelse(startrich2$r.rich >=16 & startrich2$r.rich <=20, '16-20',
+                                                            ifelse(startrich2$r.rich >=21 & startrich2$r.rich <=25, '21-25',
+                                                                   ifelse(startrich2$r.rich >=26, '>26', 'other'))))))
+
+write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
 
 
 # load PLOT models
@@ -77,7 +77,6 @@ with(rr.plot, plot(plot, m1$Estimate))
 with(rr.plot, plot(f.year_trt, m1$Estimate))
 
 
-# #------plot richness model all sp----------------
 # fixed effects
 
 plot.rich_fitted <- cbind(plot.rich.g$data,
@@ -85,6 +84,7 @@ plot.rich_fitted <- cbind(plot.rich.g$data,
                           fitted(plot.rich.g, re_formula = NA)) %>% 
   as_tibble() 
 
+View(plot.rich_fitted)
 # fixed effect coefficients 
 plot.rich_fixef <- fixef(plot.rich.g)
 

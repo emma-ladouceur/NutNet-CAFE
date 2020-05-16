@@ -92,8 +92,10 @@ price.reduced6$unique.id<-as.character(with(price.reduced6, paste(site.year.id,t
 price.reduced6$year.y<- as.numeric(price.reduced6$year.y)
 price.reduced6$year.y.m<-price.reduced6$year.y-mean(price.reduced6$year.y)
 price.reduced6$s.loss <- price.reduced6$x.rich - price.reduced6$c.rich
+price.reduced6$s.loss.n<-(price.reduced6$s.loss*-1)
 price.reduced6$s.gain <- price.reduced6$y.rich - price.reduced6$c.rich
 
+View(price.reduced6)
 sites<-price.reduced6 %>% distinct(site_code)
 
 View(sites)
