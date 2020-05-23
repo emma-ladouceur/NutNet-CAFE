@@ -10,10 +10,9 @@ plot <- read.csv(paste0(path, '/plot.csv'), header=T,fill=TRUE,sep=",",na.string
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
-plot$log.rich<-log(plot$rich)
 
 
-nn.multi <- brm(cbind(rich, plot.mass) ~ trt * year_trt + (trt * year_trt  | site_code), 
+nn.multi <- brm(cbind(rich, plot.mass) ~ trt * year_trt + (trt * year_trt  | p | site_code), 
                      data = plot,family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4)
 
 
