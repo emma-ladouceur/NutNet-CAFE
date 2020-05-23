@@ -1,17 +1,21 @@
 
 
+library(plotbiomes)
+library(tidyverse)
+library(sp)
 
-
-
-meta <- read.csv("~/Dropbox/NutNet data/comb-by-plot-clim-soil-diversity-01-Nov-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-clim <- read.csv("~/Dropbox/Projects/NutNet/Data/site-worldclim-2-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+meta <- read.csv("~/Dropbox/NutNet data/comb-by-plot-clim-soil-diversity-01-May-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+clim <- read.csv("~/Dropbox/NutNet data/site-worldclim-2-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
-meta2<- distinct(meta, site_code, country, region, habitat, MAT_v2, MAP_VAR_v2)
+head(meta)
+meta2<- distinct(meta, site_code, country, region, habitat, MAT_v2, MAP_v2)
 
-clim2<-distinct(clim,site_code,NDep,latitude,latitude.p,longitude)
+clim2<-distinct(clim,site_code,NDep,latitude,longitude)
 
 meta3<-left_join(meta2, clim2)
+
+meta3$latitude.p<-abs(meta3$latitude)
 
 
 meta3$Realm <- ifelse(meta3$latitude.p > 23.5 & meta3$latitude.p < 60, 'Temperate',
@@ -38,52 +42,33 @@ write.csv(meta3,"~/Dropbox/Projects/NutNet/Data/clim_dat.csv")
 
 clim_dat <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat.csv", stringsAsFactors = FALSE)
 
-# In order to intersect the study points with the Whittaker biomes polygons, we
-# need to transform the climate data to spatial point object, forcing
-# temperature and precipitation (cm) data as coordinates without a CRS.
-points_sp <- sp::SpatialPoints(coords = clim_dat[, c("MAT_v2", "MAP")])
-
-
-# Extract biomes for each study location. # Whittaker biomes as polygons (comes
-# with the plotbiomes package)
-Whittaker_biomes_df <- sp::over(x = points_sp,
-                                y = plotbiomes::Whittaker_biomes_poly)
-
-clim_dat <- cbind(clim_dat, Whittaker_biomes_df)
-
-write.csv(clim_dat, file = "~/Dropbox/Projects/NutNet/Data/clim_dat_with_Whittaker_biomes.csv", row.names = FALSE)
-
-
 
 library(tidyverse)
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 country_codes <- read.csv("~/Dropbox/Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
 biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv", stringsAsFactors = FALSE)
-clim_dat <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat_with_Whittaker_biomes.csv", stringsAsFactors = FALSE)
 
 head(clim_dat)
-
+head(country_codes)
+head(biogeo)
 
 biogeo2 <- left_join(biogeo,country_codes)
 
 View(biogeo2)
 
-
-clim_dat2 <- left_join(clim_dat,biogeo2)
+clim_dat_country<- clim_dat %>% rename(countrycode=country)
+clim_dat2 <- left_join(clim_dat_country,biogeo2)
 
 
 View(clim_dat2)
 
-write.csv(clim_dat2,"~/Dropbox/Projects/NutNet/Data/clim_dat_3.csv" )
+write.csv(clim_dat2, file = "~/Dropbox/Projects/NutNet/Data/clim_dat_2.csv", row.names = FALSE)
 
 
-clim <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat_3.csv", stringsAsFactors = FALSE)
+
+clim <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat_2.csv", stringsAsFactors = FALSE)
 #plot dat
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-
-plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
-plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 pdeets<-distinct(plot,site_code,block,plot,trt,year_trt,rich,NAT_rich,INT_rich,UNK_rich,live_mass)
 p.x<-pdeets[pdeets$year_trt %in% c('0'),]
@@ -114,10 +99,13 @@ p2<-distinct(plot,elevation,latitude.p,latitude,longitude,continent,country,site
 p2$site_percent_native_rich<- (p2$site_native_richness/p2$site_richness) * 100
 p2$site_percent_int_rich<- (p2$site_introduced_richness/p2$site_richness) * 100
 
+p2<-p2 %>% mutate(site_percent_int_rich= ifelse(is.na(site_percent_int_rich), 0, site_percent_int_rich),
+                  site_percent_native_rich= ifelse(is.na(site_percent_native_rich), 0, site_percent_native_rich) )
+
 p2$site_dom <- ifelse(p2$site_percent_native_rich >= p2$site_percent_int_rich , 'native dominated',
                       ifelse(p2$site_percent_int_rich  >= p2$site_percent_native_rich, 'introduced dominated','other'))
 
-View(p.xy)
+View(p2)
 rr<-p.xy %>% group_by(site_code) %>%
   summarise(s.rich = mean(rich.x),
             r.rich = round(s.rich))
@@ -133,9 +121,39 @@ View(meta)
 # nut net site data (suspect rounded differently)
 # so dont match by longitude or latitude
 
-plot_clim <- left_join(meta,clim, by="site_code")
+head(meta)
+head(clim)
+
+meta_country<- meta %>% rename(countrycode=country)
+
+
+clim_fix<- clim %>% rename(latitude.clim.dat=latitude,
+                           longitude.clim.dat=longitude,
+                           latitude.p.clim.dat=latitude.p)
+
+plot_clim <- left_join(meta_country,clim_fix,by = c( "countrycode", "site_code", "region", "habitat"))
 
 
 View(plot_clim)
 
 write.csv(plot_clim,"~/Dropbox/Projects/NutNet/Data/plot_clim.csv" )
+
+
+clim <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv", stringsAsFactors = FALSE)
+start.rich <- read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv", stringsAsFactors = FALSE)
+fig1 <- read.csv("~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv", stringsAsFactors = FALSE)
+#plot dat
+
+
+
+head(clim)
+
+
+clim_select <- clim %>% select(site_code,latitude,longitude,country,site_richness, site_dom) %>%
+  left_join(start.rich) %>% left_join(fig1, by = c("site_code", "starting.richness")) %>% select(-X.x,-X.y,-m.rich,-r.rich,-rich.start,-rich.end,-mass.start,-mass.end, -Experiment.Length,-Experiment.Length2) %>%
+  rename(Experiment.Length=maxyr)
+
+View(clim_select)
+
+
+write.csv(clim_select,"~/Dropbox/Projects/NutNet/Data/site.inclusion.csv" )

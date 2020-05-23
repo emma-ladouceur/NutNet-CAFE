@@ -55,8 +55,8 @@ load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 summary(plot.rich.g)
 # inspection of chain diagnostic
 plot(plot.rich.g)
-color_scheme_set("purple")
-pp_check(plot.rich.g)
+color_scheme_set("gray")
+pp_check(plot.rich.g) + theme_classic()
 
 
 # residuals
@@ -146,8 +146,9 @@ load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 
 # BIOMASS
 summary(plot.bm.s)
-plot(plot.bm.s)  
-pp_check(plot.bm.s)
+#plot(plot.bm.s)  
+pp_check(plot.bm.s) + theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
+                                                                                         y = 'Frequency') 
 
 
 #residuals
@@ -246,17 +247,18 @@ load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s # positive values
+#load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s # positive values
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.n.s # negative values
 
 
 # SL : sl.s
 summary(sl.s)
-plot(sl.s)  
-pp_check(sl.s)
+#plot(sl.s)  
+pp_check(sl.s) + theme_classic() + scale_x_continuous(limits = c(-700, 50))+ labs(x=expression(paste('Change in Biomass (g/',m^2, ')')), 
+                                                                                     y = 'Frequency') 
 
 
-#residuals
+# residuals
 sl1<-residuals(sl.s)
 sl1<-as.data.frame(sl1)
 nrow(sl1)
@@ -366,7 +368,8 @@ load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
 
 summary(sg.s)
 plot(sg.s)  
-pp_check(sg.s)
+pp_check(sg.s) + theme_classic() + scale_x_continuous(limits = c(-50, 700))+ labs(x=expression(paste('Change in Biomass (g/',m^2, ')')), 
+                                                                y = 'Frequency') 
 
 # residuals
 sg1<-residuals(sg.s)
@@ -470,8 +473,9 @@ load('~/Desktop/Academic/R code/NutNet/sg_dat.Rdata')
 
 # CDE
 summary(CDE.s)
-plot(CDE.s)  
-pp_check(CDE.s)
+#plot(CDE.s)  
+pp_check(CDE.s) + theme_classic() + scale_x_continuous(limits = c(-1000, 1000))+ labs(x=expression(paste('Change in Biomass (g/',m^2, ')')), 
+                                                                                   y = 'Frequency') 
 
 
 #residuals
@@ -574,7 +578,8 @@ load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
 
 summary(s.gain.s)
 plot(s.gain.s)  
-pp_check(s.gain.s)
+pp_check(s.gain.s)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Gain', 
+                                                                                     y = 'Frequency') 
 
 
 #residuals
@@ -670,8 +675,6 @@ dat<-distinct(plot, site_code, continent,habitat)
 
 sgain.trt_coef3<-full_join(sgain.trt_coef2,dat)
 
-
-rm(sgain.trt.i)
 setwd('~/Dropbox/Projects/NutNet/Data/')
 save(sgain.trt_fitted.npk,sgain.trt_fitted.ctl,sgain.trt_coef3,file = 'sgain_dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
@@ -679,15 +682,16 @@ load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
 
 # SLOSS
 
-# NEGATIVE OR POSITIVE MODEL? FIND AND REPLACE AS APPROPRIATE
+# NEGATIVE OR POSITIVE MODEL? ....FIND AND REPLACE AS APPROPRIATE
 
-summary(s.loss.s)
+summary(s.loss.n.s)
 plot(s.loss.s)  
-pp_check(s.loss.s)
+pp_check(s.loss.n.s)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Loss', 
+                                                                                    y = 'Frequency') 
 
 
 #residuals
-s.loss1<-residuals(s.loss.s)
+s.loss1<-residuals(s.loss.n.s)
 s.loss1<-as.data.frame(s.loss1)
 nrow(s.loss1)
 nrow(p.dat2)
@@ -704,9 +708,9 @@ with(s.loss.plot, p.dat3(block, s.loss1$Estimate))
 with(s.loss.plot, p.dat3(plot, s.loss1$Estimate))
 with(s.loss.plot, p.dat3(f.year_trt, s.loss1$Estimate))
 
-sloss.trt_fitted <- cbind(s.loss.s$data,
+sloss.trt_fitted <- cbind(s.loss.n.s$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(s.loss.s, re_formula = NA)) %>% 
+                          fitted(s.loss.n.s, re_formula = NA)) %>% 
   as_tibble()
 
 
@@ -734,10 +738,10 @@ sloss.trt_fitted.ctl<-sloss.trt_fitted3[sloss.trt_fitted3$trt.y %in% c('Control'
 View(sloss.trt_fitted.npk)
 
 # fixed effect coefficients -coefficient plot
-sloss.trt_fixef <- fixef(s.loss.s)
+sloss.trt_fixef <- fixef(s.loss.n.s)
 
 # coefficients for experiment-level (random) effects
-sloss.trt_coef <- coef(s.loss.s)
+sloss.trt_coef <- coef(s.loss.n.s)
 
 sloss.trt_coef2 <-  bind_cols(sloss.trt_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 

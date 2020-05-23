@@ -8,20 +8,12 @@ library(sjstats)
 library(bayesplot)
 
 
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-plot <- droplevels( plot[-which(plot$year.zero.only == "1"), ] )
-plot <- droplevels( plot[-which(plot$no.year.zero == "1"), ] )
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
-plot$log.rich<-log(plot$rich)
-#bm
-plot$log.live.mass<-log(plot$live_mass)
-
-
 
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
@@ -84,32 +76,4 @@ View(all)
 
 write.csv(all,"~/Desktop/site.inclusion.csv")
 
-
-
-
-
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-site <- read.csv("~/Dropbox/Projects/NutNet/Data/site.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-
-
-head(site)
-
-site.smol<-site %>% filter(!is.na(Loss)) 
-
-head(site.smol,n=20)
-
-nrow(site.smol)
-
-nrow(site)
-
-
-plot.smol<-site.smol %>% left_join(plot)
-
-
-plot.smol %>% distinct(site_code)
-
-
-write.csv(all,"~/Dropbox/Projects/NutNet/Data/smol.plot.csv")
 

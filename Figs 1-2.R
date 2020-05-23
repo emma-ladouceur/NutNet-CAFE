@@ -298,8 +298,9 @@ ggplot() +
 
 # FIGURE 2
 # QUADRANT PLOT DELTA BIOMASS DELTA RICH ?
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_calc.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-startrich<-plot[plot$year_trt %in% c('0'),]
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+start.rich <-read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
 
 
 #models
@@ -332,21 +333,12 @@ plot.rich_coef2 <-  bind_cols(plot.rich_coef %>%
                                              summarise(xmin = min(year_trt),
                                                        xmax = max(year_trt)),
                                            by = 'site_code') %>%
-                                inner_join(startrich %>%
-                                             group_by(site_code) %>%
-                                             summarise(m.rich = mean(rich),
-                                                       r.rich = round(m.rich)),
+                                left_join(start.rich,
                                            by = 'site_code'))
 
 
 
-plot.rich_coef2$starting.richness <- ifelse(plot.rich_coef2$r.rich >= 1 & plot.rich_coef2$r.rich <= 5, '1-5 species',
-                                            ifelse(plot.rich_coef2$r.rich >=6 & plot.rich_coef2$r.rich <=10, '6-10',
-                                                   ifelse(plot.rich_coef2$r.rich >=11 & plot.rich_coef2$r.rich <=15, '11-15',    
-                                                          ifelse(plot.rich_coef2$r.rich >=16 & plot.rich_coef2$r.rich <=20, '16-20',
-                                                                 ifelse(plot.rich_coef2$r.rich >=21 & plot.rich_coef2$r.rich <=25, '21-25',
-                                                                        ifelse(plot.rich_coef2$r.rich >=26, '>26', 'other'))))))
-#View(plot.rich_coef2)                       
+
 
 colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Estimate.trtNPK:year_trt"] <- "Estimate.trtNPK.year_trt"
 colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q2.5.trtNPK:year_trt"] <- "Q2.5.trtNPK.year_trt"
@@ -364,15 +356,9 @@ plot.rich_coef3<-full_join(plot.rich_coef2,dat)
 plot.rich_fitted <- cbind(plot.rich.g$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
                           fitted(plot.rich.g, re_formula = NA)) %>% 
-  as_tibble() 
+  as_tibble() %>% left_join(start.rich, by="site_code")
 # View(plot.rich_fitted)
-summary(plot.rich_fitted)
-plot.rich_fitted$starting.richness <- ifelse(plot.rich_fitted$rich >= 1 & plot.rich_fitted$rich <= 5, '1-5 species',
-                                             ifelse(plot.rich_fitted$rich >=6 & plot.rich_fitted$rich <=10, '6-10',
-                                                    ifelse(plot.rich_fitted$rich >=11 & plot.rich_fitted$rich <=15, '11-15',    
-                                                           ifelse(plot.rich_fitted$rich >=16 & plot.rich_fitted$rich <=20, '16-20',
-                                                                  ifelse(plot.rich_fitted$rich >=21 & plot.rich_fitted$rich <=25, '21-25',
-                                                                         ifelse(plot.rich_fitted$rich >=26, '>26', 'other'))))))
+
 plot.rich_fitted2<-full_join(plot.rich_fitted,dat)
 plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
@@ -435,17 +421,22 @@ View(plot.bm_coef2)
 
 plot.bm_coef3<-full_join(plot.bm_coef2,dat)
 
+
+load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
+
+
 View(plot.rich_coef3)
 View(plot.bm_coef3)
 colnames(plot.rich_coef3)
 colnames(plot.bm_coef3)
-plot.rich_coef4<-plot.rich_coef3[,c(-1,-2,-3,-4,-5,-6,-7,-8,-10,-14,-18,-19,-20,-21)]
-plot.bm_coef4<-plot.bm_coef3[,c(-1,-2,-3,-4,-5,-6,-7,-8,-10,-14,-18,-19,-20,-21)]
+plot.rich_coef4<-plot.rich_coef3[,c(-1,-2,-3,-8,-9,-10,-14,-15,-16,-17,-18)]
+plot.bm_coef4<-plot.bm_coef3[,c(-1,-2,-3,-8,-9,-10,-14,-15,-16,-17,-18)]
 colnames(plot.rich_coef4)
 View(plot.bm_coef4)
 
-names(plot.rich_coef4) <- c("IR.Slope","IR.Slope_lower","IR.Slope_upper","R.Slope","R.Slope_lower","R.Slope_upper","site_code","starting.richness","continent","habitat")
-names(plot.bm_coef4) <- c("IB.Slope","IB.Slope_lower","IB.Slope_upper","B.Slope","B.Slope_lower","B.Slope_upper","site_code","starting.richness","continent","habitat")
+names(plot.rich_coef4) <- c("site_code","IR.Slope","IR.Slope_lower","IR.Slope_upper","R.Slope","R.Slope_lower","R.Slope_upper","starting.richness","continent","habitat")
+names(plot.bm_coef4) <- c("site_code","IB.Slope","IB.Slope_lower","IB.Slope_upper","B.Slope","B.Slope_lower","B.Slope_upper","starting.richness","continent","habitat")
 #plot.bm_coef5<-plot.bm_coef4[complete.cases(plot.bm_coef4$B.Slope),]
 delta.coefs<-left_join(plot.rich_coef4,plot.bm_coef4)
 View(delta.coefs)

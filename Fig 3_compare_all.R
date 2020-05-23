@@ -19,18 +19,28 @@ load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
 load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
 
 load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
 load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
 
+
+summary(plot.rich.g)
+summary(plot.bm.s)
+
+summary(s.loss.n.s)
+summary(s.gain.s)
+
+summary(sl.s)
+summary(sg.s)
+summary(CDE.s)
 # site level meta data for posrteriors
 # calculated to site level details found in Climate_Data.R
 # latitude and longitude dont match due to decimal rounding
 # lat.x long.x is nutnet site, lat.y long.y is world clim
-meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 colnames(meta)
 View(meta)
@@ -40,7 +50,7 @@ plot.bm.im_fixef <- fixef(plot.bm.s)
 sl.trt.i_fixef <- fixef(sl.s)
 sg.trt.i_fixef <- fixef(sg.s)
 CDE.trt.i_fixef <- fixef(CDE.s)
-sloss.trt.i_fixef <- fixef(s.loss.s)
+sloss.trt.i_fixef <- fixef(s.loss.n.s)
 sgain.trt.i_fixef <- fixef(s.gain.s)
 
 
@@ -49,7 +59,7 @@ sg.fixed.p<-posterior_samples(sg.s, "^b",subset = floor(runif(n = 1000, 1, max =
 CDE.fixed.p<-posterior_samples(CDE.s, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 rich.fixed.p<-posterior_samples(plot.rich.g, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
 bm.fixed.p<-posterior_samples(plot.bm.s, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
-sloss.fixed.p<-posterior_samples(s.loss.s, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sloss.fixed.p<-posterior_samples(s.loss.n.s, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sgain.fixed.p<-posterior_samples(s.gain.s, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 
 
@@ -767,7 +777,7 @@ price.cloud<-ggplot()+
                                     ymin = sg.trt.rate_lower_slope, ymax = sg.trt.rate_upper_slope),width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
   geom_errorbarh(data = all.effs,aes(y=sg.trt.rate_global_slope,
                                      xmin = sgain.trt.rate_lower_slope, xmax = sgain.trt.rate_upper_slope),height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
-  ylim(-11,30) +
+  ylim(-11,35) +
   labs(x = 'Effect of NPK on Species / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
        title= 'a) Rates / Year ')
@@ -869,10 +879,11 @@ price.cloud.add<-ggplot()+
   geom_errorbar(data = all.effs,aes(x=sloss.trt.rate_global_slope+sgain.trt.rate_global_slope,
                                     ymin = sl.trt.rate_lower_slope+sg.trt.rate_lower_slope+cde.trt.rate_lower_slope, ymax = sl.trt.rate_upper_slope+sg.trt.rate_upper_slope+cde.trt.rate_upper_slope),width=0,colour = "#816687", size = 0.55,alpha=0.3) +
   
-  ylim(-11,30) +
+  ylim(-11,35) +
+  xlim(-0.65,0)+
   labs(x = 'Effect of NPK on Species / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'b) Rates / Year Added')
+       title= 'b) Rates / Year ')
 
 price.cloud.add
 
@@ -1022,8 +1033,8 @@ bef.cloud<-ggplot()+
                                      ymin = bm.trt_lower_slope, ymax = bm.trt_upper_slope),width=0,colour = "#0B775E", size = 0.55,alpha=0.3) +
   geom_errorbarh(data = r.bm.effs,aes(y=bm.trt_global_slope,
                                       xmin = rich.trt_lower_slope, xmax = rich.trt_upper_slope),height=0,colour = "#0B775E", size = 0.55,alpha=0.3) +
-  ylim(-11,30) +
-  
+  ylim(-11,35) +
+  xlim(-0.65,0)+
  # scale_color_manual(name='Overall Effects',values=c("#0B775E")) +
   labs(x = 'Effect of NPK on Species Richness / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
@@ -1062,7 +1073,6 @@ bef.leg<-ggplot()+
   geom_errorbarh(data = r.bm.effs,aes(y=bm.trt_global_slope,
                                       xmin = rich.trt_lower_slope, xmax = rich.trt_upper_slope),height=0,colour = "#0B775E", size = 0.55,alpha=0.3) +
   ylim(-11,30) +
-  
   scale_color_manual(name='Overall Effects',values=c("#0B775E")) +
   labs(x = 'Effect of NPK on Species Richness / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
@@ -1101,7 +1111,6 @@ u.leg<-ggplot()+
   geom_errorbarh(data = r.bm.effs,aes(y=bm.trt_global_slope,
                                       xmin = rich.trt_lower_slope, xmax = rich.trt_upper_slope),height=0,colour = "#0B775E", size = 0.55,alpha=0.3) +
   ylim(-11,30) +
-  
   scale_color_manual(name='Uncertainty',values=c("#0B775E")) +
   labs(x = 'Effect of NPK on Species Richness / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
@@ -1192,7 +1201,7 @@ price.cloud2<-ggplot()+
                                     ymin = sg.trt.rate_lower_slope, ymax = sg.trt.rate_upper_slope),width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
   geom_errorbarh(data = all.effs,aes(y=sg.trt.rate_global_slope,
                                      xmin = sgain.trt.rate_lower_slope, xmax = sgain.trt.rate_upper_slope),height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
-  ylim(-11,30) +
+  ylim(-11,35) +
   labs(x = 'Effect of NPK on Species / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
        title= 'b) Species Loss, Gain + Persistent Species ')

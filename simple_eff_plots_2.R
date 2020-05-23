@@ -29,7 +29,7 @@ sg.trt.i_fixef <- as.data.frame(fixef(sg.s))
 CDE.trt.i_fixef <- as.data.frame( fixef(CDE.s))
 plot.rich.im_fixef <- as.data.frame(fixef(plot.rich.g))
 plot.bm.im_fixef <- as.data.frame(fixef(plot.bm.s))
-sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.s))
+sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.n.s))
 sgain.trt.i_fixef <-as.data.frame( fixef(s.gain.s))
 
 plot.rich.im_fixef

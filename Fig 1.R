@@ -40,10 +40,11 @@ plot3<-plot2 %>% drop_na(plot.mass)
 plot4<-plot3 %>% group_by(site_code, block,plot,year_trt) %>%
   select(continent,unique.id,site_code,block, plot,year_trt,rich,plot.mass)
 
-s.check<-plotzero %>% arrange(site_code)
-View(s.check)
 
 plotzero<-plot4[plot4$year_trt %in% c('0'),]
+
+s.check<-plotzero %>% arrange(site_code)
+View(s.check)
 
 plotmax<-plot4 %>% group_by(site_code) %>% top_n(1, year_trt)
 
@@ -250,6 +251,7 @@ ggplot() +
        y = expression(paste('Biomass (g/' ,m^2, ')')), 
        title= 'Experiment Length', color=" Starting Richness", linetype="Experiment Length") +
   scale_y_continuous(limits=c(0,2500)) +
+  scale_x_continuous(limits=c(0,35)) +
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                      strip.background = element_blank(),plot.title = element_text(size=12),
                      legend.position="bottom")
@@ -280,6 +282,7 @@ ggplot() +
        y = expression(paste('Biomass (g/' ,m^2, ')')), 
        title= 'Experiment Length', color=" Starting Richness", linetype="Experiment Length") +
   scale_y_continuous(limits=c(0,2500)) +
+  scale_x_continuous(limits=c(0,35)) +
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                      strip.background = element_blank(),plot.title = element_text(size=12),
                      legend.position="bottom")

@@ -4,11 +4,13 @@ library(plotbiomes)
 library(ggplot2)
 library(tidyverse)
 
-meta <- read.csv("~/Dropbox/NutNet data/comb-by-plot-clim-soil-diversity-01-Nov-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-clim <- read.csv("~/Dropbox/Projects/NutNet/Data/site-worldclim-2-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+meta <- read.csv("~/Dropbox/NutNet data/comb-by-plot-clim-soil-diversity-01-May-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+clim <- read.csv("~/Dropbox/NutNet data/site-worldclim-2-August-2019.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
-meta2<- distinct(meta, site_code, country, region, habitat, MAT_v2, MAP_VAR_v2)
+meta3$latitude.p<-abs(meta3$latitude)
+
+meta2<- distinct(meta, site_code, country, region, habitat, MAT_v2, MAP_v2)
 
 clim2<-distinct(clim,site_code,NDep,latitude,latitude.p,longitude)
 
@@ -37,7 +39,11 @@ write.csv(meta3,"~/Dropbox/Projects/NutNet/Data/clim_dat.csv")
 
 
 meta <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+
+meta<- plot %>% select(site_code) %>% distinct(site_code) %>% left_join(meta)
+View(meta)
 
 meta$MAP_mm<-meta$MAP_v2 / 10
 

@@ -8,6 +8,7 @@ library(gridExtra)
 library(grid)
 library(sjstats)
 library(bayesplot)
+library(patchwork)
 
 
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -40,12 +41,12 @@ View(plot.rich_coef3)
 
 
 r1<-ggplot() +
-  #facet_wrap(~Model) +
-  geom_point(data = plot.rich_fitted.npk %>% filter(site_code=="nilla.au"),
+  facet_wrap(~Model) +
+  geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich,
                  colour = starting.richness), alpha=0.6,
              size = 1.3, position = position_jitter(width = 0.45 )) +
-  geom_segment(data = plot.rich_coef3 %>% filter(site_code=="nilla.au"),
+  geom_segment(data = plot.rich_coef3 ,
                aes(x = xmin, 
                    xend = xmax,
                    y = (Intercept + TE  + (ISlope+TESlope) * xmin),
@@ -54,17 +55,17 @@ r1<-ggplot() +
                    colour = starting.richness),
                size = .7) +
  # uncertainy in fixed effect
-  # geom_ribbon(data = plot.rich_fitted.npk,
-  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-  #             alpha = 0.5) +
-  # # fixed effect
-  # geom_line(data = fitted.rich,
-  #           aes(x = year_trt, y = Estimate, linetype= Treatment),
-  #           size = 1.5) +
-  # geom_ribbon(data = plot.rich_fitted.ctl,
-  #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-  #             alpha = 0.5) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,10,11,12)) +
+  geom_ribbon(data = plot.rich_fitted.npk,
+              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  # fixed effect
+  geom_line(data = fitted.rich,
+            aes(x = year_trt, y = Estimate, linetype= Treatment),
+            size = 1.5) +
+  geom_ribbon(data = plot.rich_fitted.ctl,
+              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
+              alpha = 0.5) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   labs(x='',
     #x = 'Years',
        y = ' Species richness', title= 'a)  ', color= ' Starting Richness') +
@@ -94,7 +95,7 @@ rmatrix<-ggplot() +
                    group = site_code,
                    colour = starting.richness),
                size = .7) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,10,11,12)) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   labs(x='',
        #x = 'Years',
        y = ' Species richness', title= 'Species richness  ', color= ' Starting Richness') +
@@ -104,9 +105,8 @@ rmatrix<-ggplot() +
                                  "16-20"= "#0C5BB0FF",
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.title = element_text(size=12),
-                     plot.margin= margin(t = 0.1, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
+                     plot.title = element_text(size=12))
 
 rmatrix
 
@@ -157,7 +157,7 @@ b1<-ggplot() +
        y = expression(paste('Biomass (g/',m^2, ')')), title= '', color='Starting Richness') +
   ylim(0,1900)+
  # xlim(0,11) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,11)) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -171,8 +171,7 @@ b1<-ggplot() +
 
 b1
 
-
-grid_arrange_shared_legend(r1,b1,nrow=1)
+(r1 + b1)
 
 
 bmatrix<-ggplot() +
@@ -195,16 +194,15 @@ bmatrix<-ggplot() +
        y = expression(paste('Biomass (g/',m^2, ')')), title= 'Biomass', color='Starting Richness') +
   ylim(0,1900)+
   # xlim(0,11) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,11)) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
                                  "16-20"= "#0C5BB0FF",
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.title = element_text(size=12),
-                     plot.margin= margin(t = 0.1, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
+                     plot.title = element_text(size=12))
 
 
 bmatrix
@@ -272,7 +270,7 @@ sgain.trtm<-ggplot()  +
   geom_ribbon(data = sgain.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(0,20) +
   labs(x='',
    # x = 'Years',
@@ -304,27 +302,23 @@ sgain.matrix<-ggplot()  +
                    # group = starting.richness,
                    colour = starting.richness),
                size = .7) +
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
-  ylim(0,20) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  #ylim(0,20) +
   labs(x='',
        # x = 'Years',
-       y = expression(paste('Species Gain')), title= '', color='Starting Richness') +
+       y = expression(paste('Species Gain')), title= 'Species Gain', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
                                  "16-20"= "#0C5BB0FF",
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.margin= margin(t = -0.5, r = 0.2, b = -0.5, l = 0.2, unit = "cm"))
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom")
 
 
 sgain.matrix
 
 # LOSS
-load('~/Desktop/back up old nutnet dat/sloss.n.mod.dat.old.Rdata')
-load('~/Desktop/back up old nutnet dat/sloss.mod.dat.old.Rdata')
-
 load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 fitted.sloss
@@ -359,7 +353,7 @@ fitted.sloss$Treatment <- factor(fitted.sloss$Treatment , levels=c("NPK","Contro
 sloss.trtm<-ggplot() +
   facet_grid(~Model)+
   geom_point(data = sloss.trt_fitted.npk,
-             aes(x = year.y, y = s.loss,
+             aes(x = year.y, y = s.loss.n,
                  colour = starting.richness), alpha=0.6,
              size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sloss.trt_coef3,
@@ -382,8 +376,8 @@ sloss.trtm<-ggplot() +
   geom_ribbon(data = sloss.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
-  scale_y_reverse( lim=c(20,0))+
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  #scale_y_reverse( lim=c(20,0))+
   #ylim(-20,0) +
   labs(x='',
    # x = 'Years',
@@ -401,13 +395,37 @@ sloss.trtm<-ggplot() +
 
 sloss.trtm
 
+sloss.matrix<-ggplot() +
+  facet_wrap(~site_code)+
+  geom_point(data = sloss.trt_fitted.npk,
+             aes(x = year.y, y = s.loss.n,
+                 colour = starting.richness), alpha=0.6,
+             size = .7, position = position_jitter(width = 0.45)) +
+  geom_segment(data = sloss.trt_coef3,
+               aes(x = xs, 
+                   xend = xmax,
+                   y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope) * cxmax),
+                   # group = site_code,
+                   colour = starting.richness
+               ),
+               size = .7) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  #scale_y_reverse( lim=c(20,0))+
+  #ylim(-20,0) +
+  labs(x='',
+       # x = 'Years',
+       y = expression(paste('Species Loss')), title= 'Species Loss', color='Starting Richness') +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom")
 
 
-
-
-
-
- grid.arrange(sloss.trtm,sgain.trtm,nrow=1,ncol=2)
+sloss.matrix
 
 
 
@@ -469,7 +487,7 @@ sl.trtm<-ggplot() +
   geom_ribbon(data = sl.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(-400,0) +
   labs(x='',
     #x = 'Years',
@@ -504,19 +522,18 @@ sl.matrix<-ggplot() +
                ),
                size = .7) +
   
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
  # ylim(-400,0) +
   labs(x='',
        #x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= '', color='Starting Richness') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= 'Species Loss Effect on Biomass', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
                                  "16-20"= "#0C5BB0FF",
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.margin= margin(t = -0.5, r = 0.1, b = -0.5, l = 0, unit = "cm"))
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom")
 
 
 sl.matrix
@@ -571,7 +588,7 @@ sg.trtm<-ggplot()  +
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   #scale_y_continuous(trans = 'log', breaks=c(1,2,4,6,8,16,24,64,512,1024,2048,4096)) +
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(0,400) +
   labs(x = 'Years',
        y='',
@@ -606,12 +623,11 @@ sg.matrix<-ggplot()  +
                    colour = starting.richness),
                size = .7) +
   #scale_y_continuous(trans = 'log', breaks=c(1,2,4,6,8,16,24,64,512,1024,2048,4096)) +
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
   #ylim(0,400) +
   labs(x = 'Years',
-       y='',
-       #y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-       title= '', color='Starting Richness') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
+       title= 'Species Gain Effect on Biomass', color='Starting Richness') +
   scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
                                  "6-10" = "#75B41EFF",
                                  "11-15" ="#5AC2F1FF",
@@ -619,7 +635,7 @@ sg.matrix<-ggplot()  +
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="bottom", plot.margin= margin(t = -0.5, r = 0, b = -0.5, l = 0, unit = "cm"))
+                     legend.position="bottom")
 
 
 sg.matrix
@@ -680,7 +696,7 @@ cdem<-ggplot() +
   geom_ribbon(data = cde_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(-500,1000)+
   labs(x='',
     #x = 'Years',
@@ -717,7 +733,7 @@ cdematrix<-ggplot() +
                    colour = starting.richness),
                size = .7) +
   # uncertainy in fixed effect
-  scale_x_continuous(breaks=c(1,3,6,9,11,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
   #ylim(-500,1500)+
   labs(x='',
        #x = 'Years',
@@ -731,7 +747,7 @@ cdematrix<-ggplot() +
                                  "21-25" = "#972C8DFF",
                                  ">26" = "#E0363AFF", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="bottom", plot.margin= margin(t = -0.5, r = 0.2, b = -0.5, l = 0, unit = "cm"))
+                     legend.position="bottom")
 
 
 cdematrix
@@ -748,22 +764,7 @@ g_legend<-function(a.gplot){
 
 rlegend<-g_legend(sg.trtm)
 
-r.combine <- grid.arrange(arrangeGrob(r1 ,
-                               b1 ,
-                               sloss.trtm,
-                               sgain.trtm,
-                               sl.trtm,
-                               sg.trtm,
-                               cdem + theme(legend.position="none"),
-                               rlegend,
-                               nrow=4,ncol=3,
-                               layout_matrix=rbind(c(1,2,NA),c(3,4,NA),c(5,6,7),c(NA,8,NA)),
-                               heights = c(10,10,10, 2)))
-
-r.combine
-
 # patchwork solution
-library(patchwork)
 
 (r1 | b1)/(sloss.trtm|sgain.trtm)/(sl.trtm|sg.trtm+ theme(legend.position="none")|cdem )/(rlegend) +
   plot_layout(heights = c(10, 10,10,3.5))
@@ -772,5 +773,40 @@ library(patchwork)
   plot_layout(heights = c(10,3.5))
 
 grid.arrange(sp.trt,sp.slope,bm.trt,bm.slope,nrow=2,ncol=2)
+
+
+
+
+
+# master matrix
+
+View(cde_coef3)
+cdematrix<-ggplot() +
+  # data
+  facet_wrap(~site_code) +
+  geom_segment(data = cde_coef3,
+               aes(x = xs, 
+                   xend = xmax,
+                   y = (Intercept + TE + (ISlope+TESlope)  * cxmin),
+                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
+                   group = site_code,
+                   colour = starting.richness),
+               size = .7) +
+  # uncertainy in fixed effect
+  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  #ylim(-500,1500)+
+  labs(x='',
+       #x = 'Years',
+       y= '',
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
+       title= 'Change in Persistent Species',  color='Starting Richness') +
+  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+                                 "6-10" = "#75B41EFF",
+                                 "11-15" ="#5AC2F1FF",
+                                 "16-20"= "#0C5BB0FF",
+                                 "21-25" = "#972C8DFF",
+                                 ">26" = "#E0363AFF", drop =FALSE))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+                     legend.position="bottom")
 
 
