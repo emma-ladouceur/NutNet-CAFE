@@ -18,12 +18,19 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
+plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
+
+
 # PARTITION DATA
 p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
 
 p.all$f.year.y<-as.factor(p.all$year.y)
 p.all$plot<-as.factor(p.all$plot)
 p.all$site_code<-as.factor(p.all$site_code)
+
+p.all <- p.all %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
 
 dat<-distinct(plot, site_code, continent,habitat)
 p.dat2<-inner_join(p.all,dat)
@@ -49,14 +56,15 @@ write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
 
 
 # load PLOT models
-load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
+#load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
 
-summary(plot.rich.g)
+summary(plot.rich.3)
 # inspection of chain diagnostic
 plot(plot.rich.g)
 color_scheme_set("gray")
-pp_check(plot.rich.g) + theme_classic()
+pp_check(plot.rich.3) + theme_classic()
 
 
 # residuals
@@ -79,17 +87,17 @@ with(rr.plot, plot(f.year_trt, m1$Estimate))
 
 # fixed effects
 
-plot.rich_fitted <- cbind(plot.rich.g$data,
+plot.rich_fitted <- cbind(plot.rich.3$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(plot.rich.g, re_formula = NA)) %>% 
+                          fitted(plot.rich.3, re_formula = NA)) %>% 
   as_tibble() 
 
 View(plot.rich_fitted)
 # fixed effect coefficients 
-plot.rich_fixef <- fixef(plot.rich.g)
+plot.rich_fixef <- fixef(plot.rich.3)
 
 # coefficients for experiment-level (random) effects
-plot.rich_coef <- coef(plot.rich.g)
+plot.rich_coef <- coef(plot.rich.3)
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -139,15 +147,15 @@ plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
 
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/Dropbox/Projects/NutNet/Data/3/')
 save(plot.rich_fitted.npk,plot.rich_fitted.ctl,plot.rich_coef3,file = 'rich.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 
 
 # BIOMASS
-summary(plot.bm.s)
+summary(plot.bm.3)
 #plot(plot.bm.s)  
-pp_check(plot.bm.s) + theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
+pp_check(plot.bm.3) + theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
                                                                                          y = 'Frequency') 
 
 
@@ -171,16 +179,16 @@ with(rb.plot, plot(f.year_trt, bm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-plot.bm_fitted <- cbind(plot.bm.s$data,
+plot.bm_fitted <- cbind(plot.bm.3$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(plot.bm.s, re_formula = NA)) %>% 
+                        fitted(plot.bm.3, re_formula = NA)) %>% 
   as_tibble() 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(plot.bm.s)
+plot.bm_fixef <- fixef(plot.bm.3)
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(plot.bm.s)
+plot.bm_coef <- coef(plot.bm.3)
 plot.bm_coef 
 
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
@@ -233,7 +241,7 @@ plot.bm_fitted.ctl<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('Control'),]
 
 
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/Dropbox/Projects/NutNet/Data/3/')
 save(plot.bm_fitted.npk,plot.bm_fitted.ctl,plot.bm_coef3,file = 'bm.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
 

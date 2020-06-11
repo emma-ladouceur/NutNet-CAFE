@@ -17,8 +17,11 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
+plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
+
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/3/bm.mod.dat.Rdata')
 
 plot.rich_fitted.npk
 
