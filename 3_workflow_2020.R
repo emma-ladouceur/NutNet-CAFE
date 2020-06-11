@@ -102,3 +102,19 @@ View(sites)
 
 
 write.csv(price.reduced6,"~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
+
+
+# get max year for filtering
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+
+p.all<-p.all %>% group_by(site_code) %>% 
+  summarise(min.year = min(year.x),
+            max.year = max(year.y))
+
+price.inclusion<-p.all %>% distinct(site_code,min.year,max.year)
+price.inclusion
+
+
+write.csv(p.all, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")

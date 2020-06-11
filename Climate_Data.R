@@ -149,7 +149,7 @@ fig1 <- read.csv("~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv", stringsAsFact
 head(clim)
 
 
-clim_select <- clim %>% select(site_code,latitude,longitude,country,site_richness, site_dom) %>%
+clim_select <- clim %>% select(site_code,country,habitat,site_richness, site_dom) %>%
   left_join(start.rich) %>% left_join(fig1, by = c("site_code", "starting.richness")) %>% select(-X.x,-X.y,-m.rich,-r.rich,-rich.start,-rich.end,-mass.start,-mass.end, -Experiment.Length,-Experiment.Length2) %>%
   rename(Experiment.Length=maxyr)
 

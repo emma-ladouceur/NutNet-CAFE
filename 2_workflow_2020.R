@@ -45,7 +45,7 @@ site.inclusion<-bce5 %>% distinct(site_code)
 
 View(site.inclusion)
 
-cover<- read.csv("~/Dropbox/NutNet data/full-cover-01-May-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+cover<- read.csv("~/Dropbox/NutNet data/full-cover-03-June-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 cover2<-unite_(cover, "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE)
 
 species.nn <- bce6 %>%  left_join(cover2)
@@ -54,7 +54,7 @@ species.nn <- bce6 %>%  left_join(cover2)
 View(species.nn)
 
 # plot level data
-comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-30-April-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-03-June-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 comb2<-unite_(comb, "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE)
 #select only columns of interest
@@ -71,6 +71,10 @@ plot.div <- data.frame(id=species.nn$id,ids=species.nn$ids,
                        site_code=species.nn$site_code,	year_trt=species.nn$year_trt,
                        block=species.nn$block,
                        plot=species.nn$plot, subplot.cov=species.nn$subplot.cov, local_provenance=species.nn$local_provenance)
+
+
+View(plot.div)
+
 
 all.div <- plot.div %>% distinct (ids)
 
@@ -244,6 +248,34 @@ bce5$biomass.sp.diff<-  abs(bce5$biomass.sp.plot - bce5$biomass.sp.cat)
 
 samp <- bce5 %>% top_frac(.5) %>% arrange(desc(biomass.sp.diff)) %>%
   select(id,Taxon,plot.mass,category, mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.diff) 
+
+
+
+# get max year for filtering
+
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+
+plot<-plot %>% group_by(site_code) %>% 
+                      summarise(min.year = min(year_trt),
+                                max.year = max(year_trt))
+
+site.inclusion<-plot %>% distinct(site_code,min.year,max.year)
+site.inclusion
+
+
+p.all<-p.all %>% group_by(site_code) %>% 
+  summarise(min.year = min(year.x),
+            max.year = max(year.y))
+
+price.inclusion<-p.all %>% distinct(site_code,min.year,max.year)
+price.inclusion
+
+write.csv(plot, "~/Dropbox/Projects/NutNet/Data/plot.csv")
+write.csv(p.all, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
+
 
 
 
