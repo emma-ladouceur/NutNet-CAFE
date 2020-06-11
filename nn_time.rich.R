@@ -16,7 +16,6 @@ plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
 ungroup()
 
 
-View(plot)
 plot.rich.3 <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
                     data = plot,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
