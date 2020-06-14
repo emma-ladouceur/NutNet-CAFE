@@ -10,16 +10,16 @@ plot <- read.csv(paste0(path, '/plot.csv'), header=T,fill=TRUE,sep=",",na.string
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
+plot$log.rich<-log(plot$rich)
+
+# plot <- plot %>% group_by(site_code) %>% filter(max.year >= 5) %>%
+# ungroup()
 
 
-plot <- plot %>% group_by(site_code) %>% filter(max.year >= 5) %>%
-ungroup()
-
-
-plot.rich.5<- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
+plot.rich.l<- brm(log.rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
                     data = plot,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
-save(plot.rich.5,
+save(plot.rich.l,
      file=Sys.getenv('OFILE'))
 
 

@@ -6,13 +6,14 @@ library(tidyverse)
 library(brms)
 library(ggplot2)
 library(bayesplot)
+library(patchwork)
 
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
-nn.multi <- brm(mvbind(rich, plot.mass) ~ trt * year_trt + (trt * year_trt  | p | site_code), 
-                data = plot,family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4)
+# nn.multi <- brm(mvbind(rich, plot.mass) ~ trt * year_trt + (trt * year_trt  | p | site_code), 
+#                 data = plot,family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4)
 
 
 # load model object

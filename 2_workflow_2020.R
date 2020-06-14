@@ -260,7 +260,9 @@ p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",he
 
 plot<-plot %>% group_by(site_code) %>% 
                       summarise(min.year = min(year_trt),
-                                max.year = max(year_trt))
+                                max.year = max(year_trt)) %>% left_join(plot)
+
+View(plot)
 
 site.inclusion<-plot %>% distinct(site_code,min.year,max.year)
 site.inclusion
@@ -268,8 +270,10 @@ site.inclusion
 
 p.all<-p.all %>% group_by(site_code) %>% 
   summarise(min.year = min(year.x),
-            max.year = max(year.y))
+            max.year = max(year.y)) %>% left_join(p.all)
 
+
+View(p.all)
 price.inclusion<-p.all %>% distinct(site_code,min.year,max.year)
 price.inclusion
 
