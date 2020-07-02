@@ -104,20 +104,14 @@ n <- data.f %>%
   group_by(latitude, longitude, site_code, `Length of study`, continent) %>%
   ggplot() +
   geom_polygon(data = world, aes(x=long, y = lat, group = group), fill="grey", alpha=0.7) +
-  geom_point(aes(x=longitude, y=latitude, color=`Starting Richness`, size=`Length of study`), alpha=0.5) +
+  geom_point(aes(x=longitude, y=latitude, color=`Length of study`, size=`Length of study`), alpha=0.5) +
   geom_label_repel(
     aes(x=longitude, y=latitude, label = site_code),family = 'Times',
     segment.size = 0.5, segment.alpha = 0.5,
     size = 3,
     box.padding = 0.1, point.padding = 0.3, fill = NA,
     segment.color = 'grey50') +
-  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
-                                 "6-10" = "#75B41EFF",
-                                 "11-15" ="#5AC2F1FF",
-                                 "16-20"= "#0C5BB0FF",
-                                 "21-25" = "#972C8DFF",
-                                 ">26" = "#E0363AFF", drop =FALSE))+
-  #scale_color_viridis(discrete=FALSE,name="Length of Study") +
+  scale_color_viridis(discrete=FALSE,name="Length of Study") +
   scale_size_continuous(range=c(2,8), name="Length of Study") +
   coord_equal() +
   theme_void() +
@@ -127,7 +121,7 @@ n <- data.f %>%
     legend.position=c(0.13,0.001),
     legend.direction="horizontal"
   ) +
-   ggplot2::annotate("text", x = -185, y = -34, hjust = 0, size = 7, label = paste("The Nuterient Network"), color = "Black") +
+   ggplot2::annotate("text", x = -185, y = -34, hjust = 0, size = 7, label = paste("The Nutrient Network"), color = "Black") +
    ggplot2::annotate("text", x = -181, y = -44, hjust = 0, size = 4, label = paste("Experimental Locations"), color = "black", alpha = 0.5) +
   xlim(-180,180) +
   ylim(-60,80) +

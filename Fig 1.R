@@ -191,6 +191,7 @@ fig1_dat$starting.richness <- factor(fig1_dat$starting.richness , levels=c("1-5 
 fig1_dat$Experiment.Length2 <- factor(fig1_dat$Experiment.Length2 , levels=c("1-3 years","4-6","7-9","10-12"))
 
 
+View(fig1_dat)
 # FIGURE 1
 # BIOMASS RICHNESS DIRECTIONAL ARROWS / VARIATION
 ggplot() +
@@ -203,19 +204,19 @@ ggplot() +
                                y=mass.start,
                                yend=mass.end,
                                group = site_code,
-                               colour=starting.richness,# linetype= Experiment.Length 
-                               ), 
+                               color=maxyr),  
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
-                                 "6-10" = "#75B41EFF",
-                                 "11-15" ="#5AC2F1FF",
-                                 "16-20"= "#0C5BB0FF",
-                                 "21-25" = "#972C8DFF",
-                                 ">26" = "#E0363AFF", drop =FALSE))+
+  scale_color_viridis(discrete=FALSE,name="Length of Study") +
+  # scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
+  #                                "6-10" = "#75B41EFF",
+  #                                "11-15" ="#5AC2F1FF",
+  #                                "16-20"= "#0C5BB0FF",
+  #                                "21-25" = "#972C8DFF",
+  #                                ">26" = "#E0363AFF", drop =FALSE))+
   #scale_linetype_manual(values=c("solid","dashed", "dotted"))+
   labs(x = 'Species Richness',
        y = expression(paste('Biomass (g/' ,m^2, ')')), 
-       title= 'Experiment Length', color=" Starting Richness", linetype="Experiment Length") +
+       title= '') +
    scale_y_continuous(limits=c(0,2500)) +
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                      strip.background = element_blank(),plot.title = element_text(size=12),
