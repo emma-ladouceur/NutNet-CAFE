@@ -8,19 +8,20 @@ library(gridExtra)
 library(grid)
 library("scales")
 library(viridis)
+library(patchwork)
 
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/full/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.n.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/cde.Rdata') # CDE.s
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sloss.n.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sgain.Rdata') # s.gain.s
 
 
 
@@ -263,20 +264,18 @@ grid.arrange(rich.bm.eff,sp.eff,bm.eff,nrow=3,ncol=1)
 (rich.bm.eff)/(sp.eff)/(bm.eff)
 
 
-# seperately
-
-
+# SEPERATELY
 
 
 rich.f <-bind_rows(
-  plot.rich.im_fixef['trtNPK',] %>% 
-    mutate(response='Species Richness Trt',
-           eff = Estimate,
-           eff_upper = Q97.5,
-           eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  # plot.rich.im_fixef['trtNPK',] %>% 
+  #   mutate(response='Species Richness Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   plot.rich.im_fixef['trtNPK:year_trt',] %>% 
-    mutate(response='Species Richness / Year',
+    mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
@@ -288,14 +287,14 @@ rich.f$Model <- "Species Richness"
 rich.f
 
 bm.f <-bind_rows(
-  plot.bm.im_fixef['trtNPK',] %>% 
-    mutate(response='Biomass Trt',
-           eff = Estimate,
-           eff_upper = Q97.5,
-           eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  #plot.bm.im_fixef['trtNPK',] %>% 
+    # mutate(response='Biomass Trt',
+    #        eff = Estimate,
+    #        eff_upper = Q97.5,
+    #        eff_lower = Q2.5) %>%
+    # select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   plot.bm.im_fixef['trtNPK:year_trt',] %>% 
-    mutate(response='Biomass / Year',
+    mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
@@ -305,14 +304,14 @@ bm.f <-bind_rows(
 bm.f$Model <- "Biomass"
 
 sl.f <-bind_rows(
-  sl.trt.i_fixef['trt.yNPK',] %>% 
-    mutate(response='SL Trt',
-           eff = Estimate,
-           eff_upper = Q97.5,
-           eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  # sl.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='SL Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sl.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
-    mutate(response='SL / Year',
+    mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
@@ -323,14 +322,14 @@ sl.f <-bind_rows(
 sl.f$Model <- "Species Loss Effect on Biomass"
 
 sg.f <-bind_rows(
-  sg.trt.i_fixef['trt.yNPK',] %>% 
-    mutate(response='SG Trt',
-           eff = Estimate,
-           eff_upper = Q97.5,
-           eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  # sg.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='SG Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sg.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
-    mutate(response='SG / Year',
+    mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
@@ -339,14 +338,14 @@ sg.f <-bind_rows(
 
 sg.f$Model <- "Species Gain Effect on Biomass"
 cde.f <-bind_rows(
-  CDE.trt.i_fixef['trt.yNPK',] %>% 
-    mutate(response='PS Trt',
-           eff = Estimate,
-           eff_upper = Q97.5,
-           eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  # CDE.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='PS Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   CDE.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
-    mutate(response='PS / Year',
+    mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
@@ -355,14 +354,14 @@ cde.f <-bind_rows(
 
 cde.f$Model <- "Persistent Species Change in Biomass"
 sloss.f <-bind_rows(
-  sloss.trt.i_fixef['trt.yNPK',] %>% 
-    mutate(response='Species Loss Trt',
-           eff = Estimate,
-           eff_upper = Q97.5,
-           eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  # sloss.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='Species Loss Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sloss.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
-    mutate(response='Species Loss / Year',
+    mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
@@ -372,14 +371,14 @@ sloss.f <-bind_rows(
 sloss.f$Model <- "Species Loss"
 
 sgain.f <-bind_rows(
-  sgain.trt.i_fixef['trt.yNPK',] %>% 
-    mutate(response='Species Gain Trt',
-           eff = Estimate,
-           eff_upper = Q97.5,
-           eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  # sgain.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='Species Gain Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sgain.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
-    mutate(response='Species Gain / Year',
+    mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
@@ -388,7 +387,9 @@ sgain.f <-bind_rows(
 
 sgain.f$Model <- "Species Gain"
 
-rich.f$response <- factor(rich.f$response , levels=c("Species Richness Trt","Species Richness / Year"))
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(rich.f,bm.f,sloss.f,sgain.f,sl.f,sg.f,cde.f,file = 'effs.Rdata')
+
 
 rich.eff<-ggplot() + 
   geom_point(data =rich.f, aes(x = response, y = eff, color=response),size = 2) +
@@ -400,22 +401,21 @@ rich.eff<-ggplot() +
        y = 'Slope') +
   labs(x = '',
        y= expression(paste('Effect of NPK on Species Richness')),
-       title='Species Richness') +
+       #title='Species Richness'
+       ) +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-1.2,0.2) +
-  #scale_color_manual(values = c("#F98400", "#B40F20","#3B9AB2")) +
+  scale_color_manual(values = c("#F98400")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),
                    axis.title.x = element_text(size=8),
                    title=element_text(size=8),
-                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+                   strip.background = element_blank(),legend.position="none")
 
 
 rich.eff
 
-
-bm.f$response <- factor(bm.f$response , levels=c("Biomass Trt","Biomass / Year"))
 
 bm.eff<-ggplot() + 
   geom_point(data =bm.f, aes(x = response, y = eff,color=response),size = 2) +
@@ -430,16 +430,15 @@ bm.eff<-ggplot() +
        title='Biomass') +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-50,140) +
-  #scale_color_manual(values = c("#0B775E", "#B40F20","#3B9AB2","#35274A")) +
-  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
-                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+  scale_color_manual(values = c("#0B775E")) +
+                       theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                        #axis.title.x = element_blank(),#axis.text.y = element_blank(),
+                                        axis.text.y = element_text(size=6),
+                                        axis.title.x = element_text(size=8),
+                                        title=element_text(size=8),
+                                        strip.background = element_blank(),legend.position="none")
 
 
-sloss.f$response <- factor(sloss.f$response , levels=c("Species Loss Trt","Species Loss / Year"))
 
 sloss.eff<-ggplot() + 
   geom_point(data =sloss.f, aes(x = response, y = eff,color=response),size = 2) +
@@ -454,17 +453,15 @@ sloss.eff<-ggplot() +
        title='Species Loss') +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-50,140) +
-  #scale_color_manual(values = c("#0B775E", "#B40F20","#3B9AB2","#35274A")) +
+  scale_color_manual(values = c("#B40F20")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),
                    axis.title.x = element_text(size=8),
                    title=element_text(size=8),
-                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+                   strip.background = element_blank(),legend.position="none")
 
 sloss.eff
-
-sgain.f$response <- factor(sgain.f$response , levels=c("Species Gain Trt","Species Gain / Year"))
 
 sgain.eff<-ggplot() + 
   geom_point(data =sgain.f, aes(x = response, y = eff,color=response),size = 2) +
@@ -479,18 +476,17 @@ sgain.eff<-ggplot() +
        title='Species Gain') +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-50,140) +
-  #scale_color_manual(values = c("#0B775E", "#B40F20","#3B9AB2","#35274A")) +
+  scale_color_manual(values = c("#046C9A")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),
                    axis.title.x = element_text(size=8),
                    title=element_text(size=8),
-                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+                   strip.background = element_blank(),legend.position="none")
 
 sgain.eff
 
 
-sl.f$response <- factor(sl.f$response , levels=c("SL Trt","SL / Year"))
 
 sl.eff<-ggplot() + 
   geom_point(data =sl.f, aes(x = response, y = eff,color=response),size = 2) +
@@ -505,21 +501,18 @@ sl.eff<-ggplot() +
        title='Species Loss Effect on Biomass') +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-50,140) +
-  #scale_color_manual(values = c("#0B775E", "#B40F20","#3B9AB2","#35274A")) +
+  scale_color_manual(values = c("#B40F20")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),
                    axis.title.x = element_text(size=8),
                    title=element_text(size=8),
-                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+                   strip.background = element_blank(),legend.position="none")
 
 sl.eff
 
 
-grid.arrange(rich.bm.eff,sp.eff,bm.eff,nrow=3,ncol=1)
-
-
-sg.f$response <- factor(sg.f$response , levels=c("SG Trt","SG / Year"))
+#sg.f$response <- factor(sg.f$response , levels=c("SG Trt","SG / Year"))
 
 sg.eff<-ggplot() + 
   geom_point(data =sg.f, aes(x = response, y = eff,color=response),size = 2) +
@@ -534,17 +527,16 @@ sg.eff<-ggplot() +
        title='Species Gain Effect on Biomass') +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-50,140) +
-  #scale_color_manual(values = c("#0B775E", "#B40F20","#3B9AB2","#35274A")) +
+  scale_color_manual(values = c("#046C9A")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),
                    axis.title.x = element_text(size=8),
                    title=element_text(size=8),
-                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+                   strip.background = element_blank(),legend.position="none")
 
 sg.eff
 
-cde.f$response <- factor(cde.f$response , levels=c("PS Trt","PS / Year"))
 
 cde.eff<-ggplot() + 
   geom_point(data =cde.f, aes(x = response, y = eff,color=response),size = 2) +
@@ -559,17 +551,20 @@ cde.eff<-ggplot() +
        title='Persistent Species Change in Biomass') +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-50,140) +
-  #scale_color_manual(values = c("#0B775E", "#B40F20","#3B9AB2","#35274A")) +
+  scale_color_manual(values = c("#816687")) +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    #axis.title.x = element_blank(),#axis.text.y = element_blank(),
                    axis.text.y = element_text(size=6),
                    axis.title.x = element_text(size=8),
                    title=element_text(size=8),
-                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+                   strip.background = element_blank(),legend.position="none")
 
 cde.eff
 
 
-grid.arrange(rich.eff,bm.eff,sloss.eff,sgain.eff,sl.eff,sg.eff,cde.eff,nrow=3,ncol=3)
+
+(rich.eff | bm.eff)/(sloss.eff | sgain.eff)/(sl.eff | sg.eff | cde.eff)
+
+
 
 

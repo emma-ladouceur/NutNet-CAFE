@@ -18,8 +18,8 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
-plot <- plot %>% group_by(site_code) %>% filter(max.year >= 6) %>%
-  ungroup()
+# plot <- plot %>% group_by(site_code) %>% filter(max.year >= 6) %>%
+#   ungroup()
 
 
 # PARTITION DATA
@@ -55,15 +55,21 @@ startrich2$starting.richness <- ifelse(startrich2$r.rich >= 1 & startrich2$r.ric
 write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
 
 
-# load PLOT models
-#load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
-load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.3
-load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.3
-load('~/Dropbox/Projects/NutNet/Model_fits/6/bm.Rdata') # plot.bm.6
-load('~/Dropbox/Projects/NutNet/Model_fits/6/rich.Rdata') # plot.rich.6
-load('~/Dropbox/Projects/NutNet/Model_fits/5/rich.Rdata') # plot.rich.5
-load('~/Dropbox/Projects/NutNet/Model_fits/5/bm.Rdata') # plot.rich.5
+# load models
+
+
+load('~/Dropbox/Projects/NutNet/Model_fits/full/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/rich.Rdata') # plot.rich.g
+
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/cde.Rdata') # CDE.s
+
+
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sloss.n.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sgain.Rdata') # s.gain.s
+
+
 
 summary(plot.rich.5)
 # inspection of chain diagnostic
@@ -92,17 +98,17 @@ with(rr.plot, plot(f.year_trt, m1$Estimate))
 
 # fixed effects
 
-plot.rich_fitted <- cbind(plot.rich.5$data,
+plot.rich_fitted <- cbind(plot.rich.g$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(plot.rich.5, re_formula = NA)) %>% 
+                          fitted(plot.rich.g, re_formula = NA)) %>% 
   as_tibble() 
 
 View(plot.rich_fitted)
 # fixed effect coefficients 
-plot.rich_fixef <- fixef(plot.rich.5)
+plot.rich_fixef <- fixef(plot.rich.g)
 
 # coefficients for experiment-level (random) effects
-plot.rich_coef <- coef(plot.rich.5)
+plot.rich_coef <- coef(plot.rich.g)
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -152,8 +158,8 @@ plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
 
 
-setwd('~/Dropbox/Projects/NutNet/Data/5/')
-save(plot.rich_fitted.npk,plot.rich_fitted.ctl,plot.rich_coef3,file = 'rich.mod.dat.Rdata')
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(plot.rich_fixef,plot.rich_fitted.npk,plot.rich_fitted.ctl,plot.rich_coef3,file = 'rich.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 
 
@@ -187,16 +193,16 @@ with(rb.plot, plot(f.year_trt, bm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-plot.bm_fitted <- cbind(plot.bm.5$data,
+plot.bm_fitted <- cbind(plot.bm.s$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(plot.bm.5, re_formula = NA)) %>% 
+                        fitted(plot.bm.s, re_formula = NA)) %>% 
   as_tibble() 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(plot.bm.5)
+plot.bm_fixef <- fixef(plot.bm.s)
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(plot.bm.5)
+plot.bm_coef <- coef(plot.bm.s)
 plot.bm_coef 
 
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
@@ -249,8 +255,8 @@ plot.bm_fitted.ctl<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('Control'),]
 
 
 
-setwd('~/Dropbox/Projects/NutNet/Data/5/')
-save(plot.bm_fitted.npk,plot.bm_fitted.ctl,plot.bm_coef3,file = 'bm.mod.dat.Rdata')
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(plot.bm_fixef,plot.bm_fitted.npk,plot.bm_fitted.ctl,plot.bm_coef3,file = 'bm.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
 
 
@@ -806,4 +812,141 @@ save(sloss.trt_fitted.npk,sloss.trt_fitted.ctl,sloss.trt_coef3,file = 'sloss.n.m
 load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
+# EFFS
+
+
+# SEPERATELY
+
+
+
+sl.trt.i_fixef <-  as.data.frame(fixef(sl.s))
+sg.trt.i_fixef <- as.data.frame(fixef(sg.s))
+CDE.trt.i_fixef <- as.data.frame( fixef(CDE.s))
+plot.rich.im_fixef <- as.data.frame(fixef(plot.rich.g))
+plot.bm.im_fixef <- as.data.frame(fixef(plot.bm.s))
+sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.n.s))
+sgain.trt.i_fixef <-as.data.frame( fixef(s.gain.s))
+
+rich.f <-bind_rows(
+  # plot.rich.im_fixef['trtNPK',] %>% 
+  #   mutate(response='Species Richness Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  plot.rich.im_fixef['trtNPK:year_trt',] %>% 
+    mutate(response='NPK Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)
+
+
+rich.f$Model <- "Species Richness"
+rich.f
+
+bm.f <-bind_rows(
+  #plot.bm.im_fixef['trtNPK',] %>% 
+  # mutate(response='Biomass Trt',
+  #        eff = Estimate,
+  #        eff_upper = Q97.5,
+  #        eff_lower = Q2.5) %>%
+  # select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  plot.bm.im_fixef['trtNPK:year_trt',] %>% 
+    mutate(response='NPK Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)
+
+bm.f$Model <- "Biomass"
+
+sl.f <-bind_rows(
+  # sl.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='SL Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='NPK Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)
+
+
+sl.f$Model <- "Species Loss Effect on Biomass"
+
+sg.f <-bind_rows(
+  # sg.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='SG Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sg.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='NPK Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)
+
+sg.f$Model <- "Species Gain Effect on Biomass"
+cde.f <-bind_rows(
+  # CDE.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='PS Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  CDE.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='NPK Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)
+
+cde.f$Model <- "Persistent Species Change in Biomass"
+sloss.f <-bind_rows(
+  # sloss.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='Species Loss Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sloss.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='NPK Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)
+
+sloss.f$Model <- "Species Loss"
+
+sgain.f <-bind_rows(
+  # sgain.trt.i_fixef['trt.yNPK',] %>% 
+  #   mutate(response='Species Gain Trt',
+  #          eff = Estimate,
+  #          eff_upper = Q97.5,
+  #          eff_lower = Q2.5) %>%
+  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sgain.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='NPK Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)
+
+sgain.f$Model <- "Species Gain"
+
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(rich.f,bm.f,sloss.f,sgain.f,sl.f,sg.f,cde.f,file = 'effs.Rdata')
 

@@ -15,16 +15,16 @@ library("scales")
 # EXTRACT 100 POSTERIORS
 
 # models
-load('~/Dropbox/Projects/NutNet/Model_fits/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/full/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/cde.Rdata') # CDE.s
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sloss.n.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/full/sgain.Rdata') # s.gain.s
 
 
 summary(plot.rich.g)
@@ -883,7 +883,7 @@ price.cloud.add<-ggplot()+
   xlim(-0.65,0)+
   labs(x = 'Effect of NPK on Species / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'b) Rates / Year ')
+       title= ' ')
 
 price.cloud.add
 
@@ -914,6 +914,12 @@ library(patchwork)
 
 (ctl.vec.cloud |ctl.vec.cloud.add)/(f.legend)/(p.legend) +
   plot_layout(heights = c(10,0.5,0.5))
+
+cloud<-(price.cloud.add )/(f.legend)/(p.legend) +
+  plot_layout(heights = c(10,0.5,0.5))
+
+cloud
+
 
 
 # bef cloud
@@ -967,41 +973,7 @@ r.bm.effs$Effects<-"Richness + Biomass"
 
 colnames(r.bm.effs)
 
-bef.cloud<-ggplot()+
-  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  geom_segment(data = r.bm.effs,
-               aes(x = 0,
-                   xend = rich.trt.p ,
-                   y = 0,
-                   yend = bm.trt.p ),
-               colour="#0B775E",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = r.bm.effs, aes(x= rich.trt.p, #loss
-                                   y= bm.trt.p  ),
-             colour="#0B775E",size=0.2,alpha = 0.4)+
-  # Fiexed effects section
-  # black thick arrow background so we can see the arrows
-  geom_segment(data = r.bm.effs,
-               aes(x = 0,
-                   xend = rich.trt_global_slope,
-                   y = 0,
-                   yend = bm.trt_global_slope, colour=Effects),
-               size = 1.5,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = r.bm.effs, aes(x= rich.trt_global_slope, #loss
-                                   y=  bm.trt_global_slope ),
-             colour="#0B775E",size=0.2,alpha = 0.4)+
-  geom_errorbar(data = r.bm.effs,aes(x=rich.trt_global_slope,
-                                     ymin = bm.trt_lower_slope, ymax = bm.trt_upper_slope),width=0,colour = "#0B775E", size = 0.55,alpha=0.3) +
-  geom_errorbarh(data = r.bm.effs,aes(y=bm.trt_global_slope,
-                                      xmin = rich.trt_lower_slope, xmax = rich.trt_upper_slope),height=0,colour = "#0B775E", size = 0.55,alpha=0.3) +
-  ylim(-11,30) +
-  
-  scale_color_manual(name='Overall Effects',values=c("#0B775E")) +
-  labs(x = 'Effect of NPK on Species Richness / Year',
-       y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'a) Richness & Biomass')
+
 
 bef.cloud<-ggplot()+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
@@ -1038,7 +1010,7 @@ bef.cloud<-ggplot()+
  # scale_color_manual(name='Overall Effects',values=c("#0B775E")) +
   labs(x = 'Effect of NPK on Species Richness / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'a) Richness & Biomass')
+       title= 'Richness & Biomass')
 
 bef.cloud
 
@@ -1114,99 +1086,11 @@ u.leg<-ggplot()+
   scale_color_manual(name='Uncertainty',values=c("#0B775E")) +
   labs(x = 'Effect of NPK on Species Richness / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'a) Richness & Biomass')
+       title= ' Richness & Biomass')
 
 
 
 
-price.cloud2<-ggplot()+
-  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  geom_segment(data = all.effs,
-               aes(x = sgain.trt.rate.p,
-                   xend = sgain.trt.rate.p,
-                   y = sg.trt.rate.p,
-                   yend = cde.trt.rate.p ), 
-               colour= "#816687",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = cde.s,aes(x=0, #persistent
-                              y= cde.trt.rate.p ),
-             colour="#816687",size=0.1,alpha = 0.4) +
-  geom_segment(data = all.effs,
-               aes(x = 0,
-                   xend = sloss.trt.rate.p ,
-                   y = 0,
-                   yend = sl.trt.rate.p  ),
-               colour= "#B40F20",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.trt.rate.p, #loss
-                                  y=  sl.trt.rate.p  ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
-  geom_segment(data = all.effs,
-               aes(x = sloss.trt.rate.p,
-                   xend = sgain.trt.rate.p ,
-                   y = sl.trt.rate.p,
-                   yend = sg.trt.rate.p ),
-               colour= "#046C9A",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sgain.trt.rate.p , #losses
-                                  y= sg.trt.rate.p ) ,
-             colour="#046C9A",
-             size=0.2,alpha = 0.4)+
-  # Fiexed effects section
-  # black thick arrow background so we can see the arrows
-  geom_segment(data = all.effs,
-               aes(x = sgain.trt.rate_global_slope,
-                   xend = sgain.trt.rate_global_slope,
-                   y = sg.trt.rate_global_slope,
-                   yend = cde.trt.rate_global_slope ), 
-               colour= "#816687",
-               size = 1.5,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs,aes(x=0, #persistent
-                                 y=  cde.trt.rate_global_slope),
-             colour="#816687",size=0.1,alpha = 0.4) +
-  geom_errorbar(data = all.effs,aes(x=sgain.trt.rate_global_slope,
-                                    ymin = cde.trt.rate_lower_slope, ymax = cde.trt.rate_upper_slope),width=0,colour = "#816687", size = 0.55,alpha=0.3) +
-  geom_segment(data = all.effs,
-               aes(x = 0,
-                   xend = sloss.trt.rate_global_slope,
-                   y = 0,
-                   yend = sl.trt.rate_global_slope),
-               colour= "#B40F20",
-               size = 1.5,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.trt.rate_global_slope, #loss
-                                  y=  sl.trt.rate_global_slope ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
-  geom_errorbar(data = all.effs,aes(x=sloss.trt.rate_global_slope,
-                                    ymin = sl.trt.rate_lower_slope, ymax = sl.trt.rate_upper_slope),width=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
-  geom_errorbarh(data = all.effs,aes(y=sl.trt.rate_global_slope,
-                                     xmin = sloss.trt.rate_lower_slope, xmax = sloss.trt.rate_upper_slope),height=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
-  geom_segment(data = all.effs,
-               aes(x = sloss.trt.rate_global_slope,
-                   xend =  sgain.trt.rate_global_slope,
-                   y = sl.trt.rate_global_slope,
-                   yend =  sg.trt.rate_global_slope),
-               colour= "#046C9A",
-               size = 1.5,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sgain.trt.rate_global_slope, #losses
-                                  y=  sg.trt.rate_global_slope ) ,
-             colour="#046C9A",
-             size=0.2,alpha = 0.4)+
-  geom_errorbar(data = all.effs,aes(x=sgain.trt.rate_global_slope,
-                                    ymin = sg.trt.rate_lower_slope, ymax = sg.trt.rate_upper_slope),width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
-  geom_errorbarh(data = all.effs,aes(y=sg.trt.rate_global_slope,
-                                     xmin = sgain.trt.rate_lower_slope, xmax = sgain.trt.rate_upper_slope),height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
-  ylim(-11,35) +
-  labs(x = 'Effect of NPK on Species / Year',
-       y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= 'b) Species Loss, Gain + Persistent Species ')
-
-price.cloud2
 
 
 
@@ -1221,6 +1105,7 @@ b<-(price.cloud.add)/(f.legend)/(p.legend) +
   plot_layout(heights = c(12,0.5,0.5))
 
 
+a
 
 (a|b)
 
