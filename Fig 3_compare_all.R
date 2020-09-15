@@ -63,6 +63,9 @@ sloss.fixed.p<-posterior_samples(s.loss.n.s, "^b" , subset = floor(runif(n = 100
 sgain.fixed.p<-posterior_samples(s.gain.s, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 
 
+head(sl.fixed.p)
+head(sl.trt.i_fixef)
+
 sl.fixed.p2 <-sl.fixed.p %>% 
   filter(`b_Intercept` > quantile(sl.fixed.p$`b_Intercept`, probs=0.025),
          `b_Intercept` < quantile(sl.fixed.p$`b_Intercept`, probs=0.975)) %>%
@@ -71,6 +74,13 @@ sl.fixed.p2 <-sl.fixed.p %>%
          sl.ctl_global_slope = sl.trt.i_fixef['Intercept','Estimate'],
          sl.ctl_upper_slope = sl.trt.i_fixef['Intercept','Q97.5'],
          sl.ctl_lower_slope = sl.trt.i_fixef['Intercept','Q2.5'],) %>%
+  filter(`b_year.y.m` > quantile(sl.fixed.p$`b_year.y.m`, probs=0.025),
+         `b_year.y.m` < quantile(sl.fixed.p$`b_year.y.m`, probs=0.975)) %>%
+  mutate(sl.ctl.rate.p=`b_year.y.m`) %>%
+  mutate(response = 'sl',
+         sl.ctl.rate_global_slope = sl.trt.i_fixef['year.y.m','Estimate'],
+         sl.ctl.rate_upper_slope = sl.trt.i_fixef['year.y.m','Q97.5'],
+         sl.ctl.rate_lower_slope = sl.trt.i_fixef['year.y.m','Q2.5'],) %>%
   filter(`b_trt.yNPK` > quantile(sl.fixed.p$`b_trt.yNPK`, probs=0.025),
          `b_trt.yNPK` < quantile(sl.fixed.p$`b_trt.yNPK`, probs=0.975)) %>%
   mutate(sl.trt.p=`b_trt.yNPK`) %>%
@@ -86,11 +96,12 @@ sl.fixed.p2 <-sl.fixed.p %>%
          sl.trt.rate_upper_slope = sl.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sl.trt.rate_lower_slope = sl.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
   select(sl.ctl.p,sl.ctl_global_slope, sl.ctl_upper_slope,sl.ctl_lower_slope,
+         sl.ctl.rate.p,sl.ctl.rate_global_slope, sl.ctl.rate_upper_slope,sl.ctl.rate_lower_slope,
          sl.trt.p,sl.trt_global_slope, sl.trt_upper_slope,sl.trt_lower_slope,
          sl.trt.rate.p,sl.trt.rate_global_slope, sl.trt.rate_upper_slope,sl.trt.rate_lower_slope)
 
 nrow(sl.fixed.p2)
-
+sl.fixed.p2
 
 
 sg.fixed.p2 <-sg.fixed.p %>% 
@@ -101,6 +112,13 @@ sg.fixed.p2 <-sg.fixed.p %>%
          sg.ctl_global_slope = sg.trt.i_fixef['Intercept','Estimate'],
          sg.ctl_upper_slope = sg.trt.i_fixef['Intercept','Q97.5'],
          sg.ctl_lower_slope = sg.trt.i_fixef['Intercept','Q2.5'],) %>%
+  filter(`b_year.y.m` > quantile(sg.fixed.p$`b_year.y.m`, probs=0.025),
+         `b_year.y.m` < quantile(sg.fixed.p$`b_year.y.m`, probs=0.975)) %>%
+  mutate(sg.ctl.rate.p=`b_year.y.m`) %>%
+  mutate(response = 'sl',
+         sg.ctl.rate_global_slope = sg.trt.i_fixef['year.y.m','Estimate'],
+         sg.ctl.rate_upper_slope = sg.trt.i_fixef['year.y.m','Q97.5'],
+         sg.ctl.rate_lower_slope = sg.trt.i_fixef['year.y.m','Q2.5'],) %>%
   filter(`b_trt.yNPK` > quantile(sg.fixed.p$`b_trt.yNPK`, probs=0.025),
          `b_trt.yNPK` < quantile(sg.fixed.p$`b_trt.yNPK`, probs=0.975)) %>%
   mutate(sg.trt.p=`b_trt.yNPK`) %>%
@@ -116,6 +134,7 @@ sg.fixed.p2 <-sg.fixed.p %>%
          sg.trt.rate_upper_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sg.trt.rate_lower_slope = sg.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
   select(sg.ctl.p,sg.ctl_global_slope, sg.ctl_upper_slope,sg.ctl_lower_slope,
+         sg.ctl.rate.p,sg.ctl.rate_global_slope, sg.ctl.rate_upper_slope,sg.ctl.rate_lower_slope,
          sg.trt.p,sg.trt_global_slope, sg.trt_upper_slope,sg.trt_lower_slope,
          sg.trt.rate.p,sg.trt.rate_global_slope, sg.trt.rate_upper_slope,sg.trt.rate_lower_slope)
 nrow(sg.fixed.p2)
@@ -128,6 +147,13 @@ cde.fixed.p2 <-CDE.fixed.p %>%
          cde.ctl_global_slope = CDE.trt.i_fixef['Intercept','Estimate'],
          cde.ctl_upper_slope = CDE.trt.i_fixef['Intercept','Q97.5'],
          cde.ctl_lower_slope = CDE.trt.i_fixef['Intercept','Q2.5'],) %>%
+  filter(`b_year.y.m` > quantile(CDE.fixed.p$`b_year.y.m`, probs=0.025),
+         `b_year.y.m` < quantile(CDE.fixed.p$`b_year.y.m`, probs=0.975)) %>%
+  mutate(cde.ctl.rate.p=`b_year.y.m`) %>%
+  mutate(response = 'sl',
+         cde.ctl.rate_global_slope = CDE.trt.i_fixef['year.y.m','Estimate'],
+         cde.ctl.rate_upper_slope = CDE.trt.i_fixef['year.y.m','Q97.5'],
+         cde.ctl.rate_lower_slope = CDE.trt.i_fixef['year.y.m','Q2.5'],) %>%
   filter(`b_trt.yNPK` > quantile(CDE.fixed.p$`b_trt.yNPK`, probs=0.025),
          `b_trt.yNPK` < quantile(CDE.fixed.p$`b_trt.yNPK`, probs=0.975)) %>%
   mutate(cde.trt.p=`b_trt.yNPK`) %>%
@@ -143,6 +169,7 @@ cde.fixed.p2 <-CDE.fixed.p %>%
          cde.trt.rate_upper_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          cde.trt.rate_lower_slope = CDE.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
   select(cde.ctl.p,cde.ctl_global_slope, cde.ctl_upper_slope,cde.ctl_lower_slope,
+         cde.ctl.rate.p,cde.ctl.rate_global_slope, cde.ctl.rate_upper_slope,cde.ctl.rate_lower_slope,
          cde.trt.p,cde.trt_global_slope, cde.trt_upper_slope,cde.trt_lower_slope,
          cde.trt.rate.p,cde.trt.rate_global_slope, cde.trt.rate_upper_slope,cde.trt.rate_lower_slope)
 nrow(cde.fixed.p2)
@@ -155,6 +182,13 @@ sloss.fixed.p2 <-sloss.fixed.p %>%
          sloss.ctl_global_slope = sloss.trt.i_fixef['Intercept','Estimate'],
          sloss.ctl_upper_slope = sloss.trt.i_fixef['Intercept','Q97.5'],
          sloss.ctl_lower_slope = sloss.trt.i_fixef['Intercept','Q2.5'],) %>%
+  filter(`b_year.y.m` > quantile(sloss.fixed.p$`b_year.y.m`, probs=0.025),
+         `b_year.y.m` < quantile(sloss.fixed.p$`b_year.y.m`, probs=0.975)) %>%
+  mutate(sloss.ctl.rate.p=`b_year.y.m`) %>%
+  mutate(response = 'sl',
+         sloss.ctl.rate_global_slope = sloss.trt.i_fixef['year.y.m','Estimate'],
+         sloss.ctl.rate_upper_slope = sloss.trt.i_fixef['year.y.m','Q97.5'],
+         sloss.ctl.rate_lower_slope = sloss.trt.i_fixef['year.y.m','Q2.5'],) %>%
   filter(`b_trt.yNPK` > quantile(sloss.fixed.p$`b_trt.yNPK`, probs=0.025),
          `b_trt.yNPK` < quantile(sloss.fixed.p$`b_trt.yNPK`, probs=0.975)) %>%
   mutate(sloss.trt.p=`b_trt.yNPK`) %>%
@@ -170,6 +204,7 @@ sloss.fixed.p2 <-sloss.fixed.p %>%
          sloss.trt.rate_upper_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sloss.trt.rate_lower_slope = sloss.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],)  %>%
   select(sloss.ctl.p,sloss.ctl_global_slope, sloss.ctl_upper_slope,sloss.ctl_lower_slope,
+         sloss.ctl.rate.p,sloss.ctl.rate_global_slope, sloss.ctl.rate_upper_slope,sloss.ctl.rate_lower_slope,
          sloss.trt.p,sloss.trt_global_slope, sloss.trt_upper_slope,sloss.trt_lower_slope,
          sloss.trt.rate.p,sloss.trt.rate_global_slope, sloss.trt.rate_upper_slope,sloss.trt.rate_lower_slope)
 
@@ -184,6 +219,13 @@ sgain.fixed.p2 <-sgain.fixed.p %>%
          sgain.ctl_global_slope = sgain.trt.i_fixef['Intercept','Estimate'],
          sgain.ctl_upper_slope = sgain.trt.i_fixef['Intercept','Q97.5'],
          sgain.ctl_lower_slope = sgain.trt.i_fixef['Intercept','Q2.5'],) %>%
+  filter(`b_year.y.m` > quantile(sgain.fixed.p$`b_year.y.m`, probs=0.025),
+         `b_year.y.m` < quantile(sgain.fixed.p$`b_year.y.m`, probs=0.975)) %>%
+  mutate(sgain.ctl.rate.p=`b_year.y.m`) %>%
+  mutate(response = 'sl',
+         sgain.ctl.rate_global_slope = sgain.trt.i_fixef['year.y.m','Estimate'],
+         sgain.ctl.rate_upper_slope = sgain.trt.i_fixef['year.y.m','Q97.5'],
+         sgain.ctl.rate_lower_slope = sgain.trt.i_fixef['year.y.m','Q2.5'],) %>%
   filter(`b_trt.yNPK` > quantile(sgain.fixed.p$`b_trt.yNPK`, probs=0.025),
          `b_trt.yNPK` < quantile(sgain.fixed.p$`b_trt.yNPK`, probs=0.975)) %>%
   mutate(sgain.trt.p=`b_trt.yNPK`) %>%
@@ -199,10 +241,11 @@ sgain.fixed.p2 <-sgain.fixed.p %>%
          sgain.trt.rate_upper_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Q97.5'],
          sgain.trt.rate_lower_slope = sgain.trt.i_fixef['trt.yNPK:year.y.m','Q2.5'],) %>%
   select(sgain.ctl.p,sgain.ctl_global_slope, sgain.ctl_upper_slope,sgain.ctl_lower_slope,
+         sgain.ctl.rate.p,sgain.ctl.rate_global_slope, sgain.ctl.rate_upper_slope,sgain.ctl.rate_lower_slope,
          sgain.trt.p,sgain.trt_global_slope, sgain.trt_upper_slope,sgain.trt_lower_slope,
          sgain.trt.rate.p, sgain.trt.rate_global_slope, sgain.trt.rate_upper_slope,sgain.trt.rate_lower_slope )
 nrow(sgain.fixed.p2)
-View(sgain.fixed.p2)
+head(sgain.fixed.p2)
 
 sl.ss <- sl.fixed.p2 %>% sample_n(50) 
 View(sl.ss)
@@ -418,12 +461,12 @@ ctl.vec.cloud.add<-ggplot()+
                    xend =  sloss.ctl.p+sgain.ctl.p ,
                    y = sl.ctl.p,
                    yend = sl.ctl.p+ sg.ctl.p ),
-               colour= "#3B9AB2",
+               colour= "#046C9A",
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_point(data = all.effs, aes(x= sloss.ctl.p+ sgain.ctl.p , #losses
                                   y=  sl.ctl.p+sg.ctl.p ) ,
-             colour="#3B9AB2",
+             colour="#046C9A",
              size=0.2,alpha = 0.4)+
   
   geom_segment(data = all.effs,
@@ -460,17 +503,17 @@ ctl.vec.cloud.add<-ggplot()+
                    xend = sloss.ctl_global_slope +  sgain.ctl_global_slope,
                    y = sl.ctl_global_slope,
                    yend =  sl.ctl_global_slope+sg.ctl_global_slope),
-               colour= "#3B9AB2",
+               colour= "#046C9A",
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_point(data = all.effs, aes(x= sloss.ctl_global_slope+sgain.ctl_global_slope, #losses
                                   y= sl.ctl_global_slope+ sg.ctl_global_slope ) ,
-             colour="#3B9AB2",
+             colour="#046C9A",
              size=0.2,alpha = 0.4)+
   geom_errorbar(data = all.effs,aes(x=sloss.ctl_global_slope+sgain.ctl_global_slope,
-                                    ymin = sl.ctl_lower_slope+sg.ctl_lower_slope, ymax = sl.ctl_upper_slope+sg.ctl_upper_slope),width=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+                                    ymin = sl.ctl_lower_slope+sg.ctl_lower_slope, ymax = sl.ctl_upper_slope+sg.ctl_upper_slope),width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
   geom_errorbarh(data = all.effs,aes(y=sl.ctl_global_slope+sg.ctl_global_slope,
-                                     xmin = sloss.ctl_lower_slope+sgain.ctl_lower_slope, xmax = sloss.ctl_upper_slope+sgain.ctl_upper_slope),height=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+                                     xmin = sloss.ctl_lower_slope+sgain.ctl_lower_slope, xmax = sloss.ctl_upper_slope+sgain.ctl_upper_slope),height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
   geom_segment(data = all.effs,
                aes(x = sloss.ctl_global_slope+sgain.ctl_global_slope,
                    xend = sloss.ctl_global_slope+sgain.ctl_global_slope,
@@ -486,11 +529,203 @@ ctl.vec.cloud.add<-ggplot()+
                                     ymin = sl.ctl_lower_slope+sg.ctl_lower_slope+cde.ctl_lower_slope, ymax = sl.ctl_upper_slope+sg.ctl_upper_slope+cde.ctl_upper_slope),width=0,colour = "#816687", size = 0.55,alpha=0.3) +
   labs(x = 'Change in Species in Control Plots',
        y = expression(paste('Change in Biomass (g/' ,m^2, ') in Control Plots')),
-       title= 'b) Control (Intercept) Added')
+       title= 'a) Control (Intercept) Added')
 
 
 ctl.vec.cloud.add
 
+# ctl rates
+head(all.effs)
+ctl.rates.vec.cloud<-ggplot()+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),  plot.margin = margin(0.3, 0.3, 1.5, 0.3, "cm"),)+
+  geom_segment(data = all.effs,
+               aes(x = sgain.ctl.rate.p,
+                   xend = sgain.ctl.rate.p,
+                   y = sg.ctl.rate.p,
+                   yend = cde.ctl.rate.p ), 
+               colour= "#816687",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = cde.s,aes(x=0, #persistent
+                              y= cde.ctl.rate.p ),
+             colour="#816687",size=0.1,alpha = 0.4) +
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.ctl.rate.p ,
+                   y = 0,
+                   yend = sl.ctl.rate.p  ),
+               colour= "#B40F20",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate.p, #loss
+                                  y=  sl.ctl.rate.p  ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl.rate.p,
+                   xend = sgain.ctl.rate.p ,
+                   y = sl.ctl.rate.p,
+                   yend = sg.ctl.rate.p ),
+               colour= "#3B9AB2",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sgain.ctl.rate.p , #losses
+                                  y= sg.ctl.rate.p ) ,
+             colour="#3B9AB2",
+             size=0.2,alpha = 0.4)+
+  # Fiexed effects section
+  # black thick arrow background so we can see the arrows
+  geom_segment(data = all.effs,
+               aes(x = sgain.ctl.rate_global_slope,
+                   xend = sgain.ctl.rate_global_slope,
+                   y = sg.ctl.rate_global_slope,
+                   yend = cde.ctl.rate_global_slope ), 
+               colour= "#816687",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                                 y=  cde.ctl.rate_global_slope),
+             colour="#816687",size=0.1,alpha = 0.4) +
+  geom_errorbar(data = all.effs,aes(x=sgain.ctl.rate_global_slope,
+                                    ymin = cde.ctl.rate_lower_slope, ymax = cde.ctl.rate_upper_slope),width=0,colour = "#816687", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.ctl.rate_global_slope,
+                   y = 0,
+                   yend = sl.ctl.rate_global_slope),
+               colour= "#B40F20",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate_global_slope, #loss
+                                  y=  sl.ctl.rate_global_slope ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sloss.ctl.rate_global_slope,
+                                    ymin = sl.ctl.rate_lower_slope, ymax = sl.ctl.rate_upper_slope),width=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sl.ctl.rate_global_slope,
+                                     xmin = sloss.ctl.rate_lower_slope, xmax = sloss.ctl.rate_upper_slope),height=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl.rate_global_slope,
+                   xend =  sgain.ctl.rate_global_slope,
+                   y = sl.ctl.rate_global_slope,
+                   yend =  sg.ctl.rate_global_slope),
+               colour= "#3B9AB2",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sgain.ctl.rate_global_slope, #losses
+                                  y=  sg.ctl.rate_global_slope ) ,
+             colour="#3B9AB2",
+             size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sgain.ctl.rate_global_slope,
+                                    ymin = sg.ctl.rate_lower_slope, ymax = sg.ctl.rate_upper_slope),width=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sg.ctl.rate_global_slope,
+                                     xmin = sgain.ctl.rate_lower_slope, xmax = sgain.ctl.rate_upper_slope),height=0,colour = "#3B9AB2", size = 0.55,alpha=0.3) +
+  labs(x = 'Change in Species in Control Plots',
+       y = expression(paste('Change in Biomass (g/' ,m^2, ') in Control Plots')),
+       title= 'a) Control (Intercept) Change/ Year')
+
+
+ctl.rates.vec.cloud
+
+# add ctl vec cloud rates
+head(all.effs)
+ctl.rates.vec.cloud.add<-ggplot()+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),  plot.margin = margin(0.3, 0.3, 1.5, 0.3, "cm"),)+
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.ctl.rate.p ,
+                   y = 0,
+                   yend = sl.ctl.rate.p  ),
+               colour= "#B40F20",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate.p, #loss
+                                  y=  sl.ctl.rate.p  ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl.rate.p,
+                   xend =  sloss.ctl.rate.p+sgain.ctl.rate.p ,
+                   y = sl.ctl.rate.p,
+                   yend = sl.ctl.rate.p+ sg.ctl.rate.p ),
+               colour= "#046C9A",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate.p+ sgain.ctl.rate.p , #losses
+                                  y=  sl.ctl.rate.p+sg.ctl.rate.p ) ,
+             colour="#046C9A",
+             size=0.2,alpha = 0.4)+
+  
+  geom_segment(data = all.effs,
+               aes(x =  sloss.ctl.rate.p+sgain.ctl.rate.p,
+                   xend =  sloss.ctl.rate.p+sgain.ctl.rate.p,
+                   y =  sl.ctl.rate.p+sg.ctl.rate.p,
+                   yend = sl.ctl.rate.p+sg.ctl.rate.p+cde.ctl.rate.p ), 
+               colour= "#816687",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                                 y= sl.ctl.rate.p+sg.ctl.rate.p+cde.ctl.rate.p ),
+             colour="#816687",size=0.1,alpha = 0.4) +
+  
+  # Fiexed effects section
+  # black thick arrow background so we can see the arrows
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.ctl.rate_global_slope,
+                   y = 0,
+                   yend = sl.ctl.rate_global_slope),
+               colour= "#B40F20",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate_global_slope, #loss
+                                  y=  sl.ctl.rate_global_slope ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sloss.ctl.rate_global_slope,
+                                    ymin = sl.ctl.rate_lower_slope, ymax = sl.ctl.rate_upper_slope),width=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sl.ctl.rate_global_slope,
+                                     xmin = sloss.ctl.rate_lower_slope, xmax = sloss.ctl.rate_upper_slope),height=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl.rate_global_slope,
+                   xend = sloss.ctl.rate_global_slope +  sgain.ctl.rate_global_slope,
+                   y = sl.ctl.rate_global_slope,
+                   yend =  sl.ctl.rate_global_slope+sg.ctl.rate_global_slope),
+               colour= "#046C9A",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope, #losses
+                                  y= sl.ctl.rate_global_slope+ sg.ctl.rate_global_slope ) ,
+             colour="#046C9A",
+             size=0.2,alpha = 0.4)+
+  geom_errorbar(data = all.effs,aes(x=sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
+                                    ymin = sl.ctl.rate_lower_slope+sg.ctl.rate_lower_slope, ymax = sl.ctl.rate_upper_slope+sg.ctl.rate_upper_slope),width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
+  geom_errorbarh(data = all.effs,aes(y=sl.ctl.rate_global_slope+sg.ctl.rate_global_slope,
+                                     xmin = sloss.ctl.rate_lower_slope+sgain.ctl.rate_lower_slope, xmax = sloss.ctl.rate_upper_slope+sgain.ctl.rate_upper_slope),height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
+                   xend = sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
+                   y = sl.ctl.rate_global_slope+sg.ctl.rate_global_slope,
+                   yend = sl.ctl.rate_global_slope+sg.ctl.rate_global_slope+cde.ctl.rate_global_slope ), 
+               colour= "#816687",
+               size = 1.5,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                                 y=  sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope+cde.ctl.rate_global_slope),
+             colour="#816687",size=0.1,alpha = 0.4) +
+  geom_errorbar(data = all.effs,aes(x=sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
+                                    ymin = sl.ctl.rate_lower_slope+sg.ctl.rate_lower_slope+cde.ctl.rate_lower_slope, ymax = sl.ctl.rate_upper_slope+sg.ctl.rate_upper_slope+cde.ctl.rate_upper_slope),width=0,colour = "#816687", size = 0.55,alpha=0.3) +
+  labs(x = 'Rate of change in species (species/year)',
+       y = expression(paste('Rate of change in Biomass (g/' ,m^2, '/year)')),
+       title= 'a) Rate of change in control plots')
+
+
+( ctl.rates.vec.cloud | ctl.rates.vec.cloud.add)/( ctl.vec.cloud | ctl.vec.cloud.add)
+
+write.csv(all.effs, '~/Dropbox/Projects/NutNet/Data/fixed.post.effs.csv')
+
+all.effs$added.eff <- all.effs$sl.ctl.rate_global_slope+all.effs$sg.ctl.rate_global_slope+all.effs$cde.ctl_global_slope 
+
+head(all.effs)
+
+
+ctl.rates.vec.cloud.add
 
 #TRT
 
@@ -881,9 +1116,9 @@ price.cloud.add<-ggplot()+
   
   ylim(-11,35) +
   xlim(-0.65,0)+
-  labs(x = 'Effect of NPK on Species / Year',
-       y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= ' ')
+  labs(x = 'Rate of change in species (species/year)',
+       y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
+       title= 'b) Rate of change in NPK treatments relative to control ')
 
 price.cloud.add
 
@@ -919,6 +1154,12 @@ cloud<-(price.cloud.add )/(f.legend)/(p.legend) +
   plot_layout(heights = c(10,0.5,0.5))
 
 cloud
+
+(ctl.vec.cloud.add | price.cloud.add ) / (f.legend) / (p.legend) +
+  plot_layout(heights = c(10,0.5,0.5))
+
+
+
 
 
 
@@ -1108,4 +1349,11 @@ b<-(price.cloud.add)/(f.legend)/(p.legend) +
 a
 
 (a|b)
+
+
+( ctl.rates.vec.cloud.add | price.cloud.add)/(f.legend)/(p.legend) +
+  plot_layout(heights = c(12,0.5,0.5))
+  
+  
+  
 

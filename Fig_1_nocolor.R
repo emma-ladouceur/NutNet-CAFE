@@ -150,6 +150,7 @@ bef.cloud
 
 (bm | bef.cloud | rich)
 
+( rich|bm)/(rlegend)/( bef.cloud ) + plot_layout(heights = c(10,0.75,10))
 
 
 #"#F98400","#0B775E"
@@ -229,6 +230,13 @@ u.leg<-ggplot()+
 
 
 
+#extract legend
+#https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
 
 
 

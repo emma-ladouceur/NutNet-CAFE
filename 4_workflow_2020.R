@@ -18,8 +18,8 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
-# plot <- plot %>% group_by(site_code) %>% filter(max.year >= 6) %>%
-#   ungroup()
+ plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) 
+  ungroup()
 
 
 # PARTITION DATA
@@ -32,7 +32,7 @@ p.all$site_code<-as.factor(p.all$site_code)
 p.all <- p.all %>% group_by(site_code) %>% filter(max.year >= 3) %>%
   ungroup()
 
-dat<-distinct(plot, site_code, continent,habitat)
+dat<- plot %>% distinct(site_code, continent,habitat)
 p.dat2<-inner_join(p.all,dat)
 
 
@@ -58,25 +58,28 @@ write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
 # load models
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/full/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/cde.Rdata') # CDE.s
-
-
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sloss.n.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
 
 
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # s.gain.s
 
-summary(plot.rich.5)
+
+
+summary(plot.rich.3)
 # inspection of chain diagnostic
 #plot(plot.rich.g)
 color_scheme_set("gray")
-pp_check(plot.rich.5) + theme_classic()
+pp_check(plot.rich.3) + theme_classic() + labs(x='Species Richness',
+                                               y = 'Frequency') 
 
+
+plot(plot.rich.3)
 
 # residuals
 m1<-residuals(plot.rich.g)
@@ -98,17 +101,19 @@ with(rr.plot, plot(f.year_trt, m1$Estimate))
 
 # fixed effects
 
-plot.rich_fitted <- cbind(plot.rich.g$data,
+plot.rich_fitted <- cbind(plot.rich.3$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(plot.rich.g, re_formula = NA)) %>% 
+                          fitted(plot.rich.3, re_formula = NA)) %>% 
   as_tibble() 
 
 View(plot.rich_fitted)
 # fixed effect coefficients 
-plot.rich_fixef <- fixef(plot.rich.g)
+plot.rich_fixef <- fixef(plot.rich.3)
 
 # coefficients for experiment-level (random) effects
-plot.rich_coef <- coef(plot.rich.g)
+plot.rich_coef <- coef(plot.rich.3)
+
+View(plot.rich_coef)
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -140,10 +145,10 @@ plot.rich_coef2 <-  bind_cols(plot.rich_coef$site_code[,,'Intercept'] %>%
                group_by(site_code) %>% 
                summarise(xmin = min(year_trt),
                          xmax = max(year_trt)),
-             by = 'site_code') %>% left_join(start.rich, by="site_code")
+             by = 'site_code') 
 
 
-
+View(plot.rich_coef2)
 colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Estimate.trtNPK:year_trt"] <- "Estimate.trtNPK.year_trt"
 colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q2.5.trtNPK:year_trt"] <- "Q2.5.trtNPK.year_trt"
 colnames(plot.rich_coef2)[colnames(plot.rich_coef2)=="Q97.5.trtNPK:year_trt"] <- "Q97.5.trtNPK.year_trt"
@@ -164,12 +169,11 @@ load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 
 
 # BIOMASS
-summary(plot.bm.s)
+
 summary(plot.bm.3)
-summary(plot.bm.6)
-summary(plot.bm.5)
+
 #plot(plot.bm.s)  
-pp_check(plot.bm.5) + theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
+pp_check(plot.bm.3) + theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
                                                                                          y = 'Frequency') 
 
 
@@ -193,16 +197,16 @@ with(rb.plot, plot(f.year_trt, bm1$Estimate))
 
 # #------plot richness model all sp----------------
 # fixed effects
-plot.bm_fitted <- cbind(plot.bm.s$data,
+plot.bm_fitted <- cbind(plot.bm.3$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(plot.bm.s, re_formula = NA)) %>% 
+                        fitted(plot.bm.3, re_formula = NA)) %>% 
   as_tibble() 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(plot.bm.s)
+plot.bm_fixef <- fixef(plot.bm.3)
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(plot.bm.s)
+plot.bm_coef <- coef(plot.bm.3)
 plot.bm_coef 
 
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
@@ -263,20 +267,12 @@ load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
 
 # PARTITIONS
 
-load('~/Dropbox/Projects/NutNet/Model_fits/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/cde.Rdata') # CDE.s
-
-load('~/Dropbox/Projects/NutNet/Model_fits/sgain.Rdata') # s.gain.s
-
-#load('~/Dropbox/Projects/NutNet/Model_fits/sloss.Rdata') # s.loss.s # positive values
-load('~/Dropbox/Projects/NutNet/Model_fits/sloss.n.Rdata') # s.loss.n.s # negative values
 
 
 # SL : sl.s
-summary(sl.s)
+summary(sl.3)
 #plot(sl.s)  
-pp_check(sl.s) + theme_classic() + scale_x_continuous(limits = c(-700, 50))+ labs(x=expression(paste('Change in Biomass (g/',m^2, ')')), 
+pp_check(sl.3) + theme_classic() + scale_x_continuous(limits = c(-700, 50))+ labs(x=expression(paste('Change in Biomass due to Species Loss (g/',m^2, ')')), 
                                                                                      y = 'Frequency') 
 
 
@@ -299,9 +295,9 @@ with(sl.plot, p.dat3(plot, sl1$Estimate))
 with(sl.plot, p.dat3(f.year_trt, sl1$Estimate))
 
 # fixed effects
-sl.trt_fitted <- cbind(sl.s$data,
+sl.trt_fitted <- cbind(sl.3$data,
                        # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                       fitted(sl.s, re_formula = NA)) %>% 
+                       fitted(sl.3, re_formula = NA)) %>% 
   as_tibble()
 
 
@@ -330,10 +326,10 @@ sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
 View(sl.trt_fitted.npk)
 
 # fixed effect coefficients -coefficient plot
-sl.trt_fixef <- fixef(sl.s)
+sl.trt_fixef <- fixef(sl.3)
 
 # coefficients for experiment-level (random) effects
-sl.trt_coef <- coef(sl.s)
+sl.trt_coef <- coef(sl.3)
 
 sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -388,9 +384,9 @@ load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
 
 # SG : sg.s
 
-summary(sg.s)
-plot(sg.s)  
-pp_check(sg.s) + theme_classic() + scale_x_continuous(limits = c(-50, 700))+ labs(x=expression(paste('Change in Biomass (g/',m^2, ')')), 
+summary(sg.3)
+#plot(sg.s)  
+pp_check(sg.3) + theme_classic() + scale_x_continuous(limits = c(-50, 600))+ labs(x=expression(paste('Change in Biomass due to Species Gain (g/',m^2, ')')), 
                                                                 y = 'Frequency') 
 
 # residuals
@@ -412,9 +408,9 @@ with(sg.plot, p.dat3(plot, sg1$Estimate))
 with(sg.plot, p.dat3(f.year_trt, sg1$Estimate))
 
 # fixed effects
-sg.trt_fitted <- cbind(sg.s$data,
+sg.trt_fitted <- cbind(sg.3$data,
                        # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                       fitted(sg.s, re_formula = NA)) %>% 
+                       fitted(sg.3, re_formula = NA)) %>% 
   as_tibble() 
 
 as.data.frame(sg.trt_fitted)
@@ -436,10 +432,10 @@ View(sg.trt_fitted3)
 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-sg.trt_fixef <- fixef(sg.s)
+sg.trt_fixef <- fixef(sg.3)
 
 # coefficients for experiment-level (random) effects
-sg.trt_coef <- coef(sg.s)
+sg.trt_coef <- coef(sg.3)
 sg.trt_coef 
 sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -494,9 +490,9 @@ load('~/Desktop/Academic/R code/NutNet/sg_dat.Rdata')
 
 
 # CDE
-summary(CDE.s)
+summary(CDE.3)
 #plot(CDE.s)  
-pp_check(CDE.s) + theme_classic() + scale_x_continuous(limits = c(-1000, 1000))+ labs(x=expression(paste('Change in Biomass (g/',m^2, ')')), 
+pp_check(CDE.3) + theme_classic() + scale_x_continuous(limits = c(-1000, 1000))+ labs(x=expression(paste('Change in Biomass in Persistent Species (g/',m^2, ')')), 
                                                                                    y = 'Frequency') 
 
 
@@ -519,9 +515,9 @@ with(cde.plot, p.dat3(plot, cde1$Estimate))
 with(cde.plot, p.dat3(f.year_trt, cde1$Estimate))
 
 # fixed effects
-cde_fitted <- cbind(CDE.s$data,
+cde_fitted <- cbind(CDE.3$data,
                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                    fitted(CDE.s, re_formula = NA)) %>% 
+                    fitted(CDE.3, re_formula = NA)) %>% 
   as_tibble() 
 as.data.frame(cde_fitted)
 
@@ -545,9 +541,9 @@ cde_fitted.ctl<-cde_fitted3[cde_fitted3$trt.y %in% c('Control'),]
 View(cde_fitted.npk)
 View(cde_fitted.ctl)
 
-cde_fixef <- fixef(CDE.s)
+cde_fixef <- fixef(CDE.3)
 
-cde_coef <- coef(CDE.s)
+cde_coef <- coef(CDE.3)
 cde_coef
 cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>% 
                           as_tibble() %>% 
@@ -598,9 +594,9 @@ load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
 
 # SGAIN : s.gain.s
 
-summary(s.gain.s)
-plot(s.gain.s)  
-pp_check(s.gain.s)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Gain', 
+summary(s.gain.3)
+#plot(s.gain.s)  
+pp_check(s.gain.3)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Gain', 
                                                                                      y = 'Frequency') 
 
 
@@ -625,9 +621,9 @@ with(s.gain.plot, p.dat3(f.year_trt, s.gain1$Estimate))
  
 
 
-sgain.trt_fitted <- cbind(s.gain.s$data,
+sgain.trt_fitted <- cbind(s.gain.3$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(s.gain.s, re_formula = NA)) %>% 
+                          fitted(s.gain.3, re_formula = NA)) %>% 
   as_tibble() 
 
 as.data.frame(sgain.trt_fitted)
@@ -648,10 +644,10 @@ View(sgain.trt_fitted3)
 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-sgain.trt_fixef <- fixef(s.gain.s)
+sgain.trt_fixef <- fixef(s.gain.3)
 
 # coefficients for experiment-level (random) effects
-sgain.trt_coef <- coef(s.gain.s)
+sgain.trt_coef <- coef(s.gain.3)
 sgain.trt_coef 
 sgain.trt_coef2 <-  bind_cols(sgain.trt_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -706,9 +702,9 @@ load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
 
 # NEGATIVE OR POSITIVE MODEL? ....FIND AND REPLACE AS APPROPRIATE
 
-summary(s.loss.n.s)
-plot(s.loss.s)  
-pp_check(s.loss.n.s)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Loss', 
+summary(s.loss.3)
+#plot(s.loss.s)  
+pp_check(s.loss.3)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Loss', 
                                                                                     y = 'Frequency') 
 
 
@@ -730,9 +726,9 @@ with(s.loss.plot, p.dat3(block, s.loss1$Estimate))
 with(s.loss.plot, p.dat3(plot, s.loss1$Estimate))
 with(s.loss.plot, p.dat3(f.year_trt, s.loss1$Estimate))
 
-sloss.trt_fitted <- cbind(s.loss.n.s$data,
+sloss.trt_fitted <- cbind(s.loss.3$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(s.loss.n.s, re_formula = NA)) %>% 
+                          fitted(s.loss.3, re_formula = NA)) %>% 
   as_tibble()
 
 
@@ -760,10 +756,10 @@ sloss.trt_fitted.ctl<-sloss.trt_fitted3[sloss.trt_fitted3$trt.y %in% c('Control'
 View(sloss.trt_fitted.npk)
 
 # fixed effect coefficients -coefficient plot
-sloss.trt_fixef <- fixef(s.loss.n.s)
+sloss.trt_fixef <- fixef(s.loss.3)
 
 # coefficients for experiment-level (random) effects
-sloss.trt_coef <- coef(s.loss.n.s)
+sloss.trt_coef <- coef(s.loss.3)
 
 sloss.trt_coef2 <-  bind_cols(sloss.trt_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -819,21 +815,23 @@ load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
 
-sl.trt.i_fixef <-  as.data.frame(fixef(sl.s))
-sg.trt.i_fixef <- as.data.frame(fixef(sg.s))
-CDE.trt.i_fixef <- as.data.frame( fixef(CDE.s))
-plot.rich.im_fixef <- as.data.frame(fixef(plot.rich.g))
-plot.bm.im_fixef <- as.data.frame(fixef(plot.bm.s))
-sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.n.s))
-sgain.trt.i_fixef <-as.data.frame( fixef(s.gain.s))
+sl.trt.i_fixef <-  as.data.frame(fixef(sl.3))
+sg.trt.i_fixef <- as.data.frame(fixef(sg.3))
+CDE.trt.i_fixef <- as.data.frame( fixef(CDE.3))
+plot.rich.im_fixef <- as.data.frame(fixef(plot.rich.3))
+plot.bm.im_fixef <- as.data.frame(fixef(plot.bm.3))
+sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.3))
+sgain.trt.i_fixef <-as.data.frame( fixef(s.gain.3))
+
+plot.rich.im_fixef
 
 rich.f <-bind_rows(
-  # plot.rich.im_fixef['trtNPK',] %>% 
-  #   mutate(response='Species Richness Trt',
-  #          eff = Estimate,
-  #          eff_upper = Q97.5,
-  #          eff_lower = Q2.5) %>%
-  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  plot.rich.im_fixef['year_trt',] %>%
+    mutate(response='Control Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   plot.rich.im_fixef['trtNPK:year_trt',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
@@ -847,12 +845,12 @@ rich.f$Model <- "Species Richness"
 rich.f
 
 bm.f <-bind_rows(
-  #plot.bm.im_fixef['trtNPK',] %>% 
-  # mutate(response='Biomass Trt',
-  #        eff = Estimate,
-  #        eff_upper = Q97.5,
-  #        eff_lower = Q2.5) %>%
-  # select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  plot.bm.im_fixef['year_trt',] %>%
+  mutate(response='Control Slope',
+         eff = Estimate,
+         eff_upper = Q97.5,
+         eff_lower = Q2.5) %>%
+  select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   plot.bm.im_fixef['trtNPK:year_trt',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
@@ -863,13 +861,15 @@ bm.f <-bind_rows(
 
 bm.f$Model <- "Biomass"
 
+sl.trt.i_fixef 
+
 sl.f <-bind_rows(
-  # sl.trt.i_fixef['trt.yNPK',] %>% 
-  #   mutate(response='SL Trt',
-  #          eff = Estimate,
-  #          eff_upper = Q97.5,
-  #          eff_lower = Q2.5) %>%
-  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt.i_fixef['year.y.m',] %>%
+    mutate(response='Control Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sl.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
@@ -882,12 +882,12 @@ sl.f <-bind_rows(
 sl.f$Model <- "Species Loss Effect on Biomass"
 
 sg.f <-bind_rows(
-  # sg.trt.i_fixef['trt.yNPK',] %>% 
-  #   mutate(response='SG Trt',
-  #          eff = Estimate,
-  #          eff_upper = Q97.5,
-  #          eff_lower = Q2.5) %>%
-  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sg.trt.i_fixef['year.y.m',] %>%
+    mutate(response='Control Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sg.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
@@ -897,13 +897,16 @@ sg.f <-bind_rows(
 )
 
 sg.f$Model <- "Species Gain Effect on Biomass"
+
+CDE.trt.i_fixef
+
 cde.f <-bind_rows(
-  # CDE.trt.i_fixef['trt.yNPK',] %>% 
-  #   mutate(response='PS Trt',
-  #          eff = Estimate,
-  #          eff_upper = Q97.5,
-  #          eff_lower = Q2.5) %>%
-  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  CDE.trt.i_fixef['year.y.m',] %>%
+    mutate(response='Control Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   CDE.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
@@ -913,13 +916,16 @@ cde.f <-bind_rows(
 )
 
 cde.f$Model <- "Persistent Species Change in Biomass"
+
+cde.f
+
 sloss.f <-bind_rows(
-  # sloss.trt.i_fixef['trt.yNPK',] %>% 
-  #   mutate(response='Species Loss Trt',
-  #          eff = Estimate,
-  #          eff_upper = Q97.5,
-  #          eff_lower = Q2.5) %>%
-  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sloss.trt.i_fixef['year.y.m',] %>%
+    mutate(response='Control Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sloss.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
@@ -931,12 +937,12 @@ sloss.f <-bind_rows(
 sloss.f$Model <- "Species Loss"
 
 sgain.f <-bind_rows(
-  # sgain.trt.i_fixef['trt.yNPK',] %>% 
-  #   mutate(response='Species Gain Trt',
-  #          eff = Estimate,
-  #          eff_upper = Q97.5,
-  #          eff_lower = Q2.5) %>%
-  #   select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sgain.trt.i_fixef['year.y.m',] %>%
+    mutate(response='Control Slope',
+           eff = Estimate,
+           eff_upper = Q97.5,
+           eff_lower = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sgain.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
@@ -949,4 +955,245 @@ sgain.f$Model <- "Species Gain"
 
 setwd('~/Dropbox/Projects/NutNet/Data/')
 save(rich.f,bm.f,sloss.f,sgain.f,sl.f,sg.f,cde.f,file = 'effs.Rdata')
+
+
+
+
+
+
+
+# posterior effects
+
+
+load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
+
+
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
+
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # s.gain.s
+
+
+
+# site level meta data for posrteriors
+# calculated to site level details found in Climate_Data.R
+# latitude and longitude dont match due to decimal rounding
+# lat.x long.x is nutnet site, lat.y long.y is world clim
+meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+meta <- meta %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
+
+
+colnames(meta)
+View(meta)
+
+
+rich_fixef <- fixef(plot.rich.3)
+bm_fixef <- fixef(plot.bm.3)
+
+sl.trt.i_fixef <- fixef(sl.3)
+sg.trt.i_fixef <- fixef(sg.3)
+CDE.trt.i_fixef <- fixef(CDE.3)
+sloss.trt.i_fixef <- fixef(s.loss.3)
+sgain.trt.i_fixef <- fixef(s.gain.3)
+
+rich.fixed.p<-posterior_samples(plot.rich.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000)))
+rich.fixed.p
+
+bm.fixed.p<-posterior_samples(plot.bm.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+
+sl.fixed.p<-posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sg.fixed.p<-posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+cde.fixed.p<-posterior_samples(CDE.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
+
+sloss.fixed.p<-posterior_samples(s.loss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sgain.fixed.p<-posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+
+
+
+head(rich.fixed.p)
+rich_fixef
+
+
+
+rich.p.ctl <-  rich.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+  mutate(ctl.slope =`b_year_trt`,
+         npk.slope=`b_trtNPK:year_trt`,
+         trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
+  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+ mutate( response="Control", eff = mean(ctl.slope),
+          eff_lower = quantile(ctl.slope, probs=0.025),
+          eff_upper = quantile(ctl.slope, probs=0.975))  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  
+rich.p.npk <-  rich.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+  mutate(ctl.slope =`b_year_trt`,
+         npk.slope=`b_trtNPK:year_trt`,
+         trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
+  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+  mutate( response="NPK", eff = mean(trt.slope),
+          eff_lower = quantile(trt.slope, probs=0.025),
+          eff_upper = quantile(trt.slope, probs=0.975) )  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+rich.p <- bind_rows(rich.p.ctl,rich.p.npk)
+head(rich.p)
+
+bm.p.ctl <-  bm.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+  mutate(ctl.slope =`b_year_trt`,
+         npk.slope=`b_trtNPK:year_trt`,
+         trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
+  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+  mutate( response="Control", eff = mean(ctl.slope),
+          eff_lower = quantile(ctl.slope, probs=0.025),
+          eff_upper = quantile(ctl.slope, probs=0.975))  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+bm.p.npk <-  bm.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+  mutate(ctl.slope =`b_year_trt`,
+         npk.slope=`b_trtNPK:year_trt`,
+         trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
+  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+  mutate( response="NPK", eff = mean(trt.slope),
+          eff_lower = quantile(trt.slope, probs=0.025),
+          eff_upper = quantile(trt.slope, probs=0.975) )  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+bm.p <- bind_rows(bm.p.ctl,bm.p.npk)
+
+bm.p
+
+head(sl.fixed.p)
+head(sl.trt.i_fixef)
+
+
+sl.p.ctl <-  sl.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="Control", eff = mean(ctl.slope),
+          eff_lower = quantile(ctl.slope, probs=0.025),
+          eff_upper = quantile(ctl.slope, probs=0.975))  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sl.p.npk <-  sl.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="NPK", eff = mean(trt.slope),
+          eff_lower = quantile(trt.slope, probs=0.025),
+          eff_upper = quantile(trt.slope, probs=0.975) )  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sl.p <- bind_rows(sl.p.ctl,sl.p.npk)
+sl.p 
+
+sg.p.ctl <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="Control", eff = mean(ctl.slope),
+          eff_lower = quantile(ctl.slope, probs=0.025),
+          eff_upper = quantile(ctl.slope, probs=0.975))  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sg.p.npk <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="NPK", eff = mean(trt.slope),
+          eff_lower = quantile(trt.slope, probs=0.025),
+          eff_upper = quantile(trt.slope, probs=0.975) )  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sg.p <- bind_rows(sg.p.ctl,sg.p.npk)
+sg.p
+
+
+cde.p.ctl <-  cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="Control", eff = mean(ctl.slope),
+          eff_lower = quantile(ctl.slope, probs=0.025),
+          eff_upper = quantile(ctl.slope, probs=0.975))  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+cde.p.npk <- cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="NPK", eff = mean(trt.slope),
+          eff_lower = quantile(trt.slope, probs=0.025),
+          eff_upper = quantile(trt.slope, probs=0.975) )  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+cde.p <- bind_rows(cde.p.ctl,cde.p.npk)
+cde.p
+
+sloss.p.ctl <-  sloss.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="Control", eff = mean(ctl.slope),
+          eff_lower = quantile(ctl.slope, probs=0.025),
+          eff_upper = quantile(ctl.slope, probs=0.975))  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sloss.p.npk <-  sloss.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="NPK", eff = mean(trt.slope),
+          eff_lower = quantile(trt.slope, probs=0.025),
+          eff_upper = quantile(trt.slope, probs=0.975) )  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sloss.p <- bind_rows(sloss.p.ctl,sloss.p.npk)
+sloss.p
+
+sgain.p.ctl <-  sgain.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="Control", eff = mean(ctl.slope),
+          eff_lower = quantile(ctl.slope, probs=0.025),
+          eff_upper = quantile(ctl.slope, probs=0.975))  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sgain.p.npk <-  sgain.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ctl.slope =`b_year.y.m`,
+         npk.slope=`b_trt.yNPK:year.y.m`,
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  mutate( response="NPK", eff = mean(trt.slope),
+          eff_lower = quantile(trt.slope, probs=0.025),
+          eff_upper = quantile(trt.slope, probs=0.975) )  %>%
+  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+
+sgain.p <- bind_rows(sgain.p.ctl,sgain.p.npk)
+sgain.p
+
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(rich.p,bm.p,sloss.p,sgain.p,sl.p,sg.p,cde.p,file = 'p.effs.Rdata')
+
+
+
+
+
+
 

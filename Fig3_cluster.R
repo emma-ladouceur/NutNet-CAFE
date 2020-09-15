@@ -475,6 +475,8 @@ fitted.sgain$Treatment <- factor(fitted.sgain$Treatment , levels=c("NPK","Contro
 # gains "#046C9A"
 # cde "#816687"
 
+head(sgain.trt_fitted.ctl)
+
 sgain.trtm<-ggplot()  +
   # data
   facet_grid(~Model)+
@@ -499,7 +501,7 @@ sgain.trtm<-ggplot()  +
               fill="black",alpha = 0.5) +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(0,20) +
-  labs(x = 'Years',
+  labs(x = 'Year',
        y = expression(paste('Species Gain')), title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A",
@@ -572,7 +574,7 @@ sloss.trtm<-ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   #scale_y_reverse( lim=c(20,0))+
   #ylim(-20,0) +
-  labs(x = 'Years',
+  labs(x = 'Year',
        y = expression(paste('Species Loss')), title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
@@ -643,13 +645,13 @@ sl.trtm<-ggplot() +
               fill="black",alpha = 0.5) +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(-400,0) +
-  labs(x='',
+  labs(x='Year',
        #x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.margin= margin(t = -0.5, r = 0.1, b = -0.5, l = 0, unit = "cm"))
+                     plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"))
 
 
 sl.trtm
@@ -704,13 +706,13 @@ sg.trtm<-ggplot()  +
   #scale_y_continuous(trans = 'log', breaks=c(1,2,4,6,8,16,24,64,512,1024,2048,4096)) +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(0,400) +
-  labs(x = '',
+  labs(x = 'Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
        title= '', color='Treatment') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="none", plot.margin= margin(t = -0.5, r = 0, b = -0.5, l = 0, unit = "cm"))
+                     legend.position="none", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"))
 
 
 sg.trtm
@@ -747,7 +749,7 @@ r.leg<-ggplot()  +
   # scale_colour_manual(values = c("Control" = "black",
   #                                "NPK" = "#046C9A", drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="bottom", plot.margin= margin(t = -0.5, r = 0, b = -0.5, l = 0, unit = "cm"))
+                     legend.position="bottom", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"))
 
 
 r.leg
@@ -807,13 +809,13 @@ cdem<-ggplot() +
               fill="black",alpha = 0.5) +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(-500,1000)+
-  labs(x='',
+  labs(x='Year',
         y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
        title= '',  color='Starting Richness') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#816687",drop =FALSE))+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="none", plot.margin= margin(t = -0.5, r = 0.2, b = -0.5, l = 0, unit = "cm"))
+                     legend.position="none", plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0, unit = "cm"))
 
 cdem
 
@@ -831,9 +833,13 @@ rlegend<-g_legend(r.leg)
 
 # patchwork solution
 
-(sloss.trtm|sgain.trtm)/(sl.trtm|sg.trtm+ theme(legend.position="none")|cdem ) +
-  plot_layout(heights = c(10,10))
+ (plot_spacer() | sloss.trtm | sgain.trtm) / (sl.trtm | sg.trtm  | cdem ) / (rlegend) +
+  plot_layout( heights = c(10,10,2)) 
 
+(rlegend) /
+{ ( plot_spacer() | sloss.trtm | sgain.trtm ) + plot_layout(nrow=1, ncol=3, widths=c(8,8,8)) } / 
+  (sl.trtm | sg.trtm  | cdem )+
+  plot_layout( heights = c(2,10,10)) 
 
 
 
@@ -841,7 +847,7 @@ rlegend<-g_legend(r.leg)
 # EFFECT PLOTS
 load('~/Dropbox/Projects/NutNet/Data/effs.Rdata')
 
-
+View(sloss.f)
 
 sloss.eff<-ggplot() + 
   geom_point(data =sloss.f, aes(x = response, y = eff,color=response),size = 2) +
@@ -996,7 +1002,8 @@ cde <- cdem +  annotation_custom(ggplotGrob(cde.eff), xmin = 8, xmax = 12,
 
 
 
-
+(plot_spacer() | sloss | sgain) / (sl | sg  | cde ) / (rlegend) +
+  plot_layout( heights = c(10,10,2)) 
 
 
 
@@ -1039,7 +1046,7 @@ r1<-ggplot() +
   facet_wrap(~Model) +
   geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich), colour ="black", alpha=0.2,
-             size = 1.3, position = position_jitter(width = 0.45 )) +
+             size = .7, position = position_jitter(width = 0.45 )) +
   geom_segment(data = plot.rich_coef3 ,
                aes(x = xmin, 
                    xend = xmax,

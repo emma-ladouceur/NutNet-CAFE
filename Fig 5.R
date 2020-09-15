@@ -1,0 +1,508 @@
+
+library(patchwork)
+library(tidyverse)
+library(brms)
+library(ggridges)
+library(gridExtra)
+library(grid)
+library("scales")
+library(viridis)
+
+# FIGURE 5
+
+
+# models
+load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
+
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
+
+
+meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+ml <- read.csv("~/Dropbox/Projects/NutNet/Data/site.inclusion.info.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+meta <- meta %>% left_join((ml))
+
+View(meta)
+
+#  mods study level dat
+study_levels <- plot.rich.3$data %>% 
+  as_tibble() %>% 
+  distinct(site_code) %>% 
+  mutate(level =  site_code) %>%
+  nest_legacy(level)
+
+
+study_sample_posterior <- study_levels %>%
+  mutate(sl.ctl.study = purrr::map(data, ~posterior_samples(sl.3,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000,
+                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+          sg.ctl.study = purrr::map(data, ~posterior_samples(sg.3,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
+                                                       exact = TRUE,
+                                                       subset = floor(runif(n = 1000,
+                                                                           min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+          cde.ctl.study = purrr::map(data, ~posterior_samples(CDE.3,
+                                                       pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
+                                                       exact = TRUE,
+                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
+         rich.ctl.study = purrr::map(data, ~posterior_samples(plot.rich.3,
+                                                        pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
+                                                        exact = TRUE,
+                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
+         bm.ctl.study = purrr::map(data, ~posterior_samples(plot.bm.3,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
+         sl.npk.study = purrr::map(data, ~posterior_samples(sl.3, 
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+          sg.npk.study = purrr::map(data, ~posterior_samples(sg.3,
+                                                       pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
+                                                       exact = TRUE,
+                                                       subset = floor(runif(n = 1000,
+                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
+         cde.npk.study = purrr::map(data, ~posterior_samples(CDE.3,
+                                                       pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
+                                                       exact = TRUE,
+                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
+         rich.npk.study = purrr::map(data, ~posterior_samples(plot.rich.3,
+                                                        pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
+                                                        exact = TRUE,
+                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
+         bm.npk.study = purrr::map(data, ~posterior_samples(plot.bm.3,
+                                                      pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
+                                                      exact = TRUE,
+                                                      subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()))
+
+
+# fixed posteriors
+sl.fixed.p <- posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sg.fixed.p<-posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+cde.fixed.p<-posterior_samples(CDE.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+rich.fixed.p<-posterior_samples(plot.rich.3, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
+bm.fixed.p<-posterior_samples(plot.bm.3, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
+
+head(rich.fixed.p)
+
+sl_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(sl.ctl.study,sl.npk.study) %>%
+  mutate( sl.trt.study = (sl.ctl.study + sl.npk.study)) %>%
+  group_by(site_code) %>%
+  mutate(response = 'sl',
+         sl.ctl.global = sl.fixed.p[,'b_year.y.m'],
+         sl.npk.global = sl.fixed.p[,'b_trt.yNPK:year.y.m'],) %>%
+    mutate(sl.trt.global=(sl.ctl.global+sl.npk.global))
+
+
+  
+View(sl_posterior)
+
+sl.p<-sl_posterior %>% inner_join(meta, by = 'site_code') 
+
+sl.p$anthropogenic<-as.factor(sl.p$anthropogenic)
+sl.p$grazed<-as.factor(as.character(sl.p$grazed))
+sl.p$managed<-as.factor(as.character(sl.p$managed))
+sl.p$burned<-as.factor(as.character(sl.p$burned))
+
+View(sl.p)
+write.csv(sl.p,"~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv")
+
+# SG
+
+sg_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(sg.ctl.study,sg.npk.study) %>%
+  mutate( sg.trt.study = (sg.ctl.study + sg.npk.study)) %>%
+  group_by(site_code) %>%
+  mutate(response = 'sg',
+         sg.ctl.global = sg.fixed.p[,'b_year.y.m'],
+         sg.npk.global = sg.fixed.p[,'b_trt.yNPK:year.y.m'],) %>%
+  mutate(sg.trt.global=(sg.ctl.global+sg.npk.global))
+
+
+
+View(sg_posterior)
+
+sg.p<-sg_posterior %>% inner_join(meta, by = 'site_code') 
+
+sg.p$anthropogenic<-as.factor(sg.p$anthropogenic)
+sg.p$grazed<-as.factor(as.character(sg.p$grazed))
+sg.p$managed<-as.factor(as.character(sg.p$managed))
+sg.p$burned<-as.factor(as.character(sg.p$burned))
+
+View(sg.p)
+write.csv(sg.p,"~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv")
+
+# CDE
+
+cde_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(cde.ctl.study,cde.npk.study) %>%
+  mutate( cde.trt.study = (cde.ctl.study + cde.npk.study)) %>%
+  group_by(site_code) %>%
+  mutate(response = 'cde',
+         cde.ctl.global = cde.fixed.p[,'b_year.y.m'],
+         cde.npk.global = cde.fixed.p[,'b_trt.yNPK:year.y.m'],) %>%
+  mutate(cde.trt.global=(cde.ctl.global+cde.npk.global))
+
+View(cde_posterior)
+
+cde.p<-cde_posterior %>% inner_join(meta, by = 'site_code') 
+
+cde.p$anthropogenic<-as.factor(cde.p$anthropogenic)
+cde.p$grazed<-as.factor(as.character(cde.p$grazed))
+cde.p$managed<-as.factor(as.character(cde.p$managed))
+cde.p$burned<-as.factor(as.character(cde.p$burned))
+
+View(cde.p)
+write.csv(cde.p,"~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv")
+
+
+# RICH
+
+rich_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(rich.ctl.study,rich.npk.study) %>%
+  mutate( rich.trt.study = (rich.ctl.study + rich.npk.study)) %>%
+  group_by(site_code) %>%
+  mutate(response = 'rich',
+         rich.ctl.global = rich.fixed.p[,'b_year_trt'],
+         rich.npk.global = rich.fixed.p[,'b_trtNPK:year_trt'],) %>%
+  mutate(rich.trt.global=(rich.ctl.global+rich.npk.global))
+
+View(rich_posterior)
+
+rich.p<-rich_posterior %>% inner_join(meta, by = 'site_code') 
+
+rich.p$anthropogenic<-as.factor(rich.p$anthropogenic)
+rich.p$grazed<-as.factor(as.character(rich.p$grazed))
+rich.p$managed<-as.factor(as.character(rich.p$managed))
+rich.p$burned<-as.factor(as.character(rich.p$burned))
+
+View(rich.p)
+write.csv(rich.p,"~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv")
+
+
+
+# BM
+
+bm_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(bm.ctl.study,bm.npk.study) %>%
+  mutate( bm.trt.study = (bm.ctl.study + bm.npk.study)) %>%
+  group_by(site_code) %>%
+  mutate(response = 'biomass',
+         bm.ctl.global = bm.fixed.p[,'b_year_trt'],
+         bm.npk.global = bm.fixed.p[,'b_trtNPK:year_trt'],) %>%
+  mutate(bm.trt.global=(bm.ctl.global+bm.npk.global))
+
+View(bm_posterior)
+
+bm.p<-bm_posterior %>% inner_join(meta, by = 'site_code') 
+
+bm.p$anthropogenic<-as.factor(bm.p$anthropogenic)
+bm.p$grazed<-as.factor(as.character(bm.p$grazed))
+bm.p$managed<-as.factor(as.character(bm.p$managed))
+bm.p$burned<-as.factor(as.character(bm.p$burned))
+
+View(bm.p)
+write.csv(bm.p,"~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv")
+
+
+
+rich.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
+
+
+colnames(rich.p)
+rich.p
+
+
+rich<-ggplot() +
+  geom_rect(data = rich.p %>% filter(response=="NPK"),
+            aes(xmin = eff_lower, xmax =  eff_upper, ymin = -Inf, ymax = Inf,
+            alpha = 0.3)) +
+  geom_density_ridges(data = rich.ps,
+                      aes(x = rich.trt.study + rich.trt.global, 
+                          y = multilimited,
+                      ), 
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #' scale_fill_viridis(name = #'site_rich_range',
+  #'                      #'starting.richness' ,
+  #'                      'site_rich_range',
+  #'                    # 'anthropogenic',
+  #'                    #'NDep.cats',
+  #'                    #'biome' ,
+  #'                    #'site_dom',
+  #'                    #'Realm',
+  #'                    #'colimitation',
+  #'                    discrete=TRUE) +
+  geom_vline(data = rich.p %>% filter(response=="NPK"),
+             aes(xintercept = eff)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_bw() +
+  labs( x='Effect of NPK on Change in Species Richness/Year',
+        title= 'a) Species Richness',
+        y= ' multilimited sites'
+        #color= ''
+  )+
+  geom_text(data = rich.ps %>%
+              group_by(multilimited) %>%
+              mutate(n_study = n_distinct(site_code)) %>%
+              ungroup() %>%
+              distinct(multilimited, n_study, .keep_all = T),
+            aes(x=2.5, y=multilimited,
+                label=paste('n[study] == ', n_study)),
+            size=3.5,
+            nudge_y = 0.1, parse = T) +
+  theme(panel.grid = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
+        legend.key = element_blank(),
+        legend.position="none")
+
+rich
+
+
+bm.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+
+colnames(bm.p)
+bm.p
+
+
+bm<-ggplot() +
+  geom_rect(data = bm.p %>% filter(response=="NPK"),
+            aes(xmin = eff_lower, xmax =  eff_upper, ymin = -Inf, ymax = Inf,
+                alpha = 0.3)) +
+  geom_density_ridges(data = bm.ps,
+                      aes(x = bm.trt.study + bm.trt.global, 
+                          y = multilimited,
+                      ), 
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #' scale_fill_viridis(name = #'site_bm_range',
+  #'                      #'starting.bmness' ,
+  #'                      'site_bm_range',
+  #'                    # 'anthropogenic',
+  #'                    #'NDep.cats',
+#'                    #'biome' ,
+#'                    #'site_dom',
+#'                    #'Realm',
+#'                    #'colimitation',
+#'                    discrete=TRUE) +
+geom_vline(data = bm.p %>% filter(response=="NPK"),
+           aes(xintercept = eff)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_bw() +
+  labs( x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
+        title= 'a) Biomass',
+        y= ' Multilimited sites'
+        #color= ''
+  )+
+  geom_text(data = bm.ps %>%
+              group_by(multilimited) %>%
+              mutate(n_study = n_distinct(site_code)) %>%
+              ungroup() %>%
+              distinct(multilimited, n_study, .keep_all = T),
+            aes(x=150, y=multilimited,
+                label=paste('n[study] == ', n_study)),
+            size=3.5,
+            nudge_y = 0.1, parse = T) +
+  theme(panel.grid = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
+        legend.key = element_blank(),
+        legend.position="none")
+
+bm
+
+
+(rich | bm )
+
+
+
+
+
+
+sl.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+colnames(sl.p)
+sl.p
+
+
+sl<-ggplot() +
+  geom_rect(data = sl.p %>% filter(response=="NPK"),
+            aes(xmin = eff_lower, xmax =  eff_upper, ymin = -Inf, ymax = Inf,
+                alpha = 0.3)) +
+  geom_density_ridges(data = sl.ps,
+                      aes(x = sl.trt.study + sl.trt.global, 
+                          y = multilimited,
+                      ), 
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #' scale_fill_viridis(name = #'site_sl_range',
+  #'                      #'starting.slness' ,
+  #'                      'site_sl_range',
+  #'                    # 'anthropogenic',
+  #'                    #'NDep.cats',
+  #'                    #'biome' ,
+  #'                    #'site_dom',
+  #'                    #'Realm',
+  #'                    #'colimitation',
+  #'                    discrete=TRUE) +
+  geom_vline(data = sl.p %>% filter(response=="NPK"),
+             aes(xintercept = eff)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_bw() +
+  labs( x='',
+    #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
+        title= 'a) Change in Biomass Due to Species Loss',
+        y= ' multilimited sites'
+        #color= ''
+  )+
+  # geom_text(data = sl.ps %>%
+  #             group_by(multilimited) %>%
+  #             mutate(n_study = n_distinct(site_code)) %>%
+  #             ungroup() %>%
+  #             distinct(multilimited, n_study, .keep_all = T),
+  #           aes(x=20, y=multilimited,
+  #               label=paste('n[study] == ', n_study)),
+  #           size=3.5,
+  #           nudge_y = 0.1, parse = T) +
+  theme(panel.grid = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
+        legend.key = element_blank(),
+        legend.position="none")
+
+sl
+
+
+sg.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+colnames(sg.p)
+sg.p
+
+
+sg<-ggplot() +
+  geom_rect(data = sg.p %>% filter(response=="NPK"),
+            aes(xmin = eff_lower, xmax =  eff_upper, ymin = -Inf, ymax = Inf,
+                alpha = 0.3)) +
+  geom_density_ridges(data = sg.ps,
+                      aes(x = sg.trt.study + sg.trt.global, 
+                          y = multilimited,
+                      ), 
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #' scale_fill_viridis(name = #'site_sg_range',
+  #'                      #'starting.sgness' ,
+  #'                      'site_sg_range',
+  #'                    # 'anthropogenic',
+  #'                    #'NDep.cats',
+  #'                    #'biome' ,
+  #'                    #'site_dom',
+  #'                    #'Realm',
+  #'                    #'colimitation',
+  #'                    discrete=TRUE) +
+  geom_vline(data = sg.p %>% filter(response=="NPK"),
+             aes(xintercept = eff)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_bw() +
+  labs( x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
+    title= 'b) Change in Biomass Due to Species Gain',
+    y= ' '
+    #color= ''
+  )+
+  # geom_text(data = sg.ps %>%
+  #             group_by(multilimited) %>%
+  #             mutate(n_study = n_distinct(site_code)) %>%
+  #             ungroup() %>%
+  #             distinct(multilimited, n_study, .keep_all = T),
+  #           aes(x=75, y=multilimited,
+  #               label=paste('n[study] == ', n_study)),
+  #           size=3.5,
+  #           nudge_y = 0.1, parse = T) +
+  theme(panel.grid = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
+        legend.key = element_blank(),
+        legend.position="none")
+
+sg
+
+
+
+cde.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+colnames(cde.p)
+cde.p
+
+
+cde<-ggplot() +
+  geom_rect(data = cde.p %>% filter(response=="NPK"),
+            aes(xmin = eff_lower, xmax =  eff_upper, ymin = -Inf, ymax = Inf,
+                alpha = 0.3)) +
+  geom_density_ridges(data = cde.ps,
+                      aes(x = cde.trt.study + cde.trt.global, 
+                          y = multilimited,
+                      ), 
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #' scale_fill_viridis(name = #'site_cde_range',
+  #'                      #'starting.cdeness' ,
+  #'                      'site_cde_range',
+  #'                    # 'anthropogenic',
+  #'                    #'NDep.cats',
+  #'                    #'biome' ,
+  #'                    #'site_dom',
+  #'                    #'Realm',
+  #'                    #'colimitation',
+  #'                    discrete=TRUE) +
+  geom_vline(data = cde.p %>% filter(response=="NPK"),
+             aes(xintercept = eff)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_bw() +
+  labs(x='', 
+    #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
+        title= 'c) Persistent Species Change in Biomass',
+        y= ''
+        #color= ''
+  )+
+  geom_text(data = cde.ps %>%
+              group_by(multilimited) %>%
+              mutate(n_study = n_distinct(site_code)) %>%
+              ungroup() %>%
+              distinct(multilimited, n_study, .keep_all = T),
+            aes(x=150, y=multilimited,
+                label=paste('n[study] == ', n_study)),
+            size=3.5,
+            nudge_y = 0.1, parse = T) +
+  theme(panel.grid = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
+        legend.key = element_blank(),
+        legend.position="none")
+
+cde
+
+
+(sl | sg | cde)

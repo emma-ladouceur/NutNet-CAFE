@@ -48,6 +48,10 @@ plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,se
 country_codes <- read.csv("~/Dropbox/Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
 biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv", stringsAsFactors = FALSE)
 
+plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
+
+
 head(clim_dat)
 head(country_codes)
 head(biogeo)
@@ -144,16 +148,24 @@ start.rich <- read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv", stringsA
 fig1 <- read.csv("~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv", stringsAsFactors = FALSE)
 #plot dat
 
+comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-03-June-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
-head(clim)
+head(plot)
 
 
-clim_select <- clim %>% select(site_code,country,habitat,site_richness, site_dom) %>%
-  left_join(start.rich) %>% left_join(fig1, by = c("site_code", "starting.richness")) %>% select(-X.x,-X.y,-m.rich,-r.rich,-rich.start,-rich.end,-mass.start,-mass.end, -Experiment.Length,-Experiment.Length2) %>%
+clim_select <- clim %>% select(site_code,country,habitat) %>%
+  left_join(start.rich) %>% left_join(fig1, by = c("site_code", "starting.richness")) %>% select(-X.x,-X.y,-m.rich,-r.rich,-rich.start,-rich.end,-mass.start,-mass.end, -Experiment.Length,-Experiment.Length2,-starting.richness) %>%
   rename(Experiment.Length=maxyr)
 
 View(clim_select)
 
+View(comb)
+comb <- comb %>% select(site_code,site_name,region) %>% distinct()
 
-write.csv(clim_select,"~/Dropbox/Projects/NutNet/Data/site.inclusion.csv" )
+clim_select <- clim_select %>% group_by(site_code) %>% filter(Experiment.Length >= 3) %>%
+  left_join(comb)
+
+View(clim_select)
+
+write.csv(clim_select,"~/Dropbox/Projects/NutNet/Data/site.inclusion.info.csv" )

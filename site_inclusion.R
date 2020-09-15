@@ -15,13 +15,22 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
+plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
+
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
 
-plot.rich_fitted.npk
+load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/sg_dat.Rdata')
 
-plot.rich_fitted.npk$starting.richness <- factor(plot.rich_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-plot.rich_coef3$starting.richness <- factor(plot.rich_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
+load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
+
+load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
+
+
+View(plot.rich_fitted.npk)
 
 plot.rich_fitted.npk$Model<-"Species Richness"
 plot.rich_fitted.ctl$Model<-"Species Richness"
@@ -64,7 +73,7 @@ sg.sl.cde<-sg.sl%>%  full_join(cde.s)
 price<- loss.gain %>%  full_join(sg.sl.cde)
 View(price)
 
-raw<- plot13 %>% distinct(site_code)
+raw<- plot %>% distinct(site_code)
 raw$ raw.dat<- "1"
 
 all.mods<- rich.bm %>% full_join(price)
@@ -75,5 +84,9 @@ View(all)
 
 
 write.csv(all,"~/Desktop/site.inclusion.csv")
+
+
+
+
 
 

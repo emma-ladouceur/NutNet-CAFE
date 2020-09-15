@@ -83,16 +83,6 @@ site<-plot7 %>% distinct(site_code)
 
 
 
-ggplot(plot7, aes(x=m.rich, y=m.mass, color=starting.richness,group=site_code))+
-  geom_point(size=2,shape=1)+ geom_line()+
-  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
-                                 "6-10" = "#75B41EFF",
-                                 "11-15" ="#5AC2F1FF",
-                                 "16-20"= "#0C5BB0FF",
-                                 "21-25" = "#972C8DFF",
-                                 ">26" = "#E0363AFF", drop =FALSE))+theme_classic()
-
-
 plot7$f.year_trt<-as.factor(plot7$year_trt)
 
 ggplot(plot7, aes(x=m.rich, y=m.mass,group=site_code))+
@@ -141,22 +131,7 @@ plot13<-inner_join(plot12,zrich)
 
 
 s.check<-plot13 %>% arrange(site_code)
-View(s.check)
 
-ggplot() +
-  geom_point(data=plot13,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
-  geom_point(data=plot13,aes(x=rich.end,y=mass.end),size=1.5, fill="white", shape=2) +
-  #geom_point(size=1.5, fill="white", shape=2)+
-  geom_segment(data=plot13,aes(x=rich.start,
-                               xend=rich.end,
-                               y=mass.start,
-                               yend=mass.end,
-                               group = site_code,
-                               colour=maxyr), 
-               arrow=arrow(length=unit(0.3,"cm"))) +
-  theme_classic()
-
-plot13$starting.richness <- factor(plot13$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 
 plot13$maxyr<- as.numeric(plot13$maxyr)
@@ -181,21 +156,24 @@ write.csv(plot13, "~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv")
 
 fig1_dat <-read.csv("~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+head(fig1_dat)
+
+fig1_dat <- fig1_dat %>% group_by(site_code) %>% filter(maxyr >= 3) %>%
+  ungroup()
+
 View(fig1_dat)
 
-plot1<-plot %>% distinct(site_code)
-plot.check<-plot1 %>% full_join(fig1_dat, by="site_code")
-View(plot.check)
 
-fig1_dat$starting.richness <- factor(fig1_dat$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 fig1_dat$Experiment.Length2 <- factor(fig1_dat$Experiment.Length2 , levels=c("1-3 years","4-6","7-9","10-12"))
 
 
-View(fig1_dat)
-# FIGURE 1
+
+# FIGURE S2
 # BIOMASS RICHNESS DIRECTIONAL ARROWS / VARIATION
 ggplot() +
+  facet_wrap(~maxyr, scales="free")+
   #facet_wrap(~Experiment.Length2, scales="free")+
+  #geom_text_repel(data=fig1_dat, aes(x=rich.end, y=mass.end,  label = site_code), size=3 ) +
   geom_point(data=fig1_dat,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data=fig1_dat,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
   #geom_point(size=1.5, fill="white", shape=2)+
@@ -206,86 +184,16 @@ ggplot() +
                                group = site_code,
                                color=maxyr),  
                arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  scale_color_viridis(discrete=FALSE,name="Length of Study") +
-  # scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
-  #                                "6-10" = "#75B41EFF",
-  #                                "11-15" ="#5AC2F1FF",
-  #                                "16-20"= "#0C5BB0FF",
-  #                                "21-25" = "#972C8DFF",
-  #                                ">26" = "#E0363AFF", drop =FALSE))+
-  #scale_linetype_manual(values=c("solid","dashed", "dotted"))+
+  scale_color_viridis(discrete=F,name="Length of Study") +
   labs(x = 'Species Richness',
        y = expression(paste('Biomass (g/' ,m^2, ')')), 
        title= '') +
-   scale_y_continuous(limits=c(0,2500)) +
+   scale_y_continuous(limits=c(0,1500)) +
+  scale_x_continuous(limits=c(0,35)) +
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                      strip.background = element_blank(),plot.title = element_text(size=12),
                           legend.position="bottom")
 
 
-
-#library(ggrepel)
-
-# grouped/binned by experiment length
-ggplot() +
-  facet_wrap(~Experiment.Length2, scales="free")+
-  #geom_text_repel(data=fig1_dat, aes(x=rich.end, y=mass.end,  label = site_code), size=3 ) +
-  geom_point(data=fig1_dat,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
-  geom_point(data=fig1_dat,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
-  #geom_point(size=1.5, fill="white", shape=2)+
-  geom_segment(data=fig1_dat,aes(x=rich.start,
-                                 xend=rich.end,
-                                 y=mass.start,
-                                 yend=mass.end,
-                                 group = site_code,
-                                 colour=starting.richness,# linetype= Experiment.Length 
-  ), 
-  arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
-                                 "6-10" = "#75B41EFF",
-                                 "11-15" ="#5AC2F1FF",
-                                 "16-20"= "#0C5BB0FF",
-                                 "21-25" = "#972C8DFF",
-                                 ">26" = "#E0363AFF", drop =FALSE))+
-  #scale_linetype_manual(values=c("solid","dashed", "dotted"))+
-  labs(x = 'Species Richness',
-       y = expression(paste('Biomass (g/' ,m^2, ')')), 
-       title= 'Experiment Length', color=" Starting Richness", linetype="Experiment Length") +
-  scale_y_continuous(limits=c(0,2500)) +
-  scale_x_continuous(limits=c(0,35)) +
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                     strip.background = element_blank(),plot.title = element_text(size=12),
-                     legend.position="bottom")
-
-# all experiment lengths
-ggplot() +
-  facet_wrap(~maxyr, scales="free")+
-  #geom_text_repel(data=fig1_dat, aes(x=rich.end, y=mass.end,  label = site_code), size=3 ) +
-  geom_point(data=fig1_dat,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
-  geom_point(data=fig1_dat,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
-  #geom_point(size=1.5, fill="white", shape=2)+
-  geom_segment(data=fig1_dat,aes(x=rich.start,
-                               xend=rich.end,
-                               y=mass.start,
-                               yend=mass.end,
-                               group = site_code,
-                               colour=starting.richness,# linetype= Experiment.Length 
-  ), 
-  arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-  scale_colour_manual(values = c("1-5 species" = "#E5BA3AFF",
-                                 "6-10" = "#75B41EFF",
-                                 "11-15" ="#5AC2F1FF",
-                                 "16-20"= "#0C5BB0FF",
-                                 "21-25" = "#972C8DFF",
-                                 ">26" = "#E0363AFF", drop =FALSE))+
-  #scale_linetype_manual(values=c("solid","dashed", "dotted"))+
-  labs(x = 'Species Richness',
-       y = expression(paste('Biomass (g/' ,m^2, ')')), 
-       title= 'Experiment Length', color=" Starting Richness", linetype="Experiment Length") +
-  scale_y_continuous(limits=c(0,2500)) +
-  scale_x_continuous(limits=c(0,35)) +
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                     strip.background = element_blank(),plot.title = element_text(size=12),
-                     legend.position="bottom")
 
 

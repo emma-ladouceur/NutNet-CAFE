@@ -11,6 +11,9 @@ library("rnaturalearthdata")
 
 nnmap<- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv")
 
+nnmap <- nnmap %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
+
 world <- ne_countries(scale = "medium", returnclass = "sf")
 class(world)                 
 
@@ -75,6 +78,8 @@ library(ggrepel)
 data <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv", sep=",", header=T)
 start.rich <-read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+data <- data %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  ungroup()
 
 colnames(data)
 data <- distinct(data, site_code, latitude, longitude, year_trt,continent)
@@ -98,7 +103,7 @@ world <- map_data("world")
 
 data.f$`Starting Richness` <- factor(data.f$`Starting Richness`, levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
-
+View(data.f)
 # Reformat data: I count the occurence of each unique position
 n <- data.f %>%
   group_by(latitude, longitude, site_code, `Length of study`, continent) %>%
