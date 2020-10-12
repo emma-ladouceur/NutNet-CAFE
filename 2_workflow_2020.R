@@ -1,6 +1,6 @@
 
 # workflow_2020
-# step 2
+# This workflow rcalculates species richness measures
 
 library(tidyverse)
 library(vegan)
@@ -45,7 +45,7 @@ site.inclusion<-bce5 %>% distinct(site_code)
 
 View(site.inclusion)
 
-cover<- read.csv("~/Dropbox/NutNet data/full-cover-03-June-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+cover<- read.csv("~/Dropbox/NutNet data/full-cover-24-September-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 cover2<-unite_(cover, "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE)
 
 species.nn <- bce6 %>%  left_join(cover2)
@@ -54,7 +54,7 @@ species.nn <- bce6 %>%  left_join(cover2)
 View(species.nn)
 
 # plot level data
-comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-03-June-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-31-August-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 comb2<-unite_(comb, "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE)
 #select only columns of interest
@@ -65,6 +65,10 @@ comb3<- select(comb2, id,site_code, continent,country, region, managed, burned, 
 # re calc the metrics 
 
 species.nn<-unite_(species.nn, "ids", c("site_code","year","year_trt","trt","block","plot","subplot.cov"), remove=FALSE)
+
+
+View(species.nn)
+
 
 # make div dataframe
 plot.div <- data.frame(id=species.nn$id,ids=species.nn$ids,
@@ -86,121 +90,59 @@ unk.div <- plot.div %>% filter(local_provenance=="UNK") %>% distinct (ids)
 
 View(unk.div)
 
-# all species
-species.wide <- species.nn %>% select(ids, Taxon, max_cover) %>%
-  spread(Taxon, max_cover) %>%
-  remove_rownames %>% column_to_rownames(var="ids") %>%
-  replace(is.na(.), 0)
 
-#introduced
-int.wide <- species.nn %>% filter(local_provenance=="INT") %>% droplevels() %>%
-  select(ids, Taxon, max_cover) %>%
-  spread(Taxon, max_cover) %>%
-  remove_rownames %>% column_to_rownames(var="ids") %>%
-  replace(is.na(.), 0)
-# native
-nat.wide <- species.nn %>% filter(local_provenance=="NAT") %>% droplevels() %>%
-  select(ids, Taxon, max_cover) %>%
-  spread(Taxon, max_cover) %>%
-  remove_rownames %>% column_to_rownames(var="ids") %>%
-  replace(is.na(.), 0)
-# unknown
-unk.wide <- species.nn %>% filter(local_provenance=="UNK") %>% droplevels() %>%
-  select(ids, Taxon, max_cover) %>%
-  spread(Taxon, max_cover) %>%
-  remove_rownames %>% column_to_rownames(var="ids") %>%
-  replace(is.na(.), 0)
-
-View(unk.wide)
-# rich
-all.div$rich<-specnumber(species.wide)
-
-View(all.div)
-# INT_rich
-int.div$INT_rich<-specnumber(int.wide)
-
-View(int.div)
-# NAT_rich
-nat.div$NAT_rich<-specnumber(nat.wide)
-
-# UNK_rich
-unk.div$UNK_rich<-specnumber(unk.wide)
-
-View(unk.div)
-# site level
-
-#site dataframes
-# make div dataframe
-site.div <- data.frame(site_code=species.nn$site_code,local_provenance=species.nn$local_provenance)
-
-site.all.div <- site.div %>% distinct (site_code)
-
-site.int.div <- site.div %>% filter(local_provenance=="INT") %>% distinct (site_code)
-
-site.nat.div <- site.div %>% filter(local_provenance=="NAT") %>% distinct (site_code)
-
-site.unk.div <- site.div %>% filter(local_provenance=="UNK") %>% distinct (site_code)
+rich <- species.nn %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
+  summarise(
+    all.div= vegan::specnumber(Taxon))  %>% ungroup()
 
 
-species.nn$pres<-1
-species.wide.site <- species.nn %>% select(site_code, Taxon, pres) %>%
-  distinct(site_code,Taxon, .keep_all = T) %>%
-  spread(Taxon, pres) %>%
-  remove_rownames %>% column_to_rownames(var="site_code") %>%
-  replace(is.na(.), 0)
+INT_rich <- species.nn %>% filter(local_provenance=="INT") %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
+  summarise(
+    int.div = vegan::specnumber(Taxon)) %>% ungroup()
 
-#introduced
-int.wide.site <- species.nn %>% filter(local_provenance=="INT") %>% droplevels() %>%
-  select(site_code, Taxon, pres) %>%
-  distinct(site_code,Taxon, .keep_all = T) %>%
-  spread(Taxon, pres) %>%
-  remove_rownames %>% column_to_rownames(var="site_code") %>%
-  replace(is.na(.), 0)
-# native
-nat.wide.site <- species.nn %>% filter(local_provenance=="NAT") %>% droplevels() %>%
-  select(site_code, Taxon, pres) %>%
-  distinct(site_code,Taxon, .keep_all = T) %>%
-  spread(Taxon,pres) %>%
-  remove_rownames %>% column_to_rownames(var="site_code") %>%
-  replace(is.na(.), 0)
+NAT_rich <- species.nn %>% filter(local_provenance=="NAT")  %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
+  summarise(
+    nat.div = vegan::specnumber(Taxon)) %>% ungroup()
+
+UNK_rich <- species.nn %>% filter(local_provenance=="UNK")  %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
+  summarise(
+    unk.div = vegan::specnumber(Taxon)) %>% ungroup()
+
+# site metrics
+View(species.nn)
+
+site.year.div <- species.nn %>% select(site_code,year_trt, Taxon) %>% distinct() %>% 
+  group_by(site_code, year_trt) %>%
+  summarise(
+    site_year_rich = vegan::specnumber(Taxon)) %>% ungroup()
 
 
-# site.year
+site.all.div <- species.nn %>% select(site_code,Taxon) %>% distinct() %>% 
+  group_by(site_code) %>%
+  summarise(
+    site_richness = vegan::specnumber(Taxon)) %>% ungroup()
 
-site.year.long<-unite_(species.nn, "site_year", c("site_code","year_trt"), remove=FALSE)
 
-site.year.wide <- site.year.long %>% 
-  select(site_year, Taxon, pres) %>%
-  distinct(site_year,Taxon, .keep_all = T) %>%
-  spread(Taxon, pres) %>%
-  remove_rownames %>% column_to_rownames(var="site_year") %>%
-  replace(is.na(.), 0) 
+site.nat.div <- species.nn %>% filter(local_provenance=="NAT") %>% 
+   select(site_code,Taxon) %>% distinct() %>% 
+  group_by(site_code) %>%
+  summarise(
+    site_native_richness = vegan::specnumber(Taxon)) %>% ungroup()
 
-site.year.div <- site.year.long %>% distinct (site_year)
 
-# site_year_rich
-site.year.div$site_year_rich<-specnumber(site.year.wide)
+site.int.div <- species.nn %>% filter(local_provenance=="INT")  %>%  
+  select(site_code,Taxon) %>% distinct() %>% 
+  group_by(site_code) %>%
+  summarise(
+    site_introduced_richness = vegan::specnumber(Taxon)) %>% ungroup()
 
-View(site.year.div)
-# site_richness
-site.all.div$site_richness<-specnumber(species.wide.site)
 
-View(site.all.div)
-# site_native_richness
-site.nat.div$site_native_richness<-specnumber(nat.wide.site)
-
-View(site.nat.div)
-# site_introduced_richness
-site.int.div$site_introduced_richness<-specnumber(int.wide.site)
-
-View(site.int.div)
-# cover sums
 # sum_NAT_cover
 nat.cov <- species.nn %>% group_by(ids) %>% 
   filter(local_provenance=="NAT") %>%
   summarise(sum_NAT_cover=sum(max_cover))
   
-View(nat.cov)
+
 # sum_INT_cover
 int.cov <- species.nn %>% group_by(ids) %>% 
   filter(local_provenance=="INT") %>%
@@ -217,13 +159,13 @@ colnames(species.nn)
 colnames(comb3)
 
 sp <- species.nn %>% distinct(id,ids,site_code,site_year,block,plot,year_trt,Taxon,max_cover,local_provenance,orig.bm.cat,category.mod,cat.cover,subplot.bm,local_lifeform,local_lifespan,functional_group,category,mass,cat.mass,biomass.sp.cat,biomass.sp.plot,biomass.sp.full,biomass.m.full,plot.mass,plot.cover) %>% left_join(comb3) %>%
-  left_join(all.div) %>% left_join(int.div) %>% left_join(nat.div) %>% left_join(unk.div) %>% 
+  left_join(rich) %>% left_join(INT_rich) %>% left_join(NAT_rich) %>% left_join(UNK_rich) %>% 
   left_join(site.all.div) %>% left_join(site.int.div) %>% left_join(site.nat.div) %>% left_join(site.year.div) %>%
   left_join(int.cov) %>% left_join(nat.cov) %>% left_join(unk.cov) %>% 
   arrange(ids)
 
 # perfection
-  View(sp)
+ View(sp)
 
 # join comb with all metrics above.
 
@@ -249,7 +191,7 @@ bce5$biomass.sp.diff<-  abs(bce5$biomass.sp.plot - bce5$biomass.sp.cat)
 samp <- bce5 %>% top_frac(.5) %>% arrange(desc(biomass.sp.diff)) %>%
   select(id,Taxon,plot.mass,category, mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.diff) 
 
-
+View(samp)
 
 # get max year for filtering
 

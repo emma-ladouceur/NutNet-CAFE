@@ -1,15 +1,24 @@
 # Emma Ladouceur
 # The Effect of Multiple Limiting Resources on Community Assembly and the Functioning of Ecosystems
 # Last Updated May 6 th 2020
-# Calculate per species biomass
+#  This script cleans data to living herbaceous species only and calculates per species biomass according to total plot biomass or
+# life form group (graminoid, forb, legume)
 
 
 library(tidyverse)
 
-
+#previous
 comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-30-April-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 cover<- read.csv("~/Dropbox/NutNet data/full-cover-01-May-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-30-April-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+
+
+# update
+comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-31-August-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+cover<- read.csv("~/Dropbox/NutNet data/full-cover-24-September-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-24-September-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+
+
 
 # COVER  CLEAN UP
 head(cover)
@@ -58,9 +67,28 @@ dat_cover <- cover4 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subpl
   left_join(cover4) %>%
   rename(subplot.cov=subplot) %>% arrange(id,Taxon)
 
-dat_bm <- biomass3 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>% 
+# dat_bm <- biomass3 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>% 
+#   summarise(plot.mass=sum(mass)) %>%
+#   left_join(biomass3) 
+
+dat_bm_step <- biomass3 %>% select(id,site_code,year,year_trt,trt,block,plot,subplot,category,mass) %>%
+  distinct() %>%
+  group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
+  spread(category,mass) %>%
+  mutate(LIVE = case_when(GRAMINOID >= 0 | FORB >= 0 | LIVE >= 0 ~ "NA")) %>% # remove live measurements that also measured by group
+  gather(category, mass,`ANNUAL`:`<NA>`) %>%
+  filter(!is.na(mass),
+         !mass == "NA") %>% droplevels() %>% ungroup() %>% arrange(id,site_code,year,year_trt,trt,block,plot,subplot,category)
+
+dat_bm_step$mass<-as.numeric(dat_bm_step$mass)
+
+dat_bm <- dat_bm_step %>%
+  group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
   summarise(plot.mass=sum(mass)) %>%
-  left_join(biomass3)
+  left_join(dat_bm_test ) %>% 
+  ungroup() %>% arrange(id,site_code,year,year_trt,trt,block,plot,subplot,category)
+
+View(dat_bm)
 
 # if else statement to seperate total, vascular, live mass (all total values) from those that seperated biomass by group
 # sites that measured total
