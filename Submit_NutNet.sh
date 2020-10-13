@@ -21,11 +21,11 @@ module load R/3.4.3-1
 experiment=$1
 input=$2
 output_dir=/work/$USER/$JOB_NAME/$experiment
-mkdir -p $output_dir
+mkdir -p "$output_dir"
 
 prefix=$(basename "$input" .rds)
 
 Rscript \
   nutnet_price_total.R \
-  $input \
-  $output_dir/$prefix.rds
+  "$input" \
+  "$output_dir/$prefix.rds"
