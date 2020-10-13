@@ -14,7 +14,7 @@ plot$plot<-as.factor(plot$plot)
 plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
   ungroup()
 
-nn.multi.3 <- brm(cbind(rich, plot.mass) ~ trt * year_trt + (trt * year_trt  | p | site_code), 
+nn.multi.3 <- brm(cbind(all.div, plot.mass) ~ trt * year_trt + (trt * year_trt  | p | site_code), 
                      data = plot,family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4)
 
 

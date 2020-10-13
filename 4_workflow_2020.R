@@ -18,8 +18,21 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
- plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) 
+
+plot2<-plot %>% group_by(site_code) %>% 
+  summarise(min.year = min(year_trt),
+            max.year = max(year_trt))
+
+site.inclusion<-plot2 %>% distinct(site_code,min.year,max.year)
+
+site.inclusion2<- plot %>% left_join(site.inclusion)
+
+site.inclusion2 <- site.inclusion2 %>% group_by(site_code) %>% filter(max.year >= 3)  %>%
   ungroup()
+
+site.inclusion3 <- site.inclusion2 %>% distinct(site_code,max.year)
+ 
+View(site.inclusion3)
 
 
 # PARTITION DATA
@@ -37,11 +50,13 @@ p.dat2<-inner_join(p.all,dat)
 
 
 # START RICH
+
+head(plot)
 startrich<-plot[plot$year_trt %in% c('0'),]
 
 startrich2<-startrich %>%
   group_by(site_code) %>%
-  summarise(m.rich = mean(rich),
+  summarise(m.rich = mean(all.div),
             r.rich = round(m.rich))
 
 
