@@ -9,7 +9,7 @@
 #$ -o /home/$USER/$JOB_NAME-$JOB_ID.out
 #$ -j y
 
-module load R/3.4.3-1
+module load foss/2019b R/3.6.2-2
 export OFILE=/work/$USER/NutNet/$JOB_NAME-$JOB_ID.Rdata
 export LANG=en_US.UTF-8
 Rscript --vanilla /home/ladouceu/projects/NutNet/nn_time.sl.R
