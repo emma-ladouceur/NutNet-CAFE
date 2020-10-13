@@ -16,7 +16,7 @@
 
 #$ -cwd
 
-module load R/3.4.3-1
+module load foss/2019b R/3.6.2-2
 
 experiment=$1
 input=$2
