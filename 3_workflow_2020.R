@@ -114,7 +114,9 @@ p.all<-p.all %>% group_by(site_code) %>%
             max.year = max(year.y))
 
 price.inclusion<-p.all %>% distinct(site_code,min.year,max.year)
-price.inclusion
 
+price.inclusion2<- price.reduced6 %>% left_join(price.inclusion)
 
-write.csv(p.all, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
+View(price.inclusion2)
+
+write.csv(price.inclusion2, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")

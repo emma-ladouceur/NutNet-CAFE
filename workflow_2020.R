@@ -67,26 +67,18 @@ dat_cover <- cover4 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subpl
   left_join(cover4) %>%
   rename(subplot.cov=subplot) %>% arrange(id,Taxon)
 
-# dat_bm <- biomass3 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>% 
-#   summarise(plot.mass=sum(mass)) %>%
-#   left_join(biomass3) 
 
-dat_bm_step <- biomass3 %>% select(id,site_code,year,year_trt,trt,block,plot,subplot,category,mass) %>%
-  distinct() %>%
-  group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
-  spread(category,mass) %>%
-  mutate(LIVE = case_when(GRAMINOID >= 0 | FORB >= 0 | LIVE >= 0 ~ "NA")) %>% # remove live measurements that also measured by group
-  gather(category, mass,`ANNUAL`:`<NA>`) %>%
-  filter(!is.na(mass),
-         !mass == "NA") %>% droplevels() %>% ungroup() %>% arrange(id,site_code,year,year_trt,trt,block,plot,subplot,category)
 
-dat_bm_step$mass<-as.numeric(dat_bm_step$mass)
+ahth_dat <- biomass3 %>% filter(site_code %in% c("ahth.is")) %>%
+  filter(!category %in% c( "LIVE"))
 
-dat_bm <- dat_bm_step %>%
-  group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
+biomass4 <- biomass3 %>% filter(!site_code %in% c("ahth.is")) %>%
+  bind_rows(ahth_dat) %>% arrange(site_code,year_trt,trt,block,plot,subplot,category)
+
+dat_bm <- biomass4 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
   summarise(plot.mass=sum(mass)) %>%
-  left_join(dat_bm_test ) %>% 
-  ungroup() %>% arrange(id,site_code,year,year_trt,trt,block,plot,subplot,category)
+  left_join(biomass4)
+
 
 View(dat_bm)
 
@@ -184,14 +176,12 @@ eth.bm<- dat_bm %>% ungroup() %>% filter(site_code=="ethamc.au") %>% droplevels(
 eth.bm.live<- eth.bm %>% ungroup() %>% filter(category=="LIVE") %>% droplevels() %>%
   rename(subplot.bm=subplot) %>% select(-live)
 
-View()
+View(eth.bm)
 eth.bm.sort<- eth.bm %>% ungroup() %>% filter(!category=="LIVE") %>% droplevels() %>%
   rename(
     subplot.bm.sort=subplot,
     mass.sort=mass,
     plot.mass.sort=plot.mass) %>% select(-live) 
-
-
 
 eth.bm.sort$category.mod<-eth.bm.sort$category
 

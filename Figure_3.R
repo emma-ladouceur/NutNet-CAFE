@@ -13,7 +13,6 @@ library("scales")
 
 
 # CONCEPTUAL
-conceptdat<- is.data.frame()
 
 Model<-c('A) Conceptual Figure')
 conceptdat<- data.frame(Model)
@@ -90,18 +89,17 @@ load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 is.factor(sgain.trt_fitted.npk$starting.richness)
 is.factor(sgain.trt_coef3$starting.richness)
 
-sgain.trt_fitted.npk<-sgain.trt_fitted.npk[complete.cases(sgain.trt_fitted.npk$starting.richness), ]
-sgain.trt_coef3<-sgain.trt_coef3[complete.cases(sgain.trt_coef3$starting.richness), ]
-
-sgain.trt_fitted.npk$starting.richness <- factor(sgain.trt_fitted.npk$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-sgain.trt_coef3$starting.richness <- factor(sgain.trt_coef3$starting.richness , levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
-
 sgain.trt_coef3$xs<-1
 
 sgain.trt_fitted.npk$Model<-"C) Species Gain"
 sgain.trt_fitted.ctl$Model<-"C) Species Gain"
+
+View(sgain.trt_fitted.npk)
 sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% rename(Treatment = trt.y) 
+
+
+
 fitted.sgain<-bind_rows(sgain.trt_fitted.npk,sgain.trt_fitted.ctl)
 
 fitted.sgain
@@ -113,8 +111,8 @@ fitted.sgain$Treatment <- factor(fitted.sgain$Treatment , levels=c("NPK","Contro
 # cde "#816687"
 
 head(sgain.trt_fitted.ctl)
-
-sgain.trtm<-ggplot()  +
+View(sgain.trt_coef3)
+sgain.trtm <- ggplot()  +
   # data
   facet_grid(~Model)+
   geom_point(data = sgain.trt_fitted.npk,
@@ -692,7 +690,7 @@ cde <- cdem +  annotation_custom(ggplotGrob(cde.eff), xmin = 7, xmax = 12,
   plot_layout( heights = c(10,10,2)) 
 
 
-# LANDSCAPE 14X11
+# LANDSCAPE 11X14
 (conceptual | sloss | sgain) / (sl | sg  | cde ) / (rlegend) +
   plot_layout( heights = c(10,10,0.5)) 
 

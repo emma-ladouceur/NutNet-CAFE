@@ -9,11 +9,12 @@ library(ggridges)
 library(gridExtra)
 library(grid)
 library("scales")
+library(viridis)
 
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
 
 
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
@@ -41,7 +42,7 @@ study.bm.p2<-study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=e
 
 study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2)
 
-study.effs.p
+View(study.effs.p)
 
 #"#0B775E"
 
@@ -96,11 +97,15 @@ fitted.rich$Treatment <- factor(fitted.rich$Treatment , levels=c("NPK","Control"
 
 plot.rich_coef3 <- plot.rich_coef3 %>% filter(!is.na(TESlope))
 
+
+View(plot.rich_fitted.npk)
+
+
 # orange code "#F98400"
 r1<-ggplot() +
   facet_wrap(~Model) +
   geom_point(data = plot.rich_fitted.npk,
-             aes(x = year_trt, y = rich), colour ="black", alpha=0.2,
+             aes(x = year_trt, y = all.div), colour ="black", alpha=0.2,
              size = .7, position = position_jitter(width = 0.45 )) +
   geom_segment(data = plot.rich_coef3 ,
                aes(x = xmin, 
@@ -109,7 +114,7 @@ r1<-ggplot() +
                    yend =  (Intercept + TE + (ISlope+TESlope) * xmax),
                    group = site_code),
                color="black", alpha=0.2,size = .7) +
-  # uncertainy in fixed effect
+ # uncertainy in fixed effect
   geom_ribbon(data = plot.rich_fitted.npk,
               aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
               fill="#0B775E",alpha = 0.5) +
@@ -142,7 +147,7 @@ plot.rich_coef3$Site<-"Site"
 r.leg<-ggplot() +
   facet_wrap(~Model) +
   geom_point(data = plot.rich_fitted.npk,
-             aes(x = year_trt, y = rich, fill=Plot), alpha=0.2,
+             aes(x = year_trt, y = all.div, fill=Plot), alpha=0.2,
              size = .7, position = position_jitter(width = 0.45 )) +
   geom_segment(data = plot.rich_coef3 ,
                aes(x = xmin, 
@@ -184,7 +189,7 @@ plot.rich_fitted.npk <- plot.rich_fitted.npk %>% left_join(yr)
 rmatrix<-ggplot() +
   facet_wrap(~site_code) +
   geom_point(data = plot.rich_fitted.npk,
-             aes(x = year_trt, y = rich, color=xmax), alpha=0.3,
+             aes(x = year_trt, y = all.div, color=xmax), alpha=0.3,
              size = 1.3, position = position_jitter(width = 0.45 )) +
   geom_segment(data = plot.rich_coef3,
                aes(x = xmin, 

@@ -17,7 +17,10 @@ bce2 <- droplevels(subset(bce2, !site_code=="nilla.au"))
 
 bce3<-bce2 %>% filter(!is.na(biomass.sp.full)) %>% droplevels()
 
-bce3 %>% distinct(site_code,year_trt)
+
+
+check<-bce3 %>% distinct(site_code,year_trt)
+View(check)
 
 # ethamc.au_2019_6_NPK_3_26
 # has negative biomass for graminoids. i assume this should be 0.37 and not -0.37 (desert grassland)
@@ -38,10 +41,14 @@ View(check)
 bce5 <- droplevels( bce4[-which(bce4$year.zero == "remove"), ] )
 colnames(bce5)
 
+bsites<- bce5 %>% distinct(site_code)
+View(bsites)
+
+
 bce6<- bce5 %>% select(id,site_code,year,year_trt,trt,block,plot,plot.cover,orig.bm.cat,category.mod,cat.cover,subplot.cov,subplot.bm,local_lifeform,local_lifespan,functional_group,Taxon,max_cover,category,mass,cat.mass,plot.mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.full,biomass.m.full)
   
 View(bce6)
-site.inclusion<-bce5 %>% distinct(site_code)
+site.inclusion<-bce6 %>% distinct(site_code)
 
 View(site.inclusion)
 
@@ -166,6 +173,11 @@ sp <- species.nn %>% distinct(id,ids,site_code,site_year,block,plot,year_trt,Tax
 
 # perfection
  View(sp)
+ 
+ 
+sp.d<- sp %>% distinct(site_code)
+View(sp.d)
+
 
 # join comb with all metrics above.
 
@@ -272,6 +284,8 @@ folder = "output_new"
 # input RDS files for cluster, price analysis
 # if this doesnt work close R and try again only happens because wd has changed
 mapply(saveRDS, all_lst, version=2, file=paste0(folder, "/",names(all_lst), '.rds'))
+
+
 
 
 # test it out, test the code

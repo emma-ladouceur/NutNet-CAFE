@@ -19,22 +19,13 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 
-plot2<-plot %>% group_by(site_code) %>% 
-  summarise(min.year = min(year_trt),
-            max.year = max(year_trt))
 
-site.inclusion<-plot2 %>% distinct(site_code,min.year,max.year)
-
-site.inclusion2<- plot %>% left_join(site.inclusion)
-
-site.inclusion2 <- site.inclusion2 %>% group_by(site_code) %>% filter(max.year >= 3)  %>%
+ plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3)  %>%
   ungroup()
 
-site.inclusion3 <- site.inclusion2 %>% distinct(site_code,max.year)
+ View(plot)
  
-View(site.inclusion3)
-
-
+colnames(p.all)
 # PARTITION DATA
 p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
 
@@ -48,6 +39,8 @@ p.all <- p.all %>% group_by(site_code) %>% filter(max.year >= 3) %>%
 dat<- plot %>% distinct(site_code, continent,habitat)
 p.dat2<-inner_join(p.all,dat)
 
+
+View(p.all)
 
 # START RICH
 
@@ -73,16 +66,18 @@ write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
 # load models
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
+summary(plot.rich.3)
+
+load('~/Dropbox/Projects/NutNet/Data/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/3/cde.Rdata') # CDE.s
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/3/sgain.Rdata') # s.gain.s
 
 
 
@@ -500,7 +495,7 @@ summary(sg.s)
 rm(sg.trt.i)
 setwd('~/Dropbox/Projects/NutNet/Data/')
 save(sg.trt_fitted.npk,sg.trt_fitted.ctl,sg.trt_coef3,file = 'sg_dat.Rdata')
-load('~/Desktop/Academic/R code/NutNet/sg_dat.Rdata')
+load('~/Desktop/Academic/R code/NutNet/Data/sg_dat.Rdata')
 
 
 
@@ -824,12 +819,6 @@ load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
 # EFFS
-
-
-# SEPERATELY
-
-
-
 sl.trt.i_fixef <-  as.data.frame(fixef(sl.3))
 sg.trt.i_fixef <- as.data.frame(fixef(sg.3))
 CDE.trt.i_fixef <- as.data.frame( fixef(CDE.3))
@@ -980,16 +969,16 @@ save(rich.f,bm.f,sloss.f,sgain.f,sl.f,sg.f,cde.f,file = 'effs.Rdata')
 # posterior effects
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/3/cde.Rdata') # CDE.s
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/3/sgain.Rdata') # s.gain.s
 
 
 
