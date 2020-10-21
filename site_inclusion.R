@@ -90,3 +90,43 @@ write.csv(all,"~/Desktop/site.inclusion.csv")
 
 
 
+
+library(tidyverse)
+plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-31-August-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+country_codes <- read.csv("~/Dropbox/Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
+biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv", stringsAsFactors = FALSE)
+contacts <- read.csv("~/Dropbox/Projects/NutNet/Data/pi-contact-list-8-Nov-2019.csv", stringsAsFactors = FALSE)
+
+colnames(plot)
+colnames(comb)
+head(country_codes)
+
+site_deets <- comb %>% dplyr::select(site_name,site_code)
+
+
+contacts <- contacts %>% select(-country,-site_name,-institution, -email)
+
+
+site.include <- plot %>% dplyr::select(site_code,country,habitat,max.year) %>% 
+  distinct() %>% mutate(countrycode = country) %>%
+  dplyr::select(-country) %>%
+  left_join(country_codes) %>% left_join(site_deets) %>% filter(max.year >= 3) %>%
+  dplyr::select(site_code,site_name,country,habitat, max.year) %>% distinct() %>%
+  left_join(contacts, by= c("site_code"))
+
+
+View(site.include)
+
+
+site.include.names <- site.include %>% unite( name , firstname:lastname, remove=TRUE, sep=" ") %>%
+  group_by(site_code,site_name, country, max.year) %>%
+  summarise(name = toString(name)) %>% ungroup() %>%
+  rename('data contributor(s)' = name)
+  
+
+View(site.include.names)
+
+write.csv(site.include,"~/Dropbox/Projects/NutNet/Data/Table_S1.csv")
+
+

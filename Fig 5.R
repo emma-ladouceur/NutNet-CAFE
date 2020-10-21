@@ -421,7 +421,7 @@ bm
 
 
 
-sl.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/old/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 View(sl.ps)
 View(sl.p)

@@ -25,6 +25,11 @@ plot$plot<-as.factor(plot$plot)
 
  View(plot)
  
+ plot.d <- plot %>% distinct(site_code)
+ 
+ View(plot.d)
+ 
+ 
 colnames(p.all)
 # PARTITION DATA
 p.all<-separate(p.all,site.year.id.x,into=c("site_code","year.x"),sep = "_", remove=FALSE)
@@ -381,7 +386,7 @@ View(sl.trt_coef2)
 
 
 summary(sl.s)
-
+``
 dat<-distinct(p.dat2, site_code, continent,habitat)
 
 sl.trt_coef3<-inner_join(sl.trt_coef2,dat)
@@ -495,7 +500,7 @@ summary(sg.s)
 rm(sg.trt.i)
 setwd('~/Dropbox/Projects/NutNet/Data/')
 save(sg.trt_fitted.npk,sg.trt_fitted.ctl,sg.trt_coef3,file = 'sg_dat.Rdata')
-load('~/Desktop/Academic/R code/NutNet/Data/sg_dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/g_dat.Rdata')
 
 
 
@@ -1112,7 +1117,7 @@ sg.p.ctl <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
 sg.p.npk <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
-         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`))%>%
   select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
@@ -1122,6 +1127,9 @@ sg.p.npk <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
 sg.p <- bind_rows(sg.p.ctl,sg.p.npk)
 sg.p
 
+
+
+View(cde.fixed.p)
 
 cde.p.ctl <-  cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
@@ -1133,10 +1141,11 @@ cde.p.ctl <-  cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
   select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
+View(cde.p.ctl)
 cde.p.npk <- cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
-         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
+         trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`))%>%
   select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
@@ -1194,10 +1203,5 @@ sgain.p
 
 setwd('~/Dropbox/Projects/NutNet/Data/')
 save(rich.p,bm.p,sloss.p,sgain.p,sl.p,sg.p,cde.p,file = 'p.effs.Rdata')
-
-
-
-
-
 
 

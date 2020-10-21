@@ -132,7 +132,7 @@ study.bm.p <-  bm.p %>% group_by(site_code) %>%
   select(c(site_code,eff,eff_upper,eff_lower)) %>% distinct()  
 
 
-head(bmp)
+head(study.bm.p)
 
 
 setwd('~/Dropbox/Projects/NutNet/Data/')

@@ -27,6 +27,12 @@ yr<-plot.rich_coef3 %>% select(site_code,xmax)
 plot.rich_fitted.npk <- plot.rich_fitted.npk %>% left_join(yr)
 
 
+
+View(plot.rich_fitted.npk)
+View(plot.rich_coef3)
+
+
+
 rmatrix<-ggplot() +
   facet_wrap(~site_code) +
   geom_point(data = plot.rich_fitted.npk,
@@ -274,6 +280,9 @@ yr<-cde_coef3 %>% select(site_code,xmax)
 cde_fitted.npk <- cde_fitted.npk %>% left_join(yr)
 
 cde_coef3$xs<-1
+
+
+View(cde_coef3)
 
 cde.matrix <- ggplot()  +
   facet_wrap(~site_code) +
