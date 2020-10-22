@@ -18,6 +18,9 @@ load('NN-CAFE/Data/sloss.n.mod.dat.Rdata')
 load('NN-CAFE/Data/sl.n.mod.dat.Rdata')
 load('NN-CAFE/Data/sg_dat.Rdata')
 load('NN-CAFE/Data/cde.mod.dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
+
 
 
 
@@ -83,7 +86,7 @@ server <- function(input, output) {
         plot.rich_fitted.npk <- plot.rich_fitted.npk %>% left_join(yr)
         plot.rich_fitted.ctl <- plot.rich_fitted.ctl %>% left_join(yr)
         
-           richviz<- ggplot()+
+           rich.r<- ggplot()+
             geom_point(data = plot.rich_fitted.npk %>% filter(site_code == input$selected_site) ,
                        aes(x = year_trt, y = all.div), colour = "#0B775E",
                        size = 1.3,alpha=0.5) +
@@ -104,20 +107,44 @@ server <- function(input, output) {
                                 yend =  (Intercept  + (ISlope) * xmax),
                                 group = site_code), colour = "black", linetype = "dashed",
                             size = .7) +
-            #scale_color_viridis(discrete=FALSE,name="Length of Study") +
-            scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+             ylim(0,40)+
+            scale_x_continuous(breaks=c(0,1,3,6,9,12),limits=c(0, 12)) +
             labs(
                 x = 'Year',
                 y = ' Species richness', title= 'Species richness  ') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                plot.title = element_text(size=12))
            
+           
+           rich.eff<-ggplot() + 
+               geom_point(data = study.rich.p %>% filter(site_code == input$selected_site), aes(x = response, y = eff, color=response),size = 2) +
+               geom_errorbar(data = study.rich.p %>% filter(site_code == input$selected_site), aes(x = response, ymin = eff_lower,
+                                                        ymax = eff_upper, color=response),
+                             width = 0, size = 0.7) +
+               # facet_wrap(~Model)+
+               labs(x = '',
+                    # y= expression(paste('Effect of NPK on Species Richness'))
+                    y='')+
+               geom_hline(yintercept = 0, lty = 2) +
+               # scale_y_continuous(breaks=c(0,-0.5)) +
+               scale_color_manual(values = c("#000000","#0B775E")) +
+               theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                            plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
+                                            axis.text.y = element_text(size=6),
+                                            axis.text.x = element_text(size=6),
+                                            title=element_text(size=8),
+                                            strip.background = element_blank(),legend.position="none")
+           
+           
+           richviz <- rich.r +  annotation_custom(ggplotGrob(rich.eff), xmin = 7, xmax = 12, 
+                                           ymin = 28, ymax = 40)
+           
            yr<-plot.bm_coef3 %>% select(site_code,xmax)
            plot.bm_fitted.npk <- plot.bm_fitted.npk %>% left_join(yr)
            plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% left_join(yr)
            
            
-          bmviz<- ggplot() +
+          bm.r <- ggplot() +
                geom_point(data = plot.bm_fitted.npk %>% filter(site_code == input$selected_site),
                           aes(x = year_trt, y = plot.mass), alpha=0.5,colour = "#0B775E",
                           size = 1.3,alpha=0.7) +
@@ -142,13 +169,33 @@ server <- function(input, output) {
                labs(x='Year',
                     #x = 'Years',
                     y = expression(paste('Biomass (g/',m^2, ')')), title= 'Biomass') +
-               #scale_color_viridis(discrete=FALSE,name="Length of Study") +
-               # ylim(0,1900)+
-               # xlim(0,11) +
-               scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+              ylim(0,2000)+
+               scale_x_continuous(breaks=c(0,1,3,6,9,12),limits=c(0, 12)) +
                theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                   plot.title = element_text(size=12))
            
+          bm.eff<-ggplot() + 
+              geom_point(data = study.bm.p %>% filter(site_code == input$selected_site), aes(x = response, y = eff, color=response),size = 2) +
+              geom_errorbar(data = study.bm.p %>% filter(site_code == input$selected_site), aes(x = response, ymin = eff_lower,
+                                                                                                  ymax = eff_upper, color=response),
+                            width = 0, size = 0.7) +
+              # facet_wrap(~Model)+
+              labs(x = '',
+                   # y= expression(paste('Effect of NPK on Species bmness'))
+                   y='')+
+              geom_hline(yintercept = 0, lty = 2) +
+              # scale_y_continuous(breaks=c(0,-0.5)) +
+              scale_color_manual(values = c("#000000","#0B775E")) +
+              theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                           plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
+                                           axis.text.y = element_text(size=6),
+                                           axis.text.x = element_text(size=6),
+                                           title=element_text(size=8),
+                                           strip.background = element_blank(),legend.position="none")
+          
+          
+          bmviz <- bm.r +  annotation_custom(ggplotGrob(bm.eff), xmin = 7, xmax = 12, 
+                                             ymin = 1400 ,ymax = 2000)
            (richviz | bmviz)
         
         
@@ -166,7 +213,7 @@ server <- function(input, output) {
         
         sloss.trt_coef3$xs<-1
         
-        slossviz <- ggplot()  +
+        sloss.r <- ggplot()  +
             geom_point(data = sloss.trt_fitted.npk %>% filter(site_code == input$selected_site),
                        aes(x = year.y, y = s.loss.n,),  alpha=0.5, color = "#B40F20",
                        size = 1.3, alpha=0.7) +
@@ -187,8 +234,8 @@ server <- function(input, output) {
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
-            scale_x_continuous(breaks=c(1,3,6,9,12)) +
-            # ylim(0,20) +
+            scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
+             ylim(-20,0) +
             labs(x = 'Year',
                  y = expression(paste('Species Loss')), title= 'Species Loss') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
@@ -198,13 +245,35 @@ server <- function(input, output) {
                                axis.title.y = element_text(size=9),
                                axis.text=element_text(size=9))
         
+        sloss.eff<-ggplot() + 
+            geom_point(data = study.sloss.p %>% filter(site_code == input$selected_site), aes(x = response, y = eff,color=response),size = 2) +
+            geom_errorbar(data = study.sloss.p %>% filter(site_code == input$selected_site), aes(x = response,ymin = eff_lower,
+                                              ymax = eff_upper,color=response),
+                          width = 0, size = 0.7) +
+            #facet_wrap(~Model)+
+            labs(x = '',
+                 # y= expression(paste('Effect of NPK on Species Loss'))
+                 y='') +
+            geom_hline(yintercept = 0, lty = 2) +
+            #scale_y_continuous(breaks=c(-0.5,-0.2,0)) +
+            scale_color_manual(values = c("#000000","#B40F20")) +
+            theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                         plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
+                                         axis.text.y = element_text(size=6),
+                                         axis.text.x = element_text(size=6),
+                                         title=element_text(size=8),
+                                         strip.background = element_blank(),legend.position="none")
+        
+        
+        slossviz <- sloss.r +  annotation_custom(ggplotGrob(sloss.eff),  xmin = 7, xmax = 12, 
+                                                 ymin = -20, ymax = -13)
         
         yr<-sgain.trt_coef3 %>% select(site_code,xmax)
         sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% left_join(yr)
         sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% left_join(yr)
         sgain.trt_coef3$xs<-1
         
-        sgainviz <- ggplot()  +
+        sgain.r <- ggplot()  +
             geom_point(data = sgain.trt_fitted.npk  %>% filter(site_code == input$selected_site),
                        aes(x = year.y, y = s.gain),  alpha=0.5,color= "#046C9A",
                        size = 1.3,  alpha=0.7) +
@@ -225,7 +294,7 @@ server <- function(input, output) {
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
-            scale_x_continuous(breaks=c(1,3,6,9,12)) +
+            scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
             ylim(0,20) +
             labs(x = 'Year',
                  y = expression(paste('Species Gain')), title= 'Species Gain') +
@@ -235,8 +304,31 @@ server <- function(input, output) {
                                axis.title.y = element_text(size=9),
                                axis.text=element_text(size=9))
         
+        sgain.eff<-ggplot() + 
+            geom_point(data = study.sgain.p %>% filter(site_code == input$selected_site), aes(x = response, y = eff,color=response),size = 2) +
+            geom_errorbar(data =  study.sgain.p %>% filter(site_code == input$selected_site), aes(x = response,ymin = eff_lower,
+                                              ymax = eff_upper,color=response),
+                          width = 0, size = 0.7) +
+            # facet_wrap(~Model)+
+            labs(x = '',
+                 # y= expression(paste('Effect of NPK on Species Gain'))
+                 y='') +
+            geom_hline(yintercept = 0, lty = 2) +
+            #scale_y_continuous(breaks=c(0,0.05,0.3)) +
+            scale_color_manual(values = c("#000000","#046C9A")) +
+            theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                         plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
+                                         axis.text.y = element_text(size=6),
+                                         axis.text.x = element_text(size=6),
+                                         title=element_text(size=8),
+                                         strip.background = element_blank(),legend.position="none")
         
-        (slossviz | sgainviz)
+        
+        sgainviz <- sgain.r +  annotation_custom(ggplotGrob(sgain.eff), xmin = 7, xmax = 12, 
+                                                 ymin = 13, ymax = 20)
+        
+        
+         (slossviz | sgainviz)
         
         
     })
