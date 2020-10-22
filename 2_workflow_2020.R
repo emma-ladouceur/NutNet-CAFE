@@ -102,7 +102,7 @@ View(unk.div)
 View(species.nn)
 rich <- species.nn %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
   summarise(
-    all.div.v= n_distinct(Taxon))  %>% ungroup()
+    all.div= n_distinct(Taxon))  %>% ungroup()
 
 
 View(rich)
