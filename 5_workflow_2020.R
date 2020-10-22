@@ -9,16 +9,16 @@ library(grid)
 library("scales")
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/3/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
 
-load('~/Dropbox/Projects/NutNet/Data/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Data/3/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
 
 meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -429,7 +429,7 @@ study.sloss.p.ctl <-  sloss.p %>% group_by(site_code) %>%
 
 study.sloss.p <- bind_rows(study.sloss.p.npk,study.sloss.p.ctl)
 
-
+View(study.sloss.p)
 
 study.sgain.p.npk <-  sgain.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(sgain.study.trt.effect),
@@ -445,12 +445,15 @@ study.sgain.p.ctl <-  sgain.p %>% group_by(site_code) %>%
 
 study.sgain.p <- bind_rows(study.sgain.p.npk,study.sgain.p.ctl)
 
-
+View(study.sgain.p)
 
 setwd('~/Dropbox/Projects/NutNet/Data/')
 save(study.rich.p, study.bm.p,study.sl.p,study.sg.p,study.cde.p,study.sloss.p,study.sgain.p, file = 'study.p.effs.Rdata')
 
 
+
+load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
 
 
 View(study.rich.p.npk)
@@ -464,6 +467,12 @@ rich.eff<-ggplot() +
   geom_errorbar(data = study.rich.p.s, aes(x = response, ymin = eff_lower,
                                    ymax = eff_upper, color=response),
                 width = 0, size = 0.7) +
+  # geom_hline(data = rich.p,
+  #            aes(yintercept = eff, size = 1,color=response)) +
+  # geom_rect(data = rich.p,
+  #           aes(xmin = -Inf, xmax = Inf,
+  #               ymin = eff_lower, ymax = eff_upper,fill=response),
+  #           alpha = 0.3) +
   # facet_wrap(~Model)+
   labs(x = '',
        # y= expression(paste('Effect of NPK on Species Richness'))
@@ -482,8 +491,8 @@ rich.eff<-ggplot() +
 rich.eff
 
 
-
-
+View(study.sloss.p)
+View(study.sgain.p)
 
 
 

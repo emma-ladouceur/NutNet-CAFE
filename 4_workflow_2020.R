@@ -71,18 +71,18 @@ write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
 # load models
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.g
 
 summary(plot.rich.3)
 
-load('~/Dropbox/Projects/NutNet/Data/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/3/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Data/3/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # s.gain.s
 
 
 
@@ -500,7 +500,7 @@ summary(sg.s)
 rm(sg.trt.i)
 setwd('~/Dropbox/Projects/NutNet/Data/')
 save(sg.trt_fitted.npk,sg.trt_fitted.ctl,sg.trt_coef3,file = 'sg_dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/g_dat.Rdata')
+load('~/Dropbox/Projects/NutNet/Data/sg_dat.Rdata')
 
 
 
@@ -974,16 +974,16 @@ save(rich.f,bm.f,sloss.f,sgain.f,sl.f,sg.f,cde.f,file = 'effs.Rdata')
 # posterior effects
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/3/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
 
-load('~/Dropbox/Projects/NutNet/Data/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Data/3/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
 
 

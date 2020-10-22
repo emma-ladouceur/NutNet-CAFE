@@ -13,8 +13,8 @@ library(viridis)
 
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.g
 
 
 load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
@@ -100,6 +100,8 @@ plot.rich_coef3 <- plot.rich_coef3 %>% filter(!is.na(TESlope))
 
 View(plot.rich_fitted.npk)
 
+
+View(plot.rich_coef3)
 
 # orange code "#F98400"
 r1<-ggplot() +
@@ -307,7 +309,7 @@ load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
 
 
 
-
+View(rich.p)
 
 rich.eff<-ggplot() + 
   geom_point(data =rich.p, aes(x = response, y = eff, color=response),size = 2) +

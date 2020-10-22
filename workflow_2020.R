@@ -8,9 +8,9 @@
 library(tidyverse)
 
 #previous
-comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-30-April-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-cover<- read.csv("~/Dropbox/NutNet data/full-cover-01-May-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-30-April-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+# comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-30-April-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+# cover<- read.csv("~/Dropbox/NutNet data/full-cover-01-May-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+# biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-30-April-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
 # update
@@ -69,11 +69,11 @@ dat_cover <- cover4 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subpl
 
 
 
-ahth_dat <- biomass3 %>% filter(site_code %in% c("ahth.is")) %>%
+is_dat <- biomass3 %>% filter(site_code %in% c("ahth.is", "amlr.is")) %>%
   filter(!category %in% c( "LIVE"))
 
-biomass4 <- biomass3 %>% filter(!site_code %in% c("ahth.is")) %>%
-  bind_rows(ahth_dat) %>% arrange(site_code,year_trt,trt,block,plot,subplot,category)
+biomass4 <- biomass3 %>% filter(!site_code %in% c("ahth.is", "amlr.is")) %>%
+  bind_rows(is_dat) %>% arrange(site_code,year_trt,trt,block,plot,subplot,category)
 
 dat_bm <- biomass4 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
   summarise(plot.mass=sum(mass)) %>%

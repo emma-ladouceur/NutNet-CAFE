@@ -98,22 +98,26 @@ unk.div <- plot.div %>% filter(local_provenance=="UNK") %>% distinct (ids)
 View(unk.div)
 
 
+
+View(species.nn)
 rich <- species.nn %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
   summarise(
-    all.div= vegan::specnumber(Taxon))  %>% ungroup()
+    all.div.v= n_distinct(Taxon))  %>% ungroup()
 
+
+View(rich)
 
 INT_rich <- species.nn %>% filter(local_provenance=="INT") %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
   summarise(
-    int.div = vegan::specnumber(Taxon)) %>% ungroup()
+    int.div = n_distinct(Taxon)) %>% ungroup()
 
 NAT_rich <- species.nn %>% filter(local_provenance=="NAT")  %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
   summarise(
-    nat.div = vegan::specnumber(Taxon)) %>% ungroup()
+    nat.div = n_distinct(Taxon)) %>% ungroup()
 
 UNK_rich <- species.nn %>% filter(local_provenance=="UNK")  %>%  group_by(ids,site_code, year_trt,block,plot,subplot.cov) %>%
   summarise(
-    unk.div = vegan::specnumber(Taxon)) %>% ungroup()
+    unk.div = n_distinct(Taxon)) %>% ungroup()
 
 # site metrics
 View(species.nn)
@@ -121,27 +125,27 @@ View(species.nn)
 site.year.div <- species.nn %>% select(site_code,year_trt, Taxon) %>% distinct() %>% 
   group_by(site_code, year_trt) %>%
   summarise(
-    site_year_rich = vegan::specnumber(Taxon)) %>% ungroup()
+    site_year_rich = n_distinct(Taxon)) %>% ungroup()
 
 
 site.all.div <- species.nn %>% select(site_code,Taxon) %>% distinct() %>% 
   group_by(site_code) %>%
   summarise(
-    site_richness = vegan::specnumber(Taxon)) %>% ungroup()
+    site_richness = n_distinct(Taxon)) %>% ungroup()
 
 
 site.nat.div <- species.nn %>% filter(local_provenance=="NAT") %>% 
    select(site_code,Taxon) %>% distinct() %>% 
   group_by(site_code) %>%
   summarise(
-    site_native_richness = vegan::specnumber(Taxon)) %>% ungroup()
+    site_native_richness = n_distinct(Taxon)) %>% ungroup()
 
 
 site.int.div <- species.nn %>% filter(local_provenance=="INT")  %>%  
   select(site_code,Taxon) %>% distinct() %>% 
   group_by(site_code) %>%
   summarise(
-    site_introduced_richness = vegan::specnumber(Taxon)) %>% ungroup()
+    site_introduced_richness = n_distinct(Taxon)) %>% ungroup()
 
 
 # sum_NAT_cover

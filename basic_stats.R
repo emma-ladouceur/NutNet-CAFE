@@ -21,13 +21,13 @@ load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.3
 
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # s.gain.s
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/multi.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/multi.Rdata') # s.gain.s
 
 
 
