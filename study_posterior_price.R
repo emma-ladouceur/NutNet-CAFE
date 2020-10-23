@@ -65,6 +65,8 @@ price.eff<-left_join(sg.sl.eff,cde.eff)
 
 all.effs <- left_join(price.eff,sloss.sgain.effs)
 
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(all.effs, file = 'study.price.p.effs.Rdata')
 
 
 study.price.cloud<-ggplot()+

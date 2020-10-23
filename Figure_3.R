@@ -261,6 +261,10 @@ fitted.sl
 
 fitted.sl$Treatment <- factor(fitted.sl$Treatment , levels=c("NPK","Control"))
 
+
+
+View(sl.trt_coef3)
+
 sl.trtm<-ggplot() +
   facet_grid(~Model)+
   geom_point(data = sl.trt_fitted.npk,
@@ -324,6 +328,8 @@ fitted.sg
 
 fitted.sg$Treatment <- factor(fitted.sg$Treatment , levels=c("NPK","Control"))
 
+
+View(sg.trt_coef3)
 #gai
 sg.trtm<-ggplot()  +
   # data
