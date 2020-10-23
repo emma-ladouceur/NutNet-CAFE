@@ -107,7 +107,7 @@ View(study_sample_posterior)
 
 
 rich_study_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   unnest_legacy(rich.ctl.study,rich.npk.study) %>%
   mutate( rich.trt.study = (rich.ctl.study + rich.npk.study))
 
@@ -115,7 +115,7 @@ head(rich_study_posterior)
 nrow(rich_study_posterior)
 
 bm_study_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   unnest_legacy(bm.ctl.study,bm.npk.study) %>%
   mutate( bm.trt.study = (bm.ctl.study + bm.npk.study)) 
 
@@ -123,14 +123,14 @@ bm_study_posterior <- study_sample_posterior  %>%
 head(bm_study_posterior)
 
 sl_study_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   unnest_legacy(sl.ctl.study,sl.npk.study) %>%
   mutate( sl.trt.study = (sl.ctl.study + sl.npk.study)) 
 
 head(sl_study_posterior)
 
 sg_study_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   unnest_legacy(sg.ctl.study,sg.npk.study) %>%
   mutate( sg.trt.study = (sg.ctl.study + sg.npk.study)) 
 
@@ -138,7 +138,7 @@ head(sg_study_posterior)
 
 
 cde_study_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   unnest_legacy(cde.ctl.study,cde.npk.study) %>%
   mutate( cde.trt.study = (cde.ctl.study + cde.npk.study)) 
 
@@ -146,14 +146,14 @@ head(cde_study_posterior)
 
 
 sloss_study_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   unnest_legacy(sloss.ctl.study,sloss.npk.study) %>%
   mutate( sloss.trt.study = (sloss.ctl.study + sloss.npk.study)) 
 
 head(sloss_study_posterior)
 
 sgain_study_posterior <- study_sample_posterior  %>% 
-  select(-data) %>% 
+  dplyr::select(-data) %>% 
   unnest_legacy(sgain.ctl.study,sgain.npk.study) %>%
   mutate( sgain.trt.study = (sgain.ctl.study + sgain.npk.study)) 
 
@@ -175,65 +175,65 @@ sgain.fixed.p<-posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 1000, 1
 
 
 
-rich_global_posterior <-  rich.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+rich_global_posterior <-  rich.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(rich.ctl.global =`b_year_trt`,
          rich.npk.global =`b_trtNPK:year_trt`,
          rich.trt.global =(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
-  select(-c(`b_year_trt`,`b_trtNPK:year_trt`))
+  dplyr::select(-c(`b_year_trt`,`b_trtNPK:year_trt`))
 
 head(rich_global_posterior)
 nrow(rich_global_posterior)
 
-bm_global_posterior <-  bm.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+bm_global_posterior <-  bm.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(bm.ctl.global =`b_year_trt`,
          bm.npk.global=`b_trtNPK:year_trt`,
          bm.trt.global=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
-  select(-c(`b_year_trt`,`b_trtNPK:year_trt`)) 
+  dplyr::select(-c(`b_year_trt`,`b_trtNPK:year_trt`)) 
 
 head(bm_global_posterior)
 
 
-sl_global_posterior <-  sl.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sl_global_posterior <-  sl.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sl.ctl.global =`b_year.y.m`,
          sl.npk.global=`b_trt.yNPK:year.y.m`,
          sl.trt.global=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
 
 head(sl_global_posterior)
 
-sg_global_posterior <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sg_global_posterior <-  sg.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sg.ctl.global =`b_year.y.m`,
          sg.npk.global=`b_trt.yNPK:year.y.m`,
          sg.trt.global=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
 
 head(sg_global_posterior)
 
 
-sloss_global_posterior <-  sloss.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sloss_global_posterior <-  sloss.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sloss.ctl.global =`b_year.y.m`,
          sloss.npk.global=`b_trt.yNPK:year.y.m`,
          sloss.trt.global=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
 
 head(sloss_global_posterior)
 
 
 
-sgain_global_posterior <-  sgain.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sgain_global_posterior <-  sgain.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sgain.ctl.global =`b_year.y.m`,
          sgain.npk.global=`b_trt.yNPK:year.y.m`,
          sgain.trt.global=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
 
 head(sgain_global_posterior)
 
 
-cde_global_posterior <-  cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+cde_global_posterior <-  cde.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(cde.ctl.global =`b_year.y.m`,
          cde.npk.global=`b_trt.yNPK:year.y.m`,
          cde.trt.global=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`)) 
 
 head(cde_global_posterior)
 
@@ -330,13 +330,13 @@ study.rich.p.npk <-  rich.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(rich.study.trt.effect),
           eff_lower = quantile(rich.study.trt.effect, probs=0.025),
           eff_upper = quantile(rich.study.trt.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.rich.p.ctl <-  rich.p %>% group_by(site_code) %>%
   mutate( response="Control", eff = mean(rich.study.ctl.effect),
           eff_lower = quantile(rich.study.ctl.effect, probs=0.025),
           eff_upper = quantile(rich.study.ctl.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.rich.p <- bind_rows(study.rich.p.npk,study.rich.p.ctl)
 
@@ -346,13 +346,13 @@ study.bm.p.npk <-  bm.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(bm.study.trt.effect),
           eff_lower = quantile(bm.study.trt.effect, probs=0.025),
           eff_upper = quantile(bm.study.trt.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.bm.p.ctl <-  bm.p %>% group_by(site_code) %>%
   mutate( response="Control", eff = mean(bm.study.ctl.effect),
           eff_lower = quantile(bm.study.ctl.effect, probs=0.025),
           eff_upper = quantile(bm.study.ctl.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.bm.p <- bind_rows(study.bm.p.npk,study.bm.p.ctl)
 
@@ -364,13 +364,13 @@ study.sl.p.npk <-  sl.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(sl.study.trt.effect),
           eff_lower = quantile(sl.study.trt.effect, probs=0.025),
           eff_upper = quantile(sl.study.trt.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sl.p.ctl <-  sl.p %>% group_by(site_code) %>%
   mutate( response="Control", eff = mean(sl.study.ctl.effect),
           eff_lower = quantile(sl.study.ctl.effect, probs=0.025),
           eff_upper = quantile(sl.study.ctl.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sl.p <- bind_rows(study.sl.p.npk,study.sl.p.ctl)
 
@@ -383,13 +383,13 @@ study.sg.p.npk <-  sg.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(sg.study.trt.effect),
           eff_lower = quantile(sg.study.trt.effect, probs=0.025),
           eff_upper = quantile(sg.study.trt.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sg.p.ctl <-  sg.p %>% group_by(site_code) %>%
   mutate( response="Control", eff = mean(sg.study.ctl.effect),
           eff_lower = quantile(sg.study.ctl.effect, probs=0.025),
           eff_upper = quantile(sg.study.ctl.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sg.p <- bind_rows(study.sg.p.npk,study.sg.p.ctl)
 
@@ -402,13 +402,13 @@ study.cde.p.npk <-  cde.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(cde.study.trt.effect),
           eff_lower = quantile(cde.study.trt.effect, probs=0.025),
           eff_upper = quantile(cde.study.trt.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.cde.p.ctl <-  cde.p %>% group_by(site_code) %>%
   mutate( response="Control", eff = mean(cde.study.ctl.effect),
           eff_lower = quantile(cde.study.ctl.effect, probs=0.025),
           eff_upper = quantile(cde.study.ctl.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.cde.p <- bind_rows(study.cde.p.npk,study.cde.p.ctl)
 
@@ -419,13 +419,13 @@ study.sloss.p.npk <-  sloss.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(sloss.study.trt.effect),
           eff_lower = quantile(sloss.study.trt.effect, probs=0.025),
           eff_upper = quantile(sloss.study.trt.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sloss.p.ctl <-  sloss.p %>% group_by(site_code) %>%
   mutate( response="Control", eff = mean(sloss.study.ctl.effect),
           eff_lower = quantile(sloss.study.ctl.effect, probs=0.025),
           eff_upper = quantile(sloss.study.ctl.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sloss.p <- bind_rows(study.sloss.p.npk,study.sloss.p.ctl)
 
@@ -435,13 +435,13 @@ study.sgain.p.npk <-  sgain.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(sgain.study.trt.effect),
           eff_lower = quantile(sgain.study.trt.effect, probs=0.025),
           eff_upper = quantile(sgain.study.trt.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sgain.p.ctl <-  sgain.p %>% group_by(site_code) %>%
   mutate( response="Control", eff = mean(sgain.study.ctl.effect),
           eff_lower = quantile(sgain.study.ctl.effect, probs=0.025),
           eff_upper = quantile(sgain.study.ctl.effect, probs=0.975))  %>%
-  select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
+  dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.sgain.p <- bind_rows(study.sgain.p.npk,study.sgain.p.ctl)
 

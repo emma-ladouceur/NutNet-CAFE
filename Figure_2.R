@@ -40,14 +40,15 @@ study.rich.p2 <-study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lo
 
 study.bm.p2<-study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) 
 
-study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2)
+study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2) %>% filter(response == "NPK")
 
 View(study.effs.p)
-
+View(effs.p)
 #"#0B775E"
 
 
 bef.cloud <- ggplot()+
+  #facet_wrap(~site_code) +
   geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_point(data=study.effs.p, aes(x= r.eff , y= b.eff),colour="black", alpha=0.2,size=2) +
   geom_errorbar(data=study.effs.p,aes(x= r.eff, y= b.eff,ymin = b.eff_lower, ymax = b.eff_upper), colour="black", alpha=0.2, width = 0, size = 0.75) +

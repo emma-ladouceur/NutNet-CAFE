@@ -840,13 +840,13 @@ rich.f <-bind_rows(
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   plot.rich.im_fixef['trtNPK:year_trt',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
 
@@ -859,13 +859,13 @@ bm.f <-bind_rows(
          eff = Estimate,
          eff_upper = Q97.5,
          eff_lower = Q2.5) %>%
-  select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   plot.bm.im_fixef['trtNPK:year_trt',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
 bm.f$Model <- "Biomass"
@@ -878,13 +878,13 @@ sl.f <-bind_rows(
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sl.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
 
@@ -896,13 +896,13 @@ sg.f <-bind_rows(
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sg.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
 sg.f$Model <- "Species Gain Effect on Biomass"
@@ -915,13 +915,13 @@ cde.f <-bind_rows(
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   CDE.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
 cde.f$Model <- "Persistent Species Change in Biomass"
@@ -934,13 +934,13 @@ sloss.f <-bind_rows(
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sloss.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
 sloss.f$Model <- "Species Loss"
@@ -951,13 +951,13 @@ sgain.f <-bind_rows(
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
   sgain.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
     mutate(response='NPK Slope',
            eff = Estimate,
            eff_upper = Q97.5,
            eff_lower = Q2.5) %>%
-    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+    dplyr::select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 )
 
 sgain.f$Model <- "Species Gain"
@@ -1030,48 +1030,48 @@ rich_fixef
 
 
 
-rich.p.ctl <-  rich.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+rich.p.ctl <-  rich.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(ctl.slope =`b_year_trt`,
          npk.slope=`b_trtNPK:year_trt`,
          trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
-  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+  dplyr::select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
  mutate( response="Control", eff = mean(ctl.slope),
           eff_lower = quantile(ctl.slope, probs=0.025),
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
   
-rich.p.npk <-  rich.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+rich.p.npk <-  rich.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(ctl.slope =`b_year_trt`,
          npk.slope=`b_trtNPK:year_trt`,
          trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
-  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+  dplyr::select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
           eff_upper = quantile(trt.slope, probs=0.975) )  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 rich.p <- bind_rows(rich.p.ctl,rich.p.npk)
 head(rich.p)
 
-bm.p.ctl <-  bm.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+bm.p.ctl <-  bm.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(ctl.slope =`b_year_trt`,
          npk.slope=`b_trtNPK:year_trt`,
          trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
-  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+  dplyr::select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
   mutate( response="Control", eff = mean(ctl.slope),
           eff_lower = quantile(ctl.slope, probs=0.025),
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
-bm.p.npk <-  bm.fixed.p %>% select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
+bm.p.npk <-  bm.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(ctl.slope =`b_year_trt`,
          npk.slope=`b_trtNPK:year_trt`,
          trt.slope=(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
-  select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
+  dplyr::select(-c(`b_year_trt`,`b_trtNPK:year_trt`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
           eff_upper = quantile(trt.slope, probs=0.975) )  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 bm.p <- bind_rows(bm.p.ctl,bm.p.npk)
 
@@ -1081,48 +1081,48 @@ head(sl.fixed.p)
 head(sl.trt.i_fixef)
 
 
-sl.p.ctl <-  sl.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sl.p.ctl <-  sl.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="Control", eff = mean(ctl.slope),
           eff_lower = quantile(ctl.slope, probs=0.025),
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
-sl.p.npk <-  sl.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sl.p.npk <-  sl.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
           eff_upper = quantile(trt.slope, probs=0.975) )  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 sl.p <- bind_rows(sl.p.ctl,sl.p.npk)
 sl.p 
 
-sg.p.ctl <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sg.p.ctl <-  sg.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="Control", eff = mean(ctl.slope),
           eff_lower = quantile(ctl.slope, probs=0.025),
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
-sg.p.npk <-  sg.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sg.p.npk <-  sg.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`))%>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
           eff_upper = quantile(trt.slope, probs=0.975) )  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 sg.p <- bind_rows(sg.p.ctl,sg.p.npk)
 sg.p
@@ -1131,72 +1131,72 @@ sg.p
 
 View(cde.fixed.p)
 
-cde.p.ctl <-  cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+cde.p.ctl <-  cde.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="Control", eff = mean(ctl.slope),
           eff_lower = quantile(ctl.slope, probs=0.025),
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 View(cde.p.ctl)
-cde.p.npk <- cde.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+cde.p.npk <- cde.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`))%>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
           eff_upper = quantile(trt.slope, probs=0.975) )  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 cde.p <- bind_rows(cde.p.ctl,cde.p.npk)
 cde.p
 
-sloss.p.ctl <-  sloss.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sloss.p.ctl <-  sloss.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="Control", eff = mean(ctl.slope),
           eff_lower = quantile(ctl.slope, probs=0.025),
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
-sloss.p.npk <-  sloss.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sloss.p.npk <-  sloss.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
           eff_upper = quantile(trt.slope, probs=0.975) )  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 sloss.p <- bind_rows(sloss.p.ctl,sloss.p.npk)
 sloss.p
 
-sgain.p.ctl <-  sgain.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sgain.p.ctl <-  sgain.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="Control", eff = mean(ctl.slope),
           eff_lower = quantile(ctl.slope, probs=0.025),
           eff_upper = quantile(ctl.slope, probs=0.975))  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
-sgain.p.npk <-  sgain.fixed.p %>% select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+sgain.p.npk <-  sgain.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(ctl.slope =`b_year.y.m`,
          npk.slope=`b_trt.yNPK:year.y.m`,
          trt.slope=(`b_year.y.m`+`b_trt.yNPK:year.y.m`)) %>%
-  select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`,npk.slope)) %>%
   mutate( response="NPK", eff = mean(trt.slope),
           eff_lower = quantile(trt.slope, probs=0.025),
           eff_upper = quantile(trt.slope, probs=0.975) )  %>%
-  select(-c(ctl.slope,trt.slope)) %>% distinct()   
+  dplyr::select(-c(ctl.slope,trt.slope)) %>% distinct()   
 
 sgain.p <- bind_rows(sgain.p.ctl,sgain.p.npk)
 sgain.p

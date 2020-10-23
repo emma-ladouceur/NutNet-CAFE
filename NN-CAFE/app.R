@@ -20,7 +20,7 @@ load('NN-CAFE/Data/sg_dat.Rdata')
 load('NN-CAFE/Data/cde.mod.dat.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
-
+load('~/Dropbox/Projects/NutNet/Data/study.price.p.effs.Rdata')
 
 
 
@@ -48,13 +48,27 @@ ui <- fixedPage(theme = shinytheme("readable"),
                       br(), br(),
                       "Each set of plots corresponds respectively to Figure 2, Figure 3, and Figure 4 in the main text, but visualises the  only the site level effects of each plot.",
                       br(), br(),
-                      "Unique indications for each set of plots is indicated below."
+                      "Figure captions for each set of plots written above each figure."
                ),
+               column(12,
+                      br(),
+                      h2("Figure 2: Species Richness & Plot Biomass"),
+                      br(),
+                      "In regressions represented in A) and B), each green point represents a plot treated with NPK and each grey open circle represents a control plot. Each green thin line represents the estimated NPK slope of every experimental site as a random effect and each think black dashed line represents the estimate slope of control plots.  The inset plots represent the site level slope of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, and the dashed reference line at 0 represents a slope of 0 .",
+                      br(), br(),
+                      "In C), each green point represents the slope for richness (x-axis) and biomass (y-axis) of an experimental site (n=58) treated with NPK, and error bars represent the 95% credible intervals for each site. The dashed reference line at 0 represents a slope of 0 for each metric.",
+                      br(), br()),
                fixedRow(column(12, align = "center",
                                plotOutput('richbmviz', height = 1000, width = 800),
                                br(), br(),
                )
                ),
+               column(12,
+                      br(),
+                      h2("Figure 3: Species Loss, Species Gains, Persistent Species and the Effect of Each on Biomass Change Across Time"),
+                      br(),
+                      "In regressions each colored solid point represents a pairwise comparison of a single plot before NPK nutrient addition (year 0) and for each year after treatment. Each grey open circle represents a pairwise comparison of a control plot at year 0 for each year measured after. Each colored thin solid line represents the estimated slope of NPK, and every black dashed line represents the estimate slope of control plots for every experimental site (n=58) as a random effect.  The inset plots represent the site level slope estimate of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, and the dashed reference line at 0 represents a slope of 0 for each metric.",
+                      br(), br()),
                fixedRow(column(12, align = "center",
                                plotOutput('slosssgainviz', height = 500, width = 800),
                                br(), br(),
@@ -65,6 +79,19 @@ ui <- fixedPage(theme = shinytheme("readable"),
                                br(), br(),
                )
                ),
+               column(12,
+                      br(),
+                      h2("Figure 4: All Together Now"),
+                      br(),
+                      "The dashed reference line at 0 represents a slope of 0 for each metric. The  lines show the site level effect estimate of each response, added together to consider all components of change on communities for NPK treatments. ",
+                      br(), br()),
+               fixedRow(column(12, align = "center",
+                               plotOutput('pricevectorviz', height = 500, width = 500),
+                               br(), br(),
+               )
+               ),
+               
+               
         )
     )
 )
@@ -75,7 +102,9 @@ server <- function(input, output) {
     output$sitename <- renderText(paste("Site:", 
                                         unique(site_dat$site_name[site_dat$site_code == input$selected_site]),
                                         "| Country:",
-                                        unique(site_dat$country[site_dat$site_code == input$selected_site])))
+                                        unique(site_dat$country[site_dat$site_code == input$selected_site]),
+                                        "| Habitat:",
+                                        unique(site_dat$habitat[site_dat$site_code == input$selected_site])))
     
     output$richbmviz <- renderPlot({
         
@@ -112,7 +141,7 @@ server <- function(input, output) {
             scale_x_continuous(breaks=c(0,1,3,6,9,12),limits=c(0, 12)) +
             labs(
                 x = 'Year',
-                y = ' Species richness', title="Figure 2" ,subtitle= 'A) Species Richness') +
+                y = ' Species richness', title= 'A) Species Richness') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                plot.title = element_text(size=12))
            
@@ -172,7 +201,7 @@ server <- function(input, output) {
                # uncertainy in fixed effect
                labs(x='Year',
                     #x = 'Years',
-                    y = expression(paste('Biomass (g/',m^2, ')')), subtitle= 'B) Biomass') +
+                    y = expression(paste('Biomass (g/',m^2, ')')), title= 'B) Biomass') +
               ylim(-20,2000)+
                scale_x_continuous(breaks=c(0,1,3,6,9,12),limits=c(0, 12)) +
                theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
@@ -256,7 +285,7 @@ server <- function(input, output) {
               #                                 ymin = b.eff_lower, ymax = b.eff_upper),width=0,colour = "#0B775E", size = 2,alpha=0.9) +
               # geom_errorbarh(data = effs.p,aes(y=b.eff,
               #                                  xmin = r.eff_lower, xmax = r.eff_upper),height=0,colour = "#0B775E", size = 2, alpha=0.9) +
-              scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5), limits=c(-3.5,2.5)) +
+              scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5), limits=c(-3.5,7.5)) +
               scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200),limits=c(-200,200)) +
               labs(x = 'Rate of change in species richness (species/year)',
                    y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
@@ -318,7 +347,7 @@ server <- function(input, output) {
             scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
              ylim(-20,0) +
             labs(x = 'Year',
-                 y = expression(paste('Species Loss')),  title='Figure 3',subtitle= 'Species Loss') +
+                 y = expression(paste('Species Loss')),  title= 'Species Loss') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                #plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
@@ -380,7 +409,7 @@ server <- function(input, output) {
             scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
             ylim(0,20) +
             labs(x = 'Year',
-                 y = expression(paste('Species Gain')), subtitle= 'Species Gain') +
+                 y = expression(paste('Species Gain')), title= 'Species Gain') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                # plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                axis.title.x = element_text(size=9),
@@ -454,7 +483,7 @@ server <- function(input, output) {
              ylim(-400,0) +
             labs(x = 'Year',
                  y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-                subtitle= 'Biomass Change Due To Species Loss') +
+                title= 'Biomass Change Due To Species Loss') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                # plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                axis.title.x = element_text(size=9),
@@ -518,7 +547,7 @@ server <- function(input, output) {
              scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
              ylim(0,400) +
             labs(x = 'Year',
-                 y = expression(paste('Change in Biomass (g/' ,m^2, ')')),  subtitle= 'Biomass Change Due To Species Gain') +
+                 y = expression(paste('Change in Biomass (g/' ,m^2, ')')),  title= 'Biomass Change Due To Species Gain') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                #plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
@@ -582,7 +611,7 @@ server <- function(input, output) {
              ylim(-500,1000) +
             labs(x = 'Year',
                  y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-                 subtitle= 'Persistent Species Change in Biomass') +
+                title= 'Persistent Species Change in Biomass') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                #plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                axis.title.x = element_text(size=9),
@@ -669,7 +698,44 @@ server <- function(input, output) {
         
     })
     
-       
+    output$pricevectorviz <- renderPlot({
+        
+        sitedat <- site_dat %>% 
+            filter(site_code == input$selected_site) 
+        
+        
+        study.price.cloud<-ggplot()+
+            geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+            #treatment effects
+            geom_segment(data = all.effs %>% filter(site_code == input$selected_site),
+                         aes(x = 0,
+                             xend = sloss.trt.rate.p  ,
+                             y = 0,
+                             yend = sl.trt.rate.p   ),
+                         colour= "#B40F20",
+                         arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+            geom_segment(data = all.effs %>% filter(site_code == input$selected_site),
+                         aes(x = sloss.trt.rate.p ,
+                             xend = (sloss.trt.rate.p)+(sgain.trt.rate.p ) ,
+                             y = sl.trt.rate.p ,
+                             yend = (sl.trt.rate.p)+(sg.trt.rate.p  ) ),
+                         colour= "#046C9A",
+                         arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+            geom_segment(data = all.effs %>% filter(site_code == input$selected_site),
+                         aes(x = (sloss.trt.rate.p)+(sgain.trt.rate.p),
+                             xend = (sloss.trt.rate.p)+(sgain.trt.rate.p),
+                             y = (sl.trt.rate.p)+(sg.trt.rate.p ),
+                             yend =(sl.trt.rate.p)+(sg.trt.rate.p)+ (cde.trt.rate.p  )),
+                         colour= "#F98400",
+                         arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+            labs(x = 'Rate of change in species (species/year)',
+                 y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
+                 # title= 'Rate of change / year '
+                 title = '')
+        
+        study.price.cloud
+        
+    })
     
     }
 
