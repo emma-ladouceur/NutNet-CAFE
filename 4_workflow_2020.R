@@ -595,10 +595,12 @@ cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>%
              by = 'site_code') %>% left_join(start.rich)
 
 
-View(cde_coef3)
+
 
 
 cde_coef3<-full_join(cde_coef2,dat)
+
+View(cde_coef3)
 
 
 rm(cde.trt.i)

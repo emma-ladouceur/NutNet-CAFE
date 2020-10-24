@@ -106,6 +106,9 @@ fitted.sgain
 
 fitted.sgain$Treatment <- factor(fitted.sgain$Treatment , levels=c("NPK","Control"))
 
+
+
+View(sgain.trt_coef3)
 # loss "#B40F20"
 # gains "#046C9A"
 # cde "#816687"
@@ -184,7 +187,7 @@ fitted.sloss
 fitted.sloss$Treatment <- factor(fitted.sloss$Treatment , levels=c("NPK","Control"))
 
 
-
+View(sloss.trt_coef3)
 
 sloss.trtm<-ggplot() +
   facet_grid(~Model)+
@@ -437,6 +440,8 @@ fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
 fitted.cde
 
 fitted.cde$Treatment <- factor(fitted.cde$Treatment , levels=c("NPK","Control"))
+
+View(cde_coef3)
 
 #cde
 cdem<-ggplot() +
