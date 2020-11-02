@@ -11,6 +11,7 @@ library(brms)
 library(gridExtra)
 library(grid)
 library(sjstats)
+library(viridis)
 
 # emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -36,6 +37,7 @@ plot2$unique.id<-as.character(with(plot2, paste(site_code,block,plot, sep=".")))
 #remove NAS
 plot3<-plot2 %>% drop_na(plot.mass)
 
+plot3$rich<-plot3$all.div
 
 plot4<-plot3 %>% group_by(site_code, block,plot,year_trt) %>%
   select(continent,unique.id,site_code,block, plot,year_trt,rich,plot.mass)

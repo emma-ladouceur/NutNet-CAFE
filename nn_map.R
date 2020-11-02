@@ -76,32 +76,19 @@ library(ggrepel)
 
 # Load dataset from github
 data <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv", sep=",", header=T)
-start.rich <-read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 data <- data %>% group_by(site_code) %>% filter(max.year >= 3) %>%
   ungroup()
 
-colnames(data)
-data <- distinct(data, site_code, latitude, longitude, year_trt,continent)
 
+data.f<- distinct(data, site_code, latitude, longitude, year_trt,continent) %>%
+  group_by(site_code, latitude, longitude, continent) %>%
+  summarise('Length of study' = max(year_trt)) %>% filter(!`Length of study` == 0) %>% droplevels()
 
-data2 <- data %>%
-  group_by(site_code) %>%
-  summarise('Length of study' = max(year_trt))
-
-
-data.l <- data %>% distinct( site_code, latitude, longitude, continent) %>% left_join(start.rich) %>%
-  rename(`Starting Richness`=starting.richness)
-
-data.f <- left_join(data.l,data2)
-View(data.f)
-
+View(data)
 
 # Get the world polygon
 world <- map_data("world")
-
-
-data.f$`Starting Richness` <- factor(data.f$`Starting Richness`, levels=c("1-5 species","6-10","11-15","16-20","21-25",">26"))
 
 View(data.f)
 # Reformat data: I count the occurence of each unique position

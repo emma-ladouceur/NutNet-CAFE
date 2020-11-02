@@ -17,14 +17,14 @@ plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,se
 
 
 # load model object
-load("~/Dropbox/Projects/NutNet/Model_Fits/3/multi.Rdata") # object name: nn.multi
+load("~/Dropbox/Projects/NutNet/Data/Model_Fits/3/multi.Rdata") # object name: nn.multi
 
 summary(nn.multi.3)
 
 color_scheme_set("darkgray")
 nnb<-pp_check(nn.multi.3, resp = 'plotmass')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
                                                                                                                 y = 'Frequency') 
-nnr<-pp_check(nn.multi.3, resp = 'rich')+ theme_classic()+ scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
+nnr<-pp_check(nn.multi.3, resp = 'alldiv')+ theme_classic()+ scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
                                                                                                            y = 'Frequency') 
 # Figure S3h
 (nnr | nnb)

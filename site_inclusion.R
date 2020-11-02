@@ -118,15 +118,23 @@ site.include <- plot %>% dplyr::select(site_code,country,habitat,max.year) %>%
 
 View(site.include)
 
+#write.csv(site.include,"~/Dropbox/Projects/NutNet/Data/Table_S1.csv")
+
+colims <- read.csv("~/Dropbox/Projects/NutNet/Data/Table_S1.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
 
 site.include.names <- site.include %>% unite( name , firstname:lastname, remove=TRUE, sep=" ") %>%
   group_by(site_code,site_name, country, max.year) %>%
   summarise(name = toString(name)) %>% ungroup() %>%
-  rename('data contributor(s)' = name)
+  rename('Site Manager(s)' = name)
   
 
 View(site.include.names)
 
-write.csv(site.include,"~/Dropbox/Projects/NutNet/Data/Table_S1.csv")
+si <- site.include.names %>% left_join(colims)
+
+
+View(si)
+write.csv(si,"~/Dropbox/Projects/NutNet/Data/Table_S1_new.csv")
 
 

@@ -15,12 +15,12 @@ library("scales")
 # models
 
 
-load('~/Dropbox/Projects/NutNet/Data/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/3/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
 
-load('~/Dropbox/Projects/NutNet/Data/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Data/3/sgain.Rdata') # s.gain.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
 
 

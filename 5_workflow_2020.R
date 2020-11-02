@@ -456,7 +456,32 @@ load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
 load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
 
 
-View(study.rich.p.npk)
+
+study.rich.p$Model<- "Species Richness"
+study.bm.p$Model<- "Biomass"
+study.sloss.p$Model<- "Species Loss"
+study.sgain.p$Model<- "Species Gain"
+study.sl.p$Model<- "Change Biomass Due to Species Loss"
+study.sg.p$Model<- "Change in Biomass Due to Species Gain"
+study.cde.p$Model<- "Persistent Species Change in Biomass"
+
+
+
+p.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.p) %>% bind_rows(study.sgain.p) %>%
+  bind_rows(study.sl.p) %>% bind_rows(study.sg.p) %>% bind_rows(study.cde.p) %>%
+  mutate(Treatment = response,
+         Estimate = eff,
+         Upper_CI = eff_upper,
+         Lower_CI = eff_lower) %>%
+  select(-response,-eff,-eff_upper,-eff_lower)
+
+
+View(p.all)
+
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(p.all, file = 'study.p.all.Rdata')
+
+
 
 study.rich.p.s <- study.rich.p %>% filter(site_code == "ahth.is")
 study.rich.p.s

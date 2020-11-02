@@ -14,25 +14,17 @@ library(viridis)
 
 
 # models
-load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
-
-
-meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-ml <- read.csv("~/Dropbox/Projects/NutNet/Data/site.inclusion.info.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
 
 
-meta <- meta %>% left_join((ml))
-
-View(meta)
-
-write.csv(meta,"~/Dropbox/Projects/NutNet/Data/colims.csv")
+meta <- read.csv("~/Dropbox/Projects/NutNet/Data/Table_S1.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 #  mods study level dat
 study_levels <- plot.rich.3$data %>% 
@@ -348,6 +340,7 @@ rich<-ggplot() +
   #               label=paste('n[study] == ', n_study)),
   #           size=3.5,
   #           nudge_y = 0.1, parse = T) +
+  scale_x_continuous(breaks=c(-4,-2,0,2), limits=c(-4,2))+
   theme(panel.grid = element_blank(),
         #axis.text.y = element_blank(),
         axis.title.y = element_text(size=9),
@@ -400,7 +393,7 @@ geom_vline(data = bm.p %>% filter(response=="NPK"),
               mutate(n_study = n_distinct(site_code)) %>%
               ungroup() %>%
               distinct(multilimited, n_study, .keep_all = T),
-            aes(x=150, y=multilimited,
+            aes(x=175, y=multilimited,
                 label=paste('n[study] == ', n_study)),
             size=3.5,
             nudge_y = 0.1, parse = T) +
@@ -454,7 +447,7 @@ sl<-ggplot() +
   theme_bw() +
   labs( x='',
     #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
-        title= 'c) Change in Biomass Due to Species Loss',
+        title= 'e) Change in Biomass Due to Species Loss',
         y= ' Multilimited sites'
         #color= ''
   )+
@@ -508,8 +501,8 @@ sg<-ggplot() +
              aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs( x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
-    title= 'd) Change in Biomass Due to Species Gain',
+  labs( x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
+    title= 'f) Change in Biomass Due to Species Gain',
     y= ' '
     #color= ''
   )+
@@ -566,7 +559,7 @@ cde<-ggplot() +
   theme_bw() +
   labs(x='', 
     #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
-        title= 'e) Persistent Species Change in Biomass',
+        title= 'g) Persistent Species Change in Biomass',
         y= ''
         #color= ''
   )+
@@ -595,7 +588,122 @@ cde
 
 
 
-
 (rich | bm )/(sl | sg | cde)
 
+
+
+
+
+sloss.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/old/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+View(sloss.ps)
+View(sloss.p)
+sloss.p
+
+
+sloss<-ggplot() +
+  geom_rect(data = sloss.p %>% filter(response=="NPK"),
+            aes(xmin = eff_lower, xmax =  eff_upper, ymin = -Inf, ymax = Inf,
+                alpha = 0.3)) +
+  geom_density_ridges(data = sloss.ps,
+                      aes(x = sloss.trt.study + sloss.trt.global, 
+                          y = multilimited,
+                      ), fill="#B40F20",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #' scale_fill_viridis(name = #'site_sl_range',
+  #'                      #'starting.slness' ,
+  #'                      'site_sl_range',
+  #'                    # 'anthropogenic',
+  #'                    #'NDep.cats',
+  #'                    #'biome' ,
+  #'                    #'site_dom',
+  #'                    #'Realm',
+  #'                    #'colimitation',
+  #'                    discrete=TRUE) +
+  geom_vline(data = sloss.p %>% filter(response=="NPK"),
+             aes(xintercept = eff)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_bw() +
+  labs( x = expression(paste('Effect of NPK on Species Loss / Year')),
+        title= 'c) Species Loss',
+        y= ' Multilimited sites'
+        #color= ''
+  )+
+  # geom_text(data = sl.ps %>%
+  #             group_by(multilimited) %>%
+  #             mutate(n_study = n_distinct(site_code)) %>%
+  #             ungroup() %>%
+  #             distinct(multilimited, n_study, .keep_all = T),
+  #           aes(x=20, y=multilimited,
+  #               label=paste('n[study] == ', n_study)),
+  #           size=3.5,
+  #           nudge_y = 0.1, parse = T) +
+  scale_x_continuous(breaks=c(-4,-2,0,2), limits=c(-4,2))+
+  theme(panel.grid = element_blank(),
+        #axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
+        legend.key = element_blank(),
+        legend.position="none")
+
+sloss
+
+
+sgain.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+colnames(sgain.ps)
+sgain.p
+
+
+sgain<-ggplot() +
+  geom_rect(data = sgain.p %>% filter(response=="NPK"),
+            aes(xmin = eff_lower, xmax =  eff_upper, ymin = -Inf, ymax = Inf,
+                alpha = 0.3)) +
+  geom_density_ridges(data = sgain.ps,
+                      aes(x = sgain.trt.study + sgain.trt.global, 
+                          y = multilimited,
+                      ), fill="#3B9AB2",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  #' scale_fill_viridis(name = #'site_sg_range',
+  #'                      #'starting.sgness' ,
+  #'                      'site_sg_range',
+  #'                    # 'anthropogenic',
+  #'                    #'NDep.cats',
+  #'                    #'biome' ,
+  #'                    #'site_dom',
+  #'                    #'Realm',
+  #'                    #'colimitation',
+  #'                    discrete=TRUE) +
+  geom_vline(data = sgain.p %>% filter(response=="NPK"),
+             aes(xintercept = eff)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_bw() +
+  labs( x = expression(paste('Effect of NPK on Species Gain / Year')),
+        title= 'd) Species Gain',
+        y= ' '
+        #color= ''
+  )+
+  geom_text(data = sg.ps %>%
+              group_by(multilimited) %>%
+              mutate(n_study = n_distinct(site_code)) %>%
+              ungroup() %>%
+              distinct(multilimited, n_study, .keep_all = T),
+            aes(x=2.75, y=multilimited,
+                label=paste('n[study] == ', n_study)),
+            size=3.5,
+            nudge_y = 0.1, parse = T) +
+  theme(panel.grid = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_text(size=9),
+        title=element_text(size=9),
+        legend.key = element_blank(),
+        legend.position="none")
+
+sgain
+
+
+( rich | bm )/( sloss | sgain )/( sl | sg | cde )
 

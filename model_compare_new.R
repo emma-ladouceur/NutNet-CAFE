@@ -18,20 +18,20 @@ library(patchwork)
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/full/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/rich.Rdata') # plot.rich.g
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/full/bm.Rdata') # plot.bm.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/full/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.3
-load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.3
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.3
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.3
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/5/bm.Rdata') # plot.bm.5
-load('~/Dropbox/Projects/NutNet/Model_fits/5/rich.Rdata') # plot.rich.5
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/5/bm.Rdata') # plot.bm.5
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/5/rich.Rdata') # plot.rich.5
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/6/bm.Rdata') # plot.bm.6
-load('~/Dropbox/Projects/NutNet/Model_fits/6/rich.Rdata') # plot.rich.6
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/6/bm.Rdata') # plot.bm.6
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/6/rich.Rdata') # plot.rich.6
 
 
 
@@ -88,12 +88,12 @@ rich.effs <- bind_rows(rich.p,rich.p.3,rich.p.5,rich.p.6)
 
 rich.effs
 
-write.csv(rich.effs, '~/Dropbox/Projects/NutNet/Data/rich.effs.inclusion.csv')
+write.csv(rich.effs, '~/Dropbox/Projects/NutNet/Data/rich.effs.compare.csv')
 
-rich.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/rich.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+rich.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/rich.effs.compare.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-rich.effs$response <- factor(rich.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+rich.effs$response <- factor(rich.effs$response , levels=c("=>3 years","=>5 years", "=>6 years","All years"))
 
 
 sp.slope<-ggplot() + 
@@ -174,13 +174,13 @@ bm.effs <- bind_rows(bm.p,bm.p.3,bm.p.5,bm.p.6)
 
 bm.effs
 
-write.csv(bm.effs, '~/Dropbox/Projects/NutNet/Data/bm.effs.inclusion.csv')
+write.csv(bm.effs, '~/Dropbox/Projects/NutNet/Data/bm.effs.compare.csv')
 
-bm.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/bm.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+bm.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/bm.effs.compare.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
-bm.effs$response <- factor(bm.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+bm.effs$response <- factor(bm.effs$response , levels=c("=>3 years","=>5 years", "=>6 years","All years"))
 
 
 bm.slope<-ggplot() + 
@@ -209,32 +209,44 @@ bm.slope
 
 
 
+load('~/Desktop/full/sl.Rdata') # sl.s
+load('~/Desktop/full/sg.Rdata') # sg.s
+load('~/Desktop/full/cde.Rdata') # CDE.s
+load('~/Desktop/full/sloss.Rdata') # s.loss.s
+load('~/Desktop/full/sgain.Rdata') # s.gain.s
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sloss.n.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sgain.Rdata') # s.gain.s
-
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # s.gain.s
-
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sgain.Rdata') # s.gain.s
+load('~/Desktop/6/sl.Rdata') # sl.s
+load('~/Desktop/6/sg.Rdata') # sg.s
+load('~/Desktop/6/cde.Rdata') # CDE.s
+load('~/Desktop/6/sloss.Rdata') # s.loss.s
+load('~/Desktop/6/sgain.Rdata') # s.gain.s
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sgain.Rdata') # s.gain.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/full/sl.Rdata') # sl.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/full/sg.Rdata') # sg.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/full/cde.Rdata') # CDE.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/full/sloss.n.Rdata') # s.loss.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/full/sgain.Rdata') # s.gain.s
+
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # s.gain.s
+
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/5/sl.Rdata') # sl.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/5/sg.Rdata') # sg.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/5/cde.Rdata') # CDE.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/5/sloss.Rdata') # s.loss.s
+load('~/Dropbox/Projects/NutNet/Data/Model_fits/5/sgain.Rdata') # s.gain.s
+
+
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/6/sl.Rdata') # sl.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/6/sg.Rdata') # sg.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/6/cde.Rdata') # CDE.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/6/sloss.Rdata') # s.loss.s
+# load('~/Dropbox/Projects/NutNet/Data/Model_fits/6/sgain.Rdata') # s.gain.s
 
 
 
@@ -259,7 +271,7 @@ cde.fixed.p.6<-posterior_samples(CDE.6, "^b" , subset = floor(runif(n = 1000, 1,
 
 
 
-sloss.fixed.p<-posterior_samples(s.loss.n.s, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sloss.fixed.p<-posterior_samples(s.loss.s, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sloss.fixed.p.3<-posterior_samples(s.loss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sloss.fixed.p.5<-posterior_samples(s.loss.5, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sloss.fixed.p.6<-posterior_samples(s.loss.6, "^b" , subset = floor(runif(n = 1000, 1, max = 2000)))
@@ -319,12 +331,12 @@ sl.effs <- bind_rows(sl.p,sl.p.3,sl.p.5,sl.p.6)
 
 sl.effs
 
-write.csv(sl.effs, '~/Dropbox/Projects/NutNet/Data/sl.effs.inclusion.csv')
+write.csv(sl.effs, '~/Dropbox/Projects/NutNet/Data/sl.effs.compare.csv')
 
-sl.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sl.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sl.effs.compare.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-sl.effs$response <- factor(sl.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sl.effs$response <- factor(sl.effs$response , levels=c("=>3 years","=>5 years", "=>6 years","All years"))
 
 
 sl.slope<-ggplot() + 
@@ -394,12 +406,12 @@ sg.effs <- bind_rows(sg.p,sg.p.3,sg.p.5,sg.p.6)
 
 sg.effs
 
-write.csv(sg.effs, '~/Dropbox/Projects/NutNet/Data/sg.effs.inclusion.csv')
+write.csv(sg.effs, '~/Dropbox/Projects/NutNet/Data/sg.effs.compare.csv')
 
-sg.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sg.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sg.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sg.effs.compare.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-sg.effs$response <- factor(sg.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sg.effs$response <- factor(sg.effs$response , levels=c("=>3 years","=>5 years", "=>6 years","All years"))
 
 
 sg.slope<-ggplot() + 
@@ -471,12 +483,12 @@ cde.effs <- bind_rows(cde.p,cde.p.3,cde.p.5,cde.p.6)
 
 cde.effs
 
-write.csv(cde.effs, '~/Dropbox/Projects/NutNet/Data/cde.effs.inclusion.csv')
+write.csv(cde.effs, '~/Dropbox/Projects/NutNet/Data/cde.effs.compare.csv')
 
-cde.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/cde.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+cde.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/cde.effs.compare.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-cde.effs$response <- factor(cde.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+cde.effs$response <- factor(cde.effs$response , levels=c("=>3 years","=>5 years", "=>6 years","All years"))
 
 
 cde.slope<-ggplot() + 
@@ -547,12 +559,12 @@ sloss.effs <- bind_rows(sloss.p,sloss.p.3,sloss.p.5,sloss.p.6)
 
 sloss.effs
 
-write.csv(sloss.effs, '~/Dropbox/Projects/NutNet/Data/sloss.effs.inclusion.csv')
+write.csv(sloss.effs, '~/Dropbox/Projects/NutNet/Data/sloss.effs.compare.csv')
 
-sloss.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sloss.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sloss.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sloss.effs.compare.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-sloss.effs$response <- factor(sloss.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sloss.effs$response <- factor(sloss.effs$response , levels=c("=>3 years","=>5 years", "=>6 years","All years"))
 
 
 sloss.slope<-ggplot() + 
@@ -624,12 +636,12 @@ sgain.effs <- bind_rows(sgain.p,sgain.p.3,sgain.p.5,sgain.p.6)
 
 sgain.effs
 
-write.csv(sgain.effs, '~/Dropbox/Projects/NutNet/Data/sgain.effs.inclusion.csv')
+write.csv(sgain.effs, '~/Dropbox/Projects/NutNet/Data/sgain.effs.compare.csv')
 
-sgain.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sgain.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sgain.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sgain.effs.compare.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-sgain.effs$response <- factor(sgain.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sgain.effs$response <- factor(sgain.effs$response , levels=c("=>3 years","=>5 years", "=>6 years","All years"))
 
 
 sgain.slope<-ggplot() + 
