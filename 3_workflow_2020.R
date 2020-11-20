@@ -17,7 +17,7 @@ library(tidyverse)
 library(data.table)
 library(foreach)
 
-p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 # run cluster -based price script, then load the new input
 price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_new/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
@@ -31,9 +31,9 @@ price.all <- foreach (file = price.list,.combine=rbind) %do% {
 
 View(price.all)
 
-write.csv(price.all,"~/Dropbox/Projects/NutNet/Data/nutnet_price_all.csv")
+write.csv(price.all,"~/Dropbox/Projects/NutNet/Data/nutnet_price_all.new.csv")
 
-price.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all.new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 View(price.all)
@@ -101,11 +101,11 @@ sites<-price.reduced6 %>% distinct(site_code)
 View(sites)
 
 
-write.csv(price.reduced6,"~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
+write.csv(price.reduced6,"~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.new.csv")
 
 
 # get max year for filtering
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
@@ -119,4 +119,4 @@ price.inclusion2<- price.reduced6 %>% left_join(price.inclusion)
 
 View(price.inclusion2)
 
-write.csv(price.inclusion2, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
+write.csv(price.inclusion2, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.new.csv")
