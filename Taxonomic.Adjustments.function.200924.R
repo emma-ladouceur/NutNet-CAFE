@@ -1,28 +1,49 @@
 ##### NUTNET TAXONOMIC ADJUSTMENTS
 ## Based on analyses from 2017 NutNet workshop and previous efforts
 ## JD Bakker et al
-## 191105
+## 200924
 
-## Separate taxonomic adjustments for each site to ensure temporal consistency in naming
+## Separate taxonomic adjustments for each site to increase temporal consistency in naming
+
+## Based on data in 'full-cover-24-Sept-2020.csv'
+## Includes all sites with >= 4 years of data
+
 
 Taxonomic.Adjustments <- function(datafile = datafile) {
   
   data1 <- datafile
   
   # Drop non-living taxa
+  # Confirmed with Glenda Wardle that 'OTHER ARISTIDA CONTORTA (DEAD)' was live in this growing season so need to avoid dropping it
+  data1[data1$site_code %in% c("ethamc.au", "ethass.au") & data1$Taxon == "OTHER ARISTIDA CONTORTA (DEAD)", "live"] <- 1
+  data1[data1$site_code %in% c("ethamc.au", "ethass.au") & data1$Taxon == "OTHER ARISTIDA CONTORTA (DEAD)", "Family"] <- "Poaceae"
   data1 <- data1[data1$live == 1,]
   
   # Drop mosses, lichens, fungi
   data1 <- data1[! data1$functional_group %in% c("BRYOPHYTE", "LICHEN", "CLUBMOSS", "LIVERWORT", "NON-LIVE") , ]
   #some families not consistently identified to functional group
   data1 <- data1[! data1$Family %in% c("Dicranaceae", "Lycopodiaceae", "Phallales", "Pottiaceae",
-                                       "Selaginellaceae", "Thuidiaceae", "MNIACEAE") , ]
+                                       "Selaginellaceae", "Thuidiaceae", "MNIACEAE", "Polytrichaceae") , ]
   
   # Drop records not assigned to family
-  data1 <- data1[! data1$Family %in% c("NULL") , ]  # 170079 x 18
+  data1 <- data1[! data1$Family %in% c("NULL") , ]  # 206642 x 18
   
   # Site-specific taxonomic adjustments
 
+  # ahth.is
+  Site = "ahth.is"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("FESTUCA RICHARDSONII", "FESTUCA VIVIPARA")] <- "FESTUCA SP."
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+  
+  # amlr.is
+  Site = "amlr.is"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("AGROSTIS CAPILLARIS", "AGROSTIS VINEALIS")] <- "AGROSTIS SP."
+  temp$Taxon[temp$Taxon %in% c("FESTUCA RICHARDSONII", "FESTUCA VIVIPARA", "FESTUCA RUBRA")] <- "FESTUCA SP."
+  temp$Taxon[temp$Taxon %in% c("RUMEX ACETOSA", "RUMEX ACETOSELLA")] <- "RUMEX SP."
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+  
   # arch.us
   Site = "arch.us"
   temp <- data1[data1$site_code == Site,]
@@ -40,22 +61,47 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # azi.cn
-  # POA ATTENUATA, VIOLA; PEDICULARIS?; SAUSSUREA?
-  
+  #TIBETIA == GUELDENSTAEDTIA VERNA??
+  Site = "azi.cn"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("SAUSSUREA NEOFRANCHETII", "SAUSSUREA NIGRESCENS", "SAUSSUREA PACHYNEURA",
+                               "SAUSSUREA STELLA")] <- "SAUSSUREA SP."
+  temp$Taxon[temp$Taxon %in% c("POA ATTENUATA var. KENG")] <- "POA ATTENUATA"
+  temp$Taxon[temp$Taxon %in% c("VIOLA STRIATELLA")] <- "VIOLA SP."
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
+  # badlau.de
+  Site = "badlau.de"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("VICIA SATIVA SSP. NIGRA")] <- "VICIA SATIVA"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
   # barta.us - no changes
   
   # bldr.us
-  # PODOSPERMUM, MEDICAGO, UNKNOWN GRASS?
+  Site = "bldr.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("PODOSPERMUM LACINIATUM", "PODOSPERMUM SCORZONEROIDES", "PODOSPERMUM SP.")] <- "SCORZONERA LACINIATA"
+  temp$Taxon[temp$Taxon %in% c("MEDICAGO SP.")] <- "MEDICAGO LUPULINA"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN GRASS")] <- "VULPIA BROMOIDES"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # bnch.us
-  # UNKNOWN GRASS?
-  
+  # no Agrostis or Danthonia in year_trt = 3??
+  Site = "bnch.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("ASTER SP.")] <- "SYMPHYOTRICHUM SPATHULATUM"
+  temp$Taxon[temp$Taxon %in% c("CAREX HOODII")] <- "CAREX PENSYLVANICA"
+  temp$Taxon[temp$Taxon %in% c("ELYMUS GLAUCUS")] <- "ELYMUS REPENS"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN POLEMONIACEAE SP.")] <- "MICROSTERIS GRACILIS"
+  temp <- temp[temp$Taxon != "UNKNOWN GRASS" , ]
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
   # bogong.au
   Site = "bogong.au"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("ERIGERON BELLIDIOIDES", "ERIGERON NITIDUS")] <- "ERIGERON SP."
   temp$Taxon[temp$Taxon %in% c("MICROSERIS SP.")] <- "MICROSERIS LANCEOLATA"
-  temp$Taxon[temp$Taxon %in% c("PHEBALIUM SQUAMULOSUM SSP. OZOTHAMNOIDES")] <- "PHEBALIUM SQUAMULOSUM"
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # burrawan.au - species list confirmed with J. Firn on 170324.
@@ -75,21 +121,25 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   temp$Taxon[temp$Taxon %in% c("HELIANTHUS SP.")] <- "HELIANTHUS GROSSESERRATUS"
   temp$Taxon[temp$Taxon %in% c("SOLIDAGO SP.")] <- "SOLIDAGO CANADENSIS"
   temp$Taxon[temp$Taxon %in% c("SYMPHYOTRICHUM SP.")] <- "SYMPHYOTRICHUM PILOSUM"
+  temp$Taxon[temp$Taxon %in% c("GALIUM SP.")] <- "GALIUM CONCINNUM"
   temp$Taxon[temp$Taxon %in% c("SOLANUM SP.")] <- "SOLANUM CAROLINENSE"
   temp <- temp[temp$Taxon != "UNKNOWN GRASS" , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # cdcr.us # also Asclepias, Solidago, Cyperus
+  # cdcr.us
   Site = "cdcr.us"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("CHENOPODIUM SP.")] <- "CHENOPODIUM ALBUM"
+  temp$Taxon[temp$Taxon %in% c("ASCLEPIAS SP.")] <- "ASCLEPIAS SYRIACA"
   temp$Taxon[temp$Taxon %in% c("ASTER SP.")] <- "SYMPHYOTRICHUM BOREALE"
   temp$Taxon[temp$Taxon %in% c("ERIGERON CANADENSIS")] <- "CONYZA CANADENSIS"
   temp$Taxon[temp$Taxon %in% c("ERIGERON SP.")] <- "ERIGERON STRIGOSUS"
   temp$Taxon[temp$Taxon %in% c("RUDBECKIA SP.", "RUDBECKIA HIRTA var. PULCHERRIMA")] <- "RUDBECKIA HIRTA"
-  temp$Taxon[temp$Taxon %in% c("TRAGOPOGON SP.")] <- "TRAGOPOGON DUBIUS"
+  temp$Taxon[temp$Taxon %in% c("SOLIDAGO SP.")] <- "SOLIDAGO MISSOURIENSIS"
   temp$Taxon[temp$Taxon %in% c("CAREX SCOPARIA")] <- "CAREX SP."
   temp$Taxon[temp$Taxon %in% c("CYPERUS FILICULMIS", "CYPERUS GRAYI", "CYPERUS LUPULINUS", "CYPERUS SCHWEINITZII")] <- "CYPERUS SP."
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN LAMIACEAE ")] <- "HEDEOMA HISPIDA"
+  temp$Taxon[temp$Taxon %in% c("PANICUM SP.")] <- "PANICUM ACUMINATUM"
   temp <- temp[temp$Taxon != "UNKNOWN FABACEAE" , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
@@ -97,6 +147,8 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   
   # cereep.fr
   Site = "cereep.fr"
+  # why so much Hypochaeris radicata in year 0?
+  # why minimum value of 2.5 in year 0?
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("MYOSOTIS ARVENSIS", "MYOSOTIS RAMOSISSIMA")] <- "MYOSOTIS SP."
   temp$Taxon[temp$Taxon %in% c("SILENE LATIFOLIA")] <- "SILENE LATIFOLIA SSP. ALBA"
@@ -105,17 +157,21 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   temp$Taxon[temp$Taxon %in% c("PICRIS SP.")] <- "PICRIS HIERACIOIDES"
   temp$Taxon[temp$Taxon %in% c("TRIFOLIUM ARVENSE", "TRIFOLIUM CAMPESTRE", "TRIFOLIUM DUBIUM", "TRIFOLIUM PRATENSE",
                                "TRIFOLIUM REPENS")] <- "TRIFOLIUM SP."
-  temp$Taxon[temp$Taxon %in% c("VICIA CRACCA", "VICIA HIRSUTA", "VICIA LATHYROIDES", "VICIA SATIVA",
-                               "VICIA sativa SSP. nigra", "VICIA SEPIUM", "VICIA TETRASPERMA")] <- "VICIA SP."
+  temp$Taxon[temp$Taxon %in% c("VICIA sativa SSP. nigra")] <- "VICIA SATIVA"
+  temp$Taxon[temp$Taxon %in% c("VICIA CRACCA", "VICIA LATHYROIDES", "VICIA SEPIUM", "VICIA TETRASPERMA")] <- "VICIA SP."
   temp$Taxon[temp$Taxon %in% c("ERODIUM SP.")] <- "ERODIUM CICUTARIUM"
-  temp$Taxon[temp$Taxon %in% c("GERANIUM SP.")] <- "GERANIUM MOLLE"
+  temp$Taxon[temp$Taxon %in% c("GERANIUM DISSECTUM", "GERANIUM MOLLE", "GERANIUM PUSILLUM", "GERANIUM PYRENAICUM",
+                               "GERANIUM ROTUNDIFOLIUM")] <- "GERANIUM SP."
   temp$Taxon[temp$Taxon %in% c("HYPERICUM MACULATUM SSP. OBTUSIUSCULUM", "HYPERICUM PERFORATUM")] <- "HYPERICUM SP."
   temp$Taxon[temp$Taxon %in% c("AGROSTIS CANINA", "AGROSTIS GIGANTEA")] <- "AGROSTIS SP."
   temp$Taxon[temp$Taxon %in% c("ARRHENATHERUM elatius SSP. bulbosum")] <- "ARRHENATHERUM ELATIUS"
-  temp$Taxon[temp$Taxon %in% c("BROMUS SP.", "BROMUS PECTINATUS", "BROMUS RACEMOSUS")] <- "BROMUS HORDEACEUS"
-  temp$Taxon[temp$Taxon %in% c("FESTUCA ARUNDINACEA", "FESTUCA SP.")] <- "FESTUCA RUBRA"
-  temp$Taxon[temp$Taxon %in% c("POA pratensis SSP. latifolia", "POA SP.", "POA TRIVIALIS")] <- "POA PRATENSIS"
+  temp$Taxon[temp$Taxon %in% c("BROMUS SP.")] <- "BROMUS HORDEACEUS"
+  temp$Taxon[temp$Taxon %in% c("FESTUCA SP.")] <- "FESTUCA RUBRA"
+  temp$Taxon[temp$Taxon %in% c("POA pratensis SSP. latifolia")] <- "POA PRATENSIS"
+  temp$Taxon[temp$Taxon %in% c("POA SP.")] <- "POA TRIVIALIS"
   temp$Taxon[temp$Taxon %in% c("RUMEX SP.")] <- "RUMEX ACETOSELLA"
+  temp$Taxon[temp$Taxon %in% c("RANUNCULUS SP.")] <- "RANUNCULUS REPENS"
+  temp$Taxon[temp$Taxon %in% c("VALERIANELLA SP.")] <- "VALERIANELLA LOCUSTA"
   temp <- temp[temp$Taxon != "UNKNOWN CARYOPHYLLACEAE SP." , ]
   temp <- temp[temp$Taxon != "UNKNOWN ASTERACEAE SP." , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
@@ -123,38 +179,55 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   # chilcas.ar
   Site = "chilcas.ar"
   temp <- data1[data1$site_code == Site,]
-  # CAREX SP., CYPERUS SP.?
+  temp$Taxon[temp$Taxon %in% c("CAREX SP.")] <- "CAREX PHALAROIDES"
+  temp$Taxon[temp$Taxon %in% c("CYPERUS SP.")] <- "CYPERUS ERAGROSTIS"
   temp$Taxon[temp$Taxon %in% c("BROMUS AULETICUS")] <- "BROMUS BRACHYANTHERUS"
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # comp.pt # Trifolium?
+  # comp.pt
+  # plot 14 unusual: Asteraceae only in 2012
   Site = "comp.pt"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("CREPIS CAPILLARIS", "CREPIS VESICARIA")] <- "CREPIS SP."
   temp$Taxon[temp$Taxon %in% c("HYPOCHAERIS", "LEONTODON TARAXACOIDES")] <- "HYPOCHAERIS GLABRA"
-  temp$Taxon[temp$Taxon %in% c("TRIFOLIUM SP.")] <- "TRIFOLIUM GLOMERATUM"
+  temp$Taxon[temp$Taxon %in% c("TRIFOLIUM GLOMERATUM", "TRIFOLIUM GEMELLUM", "TRIFOLIUM LIGUSTICUM")] <- "TRIFOLIUM SP."
   temp$Taxon[temp$Taxon %in% c("ERODIUM AETHIOPICUM", "ERODIUM BOTRYS", "ERODIUM CICUTARIUM")] <- "ERODIUM SP."
   temp$Taxon[temp$Taxon %in% c("OROBANCHE SP.")] <- "OROBANCHE MINOR"
-  temp$Taxon[temp$Taxon %in% c("PLANTAGO BELLARDII")] <- "PLANTAGO BELLARDI"
+  temp$Taxon[temp$Taxon %in% c("PLANTAGO BELLARDI")] <- "PLANTAGO BELLARDII"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN GRASS")] <- "AGROSTIS POURRETII"
   temp$Taxon[temp$Taxon %in% c("VULPIA")] <- "VULPIA BROMOIDES"
-  temp <- temp[! temp$Taxon %in% c("UNKNOWN ASTERACEAE SP.", "UNKNOWN ASTERACEAE", "UNKNOWN GRASS") , ]
+  temp <- temp[! temp$Taxon %in% c("UNKNOWN ASTERACEAE SP.", "UNKNOWN ASTERACEAE") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # cowi.ca - no changes
+  # Bellis perennis == Leucanthemum vulgare??
   
   # doane.us
-  # SOLIDAGO; UNKNOWN GRASS
+  Site = "doane.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("SOLIDAGO SP.")] <- "SOLIDAGO CANADENSIS"
+  temp$Taxon[temp$Taxon %in% c("PHYSALIS VIRGINIANA")] <- "PHYSALIS LONGIFOLIA"
+  temp <- temp[! temp$Taxon %in% c("UNKNOWN GRASS") , ]
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # elliot.us
   Site = "elliot.us"
   temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("CROTON SETIGER")] <- "CROTON SETIGERUS"
   temp$Taxon[temp$Taxon %in% c("JUNCUS SP.")] <- "JUNCUS DUBIUS"
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # ethass.au - Aristida?
+  # ethamc.au
+  Site = "ethamc.au"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("ARISTIDA CONTORTA", "OTHER ARISTIDA CONTORTA (DEAD)")] <- "ARISTIDA HOLATHERA"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
+    # ethass.au
   Site = "ethass.au"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("PORTULACA SP.")] <- "PORTULACA INTRATERRANEA"
+  temp$Taxon[temp$Taxon %in% c("ARISTIDA CONTORTA", "OTHER ARISTIDA CONTORTA (DEAD)")] <- "ARISTIDA HOLATHERA"
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # frue.ch - no changes
@@ -179,7 +252,7 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   
   # hero.uk - no changes
   
-    # hnvr.us
+  # hnvr.us
   Site = "hnvr.us"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("IPOMOEA SP.")] <- "CALYSTEGIA SEPIUM"
@@ -187,9 +260,32 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # hopl.us
-  # DAUCUS, SANICULA, TORILIS, UNKNOWN APIACEAE, BRODIAEA, CENTAUREA, MADIA, UNKNOWN ASTERACEAE, AMSINCKIA, PLAGIOBOTHRYS, EUPHORBIA, 
-  #  UNKNOWN EUPHORBIACEAE, ACMISPON, LATHYRUS, LUPINUS, ...
-  
+  Site = "hopl.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN APIACEAE SP.", "DAUCUS SP.")] <- "DAUCUS PUSILLUS"
+  temp$Taxon[temp$Taxon %in% c("SANICULA SP.")] <- "SANICULA BIPINNATA"
+  temp$Taxon[temp$Taxon %in% c("TORILIS ARVENSIS", "TORILIS NODOSA")] <- "TORILIS SP."
+  temp$Taxon[temp$Taxon %in% c("BRODIAEA CORONARIA", "BRODIAEA SP.")] <- "TRITELEIA SP."
+  temp$Taxon[temp$Taxon %in% c("PLAGIOBOTHRYS SP.")] <- "PLAGIOBOTHRYS NOTHOFULVUS"
+  temp$Taxon[temp$Taxon %in% c("CENTAUREA SP.")] <- "CENTAUREA MELITENSIS"
+  temp$Taxon[temp$Taxon %in% c("MADIA GRACILIS", "MADIA SATIVA")] <- "MADIA SP."
+  temp$Taxon[temp$Taxon %in% c("EUPHORBIA SP.")] <- "EUPHORBIA PEPLUS"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN EUPHORBIACEAE")] <- "EUPHORBIA SPATHULATA"
+  temp$Taxon[temp$Taxon %in% c("LATHYRUS SP.")] <- "LATHYRUS SPHAERICUS"
+  temp$Taxon[temp$Taxon %in% c("LOTUS SP.")] <- "ACMISPON WRANGELIANUS"
+  temp$Taxon[temp$Taxon %in% c("LUPINUS BICOLOR", "LUPINUS NANUS")] <- "LUPINUS SP."
+  temp$Taxon[temp$Taxon %in% c("TRIFOLIUM ALBOPURPUREUM", "TRIFOLIUM BIFIDUM", "TRIFOLIUM CILIOLATUM",
+                               "TRIFOLIUM DUBIUM", "TRIFOLIUM GRACILENTUM", "TRIFOLIUM MICROCEPHALUM",
+                               "TRIFOLIUM WILLDENOVII")] <- "TRIFOLIUM SP."
+  temp$Taxon[temp$Taxon %in% c("VICIA AMERICANA", "VICIA SP.")] <- "VICIA SATIVA"
+  temp$Taxon[temp$Taxon %in% c("CLARKIA SP.")] <- "CLARKIA PURPUREA"
+  temp$Taxon[temp$Taxon %in% c("AEGILOPS SP.")] <- "AEGILOPS TRIUNCIALIS"
+  temp$Taxon[temp$Taxon %in% c("AVENA FATUA")] <- "AVENA BARBATA"
+  temp$Taxon[temp$Taxon %in% c("CRATAEGUS SP.")] <- "CRATAEGUS DOUGLASII"
+  temp$Taxon[temp$Taxon %in% c("GALIUM APARINE", "GALIUM PARISIENSE")] <- "GALIUM SP."
+  temp <- temp[! temp$Taxon %in% c("UNKNOWN ASTERACEAE SP.", "UNKNOWN LILIACEAE") , ]
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
   # jena.de - no changes
   
   # kbs.us
@@ -198,12 +294,12 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   temp$Taxon[temp$Taxon %in% c("MELILOTUS OFFICINALIS SSP. ALBA", "MELILOTUS SP.")] <- "MELILOTUS OFFICINALIS"
   temp$Taxon[temp$Taxon %in% c("TRIFOLIUM")] <- "TRIFOLIUM REPENS"
   temp$Taxon[temp$Taxon %in% c("SETARIA SP.")] <- "SETARIA PUMILA"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN GRASS")] <- "ARRHENATHERUM ELATIUS"
   temp$Taxon[temp$Taxon %in% c("PRUNUS SP.")] <- "MALUS SP."
   temp$Taxon[temp$Taxon %in% c("ACER SP.")] <- "ACER NEGUNDO"
-  temp <- temp[! temp$Taxon %in% c("UNKNOWN BRASSICACEAE", "UNKNOWN ASTERACEAE", "UNKNOWN GRASS") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
 
-    # kibber.in
+  # kibber.in
   Site = "kibber.in"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("UNKNOWN GRASS SP.")] <- "ELYMUS LONGIARISTATUS"
@@ -234,54 +330,72 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   temp$Taxon[temp$Taxon %in% c("LOLIUM PERENNE", "LOLIUM RIGIDUM")] <- "LOLIUM SP."
   temp$Taxon[temp$Taxon %in% c("RYTIDOSPERMA ")] <- "RYTIDOSPERMA SP."
   temp$Taxon[temp$Taxon %in% c("VULPIA BROMOIDES")] <- "VULPIA SP."
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE ", "UNKNOWN GRASS") , ]
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE ") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # koffler.ca - email with M. Cadotte in March 2017
   Site = "koffler.ca"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("CAREX PLANTAGINEA")] <- "CAREX SP."
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE ", "UNKNOWN CYPERACEAE SP.", "UNKNOWN GRASS", "UNKNOWN ROSACEAE ") , ]
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE ") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # konz.us
   Site = "konz.us"
   temp <- data1[data1$site_code == Site,]
-  temp$Taxon[temp$Taxon %in% c("SOLIDAGO CANADENSIS")] <- "SOLIDAGO MISSOURIENSIS" # Kim to verify yet. 191115
   temp$Taxon[temp$Taxon %in% c("EUPHORBIA SERPENS")] <- "EUPHORBIA NUTANS"
-  temp$Taxon[temp$Taxon %in% c("CALYLOPHUS SP.")] <- "CALYLOPHUS SERRULATUS"
   temp$Taxon[temp$Taxon %in% c("MUHLENBERGIA CUSPIDATA")] <- "MUHLENBERGIA RACEMOSA"
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # lake.us - DALEA, MELILOTUS, FORB SP.
-
+  # lake.us
+  Site = "lake.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("DALEA SP.")] <- "DALEA CANDIDA"
+  temp$Taxon[temp$Taxon %in% c("MELILOTUS ALBUS", "MELILOTUS OFFICINALIS")] <- "MELILOTUS SP."
+  temp$Taxon[temp$Taxon %in% c("SOLANUM SP.")] <- "SOLANUM AMERICANUM"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+  
   # lancaster.uk - no changes
   
   # look.us
   Site = "look.us"
   temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN APIACEAE SP.")] <- "ANGELICA GENUFLEXA"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN BRASSICACEAE SP.")] <- "ERYSIMUM CAPITATUM"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN CARYOPHYLLACEAE SP.")] <- "MOEHRINGIA LATERIFLORA"
   temp$Taxon[temp$Taxon %in% c("CAREX HOODII")] <- "CAREX PENSYLVANICA"
   temp$Taxon[temp$Taxon %in% c("GALIUM SP.")] <- "GALIUM OREGANUM"
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN APIACEAE SP.", "UNKNOWN BRASSICACEAE SP.",
-                                    "UNKNOWN CARYOPHYLLACEAE SP.", "UNKNOWN ASTERACEAE SP.") , ]
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE SP.") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # marc.ar - email with J. Alberti in April 2017; NutNet data updated since then
   Site = "marc.ar"
   temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("MEDICAGO MINIMA")] <- "MEDICAGO LUPULINA"
   temp <- temp[ ! temp$Taxon %in% c("UNKNOWN GRASS ", "UNKNOWN GRASS") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # mcla.us
-  # TRITELEIA (and others in family?), CENTAUREA, LUPINUS, TRIFOLIUM, POA, UNKNOWN GRASS
-  
+  Site = "mcla.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Family[temp$Taxon == "UNKNOWN LILIACEAE"] <- "Asparagaceae"
+  temp$Taxon[temp$Taxon %in% c("BRODIAEA SP.", "TRITELEIA LAXA", "TRITELEIA SP.", "UNKNOWN LILIACEAE")] <- "DICHELOSTEMMA CAPITATUM"
+  temp$Taxon[temp$Taxon %in% c("CENTAUREA MELITENSIS", "CENTAUREA SOLSTITIALIS")] <- "CENTAUREA SP."
+  temp$Taxon[temp$Taxon %in% c("LUPINUS BICOLOR", "LUPINUS NANUS", "LUPINUS SUCCULENTUS")] <- "LUPINUS SP."
+  temp$Taxon[temp$Taxon %in% c("TRIFOLIUM SP.")] <- "TRIFOLIUM FUCATUM"
+  temp$Taxon[temp$Taxon %in% c("AVENA BARBATA")] <- "AVENA FATUA"
+  temp$Taxon[temp$Taxon %in% c("POA SP.", "UNKNOWN GRASS")] <- "POA SECUNDA"
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN BRASSICACEAE", "UNKNOWN ASTERACEAE") , ]
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
   # mtca.au
   Site = "mtca.au"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("HORDEUM MURINUM SSP. LEPORINUM")] <- "HORDEUM MURINUM"
-  temp$Taxon[temp$Taxon %in% c("STIPA NITIDA", "STIPA TRICHOPHYLLA")] <- "STIPA SP."
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
+  # pape.de - no changes
+
   # ping.au - no changes
   Site = "ping.au"
   temp <- data1[data1$site_code == Site,]
@@ -299,73 +413,107 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
 
   # rook.uk - no changes
   
+  # saana.fi - no changes
+  
   # sage.us - no changes
 
-  # saana.fi - no changes
-
-  # sava.us - VACCINIUM, HYPERICUM, RUBUS, SMILAX
+  # saline.us
+  # Asclepias syriaca == Apocynum cannabinum??
+  # note strong reversal in Sporobolus sp. in years 1 and 2
+  Site = "saline.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("LIATRIS PUNCTATA")] <- "LIATRIS MUCRONATA"
+  temp$Taxon[temp$Taxon %in% c("SOLIDAGO RIGIDA")] <- "SOLIDAGO CANADENSIS"
+  temp$Taxon[temp$Taxon %in% c("EUPHORBIA DENTATA", "EUPHORBIA MARGINATA",
+                               "EUPHORBIA NUTANS", "EUPHORBIA SERPENS", "EUPHORBIA SPATHULATA")] <- "EUPHORBIA SP."
+  temp$Taxon[temp$Taxon %in% c("SOLANUM SP.", "SOLANUM ROSTRATUM")] <- "SOLANUM PTYCHANTHUM"
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN LAMIACEAE", "FORB SP.", "SHRUB SP.", "UNKNOWN", "UNKNOWN SP.") , ]
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # sedg.us - ASTER?
+  # sava.us
+  Site = "sava.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("VACCINIUM VIRGATUM")] <- "VACCINIUM STAMINEUM"
+  temp$Taxon[temp$Taxon %in% c("QUERCUS FALCATA")] <- "QUERCUS MARGARETTIAE"
+  temp$Taxon[temp$Taxon %in% c("DANTHONIA SERICEA", "MUHLENBERGIA CAPILLARIS")] <- "ERAGROSTIS SPECTABILIS"
+  temp$Taxon[temp$Taxon %in% c("RUBUS CUNEIFOLIUS")] <- "RUBUS FLAGELLARIS"
+  temp$Taxon[temp$Taxon %in% c("SMILAX BONA-NOX")] <- "SMILAX MARITIMA"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
+  # sedg.us
   Site = "sedg.us"
   temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("ASTER SP.")] <- "CORETHROGYNE FILAGINIFOLIA"
+  temp$Taxon[temp$Taxon %in% c("CIRSIUM SP.")] <- "CARDUUS PYCNOCEPHALUS"
   temp$Taxon[temp$Taxon %in% c("TRIFOLIUM MICROCEPHALUM")] <- "TRIFOLIUM SP."
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # sereng.tz - MARISCUS == UNKNOWN CYPERACEAE?
+  # sereng.tz
   Site = "sereng.tz"
   temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("CYPERUS MOLLIPES", "MARISCUS SP.")] <- "CYPERUS NIVEUS var. LEUCOCEPHALUS"
+  temp$Taxon[temp$Taxon %in% c("CYPERUS REMOTUS")] <- "CYPERUS SQUARROSUS"
   temp$Taxon[temp$Taxon %in% c("KYLLINGA NERVOSA", "KYLLINGA ALBA")] <- "KYLLINGA SP."
   temp$Taxon[temp$Taxon %in% c("DACTYLOCTENIUM SP.")] <- "DACTYLOCTENIUM AEGYPTIUM"
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ACANTHACEAE", "UNKNOWN CYPERACEAE") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # sevi.us
   Site = "sevi.us"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("SALSOLA KALI SSP. TRAGUS")] <- "SALSOLA KALI"
-  temp$Taxon[temp$Taxon %in% c("EUPHORBIA EXSTIPULATA", "EUPHORBIA FENDLERI", "EUPHORBIA SERPYLLIFOLIA",
-                               "EUPHORBIA SERRULA")] <- "EUPHORBIA SP."
-  temp$Taxon[temp$Taxon %in% c("SPHAERALCEA COCCINEA", "SPHAERALCEA HASTULATA", "SPHAERALCEA POLYCHROMA",
-                               "SPHAERALCEA WRIGHTII")] <- "SPHAERALCEA SP."
-  temp$Taxon[temp$Taxon %in% c("ARISTIDA ADSCENSIONIS", "ARISTIDA PURPUREA")] <- "ARISTIDA SP."
-  temp$Taxon[temp$Taxon %in% c("SPOROBOLUS CONTRACTUS", "SPOROBOLUS CRYPTANDRUS", "SPOROBOLUS FLEXUOSUS")] <- "SPOROBOLUS SP."
+  temp$Taxon[temp$Taxon %in% c("EUPHORBIA SP.")] <- "EUPHORBIA ALBOMARGINATA"
+  temp$Taxon[temp$Taxon %in% c("SPHAERALCEA COCCINEA", "SPHAERALCEA HASTULATA",
+                               "SPHAERALCEA POLYCHROMA")] <- "SPHAERALCEA SP."
+  temp$Taxon[temp$Taxon %in% c("SPOROBOLUS CONTRACTUS", "SPOROBOLUS CRYPTANDRUS",
+                               "SPOROBOLUS FLEXUOSUS")] <- "SPOROBOLUS SP."
   data1 <- rbind(data1[data1$site_code != Site,], temp)
 
   # sgs.us
-  # LACTUCA, PICRADENIOPSIS, EUPHORBIA, SCUTELLARIA, UNKNOWN?, ELYMUS
-  
+  # Oxytropis widespread but only in year 2??
+  Site = "sgs.us"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("AMARANTHUS SP.")] <- "AMARANTHUS GRAECIZANS"
+  temp$Taxon[temp$Taxon %in% c("EUPHORBIA BRACHYCERA", "EUPHORBIA SP.")] <- "EUPHORBIA GLYPTOSPERMA"
+  temp$Taxon[temp$Taxon %in% c("ASTRAGALUS SP.")] <- "ASTRAGALUS BISULCATUS"
+  temp$Taxon[temp$Taxon %in% c("ELYMUS CANADENSIS", "SCHEDONNARDUS PANICULATUS")] <- "ELYMUS ELYMOIDES"
+  temp$Taxon[temp$Taxon %in% c("SOLANUM SP.")] <- "SOLANUM ROSTRATUM"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
   # shps.us
   Site = "shps.us"
   temp <- data1[data1$site_code == Site,]
-  temp$Taxon[temp$Taxon %in% c("LAPPULA REDOWSKII")] <- "LAPPULA OCCIDENTALIS var. OCCIDENTALIS"
+  temp$Taxon[temp$Taxon %in% c("LAPPULA OCCIDENTALIS var. OCCIDENTALIS")] <- "LAPPULA REDOWSKII"
   temp$Taxon[temp$Taxon %in% c("ANTENNARIA SP.")] <- "ANTENNARIA DIMORPHA"
   temp$Taxon[temp$Taxon %in% c("PSEUDOSCLEROCHLOA RUPESTRIS")] <- "POA SECUNDA"
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN AMARANTHACEAE SP.", "UNKNOWN BRASSICACEAE SP.") , ]
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN BRASSICACEAE SP.") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # sier.us - ASTER?
   Site = "sier.us"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("TORILIS ARVENSIS", "TORILIS NODOSA", "TORILIS")] <- "TORILIS SP."
-  temp$Taxon[temp$Taxon %in% c("BRODIAEA SP.", "DICHELOSTEMMA CAPITATUM", "DICHELOSTEMMA MULTIFLORUM", 
-                               "DICHELOSTEMMA VOLUBILE", "TRITELEIA LAXA", "TRITELEIA SP.",
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN APIACEAE")] <- "DAUCUS PUSILLUS"
+  temp$Taxon[temp$Taxon %in% c("BRODIAEA SP.", "TRITELEIA LAXA", "TRITELEIA SP.",
                                "UNKNOWN LILIACEAE")] <- "TRITELEIA HYACINTHINA"
+  temp$Taxon[temp$Taxon %in% c("DICHELOSTEMMA MULTIFLORUM", "DICHELOSTEMMA VOLUBILE")] <- "DICHELOSTEMMA CAPITATUM"
   temp$Taxon[temp$Taxon %in% c("PLAGIOBOTHRYS SP.")] <- "PLAGIOBOTHRYS NOTHOFULVUS"
   temp$Taxon[temp$Taxon %in% c("CARDAMINE SP.")] <- "CARDAMINE OLIGOSPERMA"
-  temp$Taxon[temp$Taxon %in% c("CENTAUREA SOLSTITIALIS")] <- "CENTAUREA MELITENSIS"
+  temp$Taxon[temp$Taxon %in% c("SILENE GALLICA")] <- "PETRORHAGIA DUBIA"
+  temp$Taxon[temp$Taxon %in% c("STELLARIA SP.")] <- "STELLARIA MEDIA"
   temp$Taxon[temp$Taxon %in% c("HEMIZONIA")] <- "HEMIZONIA CONGESTA"
+  temp$Taxon[temp$Taxon %in% c("MADIA GRACILIS", "MADIA SATIVA")] <- "MADIA SP."
   temp$Taxon[temp$Taxon %in% c("UNKNOWN ASTERACEAE")] <- "ASTER SP."
   temp$Taxon[temp$Taxon %in% c("CONVOLVULUS SP.")] <- "CONVOLVULUS ARVENSIS"
-  temp$Taxon[temp$Taxon %in% c("LUPINUS BICOLOR", "LUPINUS NANUS")] <- "LUPINUS"
+  temp$Taxon[temp$Taxon %in% c("LUPINUS BICOLOR", "LUPINUS NANUS", "LUPINUS")] <- "LUPINUS SP."
   temp$Taxon[temp$Taxon %in% c("TRIFOLIUM SP.")] <- "TRIFOLIUM DUBIUM"
   temp$Taxon[temp$Taxon %in% c("VICIA SP.")] <- "VICIA SATIVA"
-  temp$Taxon[temp$Taxon %in% c("ERODIUM BOTRYS", "ERODIUM CICUTARIUM", "ERODIUM MOSCHATUM")] <- "ERODIUM SP."
+  temp$Taxon[temp$Taxon %in% c("ERODIUM SP.")] <- "ERODIUM BOTRYS"
   temp$Taxon[temp$Taxon %in% c("CLARKIA SP.")] <- "CLARKIA PURPUREA"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN ONAGRACEAE SP.")] <- "EPILOBIUM SP."
   temp$Taxon[temp$Taxon %in% c("HORDEUM MARINUM")] <- "HORDEUM MURINUM"
-  temp$Taxon[temp$Taxon %in% c("LINANTHUS BICOLOR", "LINANTHUS PARVIFLORUS")] <- "LINANTHUS SP."
-  temp$Taxon[temp$Taxon %in% c("GALIUM APARINE", "GALIUM PARISIENSE", "GALIUM PORRIGENS")] <- "GALIUM SP."
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN APIACEAE", "UNKNOWN CARYOPHYLLACEAE", "UNKNOWN ASTERACEAE SP.",
-                                    "UNKNOWN ONAGRACEAE SP.") , ]
+  temp$Taxon[temp$Taxon %in% c("LINANTHUS SP.")] <- "LINANTHUS BICOLOR"
+  temp$Taxon[temp$Taxon %in% c("GALIUM SP.")] <- "GALIUM PARISIENSE"
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN CARYOPHYLLACEAE", "UNKNOWN ASTERACEAE SP.") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # smith.us
@@ -373,24 +521,21 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("TRITELEIA GRANDIFLORA")] <- "BRODIAEA CORONARIA"
   temp$Taxon[temp$Taxon %in% c("SYMPHORICARPOS ALBUS var. LAEVIGATUS")] <- "SYMPHORICARPOS ALBUS"
-  temp$Taxon[temp$Taxon %in% c("CREPIS CAPILLARIS")] <- "TARAXACUM CAMPYLODES"
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE") , ]
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN ASTERACEAE")] <- "CREPIS CAPILLARIS"
   data1 <- rbind(data1[data1$site_code != Site,], temp)
+  
+  ### check for other changes to smith.us composition ####
   
   # spin.us
   Site = "spin.us"
   temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("LYCHNIS LATIFOLIA SSP. ALBA")] <- "SILENE LATIFOLIA"
   temp$Taxon[temp$Taxon %in% c("UNKNOWN CYPERACEAE")] <- "CAREX SP."
   temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # summ.za
-  Site = "summ.za"
-  temp <- data1[data1$site_code == Site,]
-  temp$Taxon[temp$Taxon %in% c("SEBAEA GRANDIS")] <- "SEBAEA SP."
-  temp$Taxon[temp$Taxon %in% c("EULOPHIA TENELLA")] <- "EULOPHIA SP."
-  data1 <- rbind(data1[data1$site_code != Site,], temp)
-  
+  # summ.za - no changes
+
   # temple.us
   Site = "temple.us"
   temp <- data1[data1$site_code == Site,]
@@ -398,54 +543,79 @@ Taxonomic.Adjustments <- function(datafile = datafile) {
   temp$Taxon[temp$Taxon %in% c("TORILIS SP.")] <- "TORILIS ARVENSIS"
   temp$Taxon[temp$Taxon %in% c("LACTUCA SP.")] <- "LACTUCA SERRIOLA"
   temp$Taxon[temp$Taxon %in% c("AGALINIS SP.")] <- "AGALINIS FASCICULATA"
+  temp$Taxon[temp$Taxon %in% c("SPOROBOLUS SP.")] <- "SPOROBOLUS COMPOSITUS"
   temp <- temp[ ! temp$Taxon %in% c("UNKNOWN FABACEAE", "UNKNOWN GRASS") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # trel.us
+  # thth.is
+  Site = "thth.is"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("FESTUCA RICHARDSONII", "FESTUCA RUBRA")] <- "FESTUCA SP."
+  temp$Taxon[temp$Taxon %in% c("RUMEX SP.")] <- "RUMEX ACETOSA"
+  temp$Taxon[temp$Taxon %in% c("VIOLA SP.")] <- "VIOLA PALUSTRIS"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+  
+  # tmlr.is
+  Site = "tmlr.is"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("AGROSTIS SP.")] <- "AGROSTIS STOLONIFERA"
+  temp$Taxon[temp$Taxon %in% c("FESTUCA RICHARDSONII", "FESTUCA RUBRA")] <- "FESTUCA SP."
+  temp$Taxon[temp$Taxon %in% c("RUMEX SP.")] <- "RUMEX ACETOSA"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+  
+  # trel.us - no JUNCUS in 2008??  No CAREX in 2009 or 2010?
   Site = "trel.us"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("BROMUS SP.")] <- "BROMUS INERMIS"
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
-  # ukul.za - LEONOTIS?
+  # ukul.za
   Site = "ukul.za"
   temp <- data1[data1$site_code == Site,]
-  temp$Taxon[temp$Taxon %in% c("PACHYCARPUS ASPERIFOLIUS", "PACHYCARPUS SCABER")] <- "PACHYCARPUS SP."
+  temp$Taxon[temp$Taxon %in% c("PACHYCARPUS SP.")] <- "PACHYCARPUS SCABER"
   temp$Taxon[temp$Taxon %in% c("ACACIA SP.")] <- "ACACIA NILOTICA SSP. KRAUSSIANA"
   temp$Taxon[temp$Taxon %in% c("CHAMAECRISTA COMOSA", "CHAMAECRISTA PLUMOSA")] <- "CHAMAECRISTA SP."
   temp$Taxon[temp$Taxon %in% c("CROTALARIA GLOBIFERA")] <- "CROTALARIA SP."
   temp$Taxon[temp$Taxon %in% c("ALBUCA")] <- "ALBUCA SETOSA"
-  temp$Taxon[temp$Taxon %in% c("LEDEBOURIA COOPERI")] <- "LEDEBOURIA SP."
+  temp$Taxon[temp$Taxon %in% c("LEDEBOURIA SP.")] <- "LEDEBOURIA COOPERI"
   temp$Taxon[temp$Taxon %in% c("HYPERICUM AETHIOPICUM SSP. SONDERI")] <- "HYPERICUM SP."
   temp$Taxon[temp$Taxon %in% c("LEONOTIS OCYMIFOLIA var. RAINERIANA")] <- "LEONOTIS LEONURUS"
-  temp$Taxon[temp$Taxon %in% c("SOLANUM AMERICANUM", "SOLANUM MAURITIANUM", "SOLANUM PANDURIFORME",
-                               "SOLANUM RETROFLEXUM")] <- "SOLANUM SP."
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN CYPERACEAE SP.", "UNKNOWN FABACEAE SP.", "UNKNOWN GRASS") , ]
+  temp$Taxon[temp$Taxon %in% c("SOLANUM SP.")] <- "SOLANUM MAURITIANUM"
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN FABACEAE SP.", "UNKNOWN GRASS") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # unc.us
   Site = "unc.us"
   temp <- data1[data1$site_code == Site,]
-  temp$Taxon[temp$Taxon %in% c("ERIGERON ANNUUS", "ERIGERON STRIGOSUS")] <- "ERIGERON SP."
+  temp$Taxon[temp$Taxon %in% c("ERIGERON SP.")] <- "ERIGERON ANNUUS"
   temp$Taxon[temp$Taxon %in% c("SOLIDAGO SP.")] <- "SOLIDAGO PINETORUM"
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN ASTERACEAE")] <- "VERBESINA OCCIDENTALIS"
   temp$Taxon[temp$Taxon %in% c("PANICUM DICHOTOMUM", "PANICUM LINEARIFOLIUM")] <- "PANICUM SP."
   temp$Taxon[temp$Taxon %in% c("SMILAX BONA-NOX")] <- "SMILAX ROTUNDIFOLIA"
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN ASTERACEAE", "UNKNOWN GRASS") , ]
+  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN GRASS") , ]
   data1 <- rbind(data1[data1$site_code != Site,], temp)
   
   # valm.ch - no changes
   
-  # yarra.au
+  # veluwe.nl
+  Site = "veluwe.nl"
+  temp <- data1[data1$site_code == Site,]
+  temp$Taxon[temp$Taxon %in% c("VERONICA SP.")] <- "VERONICA OFFICINALIS"
+  data1 <- rbind(data1[data1$site_code != Site,], temp)
+
+    # yarra.au
   Site = "yarra.au"
   temp <- data1[data1$site_code == Site,]
   temp$Taxon[temp$Taxon %in% c("VICIA SATIVA")] <- "VICIA SP."
-  temp$Taxon[temp$Taxon %in% c("DICHELACHNE SQUAMULOSUM")] <- "DICHELACHNE SP."
+  temp$Taxon[temp$Taxon %in% c("DICHELACHNE SP.")] <- "DICHELACHNE SQUAMULOSUM"
   temp$Taxon[temp$Taxon %in% c("PASPALUM DILATATUM", "PASPALUM NOTATUM")] <- "PASPALUM SP."
-  temp <- temp[ ! temp$Taxon %in% c("UNKNOWN GRASS ") , ]
+  temp$Taxon[temp$Taxon %in% c("UNKNOWN GRASS ")] <- "SPOROBOLUS SP."
   data1 <- rbind(data1[data1$site_code != Site,], temp)
 
-  temp <- ddply(data1, .(site_code, block, plot, subplot, trt, year, year_trt, Taxon), summarize, max_cover = sum(max_cover))
-  
+  temp <- data1 %>%
+    group_by(site_code, block, plot, subplot, trt, year, year_trt, Taxon) %>%
+    summarize(max_cover = sum(max_cover), .groups = "keep")
+
   temp
   
 }

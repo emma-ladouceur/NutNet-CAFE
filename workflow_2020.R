@@ -19,12 +19,29 @@ cover<- read.csv("~/Dropbox/NutNet data/full-cover-24-September-2020.csv",header
 biomass <- read.csv("~/Dropbox/NutNet data/full-biomass-24-September-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
+# load  Bakker Taxonomic adjustments
+source("./Taxonomic.Adjustments.function.200924.R")
+
+# apply Jon Bakker based taxonomic adjustments
+adjusted.cover <- Taxonomic.Adjustments(cover)
+
+colnames(cover)
+colnames(adjusted.cover)
+
+cover.deets<- cover %>% select(site_code,site_name,block,plot,subplot,trt,year,year_trt,trt,
+                              Family,Taxon,local_provenance,local_lifeform,local_lifespan,functional_group,live)
+
+View(cover.deets)
+ new.cover <- adjusted.cover %>% inner_join(cover.deets, by = c("site_code", "block", "plot", "subplot", "trt", "year", "year_trt","Taxon")) #%>%
+  # mutate(Taxon=Taxon.x) %>%
+  # select(-Taxon.y) %>% distinct()
+
 
 # COVER  CLEAN UP
-head(cover)
+head(new.cover)
 
 # Drop non-living taxa
-cover1 <- cover[cover$live == 1,]
+cover1 <- new.cover[new.cover$live == 1,]
 
 # reduce to only relevant functional groups.....
 # first for cover
@@ -40,7 +57,11 @@ cover3<-cover2[complete.cases(cover2$Family),]
 # make a unique id for every plot in cover dataset
 cover4<-unite_(cover3, "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE)
 
-head(cover4)
+View(cover4)
+
+
+write.csv(cover4, "~/Dropbox/Projects/NutNet/Data/cover.adjust.csv")
+
 
 # BIOMASS CLEAN UP
 head(biomass)
@@ -67,7 +88,7 @@ dat_cover <- cover4 %>% group_by(id,site_code,year,year_trt,trt,block,plot,subpl
   left_join(cover4) %>%
   rename(subplot.cov=subplot) %>% arrange(id,Taxon)
 
-
+View(cover4)
 
 is_dat <- biomass3 %>% filter(site_code %in% c("ahth.is", "amlr.is")) %>%
   filter(!category %in% c( "LIVE"))
@@ -102,7 +123,7 @@ sep_dat <- dat_bm %>% ungroup() %>% filter(!category %in% c("TOTAL","VASCULAR", 
 # SPECIAL CASES
 # 1. biomass per species for sites that measured total biomass only
 total.dat <- biomass.total %>% left_join(dat_cover, by= c("id", "site_code", "year", "year_trt", "trt", "block", "plot" ) ) %>%
-  select(-c(site_name, Family,live,local_provenance,N_fixer,ps_path)) %>% arrange(id, subplot.cov)
+  select(-c(site_name, Family,live,local_provenance)) %>% arrange(id, subplot.cov)
 
 colnames(total.dat)
 
@@ -233,7 +254,7 @@ eth.sort3$biomass.m.full <- "category"
 
 
 eth.dat <- eth.sort3 %>% bind_rows(eth.live) %>%
-  select(-Family,-N_fixer,-ps_path,-local_provenance) %>%
+  select(-Family,-local_provenance) %>%
   rename(orig.bm.cat=category,
          category=category.mod)
 
@@ -432,7 +453,7 @@ sites<-total.dat %>% distinct(site_code, year_trt)
 View(sites)
 
 
-write.csv(total.dat, "~/Dropbox/Projects/NutNet/Data/biomass_sp.csv")
+write.csv(total.dat, "~/Dropbox/Projects/NutNet/Data/biomass_sp.new.csv")
 
 
 

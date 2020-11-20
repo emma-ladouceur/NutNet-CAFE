@@ -6,8 +6,10 @@ library(tidyverse)
 library(vegan)
 library(priceTools)
 
-biomass <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biomass <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp.new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
+
+View(biomass)
 
 bce <- droplevels(subset(biomass, experiment_type == "Experimental (Full Factorial)"| experiment_type == "Experimental (Nutrients Only)"))
 bce2 <- droplevels(subset(bce, trt=="NPK"|trt=="Control"))
@@ -48,11 +50,12 @@ View(bsites)
 bce6<- bce5 %>% select(id,site_code,year,year_trt,trt,block,plot,plot.cover,orig.bm.cat,category.mod,cat.cover,subplot.cov,subplot.bm,local_lifeform,local_lifespan,functional_group,Taxon,max_cover,category,mass,cat.mass,plot.mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.full,biomass.m.full)
   
 View(bce6)
-site.inclusion<-bce6 %>% distinct(site_code)
+
+ site.inclusion<-bce6 %>% distinct(site_code)
 
 View(site.inclusion)
 
-cover<- read.csv("~/Dropbox/NutNet data/full-cover-24-September-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+cover<- read.csv("~/Dropbox/Projects/NutNet/Data/cover.adjust.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 cover2<-unite_(cover, "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE)
 
 species.nn <- bce6 %>%  left_join(cover2)
@@ -186,7 +189,7 @@ View(sp.d)
 # join comb with all metrics above.
 
 # species biomass data for NPK and Control plots for appropriate sites to match price calcs
-write.csv(sp, "~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv")
+write.csv(sp, "~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.new.csv")
   
 plot <- sp %>% select(-c(Taxon, max_cover,local_provenance,category.mod,cat.cover,subplot.bm,local_lifeform,local_lifespan,functional_group,category,mass,cat.mass,biomass.sp.cat,biomass.sp.plot,biomass.sp.full,biomass.m.full)) %>%
   distinct(ids, .keep_all = T)
