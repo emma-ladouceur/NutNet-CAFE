@@ -12,14 +12,14 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 plot$log.rich<-log(plot$all.div)
 
- # plot <- plot %>% group_by(site_code) %>% filter(max.year >= 6) %>%
- # ungroup()
+ plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+ ungroup()
 
 
-plot.rich.g<- brm(all.div ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
+plot.rich.3<- brm(all.div ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
                     data = plot,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
-save(plot.rich.g,
+save(plot.rich.3,
      file=Sys.getenv('OFILE'))
 
 
