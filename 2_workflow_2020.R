@@ -294,7 +294,8 @@ View(pp)
 plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-
+colnames(plot)
+View(p.all)
 
 plot<-plot %>% group_by(site_code) %>% 
   summarise(min.year = min(year_trt),

@@ -74,7 +74,6 @@ write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
 load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.s
 load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.g
 
-summary(plot.rich.3)
 
 load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
 load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
@@ -84,7 +83,19 @@ load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
 load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # s.loss.s
 load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # s.gain.s
 
+# temp
 
+load('~/Desktop/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/Desktop/Model_fits/3/rich.Rdata') # plot.rich.g
+
+
+load('~/Desktop/Model_fits/3/sl.Rdata') # sl.s
+load('~/Desktop/Model_fits/3/sg.Rdata') # sg.s
+load('~/Desktop/Model_fits/3/cde.Rdata') # CDE.s
+
+
+load('~/Desktop/Model_fits/3/sloss.Rdata') # s.loss.s
+load('~/Desktop/Model_fits/3/sgain.Rdata') # s.gain.s
 
 summary(plot.rich.3)
 # inspection of chain diagnostic

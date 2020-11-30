@@ -483,42 +483,71 @@ save(p.all, file = 'study.p.all.Rdata')
 
 
 
-study.rich.p.s <- study.rich.p %>% filter(site_code == "ahth.is")
-study.rich.p.s
+
+load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
+
+sloss.t <- study.sloss.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
+  mutate(sloss.trt.rate.p = eff) %>%
+  select(-response,-eff)
+
+sloss.c <- study.sloss.p %>% select(site_code,eff,response) %>% filter(response == "Control") %>%
+  mutate(sloss.ctl.rate.p = eff) %>%
+  select(-response,-eff)
+
+sloss.eff <- left_join(sloss.t,sloss.c)
+
+sgain.t <- study.sgain.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
+  mutate(sgain.trt.rate.p = eff) %>%
+  select(-response,-eff)
+
+sgain.c <- study.sgain.p %>% select(site_code,eff,response) %>% filter(response == "Control") %>%
+  mutate(sgain.ctl.rate.p = eff) %>%
+  select(-response,-eff)
+
+sgain.eff <- left_join(sgain.t,sgain.c)
 
 
-rich.eff<-ggplot() + 
-  geom_point(data =study.rich.p.s, aes(x = response, y = eff, color=response),size = 2) +
-  geom_errorbar(data = study.rich.p.s, aes(x = response, ymin = eff_lower,
-                                   ymax = eff_upper, color=response),
-                width = 0, size = 0.7) +
-  # geom_hline(data = rich.p,
-  #            aes(yintercept = eff, size = 1,color=response)) +
-  # geom_rect(data = rich.p,
-  #           aes(xmin = -Inf, xmax = Inf,
-  #               ymin = eff_lower, ymax = eff_upper,fill=response),
-  #           alpha = 0.3) +
-  # facet_wrap(~Model)+
-  labs(x = '',
-       # y= expression(paste('Effect of NPK on Species Richness'))
-       y='')+
-  geom_hline(yintercept = 0, lty = 2) +
- # scale_y_continuous(breaks=c(0,-0.5)) +
-  scale_color_manual(values = c("#000000","#0B775E")) +
-  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                               axis.text.y = element_text(size=6),
-                               axis.text.x = element_text(size=6),
-                               title=element_text(size=8),
-                               strip.background = element_blank(),legend.position="none")
+sl.t <- study.sl.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
+  mutate(sl.trt.rate.p = eff) %>%
+  select(-response,-eff)
+
+sl.c <- study.sl.p %>% select(site_code,eff,response) %>% filter(response == "Control") %>%
+  mutate(sl.ctl.rate.p = eff) %>%
+  select(-response,-eff)
+
+sl.eff <- left_join(sl.t,sl.c)
+
+sg.t <- study.sg.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
+  mutate(sg.trt.rate.p = eff) %>%
+  select(-response,-eff)
+
+sg.c <- study.sg.p %>% select(site_code,eff,response) %>% filter(response == "Control") %>%
+  mutate(sg.ctl.rate.p = eff) %>%
+  select(-response,-eff)
+
+sg.eff <- left_join(sg.t,sg.c)
+
+cde.t <- study.cde.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
+  mutate(cde.trt.rate.p = eff) %>%
+  select(-response,-eff)
+
+cde.c <- study.cde.p %>% select(site_code,eff,response) %>% filter(response == "Control") %>%
+  mutate(cde.ctl.rate.p = eff) %>%
+  select(-response,-eff)
+
+cde.eff <- left_join(cde.t,cde.c)
 
 
-rich.eff
+sloss.sgain.effs<- left_join(sloss.eff,sgain.eff)
+
+sg.sl.eff<-left_join(sg.eff,sl.eff)
 
 
-View(study.sloss.p)
-View(study.sgain.p)
+price.eff<-left_join(sg.sl.eff,cde.eff)
 
 
+all.effs <- left_join(price.eff,sloss.sgain.effs)
 
+setwd('~/Dropbox/Projects/NutNet/Data/')
+save(all.effs, file = 'study.price.p.effs.Rdata')
 

@@ -107,6 +107,7 @@ View(plot.rich_coef3)
 # orange code "#F98400"
 r1<-ggplot() +
   facet_wrap(~Model) +
+  geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = all.div), colour ="black", alpha=0.2,
              size = .7, position = position_jitter(width = 0.45 )) +
@@ -230,6 +231,7 @@ plot.bm_coef3 <- plot.bm_coef3 %>% filter(!is.na(TESlope))
 
 
 b1<-ggplot() +
+  geom_hline(yintercept = 0,linetype="longdash") +
   facet_grid(~Model)+
   geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = plot.mass), color="black",alpha=0.2,

@@ -116,6 +116,7 @@ View(sgain.trt_coef3)
 head(sgain.trt_fitted.ctl)
 View(sgain.trt_coef3)
 sgain.trtm <- ggplot()  +
+  geom_hline(yintercept = 0,linetype="longdash") +
   # data
   facet_grid(~Model)+
   geom_point(data = sgain.trt_fitted.npk,
@@ -187,9 +188,10 @@ fitted.sloss
 fitted.sloss$Treatment <- factor(fitted.sloss$Treatment , levels=c("NPK","Control"))
 
 
-View(sloss.trt_coef3)
+summary(sloss.trt_fitted.npk)
 
 sloss.trtm<-ggplot() +
+  geom_hline(yintercept = 0,linetype="longdash") +
   facet_grid(~Model)+
   geom_point(data = sloss.trt_fitted.npk,
              aes(x = year.y, y = s.loss.n),color="black", alpha=0.2,
@@ -270,6 +272,7 @@ View(sl.trt_coef3)
 
 sl.trtm<-ggplot() +
   facet_grid(~Model)+
+  geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL),color="black",alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
@@ -292,7 +295,7 @@ sl.trtm<-ggplot() +
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="black",alpha = 0.5) +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
-  ylim(-400,0) +
+  ylim(-400,5) +
   labs(x='Year',
        #x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= '') +
@@ -335,6 +338,7 @@ fitted.sg$Treatment <- factor(fitted.sg$Treatment , levels=c("NPK","Control"))
 View(sg.trt_coef3)
 #gai
 sg.trtm<-ggplot()  +
+  geom_hline(yintercept = 0,linetype="longdash") +
   # data
   facet_grid(~Model) +
   geom_point(data = sg.trt_fitted.npk,
@@ -445,6 +449,7 @@ View(cde_coef3)
 
 #cde
 cdem<-ggplot() +
+  geom_hline(yintercept = 0,linetype="longdash") +
   # data
   facet_grid(~Model) +
   geom_point(data = cde_fitted.npk,

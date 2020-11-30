@@ -390,11 +390,11 @@ geom_vline(data = bm.p %>% filter(response=="NPK"),
   )+
   geom_text(data = bm.ps %>%
               group_by(multilimited) %>%
-              mutate(n_study = n_distinct(site_code)) %>%
+              mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
-              distinct(multilimited, n_study, .keep_all = T),
+              distinct(multilimited, n_sites, .keep_all = T),
             aes(x=175, y=multilimited,
-                label=paste('n[study] == ', n_study)),
+                label=paste('n[sites] == ', n_sites)),
             size=3.5,
             nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
@@ -414,7 +414,7 @@ bm
 
 
 
-sl.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/old/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 View(sl.ps)
 View(sl.p)
@@ -566,11 +566,11 @@ cde<-ggplot() +
   xlim(-250,100)+
   geom_text(data = cde.ps %>%
               group_by(multilimited) %>%
-              mutate(n_study = n_distinct(site_code)) %>%
+              mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
-              distinct(multilimited, n_study, .keep_all = T),
+              distinct(multilimited, n_sites, .keep_all = T),
             aes(x=80, y=multilimited,
-                label=paste('n[study] == ', n_study)),
+                label=paste('n[sites] == ', n_sites)),
             size=3.5,
             nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
@@ -594,7 +594,7 @@ cde
 
 
 
-sloss.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/old/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sloss.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 View(sloss.ps)
 View(sloss.p)
@@ -688,11 +688,11 @@ sgain<-ggplot() +
   )+
   geom_text(data = sg.ps %>%
               group_by(multilimited) %>%
-              mutate(n_study = n_distinct(site_code)) %>%
+              mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
-              distinct(multilimited, n_study, .keep_all = T),
+              distinct(multilimited, n_sites, .keep_all = T),
             aes(x=2.75, y=multilimited,
-                label=paste('n[study] == ', n_study)),
+                label=paste('n[sites] == ', n_sites)),
             size=3.5,
             nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
