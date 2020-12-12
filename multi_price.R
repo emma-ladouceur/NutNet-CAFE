@@ -18,7 +18,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(max.year >= 3) %>%
 
 
 pp.multi <- brm(mvbind(SL,SG,CDE) ~ trt.y * year.y.m + (trt.y * year.y.m  | p | site_code),
-                data = plot,family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4)
+                data = p.all,family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4)
 
 
 save(pp.multi,
