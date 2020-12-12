@@ -17,7 +17,7 @@ library(tidyverse)
 library(data.table)
 library(foreach)
 
-p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 # run cluster -based price script, then load the new input
 price.list<-list.files(path = "~/Desktop/Academic/R Code/NutNet/input_new/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
@@ -31,9 +31,9 @@ price.all <- foreach (file = price.list,.combine=rbind) %do% {
 
 View(price.all)
 
-write.csv(price.all,"~/Dropbox/Projects/NutNet/Data/nutnet_price_all.new.csv")
+write.csv(price.all,"~/Dropbox/Projects/NutNet/Data/nutnet_price_all.csv")
 
-price.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all.new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 View(price.all)

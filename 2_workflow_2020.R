@@ -6,7 +6,7 @@ library(tidyverse)
 library(vegan)
 library(priceTools)
 
-biomass <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp.new.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biomass <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
 View(biomass)
@@ -199,7 +199,7 @@ colnames(plot)
 site.inclusion<-plot %>% distinct(site_code)
 View(site.inclusion)
 
-write.csv(plot, "~/Dropbox/Projects/NutNet/Data/plot.new.csv")
+write.csv(plot, "~/Dropbox/Projects/NutNet/Data/plot.csv")
 
 colnames(sp)
 colnames(plot)
