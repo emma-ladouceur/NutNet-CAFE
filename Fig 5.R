@@ -468,23 +468,23 @@ sl<-ggplot() +
              aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs( x='',
-    #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
+  labs( #x='',
+    x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
         title= 'e) Change in Biomass Due to Species Loss',
-        y= ' Slope'
+        y= ''
         #color= ''
   )+
   # geom_text(data = sl.ps %>%
-  #             group_by(multilimited) %>%
+  #             group_by(Quadrant) %>%
   #             mutate(n_study = n_distinct(site_code)) %>%
   #             ungroup() %>%
-  #             distinct(multilimited, n_study, .keep_all = T),
-  #           aes(x=20, y=multilimited,
+  #             distinct(Quadrant, n_study, .keep_all = T),
+  #           aes(x=20, y=Quadrant,
   #               label=paste('n[study] == ', n_study)),
   #           size=3.5,
   #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
-        #axis.text.y = element_blank(),
+        axis.text.y = element_blank(),
         axis.title.y = element_text(size=9),
         title=element_text(size=9),
         legend.key = element_blank(),
@@ -530,20 +530,21 @@ sg<-ggplot() +
              aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
-  labs( x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
+  labs( x = '',
+    #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
     title= 'f) Change in Biomass Due to Species Gain',
     y= ' '
     #color= ''
   )+
-  # geom_text(data = sg.ps %>%
-  #             group_by(multilimited) %>%
-  #             mutate(n_study = n_distinct(site_code)) %>%
-  #             ungroup() %>%
-  #             distinct(multilimited, n_study, .keep_all = T),
-  #           aes(x=75, y=multilimited,
-  #               label=paste('n[study] == ', n_study)),
-  #           size=3.5,
-  #           nudge_y = 0.1, parse = T) +
+  geom_text(data = sg.ps %>%
+              group_by(Quadrant) %>%
+              mutate(n_study = n_distinct(site_code)) %>%
+              ungroup() %>%
+              distinct(Quadrant, n_study, .keep_all = T),
+            aes(x=75, y=Quadrant,
+                label=paste('n[study] == ', n_study)),
+            size=3.5,
+            nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         axis.title.y = element_text(size=9),
@@ -594,22 +595,22 @@ cde<-ggplot() +
   theme_bw() +
   labs(x='', 
     #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
-        title= 'g) Persistent Species Change in Biomass',
-        y= ''
+        title= 'd) Persistent Species Change in Biomass',
+        y= 'Slope'
         #color= ''
   )+
   xlim(-250,100)+
-  geom_text(data = cde.ps %>%
-              group_by(Quadrant) %>%
-              mutate(n_sites = n_distinct(site_code)) %>%
-              ungroup() %>%
-              distinct(Quadrant, n_sites, .keep_all = T),
-            aes(x=80, y=Quadrant,
-                label=paste('n[sites] == ', n_sites)),
-            size=3.5,
-            nudge_y = 0.1, parse = T) +
+  # geom_text(data = cde.ps %>%
+  #             group_by(Quadrant) %>%
+  #             mutate(n_sites = n_distinct(site_code)) %>%
+  #             ungroup() %>%
+  #             distinct(Quadrant, n_sites, .keep_all = T),
+  #           aes(x=80, y=Quadrant,
+  #               label=paste('n[sites] == ', n_sites)),
+  #           size=3.5,
+  #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
+        #axis.text.y = element_blank(),
         axis.title.y = element_text(size=9),
         title=element_text(size=9),
         legend.key = element_blank(),
@@ -668,7 +669,7 @@ sloss<-ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
   labs( x = expression(paste('Effect of NPK on Species Loss / Year')),
-        title= 'c) Species Loss',
+        title= 'a) Species Loss',
         y= ' Slope'
         #color= ''
   )+
@@ -730,7 +731,7 @@ sgain<-ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
   labs( x = expression(paste('Effect of NPK on Species Gain / Year')),
-        title= 'd) Species Gain',
+        title= 'b) Species Gain',
         y= ' '
         #color= ''
   )+
@@ -754,4 +755,12 @@ sgain
 
 
 ( rich | bm )/( sloss | sgain )/( sl | sg | cde )
+
+
+
+
+( sloss | sgain )/( cde  | sl | sg )
+
+
+
 
