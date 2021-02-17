@@ -70,35 +70,36 @@ write.csv(clim_dat2, file = "~/Dropbox/Projects/NutNet/Data/clim_dat_2.csv", row
 
 
 
-clim <- read.csv("~/Dropbox/Projects/NutNet/Data/clim_dat_2.csv", stringsAsFactors = FALSE)
+clim <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/clim_dat_2.csv", stringsAsFactors = FALSE)
 #plot dat
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-pdeets<-distinct(plot,site_code,block,plot,trt,year_trt,rich,NAT_rich,INT_rich,UNK_rich,live_mass)
+colnames(plot)
+pdeets<-distinct(plot,site_code,block,plot,trt,year_trt,all.div,nat.div,int.div,unk.div,plot.mass)
 p.x<-pdeets[pdeets$year_trt %in% c('0'),]
 p.y<-pdeets[pdeets$year_trt != "0",]
 colnames(p.x)
 
-colnames(p.x)[5] <-"year_trt.x"
-colnames(p.x)[6] <-"rich.x"
-colnames(p.x)[7] <-"NAT_rich.x"
-colnames(p.x)[8] <-"INT_rich.x"
-colnames(p.x)[9] <-"UNK_rich.x"
-colnames(p.x)[10] <-"live_mass.x"
+colnames(p.x)[2] <-"year_trt.x"
+colnames(p.x)[7] <-"all.div.x"
+colnames(p.x)[9] <-"nat.div.x"
+colnames(p.x)[8] <-"int.div.x"
+colnames(p.x)[10] <-"unk.div.x"
+colnames(p.x)[5] <-"plot.mass.x"
 
-colnames(p.y)[5] <-"year_trt.y"
-colnames(p.y)[6] <-"rich.y"
-colnames(p.y)[7] <-"NAT_rich.y"
-colnames(p.y)[8] <-"INT_rich.y"
-colnames(p.y)[9] <-"UNK_rich.y"
-colnames(p.y)[10] <-"live_mass.y"
+colnames(p.y)[2] <-"year_trt.y"
+colnames(p.y)[7] <-"all.div.y"
+colnames(p.y)[9] <-"nat.div.y"
+colnames(p.y)[8] <-"int.div.y"
+colnames(p.y)[10] <-"unk.div.y"
+colnames(p.y)[5] <-"plot.mass.y"
 
 
 p.xy<-left_join(p.x,p.y)
 View(p.xy)
 
 View(plot)
-p2<-distinct(plot,elevation,latitude.p,latitude,longitude,continent,country,site_code,region,grazed,burned,managed,anthropogenic,habitat,site_richness,site_native_richness,site_introduced_richness)
+p2<-distinct(plot,elevation,latitude,longitude,continent,country,site_code,region,grazed,burned,managed,anthropogenic,habitat,site_richness,site_native_richness,site_introduced_richness)
 
 p2$site_percent_native_rich<- (p2$site_native_richness/p2$site_richness) * 100
 p2$site_percent_int_rich<- (p2$site_introduced_richness/p2$site_richness) * 100
@@ -109,10 +110,11 @@ p2<-p2 %>% mutate(site_percent_int_rich= ifelse(is.na(site_percent_int_rich), 0,
 p2$site_dom <- ifelse(p2$site_percent_native_rich >= p2$site_percent_int_rich , 'native dominated',
                       ifelse(p2$site_percent_int_rich  >= p2$site_percent_native_rich, 'introduced dominated','other'))
 
-View(p2)
+View(p.xy)
 rr<-p.xy %>% group_by(site_code) %>%
-  summarise(s.rich = mean(rich.x),
-            r.rich = round(s.rich))
+  summarise(s.rich = mean(all.div.x),
+            r.rich = round(s.rich),
+            max.year = max(year_trt.y))
 
 View(p2)
 meta<-left_join(p2,rr)
@@ -125,30 +127,17 @@ View(meta)
 # nut net site data (suspect rounded differently)
 # so dont match by longitude or latitude
 
-head(meta)
-head(clim)
-
-meta_country<- meta %>% rename(countrycode=country)
 
 
-clim_fix<- clim %>% rename(latitude.clim.dat=latitude,
-                           longitude.clim.dat=longitude,
-                           latitude.p.clim.dat=latitude.p)
-
-plot_clim <- left_join(meta_country,clim_fix,by = c( "countrycode", "site_code", "region", "habitat"))
+write.csv(meta,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/meta.csv" )
 
 
-View(plot_clim)
-
-write.csv(plot_clim,"~/Dropbox/Projects/NutNet/Data/plot_clim.csv" )
-
-
-clim <- read.csv("~/Dropbox/Projects/NutNet/Data/plot_clim.csv", stringsAsFactors = FALSE)
-start.rich <- read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv", stringsAsFactors = FALSE)
-fig1 <- read.csv("~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv", stringsAsFactors = FALSE)
+clim <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/meta.csv", stringsAsFactors = FALSE)
+start.rich <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/start.rich.csv", stringsAsFactors = FALSE)
+fig1 <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure1_dat.csv", stringsAsFactors = FALSE)
 #plot dat
 
-comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-03-June-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-31-August-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
 head(plot)

@@ -1,7 +1,10 @@
 
 
+library(ggplot2)
+library(tidyverse)
+library(patchwork)
 
-load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
 
 sloss.t <- study.sloss.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
   mutate(sloss.trt.rate.p = eff) %>%
@@ -65,12 +68,15 @@ price.eff<-left_join(sg.sl.eff,cde.eff)
 
 all.effs <- left_join(price.eff,sloss.sgain.effs)
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/')
 save(all.effs, file = 'study.price.p.effs.Rdata')
 
+quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
+
+all.effs <- all.effs %>% left_join(quads)
 
 study.price.cloud<-ggplot()+
-  facet_wrap(~site_code) +
+  facet_wrap(~Quadrant) +
   geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   #treatment effects
   geom_segment(data = all.effs,
@@ -94,6 +100,28 @@ study.price.cloud<-ggplot()+
                    yend =(sl.trt.rate.p)+(sg.trt.rate.p)+ (cde.trt.rate.p  )),
                colour= "#F98400",
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  # #CTLS
+  # geom_segment(data = all.effs,
+  #              aes(x = 0,
+  #                  xend = sloss.ctl.rate.p  ,
+  #                  y = 0,
+  #                  yend = sl.ctl.rate.p   ),
+  #              colour= "black", alpha=0.2,
+  #              arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  # geom_segment(data = all.effs,
+  #              aes(x = sloss.ctl.rate.p ,
+  #                  xend = (sloss.ctl.rate.p)+(sgain.ctl.rate.p ) ,
+  #                  y = sl.ctl.rate.p ,
+  #                  yend = (sl.ctl.rate.p)+(sg.ctl.rate.p  ) ),
+  #              colour= "black", alpha=0.2,
+  #              arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  # geom_segment(data = all.effs,
+  #              aes(x = (sloss.ctl.rate.p)+(sgain.ctl.rate.p),
+  #                  xend = (sloss.ctl.rate.p)+(sgain.ctl.rate.p),
+  #                  y = (sl.ctl.rate.p)+(sg.ctl.rate.p ),
+  #                  yend =(sl.ctl.rate.p)+(sg.ctl.rate.p)+ (cde.ctl.rate.p  )),
+  #              colour= "black", alpha=0.2,
+  #              arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   labs(x = 'Rate of change in species (species/year)',
        y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
        # title= 'Rate of change / year '
@@ -101,4 +129,40 @@ study.price.cloud<-ggplot()+
 
 
 study.price.cloud
+
+
+study.price.cloud.ctl<-ggplot()+
+  # facet_wrap(~site_code) +
+  geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+  #treatment effects
+  geom_segment(data = all.effs,
+               aes(x = 0,
+                   xend = sloss.ctl.rate.p  ,
+                   y = 0,
+                   yend = sl.ctl.rate.p   ),
+               colour= "#B40F20", linetype=2,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_segment(data = all.effs,
+               aes(x = sloss.ctl.rate.p ,
+                   xend = (sloss.ctl.rate.p)+(sgain.ctl.rate.p ) ,
+                   y = sl.ctl.rate.p ,
+                   yend = (sl.ctl.rate.p)+(sg.ctl.rate.p  ) ),
+               colour= "#046C9A",linetype=2,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_segment(data = all.effs,
+               aes(x = (sloss.ctl.rate.p)+(sgain.ctl.rate.p),
+                   xend = (sloss.ctl.rate.p)+(sgain.ctl.rate.p),
+                   y = (sl.ctl.rate.p)+(sg.ctl.rate.p ),
+                   yend =(sl.ctl.rate.p)+(sg.ctl.rate.p)+ (cde.ctl.rate.p  )),
+               colour= "#F98400",linetype=2,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  labs(x = 'Rate of change in species (species/year)',
+       y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
+       # title= 'Rate of change / year '
+       title = '')
+
+
+study.price.cloud.ctl
+
+(study.price.cloud | study.price.cloud.ctl )
 

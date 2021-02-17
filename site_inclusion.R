@@ -8,7 +8,7 @@ library(sjstats)
 library(bayesplot)
 
 
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 colnames(plot)
 plot$site_code<-as.factor(plot$site_code)
@@ -18,16 +18,16 @@ plot$plot<-as.factor(plot$plot)
 plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
   ungroup()
 
-load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.mod.dat.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sg_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_dat.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_dat.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
 View(plot.rich_fitted.npk)
@@ -82,59 +82,45 @@ View(all.mods)
 all<-all.mods %>% full_join(raw)
 View(all)
 
-
-write.csv(all,"~/Desktop/site.inclusion.csv")
-
+write.csv(all,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/site.inclusion.csv")
 
 
+# Table S1
+comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-31-August-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+country_codes <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
+pis <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/pi-contact-list-8-Nov-2019.csv", stringsAsFactors = FALSE)
 
-
-
-
-library(tidyverse)
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-comb <- read.csv("~/Dropbox/NutNet data/comb-by-plot-31-August-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-country_codes <- read.csv("~/Dropbox/Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
-biogeo <- read.csv("~/Dropbox/Projects/NutNet/Data/biogeographic_realms.csv", stringsAsFactors = FALSE)
-contacts <- read.csv("~/Dropbox/Projects/NutNet/Data/pi-contact-list-8-Nov-2019.csv", stringsAsFactors = FALSE)
-
-colnames(plot)
 colnames(comb)
 head(country_codes)
 
-site_deets <- comb %>% dplyr::select(site_name,site_code)
+prep <- comb %>% distinct(site_code, site_name, country,habitat) 
+
+prep <- comb %>%
+  group_by(site_code) %>%
+  summarise(`Experiment Length` = max(year_trt)) %>%
+  filter(`Experiment Length` >= 3) %>% left_join(prep) %>%
+  mutate(countrycode = country) %>% select(-country) %>% left_join(country_codes) %>%
+  select(-countrycode)
+
+head(prep)
+
+pis_prep <- pis %>% select(site_code, firstname, lastname) %>%
+  unite(`Site Manager`, firstname:lastname, remove=TRUE, sep=" ") %>%
+  group_by(site_code) %>%
+  summarise(
+    `Site Managers` = paste(`Site Manager`, collapse = ', ') ) 
+
+head(pis_prep)
 
 
-contacts <- contacts %>% select(-country,-site_name,-institution, -email)
+site_info <- prep %>% left_join(pis_prep)
+
+colnames(site_info)
+
+table_s1 <- all %>% select(site_code) %>% left_join(site_info) 
 
 
-site.include <- plot %>% dplyr::select(site_code,country,habitat,max.year) %>% 
-  distinct() %>% mutate(countrycode = country) %>%
-  dplyr::select(-country) %>%
-  left_join(country_codes) %>% left_join(site_deets) %>% filter(max.year >= 3) %>%
-  dplyr::select(site_code,site_name,country,habitat, max.year) %>% distinct() %>%
-  left_join(contacts, by= c("site_code"))
+View(table_s1)
 
-
-View(site.include)
-
-#write.csv(site.include,"~/Dropbox/Projects/NutNet/Data/Table_S1.csv")
-
-colims <- read.csv("~/Dropbox/Projects/NutNet/Data/Table_S1.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-
-site.include.names <- site.include %>% unite( name , firstname:lastname, remove=TRUE, sep=" ") %>%
-  group_by(site_code,site_name, country, max.year) %>%
-  summarise(name = toString(name)) %>% ungroup() %>%
-  rename('Site Manager(s)' = name)
-  
-
-View(site.include.names)
-
-si <- site.include.names %>% left_join(colims)
-
-
-View(si)
-write.csv(si,"~/Dropbox/Projects/NutNet/Data/Table_S1_new.csv")
-
+write.csv(table_s1,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S1.csv")
 

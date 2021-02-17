@@ -14,17 +14,17 @@ library(viridis)
 
 
 # models
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.g
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.g
 
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
 
 
-meta <- read.csv("~/Dropbox/Projects/NutNet/Data/Table_S1.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S1.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 #  mods study level dat
 study_levels <- plot.rich.3$data %>% 
@@ -132,7 +132,7 @@ sl.p$managed<-as.factor(as.character(sl.p$managed))
 sl.p$burned<-as.factor(as.character(sl.p$burned))
 
 View(sl.p)
-write.csv(sl.p,"~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv")
+write.csv(sl.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl_posteriors.csv")
 
 # SLOSS
 sloss_posterior <- study_sample_posterior  %>% 
@@ -157,7 +157,7 @@ sloss.p$managed<-as.factor(as.character(sloss.p$managed))
 sloss.p$burned<-as.factor(as.character(sloss.p$burned))
 
 View(sloss.p)
-write.csv(sloss.p,"~/Dropbox/Projects/NutNet/Data/sloss_posteriors.csv")
+write.csv(sloss.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss_posteriors.csv")
 
 
 
@@ -185,7 +185,7 @@ sg.p$managed<-as.factor(as.character(sg.p$managed))
 sg.p$burned<-as.factor(as.character(sg.p$burned))
 
 View(sg.p)
-write.csv(sg.p,"~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv")
+write.csv(sg.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_posteriors.csv")
 
 
 
@@ -213,7 +213,7 @@ sgain.p$managed<-as.factor(as.character(sgain.p$managed))
 sgain.p$burned<-as.factor(as.character(sgain.p$burned))
 
 View(sgain.p)
-write.csv(sgain.p,"~/Dropbox/Projects/NutNet/Data/sgain_posteriors.csv")
+write.csv(sgain.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_posteriors.csv")
 
 
 # CDE
@@ -238,7 +238,7 @@ cde.p$managed<-as.factor(as.character(cde.p$managed))
 cde.p$burned<-as.factor(as.character(cde.p$burned))
 
 View(cde.p)
-write.csv(cde.p,"~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv")
+write.csv(cde.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde_posteriors.csv")
 
 
 # RICH
@@ -263,7 +263,7 @@ rich.p$managed<-as.factor(as.character(rich.p$managed))
 rich.p$burned<-as.factor(as.character(rich.p$burned))
 
 View(rich.p)
-write.csv(rich.p,"~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv")
+write.csv(rich.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich_posteriors.csv")
 
 
 
@@ -289,18 +289,21 @@ bm.p$managed<-as.factor(as.character(bm.p$managed))
 bm.p$burned<-as.factor(as.character(bm.p$burned))
 
 View(bm.p)
-write.csv(bm.p,"~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv")
+write.csv(bm.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm_posteriors.csv")
 
 
+meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/meta.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-rich.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/rich_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
+meta <- meta %>% select(site_code, Quadrant)
 
+View(meta)
 
-summary(rich.ps)
-colnames(rich.p)
-rich.p
+rich.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/p.effs.Rdata')
 
+View(rich.ps)
+rich.ps <- rich.ps %>% left_join(meta, by ="site_code")
+View(rich.ps)
 
 rich<-ggplot() +
   geom_rect(data = rich.p %>% filter(response=="NPK"),
@@ -308,14 +311,20 @@ rich<-ggplot() +
             alpha = 0.3)) +
   geom_density_ridges(data = rich.ps,
                       aes(x = rich.trt.study + rich.trt.global, 
-                          y = multilimited,
+                        y = Quadrant, 
                       ), fill="#0B775E",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  geom_density_ridges(data = rich.ps,
+                      aes(x = rich.ctl.study + rich.ctl.global, 
+                          y = Quadrant 
+                      ), colour ="black", 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   #' scale_fill_viridis(name = #'site_rich_range',
   #'                      #'starting.richness' ,
-  #'                      'site_rich_range',
-  #'                    # 'anthropogenic',
+  #'                     # 'site_rich_range',
+  #'                    'anthropogenic',
   #'                    #'NDep.cats',
   #'                    #'biome' ,
   #'                    #'site_dom',
@@ -328,15 +337,15 @@ rich<-ggplot() +
   theme_bw() +
   labs( x='Effect of NPK on Change in Species Richness/Year',
         title= 'a) Species Richness',
-        y= 'Multilimited sites'
+        y= 'Slope'
         #color= ''
   )+
   # geom_text(data = rich.ps %>%
-  #             group_by(multilimited) %>%
+  #             group_by(site_dom) %>%
   #             mutate(n_study = n_distinct(site_code)) %>%
   #             ungroup() %>%
-  #             distinct(multilimited, n_study, .keep_all = T),
-  #           aes(x=2.5, y=multilimited,
+  #             distinct(site_dom, n_study, .keep_all = T),
+  #           aes(x=2.5, y=site_dom,
   #               label=paste('n[study] == ', n_study)),
   #           size=3.5,
   #           nudge_y = 0.1, parse = T) +
@@ -351,12 +360,13 @@ rich<-ggplot() +
 rich
 
 
-bm.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+bm.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
+bm.ps <- bm.ps %>% left_join(meta, by ="site_code")
 colnames(bm.p)
-bm.p
+bm.ps
 
 
 bm<-ggplot() +
@@ -365,8 +375,14 @@ bm<-ggplot() +
                 alpha = 0.3)) +
   geom_density_ridges(data = bm.ps,
                       aes(x = bm.trt.study + bm.trt.global, 
-                          y = multilimited,
+                          y = Quadrant,
                       ), fill="#0B775E",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  geom_density_ridges(data = bm.ps,
+                      aes(x = bm.ctl.study + bm.ctl.global, 
+                          y = Quadrant 
+                      ), colour ="black", 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   #' scale_fill_viridis(name = #'site_bm_range',
@@ -389,11 +405,11 @@ geom_vline(data = bm.p %>% filter(response=="NPK"),
         #color= ''
   )+
   geom_text(data = bm.ps %>%
-              group_by(multilimited) %>%
+              group_by(Quadrant) %>%
               mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
-              distinct(multilimited, n_sites, .keep_all = T),
-            aes(x=175, y=multilimited,
+              distinct(Quadrant, n_sites, .keep_all = T),
+            aes(x=175, y=Quadrant,
                 label=paste('n[sites] == ', n_sites)),
             size=3.5,
             nudge_y = 0.1, parse = T) +
@@ -414,8 +430,9 @@ bm
 
 
 
-sl.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+sl.ps <- sl.ps %>% left_join(meta, by ="site_code")
 View(sl.ps)
 View(sl.p)
 sl.p
@@ -427,8 +444,14 @@ sl<-ggplot() +
                 alpha = 0.3)) +
   geom_density_ridges(data = sl.ps,
                       aes(x = sl.trt.study + sl.trt.global, 
-                          y = multilimited,
+                          y = Quadrant,
                       ), fill="#B40F20",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  geom_density_ridges(data = sl.ps,
+                      aes(x = sl.ctl.study + sl.ctl.global, 
+                          y = Quadrant 
+                      ), colour ="black", 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   #' scale_fill_viridis(name = #'site_sl_range',
@@ -448,7 +471,7 @@ sl<-ggplot() +
   labs( x='',
     #x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')')),
         title= 'e) Change in Biomass Due to Species Loss',
-        y= ' Multilimited sites'
+        y= ' Slope'
         #color= ''
   )+
   # geom_text(data = sl.ps %>%
@@ -470,9 +493,9 @@ sl<-ggplot() +
 sl
 
 
-sg.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sg.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-
+sg.ps <- sg.ps %>% left_join(meta, by ="site_code")
 colnames(sg.p)
 sg.p
 
@@ -483,8 +506,14 @@ sg<-ggplot() +
                 alpha = 0.3)) +
   geom_density_ridges(data = sg.ps,
                       aes(x = sg.trt.study + sg.trt.global, 
-                          y = multilimited,
+                          y = Quadrant,
                       ), fill="#3B9AB2",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  geom_density_ridges(data = sg.ps,
+                      aes(x = sg.ctl.study + sg.ctl.global, 
+                          y = Quadrant 
+                      ), colour ="black", 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   #' scale_fill_viridis(name = #'site_sg_range',
@@ -526,9 +555,9 @@ sg
 
 
 
-cde.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+cde.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-
+cde.ps <- cde.ps %>% left_join(meta, by ="site_code")
 colnames(cde.p)
 cde.p
 
@@ -539,8 +568,14 @@ cde<-ggplot() +
                 alpha = 0.3)) +
   geom_density_ridges(data = cde.ps,
                       aes(x = cde.trt.study + cde.trt.global, 
-                          y = multilimited,
+                          y = Quadrant,
                       ), fill="#F98400",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  geom_density_ridges(data = cde.ps,
+                      aes(x = cde.ctl.study + cde.ctl.global, 
+                          y = Quadrant 
+                      ), colour ="black", 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   #' scale_fill_viridis(name = #'site_cde_range',
@@ -565,11 +600,11 @@ cde<-ggplot() +
   )+
   xlim(-250,100)+
   geom_text(data = cde.ps %>%
-              group_by(multilimited) %>%
+              group_by(Quadrant) %>%
               mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
-              distinct(multilimited, n_sites, .keep_all = T),
-            aes(x=80, y=multilimited,
+              distinct(Quadrant, n_sites, .keep_all = T),
+            aes(x=80, y=Quadrant,
                 label=paste('n[sites] == ', n_sites)),
             size=3.5,
             nudge_y = 0.1, parse = T) +
@@ -594,8 +629,9 @@ cde
 
 
 
-sloss.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sloss.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+sloss.ps <- sloss.ps %>% left_join(meta, by ="site_code")
 View(sloss.ps)
 View(sloss.p)
 sloss.p
@@ -607,8 +643,14 @@ sloss<-ggplot() +
                 alpha = 0.3)) +
   geom_density_ridges(data = sloss.ps,
                       aes(x = sloss.trt.study + sloss.trt.global, 
-                          y = multilimited,
+                          y = Quadrant,
                       ), fill="#B40F20",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  geom_density_ridges(data = sloss.ps,
+                      aes(x = sloss.ctl.study + sloss.ctl.global, 
+                          y = Quadrant 
+                      ), colour ="black", 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   #' scale_fill_viridis(name = #'site_sl_range',
@@ -627,7 +669,7 @@ sloss<-ggplot() +
   theme_bw() +
   labs( x = expression(paste('Effect of NPK on Species Loss / Year')),
         title= 'c) Species Loss',
-        y= ' Multilimited sites'
+        y= ' Slope'
         #color= ''
   )+
   # geom_text(data = sl.ps %>%
@@ -650,9 +692,9 @@ sloss<-ggplot() +
 sloss
 
 
-sgain.ps <- read.csv("~/Dropbox/Projects/NutNet/Data/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sgain.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-
+sgain.ps <- sgain.ps %>% left_join(meta, by ="site_code")
 colnames(sgain.ps)
 sgain.p
 
@@ -663,8 +705,14 @@ sgain<-ggplot() +
                 alpha = 0.3)) +
   geom_density_ridges(data = sgain.ps,
                       aes(x = sgain.trt.study + sgain.trt.global, 
-                          y = multilimited,
+                          y = Quadrant,
                       ), fill="#3B9AB2",
+                      scale = 1, alpha = 0.6,
+                      linetype = 0) +
+  geom_density_ridges(data = sgain.ps,
+                      aes(x = sgain.ctl.study + sgain.ctl.global, 
+                          y = Quadrant 
+                      ), colour ="black", 
                       scale = 1, alpha = 0.6,
                       linetype = 0) +
   #' scale_fill_viridis(name = #'site_sg_range',
@@ -687,11 +735,11 @@ sgain<-ggplot() +
         #color= ''
   )+
   geom_text(data = sg.ps %>%
-              group_by(multilimited) %>%
+              group_by(Quadrant) %>%
               mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
-              distinct(multilimited, n_sites, .keep_all = T),
-            aes(x=2.75, y=multilimited,
+              distinct(Quadrant, n_sites, .keep_all = T),
+            aes(x=2.75, y=Quadrant,
                 label=paste('n[sites] == ', n_sites)),
             size=3.5,
             nudge_y = 0.1, parse = T) +

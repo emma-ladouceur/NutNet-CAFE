@@ -73,17 +73,17 @@ conceptual
 
 # PARTITIONS
 
-sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
 # GAINS N LOSSES
 
 
-load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
 is.factor(sgain.trt_fitted.npk$starting.richness)
@@ -157,7 +157,7 @@ sgain.trtm
 
 
 # LOSS
-load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 fitted.sloss
 
@@ -237,11 +237,11 @@ sloss.trtm
 # BIOMASS PARTITIONS
 
 
-load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.n.mod.dat.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/sg_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_dat.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.mod.dat.Rdata')
 
 
 as.factor(as.character(sl.trt_fitted.npk$starting.richness))
@@ -256,8 +256,8 @@ sl.trt_coef3$starting.richness <- factor(sl.trt_coef3$starting.richness , levels
 
 sl.trt_coef3$xs<-1
 
-sl.trt_fitted.npk$Model<-"D) Biomass Change Due To Species Loss"
-sl.trt_fitted.ctl$Model<-"D) Biomass Change Due To Species Loss"
+sl.trt_fitted.npk$Model<-"E) Biomass Change Due To Species Loss"
+sl.trt_fitted.ctl$Model<-"E) Biomass Change Due To Species Loss"
 sl.trt_fitted.npk <- sl.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sl<-bind_rows(sl.trt_fitted.npk,sl.trt_fitted.ctl)
@@ -324,8 +324,8 @@ sg.trt_coef3$starting.richness <- factor(sg.trt_coef3$starting.richness , levels
 
 sg.trt_coef3$xs<-1
 
-sg.trt_fitted.npk$Model<-"E) Biomass Change Due To Species Gain"
-sg.trt_fitted.ctl$Model<-"E) Biomass Change Due To Species Gain"
+sg.trt_fitted.npk$Model<-"F) Biomass Change Due To Species Gain"
+sg.trt_fitted.ctl$Model<-"F) Biomass Change Due To Species Gain"
 sg.trt_fitted.npk <- sg.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sg.trt_fitted.ctl <- sg.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sg<-bind_rows(sg.trt_fitted.npk,sg.trt_fitted.ctl)
@@ -435,8 +435,8 @@ cde_fitted.ctl
 
 cde_coef3$xs<-1
 
-cde_fitted.npk$Model<-"F) Persistent Species Change in Biomass"
-cde_fitted.ctl$Model<-"F) Persistent Species Change in Biomass"
+cde_fitted.npk$Model<-"D) Persistent Species Change in Biomass"
+cde_fitted.ctl$Model<-"D) Persistent Species Change in Biomass"
 cde_fitted.npk <- cde_fitted.npk %>% rename(Treatment = trt.y) 
 cde_fitted.ctl <- cde_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
@@ -506,9 +506,9 @@ rlegend<-g_legend(r.leg)
 
 
 # EFFECT PLOTS
-load('~/Dropbox/Projects/NutNet/Data/effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/effs.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/p.effs.Rdata')
 
 rich.p
 bm.p
@@ -711,7 +711,9 @@ cde <- cdem +  annotation_custom(ggplotGrob(cde.eff), xmin = 7, xmax = 12,
   plot_layout( heights = c(10,10,0.5)) 
 
 
-
+# LANDSCAPE 11X14
+(conceptual | sloss | sgain) / ( cde | sl | sg ) / (rlegend) +
+  plot_layout( heights = c(10,10,0.5)) 
 
 
 

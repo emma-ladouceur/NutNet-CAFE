@@ -13,18 +13,18 @@ library(viridis)
 
 
 
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.g
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.mod.dat.Rdata')
 
 
 
-load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/p.effs.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
 
 rich.p2 <-rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) %>%
   filter(response=="NPK")
@@ -75,7 +75,7 @@ bef.cloud
 # RICHNESS AND BIOMASS SUPPLEMENTARY FIGURE S4
 
 
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
@@ -306,9 +306,9 @@ bmatrix<-ggplot() +
 
 bmatrix
 
-load('~/Dropbox/Projects/NutNet/Data/effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/effs.Rdata')
 
-load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/p.effs.Rdata')
 
 
 
