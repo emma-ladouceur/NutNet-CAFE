@@ -203,7 +203,8 @@ sloss.se<-ggplot() +
                                axis.text.y = element_text(size=8),
                                axis.text.x = element_text(size=8),
                                title=element_text(size=8),
-                               strip.background = element_blank(),legend.position="none")
+                               strip.background = element_blank(),legend.position="none") +
+   scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
 sloss.se
 
@@ -248,7 +249,7 @@ sgain.se<-ggplot() +
   # scale_y_continuous(breaks=c(-100,50)) +
   #scale_color_manual(values = c("#000000","#0B775E")) +
   #coord_flip()+
-  labs(title= "Species Gain", y= 'Study-Level Slope')+ 
+  labs(title= "Species Gain", x= 'Study-Level Slope')+ 
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                #plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
                                axis.title.y = element_blank(),
