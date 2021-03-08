@@ -471,7 +471,7 @@ sl<-ggplot() +
   scale_x_continuous(breaks=c(-40,-20,-10,-5,0,10), limits=c(-40,15))+
   labs( #x='',
     x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
-        title= 'b) Change in Biomass Due to Species Loss',
+        title= 'c) Change in Biomass Due to Species Loss',
         y= ''
         #color= ''
   )+
@@ -702,7 +702,7 @@ sgain<-ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw() +
   labs( x = expression(paste('Effect of NPK on Species Gain / Year')),
-        title= 'c) Species Gain',
+        title= 'b) Species Gain',
         y= ' '
         #color= ''
   )+
@@ -730,8 +730,8 @@ sgain
 ( rich | bm )/( sloss | sgain )/( sl | sg | cde )
 
 
-# LANDSCAPE 7 X 17
-( sloss | sl | sgain | sg |  cde  )
+# LANDSCAPE 7 X 19
+( sloss |  sgain | sl | sg |  cde  )
 
 
 

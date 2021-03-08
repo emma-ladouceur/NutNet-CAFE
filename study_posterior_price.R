@@ -68,12 +68,16 @@ price.eff<-left_join(sg.sl.eff,cde.eff)
 
 all.effs <- left_join(price.eff,sloss.sgain.effs)
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects//NutNet/Data/')
 save(all.effs, file = 'study.price.p.effs.Rdata')
 
 quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
 
 all.effs <- all.effs %>% left_join(quads)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
+save(all.effs, file = 'study.price.p.effs.q.Rdata')
+
 
 study.price.cloud<-ggplot()+
   facet_wrap(~Quadrant) +
@@ -167,17 +171,19 @@ study.price.cloud.ctl
 (study.price.cloud | study.price.cloud.ctl )
 
 
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.price.p.effs.q.Rdata')
+
 
 colnames(all.effs)
 all.effs$Quadrant<-as.factor(as.character(all.effs$Quadrant))
 levels(all.effs$Quadrant)
 
-npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.rate.p,sloss.trt.rate.p,sgain.trt.rate.p, Quadrant) %>%
+npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.rate.p,sloss.trt.rate.p,sgain.trt.rate.p, Quadrant)# %>%
  # gather(model ,effect, sg.trt.rate.p:sgain.trt.rate.p) %>%
-  filter(!Quadrant == "-biomass +rich")
+  #filter(!Quadrant == "-biomass +rich")
 
 head(npk.effs)
-npk.effs$Quadrant<-factor(npk.effs$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
+npk.effs$Quadrant<-factor(npk.effs$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich","-biomass +rich"))
   
   
   

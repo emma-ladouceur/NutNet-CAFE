@@ -89,6 +89,9 @@ write.csv(all,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/site.incl
 comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-31-August-2020.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 country_codes <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
 pis <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/pi-contact-list-8-Nov-2019.csv", stringsAsFactors = FALSE)
+# produce under meta_data code
+quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
+
 
 colnames(comb)
 head(country_codes)
@@ -115,9 +118,9 @@ head(pis_prep)
 
 site_info <- prep %>% left_join(pis_prep)
 
-colnames(site_info)
+head(site_info)
 
-table_s1 <- all %>% select(site_code) %>% left_join(site_info) 
+table_s1 <- all %>% dplyr::select(site_code) %>% left_join(site_info) %>% left_join(quads)
 
 
 View(table_s1)
