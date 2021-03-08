@@ -40,7 +40,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 # i refer to this as cumulative time
 # the 'baseline' plot is the starting point always referred to as x, and comparioson plot is y
 # so x.func is year 0 biomass, and y.func is year 1 biomass etc, all columns labelled as such
-price <- read.csv("~/Dropbox/Projects/NutNet/Data/cumulative_time_only4.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 summary(price)
 head(price)
