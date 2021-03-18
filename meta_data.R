@@ -38,7 +38,7 @@ bm.p2<-bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) %>
   filter(response=="NPK")
 
 effs.p <- rich.p2 %>% left_join(bm.p2)
-
+ 
 effs.p
 
 study.rich.p2 <-study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
@@ -49,11 +49,13 @@ study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2) %>% filter(response == 
 
 colnames(study.effs.p)
 
-study.effs.p$Quadrant <- ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff > 0, '+biomass -rich',
-                                ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff < 0,  '-biomass -rich',
-                                       ifelse(study.effs.p$r.eff  > 0 & study.effs.p$b.eff > 0,  '+biomass +rich',
-                                              ifelse(study.effs.p$r.eff > 0 & study.effs.p$b.eff < 0, '-biomass +rich','other'))))
+study.effs.p$Quadrant <- ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff > 0, '-rich +biomass',
+                                ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff < 0,  '-rich -biomass',
+                                       ifelse(study.effs.p$r.eff  > 0 & study.effs.p$b.eff > 0,  '+rich +biomass',
+                                              ifelse(study.effs.p$r.eff > 0 & study.effs.p$b.eff < 0, '+rich -biomass','other'))))
 View(study.effs.p)
+
+study.effs.p$Quadrant <- factor(study.effs.p$Quadrant, levels= c("-rich +biomass",  "+rich +biomass", "-rich -biomass", "+rich -biomass"))
 
 
 bef.cloud <- ggplot()+
@@ -62,6 +64,7 @@ bef.cloud <- ggplot()+
   geom_point(data=study.effs.p, aes(x= r.eff , y= b.eff), colour="black",alpha=0.2,size=2) +
   geom_errorbar(data=study.effs.p,aes(x= r.eff, y= b.eff,ymin = b.eff_lower, ymax = b.eff_upper), colour="black", alpha=0.2, width = 0, size = 0.75) +
   geom_errorbarh(data=study.effs.p,aes(x= r.eff, y= b.eff,xmin =  r.eff_lower, xmax =r.eff_upper), colour="black", alpha=0.2, width = 0, size = 0.75) +
+ # geom_text(data=study.effs.p, aes(x= r.eff , y= b.eff, label=site_code))+
   # geom_point(data = effs.p, aes(x= r.eff, #loss
   #                               y=  b.eff ),
   #            fill="#0B775E",color="#0B775E",size=8, alpha=0.6)+
@@ -74,7 +77,7 @@ bef.cloud <- ggplot()+
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        # title= 'Control Slope + NPK Slope'
-       title = ' ')
+       title = ' ')+ theme_classic(base_size=14) + theme(strip.text = element_text(size=14))
 
 bef.cloud
 
@@ -97,6 +100,9 @@ site.include <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Dat
 quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
 
 colnames(plot)
+
+
+plot %>% distinct(site_code, max.year)
 
 plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
   ungroup()

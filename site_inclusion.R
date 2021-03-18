@@ -92,6 +92,8 @@ pis <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/pi-cont
 # produce under meta_data code
 quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
 
+all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/site.inclusion.csv", stringsAsFactors = FALSE)
+
 
 colnames(comb)
 head(country_codes)
@@ -120,7 +122,7 @@ site_info <- prep %>% left_join(pis_prep)
 
 head(site_info)
 
-table_s1 <- all %>% dplyr::select(site_code) %>% left_join(site_info) %>% left_join(quads)
+table_s1 <- all %>% select(site_code) %>% left_join(site_info) %>% left_join(quads)
 
 
 View(table_s1)

@@ -12,23 +12,23 @@ library(viridis)
 library(patchwork)
 
 # model compare
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/full/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/rich.Rdata') # plot.rich.g
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/bm.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/bm.Rdata') # plot.bm.3
-load('~/Dropbox/Projects/NutNet/Model_fits/3/rich.Rdata') # plot.rich.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.3
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/5/bm.Rdata') # plot.bm.5
-load('~/Dropbox/Projects/NutNet/Model_fits/5/rich.Rdata') # plot.rich.5
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/5/bm.Rdata') # plot.bm.5
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/5/rich.Rdata') # plot.rich.5
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/6/bm.Rdata') # plot.bm.6
-load('~/Dropbox/Projects/NutNet/Model_fits/6/rich.Rdata') # plot.rich.6
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/bm.Rdata') # plot.bm.6
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/rich.Rdata') # plot.rich.6
 
 
 
@@ -124,9 +124,9 @@ rich.effs <- bind_rows(rich.f,rich.f.3,rich.f.5,rich.f.6)
 
 rich.effs
 
-write.csv(rich.effs, '~/Dropbox/Projects/NutNet/Data/rich.effs.inclusion.csv')
+write.csv(rich.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.effs.inclusion.csv')
 
-rich.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/rich.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+rich.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 rich.effs$response <- factor(rich.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
@@ -144,11 +144,7 @@ sp.slope<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-1.2,0.2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
-  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 
 
@@ -227,9 +223,9 @@ bm.f.6 <-bind_rows(
 bm.effs <- bind_rows(bm.f,bm.f.3,bm.f.5,bm.f.6)
 
 bm.effs
-write.csv(bm.effs, '~/Dropbox/Projects/NutNet/Data/bm.effs.inclusion.csv')
+write.csv(bm.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.effs.inclusion.csv')
 
-bm.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/bm.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+bm.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 bm.effs$response <- factor(bm.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
@@ -247,11 +243,7 @@ bm.slope<-ggplot() +
        title='b) NPK Effect on Change in Biomass / Year') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
-  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 
 bm.slope
@@ -263,37 +255,37 @@ bm.slope
 
 # price effects
 
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sloss.n.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/full/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sgain.Rdata') # s.gain.s
 
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/3/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/5/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sgain.Rdata') # s.gain.s
 
 
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/cde.Rdata') # CDE.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Model_fits/6/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain.Rdata') # s.gain.s
 
 sl.trt.i_fixef <- as.data.frame(fixef(sl.s))
 sg.trt.i_fixef <- as.data.frame(fixef(sg.s))
 cde.trt.i_fixef <- as.data.frame(fixef(CDE.s))
-sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.n.s))
+sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.s))
 sgain.trt.i_fixef <- as.data.frame(fixef(s.gain.s))
 
 
@@ -384,9 +376,9 @@ sl.f.6 <-bind_rows(
 sl.effs <- bind_rows(sl.f,sl.f.3,sl.f.5,sl.f.6)
 
 
-write.csv(sl.effs, '~/Dropbox/Projects/NutNet/Data/sl.effs.inclusion.csv')
+write.csv(sl.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.effs.inclusion.csv')
 
-sl.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sl.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sl.effs$response <- factor(sl.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
 
@@ -400,14 +392,10 @@ sl.slope<-ggplot() +
        y = 'Slope') +
   labs(x = '',
        y= expression(paste('Change in Biomass (g/' ,m^2, ') / Year ')),
-       title='e) NPK Effect on Change Biomass / Year Due to Species Loss') +
+       title='e) NPK Effect on Change in \n  Biomass / Year Due to Species Loss') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
-  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 sl.slope
 
@@ -479,9 +467,9 @@ sg.f.6 <-bind_rows(
 
 sg.effs <- bind_rows(sg.f,sg.f.3,sg.f.5,sg.f.6)
 
-write.csv(sg.effs, '~/Dropbox/Projects/NutNet/Data/sg.effs.inclusion.csv')
+write.csv(sg.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg.effs.inclusion.csv')
 
-sg.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sg.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sg.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 sg.effs$response <- factor(sg.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
@@ -496,14 +484,10 @@ sg.slope<-ggplot() +
        y = 'Slope') +
   labs(x = '',
        y= expression(paste('Change in Biomass (g/' ,m^2, ') / Year ')),
-       title='f) NPK Effect on Change in  Biomass / Year Due to Species Gain') +
+       title='f) NPK Effect on Change in  \n Biomass / Year Due to Species Gain') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
-  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 sg.slope
 
@@ -575,9 +559,9 @@ cde.f.6 <-bind_rows(
 
 cde.effs <- bind_rows(cde.f,cde.f.3,cde.f.5,cde.f.6)
 
-write.csv(cde.effs, '~/Dropbox/Projects/NutNet/Data/cde.effs.inclusion.csv')
+write.csv(cde.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.effs.inclusion.csv')
 
-cde.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/cde.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+cde.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 cde.effs$response <- factor(cde.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
@@ -592,14 +576,10 @@ cde.slope<-ggplot() +
        y = 'Slope') +
   labs(x = '',
        y= expression(paste('Change in Biomass (g/' ,m^2, ') / Year ')),
-       title='g) NPK Effect on Persistent Species Change in Biomass / Year') +
+       title='g) NPK Effect on Persistent Species \n  Change in Biomass / Year') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
-  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 cde.slope
 
@@ -672,9 +652,9 @@ sloss.f.6 <-bind_rows(
 
 sloss.effs <- bind_rows(sloss.f,sloss.f.3,sloss.f.5,sloss.f.6)
 
-write.csv(sloss.effs, '~/Dropbox/Projects/NutNet/Data/sloss.effs.inclusion.csv')
+write.csv(sloss.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.effs.inclusion.csv')
 
-sloss.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sloss.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sloss.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 sloss.effs$response <- factor(sloss.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
@@ -693,11 +673,7 @@ sloss.slope<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   #ylim(-50,140) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
-  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 sloss.slope
 
@@ -770,9 +746,9 @@ sgain.f.6 <-bind_rows(
 
 sgain.effs <- bind_rows(sgain.f,sgain.f.3,sgain.f.5,sgain.f.6)
 
-write.csv(sgain.effs, '~/Dropbox/Projects/NutNet/Data/sgain.effs.inclusion.csv')
+write.csv(sgain.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.effs.inclusion.csv')
 
-sgain.effs <- read.csv("~/Dropbox/Projects/NutNet/Data/sgain.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sgain.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 sgain.effs$response <- factor(sgain.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
@@ -792,14 +768,10 @@ sgain.slope<-ggplot() +
   #ylim(-50,140) +
   #scale_color_viridis(discrete = TRUE, option = "C")+
   scale_color_manual(values = wes_palette("Darjeeling1")) +
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                   #axis.title.x = element_blank(),#axis.text.y = element_blank(),
-                   axis.text.y = element_text(size=6),
-                   axis.title.x = element_text(size=8),
-                   title=element_text(size=8),
+  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                    strip.background = element_rect(colour="black", fill="white"),legend.position="none")
 sgain.slope
 
-
+# LANDSCAPE 10 X 15
 (sp.slope | bm.slope)/(sloss.slope | sgain.slope)/(sl.slope | sg.slope | cde.slope)
 

@@ -12,6 +12,7 @@ library(gridExtra)
 library(grid)
 library(sjstats)
 library(viridis)
+library(ggrepel)
 
 # emmas links
 sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -156,14 +157,20 @@ write.csv(plot13, "~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv")
 
 
 
-fig1_dat <-read.csv("~/Dropbox/Projects/NutNet/Data/Figure1_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+fig1_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure1_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+t_s1 <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S1.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 head(fig1_dat)
 
 fig1_dat <- fig1_dat %>% group_by(site_code) %>% filter(maxyr >= 3) %>%
-  ungroup()
+  ungroup() %>% select(-X)
 
-View(fig1_dat)
+head(fig1_dat)
+head(t_s1)
+
+fig1_dat <- fig1_dat %>% left_join(t_s1, by="site_code") 
+
+write.csv(fig1_dat, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/site_dat.csv")
 
 
 fig1_dat$Experiment.Length2 <- factor(fig1_dat$Experiment.Length2 , levels=c("1-3 years","4-6","7-9","10-12"))
@@ -175,10 +182,9 @@ fig1_dat$Experiment.Length2 <- factor(fig1_dat$Experiment.Length2 , levels=c("1-
 ggplot() +
   facet_wrap(~maxyr, scales="free")+
   #facet_wrap(~Experiment.Length2, scales="free")+
-  #geom_text_repel(data=fig1_dat, aes(x=rich.end, y=mass.end,  label = site_code), size=3 ) +
+  geom_text_repel(data=fig1_dat, aes(x=rich.end, y=mass.end,  label = site_n), size=3 ) +
   geom_point(data=fig1_dat,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data=fig1_dat,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
-  #geom_point(size=1.5, fill="white", shape=2)+
   geom_segment(data=fig1_dat,aes(x=rich.start,
                                xend=rich.end,
                                y=mass.start,
@@ -197,5 +203,29 @@ ggplot() +
                           legend.position="bottom")
 
 
+
+
+ggplot() +
+  #facet_wrap(~maxyr, scales="free")+
+  #facet_wrap(~Experiment.Length2, scales="free")+
+ # geom_text_repel(data=fig1_dat, aes(x=rich.end, y=mass.end,  label = site_n), size=3 ) +
+  geom_point(data=fig1_dat,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
+  geom_point(data=fig1_dat,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
+  geom_segment(data=fig1_dat,aes(x=rich.start,
+                                 xend=rich.end,
+                                 y=mass.start,
+                                 yend=mass.end,
+                                 group = site_code,
+                                 color=maxyr),  
+               arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+  scale_color_viridis(discrete=F,name="Length of Study") +
+  labs(x = 'Species Richness',
+       y = expression(paste('Biomass (g/' ,m^2, ')')), 
+       title= '') +
+  scale_y_continuous(limits=c(0,1500)) +
+  scale_x_continuous(limits=c(0,35)) +
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                     strip.background = element_blank(),plot.title = element_text(size=12),
+                     legend.position="bottom")
 
 

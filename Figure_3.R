@@ -18,6 +18,7 @@ Model<-c('A) Conceptual Figure')
 conceptdat<- data.frame(Model)
 conceptdat  
 
+# "#3B9AB2",
 conceptual<-ggplot(data=conceptdat)+
   facet_grid(~Model)+
   geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
@@ -42,7 +43,7 @@ conceptual<-ggplot(data=conceptdat)+
                    xend =  -0.5+0.05,
                    y = -8,
                    yend =  -8+10,),
-               size = 1.5, color= "#3B9AB2",
+               size = 1.5, color= "#046C9A",
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_segment(
                aes(x = 0,
@@ -61,11 +62,9 @@ conceptual<-ggplot(data=conceptdat)+
   scale_y_continuous(breaks=c(0)) +
   scale_x_continuous(breaks=c(0)) +
   labs(x = 'Change in Species',
-       y = 'Change in  Biomass') + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+       y = 'Change in  Biomass') + theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                                                      plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                                                     axis.title.x = element_text(size=9),
-                                                     axis.title.y = element_text(size=9),
-                                                     axis.text=element_text(size=9))
+                                                     strip.text = element_text(size=14))
 
 conceptual
 
@@ -145,11 +144,13 @@ sgain.trtm <- ggplot()  +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A",
                                  drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+  theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                      plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                     axis.title.x = element_text(size=9),
-                     axis.title.y = element_text(size=9),
-                     axis.text=element_text(size=9))
+                     strip.text = element_text(size=14),
+                     # axis.title.x = element_text(size=9),
+                     # axis.title.y = element_text(size=9),
+                     # axis.text=element_text(size=9)
+                     )
 
 
 sgain.trtm
@@ -221,11 +222,13 @@ sloss.trtm<-ggplot() +
        y = expression(paste('Species Loss')), title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+  theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                      plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                     axis.title.x = element_text(size=9),
-                     axis.title.y = element_text(size=9),
-                     axis.text=element_text(size=9))
+                     strip.text = element_text(size=14),
+                     # axis.title.x = element_text(size=9),
+                     # axis.title.y = element_text(size=9),
+                     # axis.text=element_text(size=9)
+                     )
 
 
 
@@ -301,11 +304,13 @@ sl.trtm<-ggplot() +
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+  theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                      plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                     axis.title.x = element_text(size=9),
-                     axis.title.y = element_text(size=9),
-                     axis.text=element_text(size=9))
+                     strip.text = element_text(size=14),
+                     # axis.title.x = element_text(size=9),
+                     # axis.title.y = element_text(size=9),
+                     # axis.text=element_text(size=9)
+                     )
 
 
 sl.trtm
@@ -368,11 +373,13 @@ sg.trtm<-ggplot()  +
        title= '', color='Treatment') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+  theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
                      legend.position="none", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
-                     axis.title.x = element_text(size=9),
-                     axis.title.y = element_text(size=9),
-                     axis.text=element_text(size=9))
+                     strip.text = element_text(size=14),
+                     # axis.title.x = element_text(size=9),
+                     # axis.title.y = element_text(size=9),
+                     # axis.text=element_text(size=9)
+                     )
 
 
 sg.trtm
@@ -409,7 +416,7 @@ r.leg<-ggplot()  +
        title= '', color='',fill='',linetype='') +
   scale_fill_manual(values = c("black", drop =FALSE))+
    scale_color_manual(values = c("black",drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+  theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
                      legend.position="bottom", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
                      legend.spacing.x = unit(0.25, 'cm'))
 
@@ -479,11 +486,13 @@ cdem<-ggplot() +
        title= '',  color='Starting Richness') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#F98400",drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
+  theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
                      legend.position="none", plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                     axis.title.x = element_text(size=9),
-                     axis.title.y = element_text(size=9),
-                     axis.text=element_text(size=9))
+                     strip.text = element_text(size=14),
+                     # axis.title.x = element_text(size=9),
+                     # axis.title.y = element_text(size=9),
+                     # axis.text=element_text(size=9)
+                     )
 
 cdem
 
@@ -536,11 +545,8 @@ sloss.eff<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(-0.5,-0.2,0)) +
   scale_color_manual(values = c("#000000","#B40F20")) +
-  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                              axis.text.y = element_text(size=6),
-                              axis.text.x = element_text(size=6),
-                              title=element_text(size=8),
                               strip.background = element_blank(),legend.position="none")
 
 sloss.eff
@@ -564,11 +570,8 @@ sgain.eff<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(0,0.05,0.3)) +
   scale_color_manual(values = c("#000000","#046C9A")) +
-  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                              axis.text.y = element_text(size=6),
-                              axis.text.x = element_text(size=6),
-                              title=element_text(size=8),
                               strip.background = element_blank(),legend.position="none")
 
 sgain.eff
@@ -592,11 +595,8 @@ sl.eff<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(0,-8)) +
   scale_color_manual(values = c("#000000","#B40F20")) +
-  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                              axis.text.y = element_text(size=6),
-                              axis.text.x = element_text(size=6),
-                              title=element_text(size=6),
                               strip.background = element_blank(),legend.position="none")
 
 sl.eff
@@ -620,11 +620,8 @@ sg.eff<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(0,5,10)) +
   scale_color_manual(values = c("#000000","#046C9A")) +
-  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                              axis.text.y = element_text(size=6),
-                              axis.text.x = element_text(size=6),
-                              title=element_text(size=8),
                               strip.background = element_blank(),legend.position="none")
 
 sg.eff
@@ -652,11 +649,8 @@ cde.eff<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(-8,0,4,14)) +
   scale_color_manual(values = c("#000000","#F98400")) +
-  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                              axis.text.y = element_text(size=6),
-                              axis.text.x = element_text(size=6),
-                              title=element_text(size=8),
                               strip.background = element_blank(),legend.position="none")
 
 cde.eff
@@ -680,24 +674,24 @@ cde.eff
 
 
 sloss <- sloss.trtm +  annotation_custom(ggplotGrob(sloss.eff), xmin = 7, xmax = 12, 
-                                         ymin = -20, ymax = -13)
+                                         ymin = -20, ymax = -11)
 
 
 
 sgain <- sgain.trtm +  annotation_custom(ggplotGrob(sgain.eff), xmin = 7, xmax = 12, 
-                                         ymin = 13, ymax = 20)
+                                         ymin = 11, ymax = 20)
 
 
 sl <- sl.trtm +  annotation_custom(ggplotGrob(sl.eff), xmin = 7, xmax = 12, 
-                                   ymin = -400, ymax = -275)
+                                   ymin = -400, ymax = -255)
 
 
 
 sg <- sg.trtm +  annotation_custom(ggplotGrob(sg.eff), xmin = 7, xmax = 12, 
-                                   ymin = 275, ymax = 400)
+                                   ymin = 255, ymax = 400)
 
 cde <- cdem +  annotation_custom(ggplotGrob(cde.eff), xmin = 7, xmax = 12, 
-                                 ymin = 500, ymax = 1000)
+                                 ymin = 400, ymax = 1050)
 
 
 

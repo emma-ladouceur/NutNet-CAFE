@@ -10,7 +10,9 @@ library(gridExtra)
 library(grid)
 library("scales")
 library(viridis)
-
+library(grid)
+library(gridExtra)
+library(gtable)
 
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
@@ -49,7 +51,7 @@ View(effs.p)
 
 bef.cloud <- ggplot()+
   #facet_wrap(~site_code) +
-  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
   geom_point(data=study.effs.p, aes(x= r.eff , y= b.eff),colour="black", alpha=0.2,size=2) +
   geom_errorbar(data=study.effs.p,aes(x= r.eff, y= b.eff,ymin = b.eff_lower, ymax = b.eff_upper), colour="black", alpha=0.2, width = 0, size = 0.75) +
   geom_errorbarh(data=study.effs.p,aes(x= r.eff, y= b.eff,xmin =  r.eff_lower, xmax =r.eff_upper), colour="black", alpha=0.2, width = 0, size = 0.75) +
@@ -65,11 +67,83 @@ scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        # title= 'Control Slope + NPK Slope'
-       title = ' C)')
+       title = ' C)') + theme_classic(base_size=14 ) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
 bef.cloud
 
 
+# cloud leg
+
+head(study.effs.p)
+study.effs.p$Site<-"Site-Level Effects of NPK"
+effs.p$Overall<-"Overall Effects of NPK"
+
+site.cloud.leg<- ggplot()+
+  #facet_wrap(~site_code) +
+  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+  geom_point(data=study.effs.p, aes(x= r.eff , y= b.eff, color=Site), alpha=0.2,size=2) +
+  geom_errorbar(data=study.effs.p,aes(x= r.eff, y= b.eff,ymin = b.eff_lower, ymax = b.eff_upper, color=Site),  alpha=0.2, width = 0, size = 0.75) +
+  geom_errorbarh(data=study.effs.p,aes(x= r.eff, y= b.eff,xmin =  r.eff_lower, xmax =r.eff_upper, color=Site), alpha=0.2, width = 0, size = 0.75) +
+  # geom_point(data = effs.p, aes(x= r.eff, #loss
+  #                               y=  b.eff ,color=Overall),
+  #            size=8, alpha=0.6)+
+  # geom_errorbar(data = effs.p,aes(x=r.eff,
+  #                                 ymin = b.eff_lower, ymax = b.eff_upper,color=Overall),width=0, size = 2,alpha=0.9) +
+  # geom_errorbarh(data = effs.p,aes(y=b.eff,
+  #                                  xmin = r.eff_lower, xmax = r.eff_upper,color=Overall),height=0, size = 2, alpha=0.9) +
+  scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
+  scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
+  labs(x = 'Rate of change in species richness (species/year)',
+       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
+       # title= 'Control Slope + NPK Slope'
+       title = ' C)',  color='',fill='',linetype='') + 
+  #scale_fill_manual(values = c( "#0B775E","black", drop =FALSE))+
+  scale_color_manual(values = c("black",drop =FALSE))+
+  scale_color_manual(values = c( "#0B775E",drop =FALSE))+
+  # scale_color_manual(name='Uncertainty',breaks=c("Losses","Gains","Persistent Sp."),
+  #                    values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))+
+  theme_classic(base_size=14 ) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+site.cloud.leg
+
+o.cloud.leg<- ggplot()+
+  #facet_wrap(~site_code) +
+  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+  # geom_point(data=study.effs.p, aes(x= r.eff , y= b.eff, color=Site), alpha=0.2,size=2) +
+  # geom_errorbar(data=study.effs.p,aes(x= r.eff, y= b.eff,ymin = b.eff_lower, ymax = b.eff_upper, color=Site),  alpha=0.2, width = 0, size = 0.75) +
+  # geom_errorbarh(data=study.effs.p,aes(x= r.eff, y= b.eff,xmin =  r.eff_lower, xmax =r.eff_upper, color=Site), alpha=0.2, width = 0, size = 0.75) +
+  geom_point(data = effs.p, aes(x= r.eff, #loss
+                                y=  b.eff ,color=Overall),
+             size=8, alpha=0.6)+
+  geom_errorbar(data = effs.p,aes(x=r.eff,
+                                  ymin = b.eff_lower, ymax = b.eff_upper,color=Overall),width=0, size = 2,alpha=0.9) +
+  geom_errorbarh(data = effs.p,aes(y=b.eff,
+                                   xmin = r.eff_lower, xmax = r.eff_upper,color=Overall),height=0, size = 2, alpha=0.9) +
+  scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
+  scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
+  labs(x = 'Rate of change in species richness (species/year)',
+       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
+       # title= 'Control Slope + NPK Slope'
+       title = ' C)',  color='',fill='',linetype='') + 
+  scale_color_manual(values = c( "#0B775E",drop =FALSE))+
+  # scale_color_manual(name='Uncertainty',breaks=c("Losses","Gains","Persistent Sp."),
+  #                    values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))+
+  theme_classic(base_size=14 ) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+o.cloud.leg
+
+sc.leg<-g_legend(site.cloud.leg)
+oc.leg<-g_legend(o.cloud.leg)
+
+cloud.leg <- grid.arrange(oc.leg,sc.leg,ncol=2,nrow=1)
+
+cloud.leg
 
 
 # RICHNESS AND BIOMASS SUPPLEMENTARY FIGURE S4
@@ -135,12 +209,14 @@ r1<-ggplot() +
        y = ' Species richness', title= 'A)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#0B775E", drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.title = element_text(size=12),
+  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+                   #  plot.title = element_text(size=12),
+                   strip.text = element_text(size=14),
                      plot.margin= margin(t = 0.1, r = 0.2, b = 0.2, l = 0.2, unit = "cm"),
-                     axis.title.x = element_text(size=9),
-                     axis.title.y = element_text(size=9),
-                     axis.text=element_text(size=9))
+                    # axis.title.x = element_text(size=9),
+                     #axis.title.y = element_text(size=9),
+                    # axis.text=element_text(size=9)
+                    )
 
 r1
 
@@ -177,8 +253,8 @@ r.leg<-ggplot() +
        y = ' Species richness', title= '', color='',fill='',linetype='') +
   scale_fill_manual(values = c("black", drop =FALSE))+
   scale_color_manual(values = c("black",drop =FALSE))+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
-                     plot.title = element_text(size=12),
+  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
+                     #plot.title = element_text(size=12),
                      plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),legend.spacing.x = unit(0.25, 'cm'))
 
 r.leg
@@ -262,12 +338,14 @@ b1<-ggplot() +
   ylim(0,2000)+
   #scale_y_continuous(breaks=c(0,500,1000,1500,2000,2500)) +
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                     plot.title = element_text(size=12),
+  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+                    # plot.title = element_text(size=12),
+                    strip.text = element_text(size=14),
                      plot.margin= margin(t = 0.1, r = 0.2, b =0.2, l = 0.2, unit = "cm"),
-                     axis.title.x = element_text(size=9),
-                     axis.title.y = element_text(size=9),
-                     axis.text=element_text(size=9))
+                     # axis.title.x = element_text(size=9),
+                     # axis.title.y = element_text(size=9),
+                     # axis.text=element_text(size=9)
+                    )
 
 
 b1
@@ -326,11 +404,11 @@ rich.eff<-ggplot() +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(0,-0.5)) +
   scale_color_manual(values = c("#000000","#0B775E")) +
-  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                              axis.text.y = element_text(size=6),
-                              axis.text.x = element_text(size=6),
-                              title=element_text(size=8),
+                              # axis.text.y = element_text(size=6),
+                              # axis.text.x = element_text(size=6),
+                              # title=element_text(size=8),
                               strip.background = element_blank(),legend.position="none")
 
 
@@ -351,9 +429,9 @@ bm.eff<-ggplot() +
   scale_color_manual(values = c("#000000","#0B775E")) +
   theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
-                              axis.text.y = element_text(size=6),
-                              axis.text.x = element_text(size=6),
-                              title=element_text(size=8),
+                              # axis.text.y = element_text(size=6),
+                              # axis.text.x = element_text(size=6),
+                              # title=element_text(size=8),
                               strip.background = element_blank(),legend.position="none")
 bm.eff
 
@@ -371,6 +449,7 @@ g_legend<-function(a.gplot){
 rlegend<-g_legend(r.leg)
 
 
+
 rich <- r1 +  annotation_custom(ggplotGrob(rich.eff), xmin = 7, xmax = 12, 
                                 ymin = 28, ymax = 40)
 
@@ -379,8 +458,8 @@ bm <- b1+  annotation_custom(ggplotGrob(bm.eff), xmin = 7, xmax = 12,
 
 
 
-# PORTRAIT 11 X 10
-( rich | bm ) / ( rlegend ) / ( bef.cloud ) + plot_layout(heights = c(10,0.75,10))
+# PORTRAIT 10 X 11
+( rich | bm ) / ( rlegend ) / ( bef.cloud )/ (cloud.leg) + plot_layout(heights = c(10,0.75,10,0.75))
 
 
 

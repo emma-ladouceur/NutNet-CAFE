@@ -8,10 +8,10 @@ library(bayesplot)
 
 
 # Emmas links
-sp <- read.csv("~/Dropbox/Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-start.rich <-read.csv("~/Dropbox/Projects/NutNet/Data/start.rich.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+start.rich <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/start.rich.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 # PLOT 
 plot$site_code<-as.factor(plot$site_code)
@@ -65,44 +65,31 @@ startrich2$starting.richness <- ifelse(startrich2$r.rich >= 1 & startrich2$r.ric
                                                             ifelse(startrich2$r.rich >=21 & startrich2$r.rich <=25, '21-25',
                                                                    ifelse(startrich2$r.rich >=26, '>26', 'other'))))))
 
-write.csv(startrich2, "~/Dropbox/Projects/NutNet/Data/start.rich.csv")
+write.csv(startrich2, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/start.rich.csv")
 
 
 # load models
 
 
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.g
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
 
 
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # s.gain.s
 
-# temp
-
-load('~/Desktop/Model_fits/3/bm.Rdata') # plot.bm.s
-load('~/Desktop/Model_fits/3/rich.Rdata') # plot.rich.g
-
-
-load('~/Desktop/Model_fits/3/sl.Rdata') # sl.s
-load('~/Desktop/Model_fits/3/sg.Rdata') # sg.s
-load('~/Desktop/Model_fits/3/cde.Rdata') # CDE.s
-
-
-load('~/Desktop/Model_fits/3/sloss.Rdata') # s.loss.s
-load('~/Desktop/Model_fits/3/sgain.Rdata') # s.gain.s
 
 summary(plot.rich.3)
 # inspection of chain diagnostic
 #plot(plot.rich.g)
 color_scheme_set("gray")
 pp_check(plot.rich.3) + theme_classic() + labs(x='Species Richness',
-                                               y = 'Frequency') 
+                                               y = 'Density') 
 
 
 plot(plot.rich.3)
@@ -189,9 +176,9 @@ plot.rich_fitted.npk<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('NPK'),]
 plot.rich_fitted.ctl<-plot.rich_fitted2[plot.rich_fitted2$trt %in% c('Control'),]
 
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(plot.rich_fixef,plot.rich_fitted.npk,plot.rich_fitted.ctl,plot.rich_coef3,file = 'rich.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/rich.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata')
 
 
 # BIOMASS
@@ -200,7 +187,7 @@ summary(plot.bm.3)
 
 #plot(plot.bm.s)  
 pp_check(plot.bm.3) + theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
-                                                                                         y = 'Frequency') 
+                                                                                         y = 'Density') 
 
 
 #residuals
@@ -285,9 +272,9 @@ plot.bm_fitted.ctl<-plot.bm_fitted2[plot.bm_fitted2$trt %in% c('Control'),]
 
 
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(plot.bm_fixef,plot.bm_fitted.npk,plot.bm_fitted.ctl,plot.bm_coef3,file = 'bm.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.mod.dat.Rdata')
 
 
 
@@ -299,7 +286,7 @@ load('~/Dropbox/Projects/NutNet/Data/bm.mod.dat.Rdata')
 summary(sl.3)
 #plot(sl.s)  
 pp_check(sl.3) + theme_classic() + scale_x_continuous(limits = c(-700, 50))+ labs(x=expression(paste('Change in Biomass due to Species Loss (g/',m^2, ')')), 
-                                                                                     y = 'Frequency') 
+                                                                                     y = 'Density') 
 
 
 # residuals
@@ -403,9 +390,9 @@ dat<-distinct(p.dat2, site_code, continent,habitat)
 sl.trt_coef3<-inner_join(sl.trt_coef2,dat)
 View(sl.trt_coef3)
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef3,file = 'sl.n.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.n.mod.dat.Rdata')
 
 
 # SG : sg.s
@@ -413,7 +400,7 @@ load('~/Dropbox/Projects/NutNet/Data/sl.n.mod.dat.Rdata')
 summary(sg.3)
 #plot(sg.s)  
 pp_check(sg.3) + theme_classic() + scale_x_continuous(limits = c(-50, 600))+ labs(x=expression(paste('Change in Biomass due to Species Gain (g/',m^2, ')')), 
-                                                                y = 'Frequency') 
+                                                                y = 'Density') 
 
 # residuals
 sg1<-residuals(sg.s)
@@ -509,9 +496,9 @@ sg.trt_coef3<-full_join(sg.trt_coef2,dat)
 summary(sg.s)
 
 rm(sg.trt.i)
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(sg.trt_fitted.npk,sg.trt_fitted.ctl,sg.trt_coef3,file = 'sg_dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sg_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_dat.Rdata')
 
 
 
@@ -519,7 +506,7 @@ load('~/Dropbox/Projects/NutNet/Data/sg_dat.Rdata')
 summary(CDE.3)
 #plot(CDE.s)  
 pp_check(CDE.3) + theme_classic() + scale_x_continuous(limits = c(-1000, 1000))+ labs(x=expression(paste('Change in Biomass in Persistent Species (g/',m^2, ')')), 
-                                                                                   y = 'Frequency') 
+                                                                                   y = 'Density') 
 
 
 #residuals
@@ -615,9 +602,9 @@ View(cde_coef3)
 
 
 rm(cde.trt.i)
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(cde_fitted.npk,cde_fitted.ctl,cde_coef3,file = 'cde.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.mod.dat.Rdata')
 
 
 # SGAIN : s.gain.s
@@ -625,7 +612,7 @@ load('~/Dropbox/Projects/NutNet/Data/cde.mod.dat.Rdata')
 summary(s.gain.3)
 #plot(s.gain.s)  
 pp_check(s.gain.3)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Gain', 
-                                                                                     y = 'Frequency') 
+                                                                                     y = 'Density') 
 
 
 #residuals
@@ -721,9 +708,9 @@ dat<-distinct(plot, site_code, continent,habitat)
 
 sgain.trt_coef3<-full_join(sgain.trt_coef2,dat)
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(sgain.trt_fitted.npk,sgain.trt_fitted.ctl,sgain.trt_coef3,file = 'sgain_dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_dat.Rdata')
 
 
 # SLOSS
@@ -733,7 +720,7 @@ load('~/Dropbox/Projects/NutNet/Data/sgain_dat.Rdata')
 summary(s.loss.3)
 #plot(s.loss.s)  
 pp_check(s.loss.3)+ theme_classic() + scale_x_continuous(limits = c(-25, 25))+ labs(x='Species Loss', 
-                                                                                    y = 'Frequency') 
+                                                                                    y = 'Density') 
 
 
 #residuals
@@ -831,9 +818,9 @@ dat<-distinct(p.dat2, site_code, continent,habitat)
 sloss.trt_coef3<-inner_join(sloss.trt_coef2,dat)
 View(sloss.trt_coef3)
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(sloss.trt_fitted.npk,sloss.trt_fitted.ctl,sloss.trt_coef3,file = 'sloss.n.mod.dat.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
 # EFFS
@@ -975,7 +962,7 @@ sgain.f <-bind_rows(
 
 sgain.f$Model <- "Species Gain"
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(rich.f,bm.f,sloss.f,sgain.f,sl.f,sg.f,cde.f,file = 'effs.Rdata')
 
 
@@ -987,16 +974,16 @@ save(rich.f,bm.f,sloss.f,sgain.f,sl.f,sg.f,cde.f,file = 'effs.Rdata')
 # posterior effects
 
 
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/3/rich.Rdata') # plot.rich.g
 
 
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
 
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
 
 
@@ -1004,7 +991,7 @@ load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 # calculated to site level details found in Climate_Data.R
 # latitude and longitude dont match due to decimal rounding
 # lat.x long.x is nutnet site, lat.y long.y is world clim
-meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 meta <- meta %>% group_by(site_code) %>% filter(max.year >= 3) %>%
@@ -1214,7 +1201,7 @@ sgain.p.npk <-  sgain.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.
 sgain.p <- bind_rows(sgain.p.ctl,sgain.p.npk)
 sgain.p
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(rich.p,bm.p,sloss.p,sgain.p,sl.p,sg.p,cde.p,file = 'p.effs.Rdata')
 
 

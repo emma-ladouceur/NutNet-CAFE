@@ -414,9 +414,6 @@ geom_vline(data = bm.p %>% filter(response=="NPK"),
             size=3.5,
             nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.y = element_text(size=9),
-        title=element_text(size=9),
         legend.key = element_blank(),
         legend.position="none")
 
@@ -448,6 +445,9 @@ npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.r
 head(npk.effs)
 npk.effs$Quadrant<-factor(npk.effs$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
 
+library(stringr)
+
+# https://stackoverflow.com/questions/13223846/ggplot2-two-line-label-with-expression
 
 sl<-ggplot() +
   # geom_rect(data = sl.p %>% filter(response=="NPK"),
@@ -467,21 +467,22 @@ sl<-ggplot() +
   # geom_vline(data = sl.p %>% filter(response=="NPK"),
   #            aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
+  theme_bw(base_size=14) +
   scale_x_continuous(breaks=c(-40,-20,-10,-5,0,10), limits=c(-40,15))+
   labs( #x='',
-    x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
-        title= 'c) Change in Biomass Due to Species Loss',
+    x = expression(paste(atop('Effect of NPK on', paste('Change in Biomass (g/' ,m^2, ') / Year')))),
+        title= 'c) Change in Biomass \n Due to Species Loss',
         y= ''
         #color= ''
   )+
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.y = element_text(size=9),
-        axis.title.x = element_text(size=9),
-        title=element_text(size=9),
         legend.key = element_blank(),
-        legend.position="none") 
+        axis.text.y = element_blank(),
+        axis.title.x=element_text( hjust=0.5, 
+                                   margin = margin(t = 16, r = 0, b = 0, l = 0)), 
+        legend.position="none") #+
+ # scale_x_continuous(title = function(x) stringr::str_wrap(x, width = 16))
+
 
 sl
 
@@ -517,10 +518,10 @@ sg<-ggplot() +
   # geom_vline(data = sg.p %>% filter(response=="NPK"),
   #            aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
+  theme_bw(base_size=14) +
   labs( #x = '',
-    x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
-    title= 'd) Change in Biomass Due to Species Gain',
+    x = expression(paste(atop('Effect of NPK on', paste('Change in Biomass (g/' ,m^2, ') / Year')))),
+    title= 'd) Change in Biomass \n Due to Species Gain',
     y= ' '
     #color= ''
   )+
@@ -535,11 +536,10 @@ sg<-ggplot() +
   #           size=3.5,
   #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.y = element_text(size=9),
-        axis.title.x = element_text(size=9),
-        title=element_text(size=9),
         legend.key = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x=element_text( hjust=0.5,
+                                   margin = margin(t = 16, r = 0, b = 0, l = 0)), 
         legend.position="none")
 
 sg
@@ -575,10 +575,10 @@ cde<-ggplot() +
   # geom_vline(data = cde.p %>% filter(response=="NPK"),
   #            aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
+  theme_bw(base_size=14) +
   labs(#x='', 
-    x = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/Year')),
-        title= 'e) Persistent Species Change in Biomass',
+    x = expression(paste(atop('Effect of NPK on', paste('Change in Biomass (g/' ,m^2, ') / Year')))),
+        title= 'e) Persistent Species \n Change in Biomass',
         y= ''
         #color= ''
   )+
@@ -588,16 +588,15 @@ cde<-ggplot() +
               mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
               distinct(Quadrant, n_sites, .keep_all = T),
-            aes(x=80, y=Quadrant,
+            aes(x=-100, y=Quadrant,
                 label=paste('n[sites] == ', n_sites)),
-            size=3.5,
-            nudge_y = 0.1, parse = T) +
+            size=6,
+            nudge_y = 0.5, parse = T) +
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.y = element_text(size=9),
-        axis.title.x = element_text(size=9),
-        title=element_text(size=9),
         legend.key = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x=element_text(  hjust=0.5,
+                                   margin = margin(t = 16, r = 0, b = 0, l = 0)), 
         legend.position="none")
 
 cde
@@ -644,7 +643,7 @@ sloss<-ggplot() +
   # geom_vline(data = sloss.p %>% filter(response=="NPK"),
   #            aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
+  theme_bw(base_size=14) +
   labs( x = expression(paste('Effect of NPK on Species Loss / Year')),
         title= 'a) Species Loss',
         y= ' Slope'
@@ -661,10 +660,6 @@ sloss<-ggplot() +
   #           size=3.5,
   #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
-        #axis.text.y = element_blank(),
-        axis.title.y = element_text(size=9),
-        axis.title.x = element_text(size=9),
-        title=element_text(size=9),
         legend.key = element_blank(),
         legend.position="none")+  scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
@@ -700,7 +695,7 @@ sgain<-ggplot() +
   # geom_vline(data = sgain.p %>% filter(response=="NPK"),
   #            aes(xintercept = eff)) +
   geom_vline(xintercept = 0, lty = 2) +
-  theme_bw() +
+  theme_bw(base_size=14) +
   labs( x = expression(paste('Effect of NPK on Species Gain / Year')),
         title= 'b) Species Gain',
         y= ' '
@@ -717,11 +712,9 @@ sgain<-ggplot() +
   #           size=3.5,
   #           nudge_y = 0.1, parse = T) +
   theme(panel.grid = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.y = element_text(size=9),
-        axis.title.x = element_text(size=9, hjust = 0.5),
-        title=element_text(size=9),
+        axis.title.x = element_text(hjust = 0.5),
         legend.key = element_blank(),
+        axis.text.y = element_blank(),
         legend.position="none") 
 
 sgain
