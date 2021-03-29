@@ -12,14 +12,11 @@ library(brms)
 library(patchwork)
 
 # model compare
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.3
-
-
-
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
@@ -27,7 +24,24 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde.R
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # s.loss.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # s.gain.s
 
+
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Model_fits/3/multi.Rdata') # s.gain.s
+
+
+
+#  SIGMAS
+# NO SL
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg_sigma2-7609895.Rdata') # sg.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde_sigma2-7609676.Rdata') # CDE.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss_sigma2-7609893.Rdata') # s.loss.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain_sigma2-7609897.Rdata') # s.gain.3_sigma2
+
+
+summary(sg.3_sigma2)
+summary(CDE.3_sigma2)
+summary(s.loss.3_sigma2)
+summary(s.gain.3_sigma2)
 
 
 
