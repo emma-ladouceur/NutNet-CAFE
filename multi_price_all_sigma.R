@@ -9,8 +9,6 @@ path <- '/gpfs1/data/idiv_chase/emmala/NutNet'
 p.all <- read.csv(paste0(path, '/nutnet_cumulative_time.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-p.all <- read.csv('~/Dropbox/NutNet/Data/nutnet_cumulative_time.csv')
-
 p.all$site_code<-as.factor(p.all$site_code)
 p.all$site.year.id<-as.factor(p.all$site.year.id)
 p.all$block<-as.factor(p.all$block)
