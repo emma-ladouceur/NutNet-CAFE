@@ -36,12 +36,20 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg_si
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde_sigma2-7609676.Rdata') # CDE.3_sigma2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss_sigma2-7609893.Rdata') # s.loss.3_sigma2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain_sigma2-7609897.Rdata') # s.gain.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss_sigma2-7609893.Rdata') # s.loss.3_sigma2
+load('~/Desktop/nn_time.bm-7612956.Rdata') # plot.bm.3_sigma
+
+summary(plot.bm.3_sigma)
+summary(plot.bm.3)
 
 
 summary(sg.3_sigma2)
 summary(CDE.3_sigma2)
 summary(s.loss.3_sigma2)
 summary(s.gain.3_sigma2)
+
+pp_check(plot.bm.3_sigma)
+
 
 
 
@@ -90,6 +98,5 @@ p.all <- rich.p %>% bind_rows(bm.p) %>% bind_rows(sloss.p) %>% bind_rows(sgain.p
 
 
 write.csv(p.all, '~/Dropbox/Projects/NutNet/Data/Table_S2.csv')
-
 
 
