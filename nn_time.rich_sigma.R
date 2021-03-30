@@ -20,6 +20,8 @@ plot.rich.3_sigma <- brm( bf( all.div ~  trt * year_trt + (trt * year_trt | site
                               sigma ~ 0 + trt + (0 + trt | site_code) ), 
                     data = plot,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
+
+
 save(plot.rich.3_sigma,
      file=Sys.getenv('OFILE'))
 
