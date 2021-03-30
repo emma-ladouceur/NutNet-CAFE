@@ -37,7 +37,22 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde_s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss_sigma2-7609893.Rdata') # s.loss.3_sigma2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain_sigma2-7609897.Rdata') # s.gain.3_sigma2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss_sigma2-7609893.Rdata') # s.loss.3_sigma2
-load('~/Desktop/nn_time.bm-7612956.Rdata') # plot.bm.3_sigma
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/nn_time.bm-7612956.Rdata') # plot.bm.3_sigma
+
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/nn_time.rich_sigma-7612959.Rdata') # plot.rich.3_sigma
+
+
+# still not converged
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/nn_timesl-sigma-7612932.Rdata') # sl.3_sigma
+
+summary(plot.rich.3_sigma)
+
+pp_check(plot.rich.3_sigma)
+
+summary(sl.3_sigma)
+
+pp_check(sl.3_sigma)
+
 
 summary(plot.bm.3_sigma)
 summary(plot.bm.3)

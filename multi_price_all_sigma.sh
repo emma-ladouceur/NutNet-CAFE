@@ -12,6 +12,6 @@
 module load foss/2019b R/3.6.2-2
 export OFILE=/work/$USER/NutNet/$JOB_NAME-$JOB_ID.Rdata
 export LANG=en_US.UTF-8
-Rscript --vanilla /home/ladouceu/projects/NutNet/multi_price_all.R
+Rscript --vanilla /home/ladouceu/projects/NutNet/multi_price_all_sigma.R
 
 
