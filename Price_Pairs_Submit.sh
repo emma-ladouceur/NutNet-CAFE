@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #$ -S /bin/bash
-#$ -N 3_Price_Pairs
+#$ -N Price_Pairs
 
 #$ -l h_rt=24:00:00
 #$ -l h_vmem=8G
@@ -26,6 +26,6 @@ mkdir -p "$output_dir"
 prefix=$(basename "$input" .rds)
 
 Rscript \
-  3_Price_Pairs.R \
+  Price_Pairs.R \
   "$input" \
   "$output_dir/$prefix.rds"
