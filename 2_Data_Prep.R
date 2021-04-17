@@ -45,7 +45,7 @@ species_nn <- biomass_exp  %>%
   left_join(biomass_exp) %>% # rejoin with data
   filter(!year.zero %in% "remove") %>%  # remove studies with no year 0
   select(-year_min,  -year.zero) %>% # remove excess columns, keep year_max because we want to know how old sites are
-  select(id,site_code,year,year_trt,year_max,trt,block,plot,plot.cover,orig.bm.cat,category.mod,cat.cover,subplot.cov,subplot.bm,local_lifeform,local_lifespan,local_provenance,functional_group,Taxon,max_cover,category,orig.mass,strip.mass,cat.mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.full,biomass.m.full)
+  select(id,site_code,site_name,year,year_trt,year_max,trt,block,plot,plot.cover,orig.bm.cat,category.mod,cat.cover,subplot.cov,subplot.bm,local_lifeform,local_lifespan,local_provenance,functional_group,Taxon,max_cover,category,orig.mass,strip.mass,cat.mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.full,biomass.m.full)
 
 colnames(species_nn)
 
@@ -105,7 +105,7 @@ unk_cov <- species_nn %>% group_by(id) %>%
   summarise(sum_UNK_cover=sum(max_cover))
 
 
-sp <- species_nn %>% distinct(id,site_code,block,plot,year_trt,year_max,trt,Taxon,max_cover,local_provenance,
+sp <- species_nn %>% distinct(id,site_code,site_name,block,plot,year_trt,year_max,trt,Taxon,max_cover,local_provenance,
                               orig.bm.cat,category.mod,cat.cover,subplot.bm,local_lifeform,local_lifespan,functional_group,
                               category,cat.mass,biomass.sp.cat,biomass.sp.plot,biomass.sp.full,biomass.m.full,orig.mass,strip.mass,plot.cover) %>%
   left_join(rich_plot) %>% left_join(INT_rich_plot) %>% left_join(NAT_rich_plot) %>% left_join(UNK_rich_plot) %>% 
@@ -124,18 +124,18 @@ biggest.bm.values <- sp %>%  filter(year_max >= 3) %>% # out analysis is based o
 # need help thinking if any of these need to be cleaned/ remove, fixed or whats gone on with strange values
 View(biggest.bm.values)
 
-# 1 output species data
+# 1 output clean /species biomass data
 # species biomass data for NPK and Control plots for appropriate sites to match price calcs
 write.csv(sp, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/biomass_sp_CAFE.csv")
 
-# 2 plot  and site data 
+# 2 plot and site data 
 plot <- sp %>% select(-c(Taxon, max_cover,local_provenance,category.mod,cat.cover,subplot.bm,local_lifeform,local_lifespan,functional_group,category,strip.mass,cat.mass,biomass.sp.cat,biomass.sp.plot,biomass.sp.full,biomass.m.full)) %>%
   distinct(id, .keep_all = T)
 
-View(plot)
+head(plot)
 
 site.inclusion<-plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
-# 58 sites will be included in our analyses
+# 58 sites will be included in our main analysis
 head(site.inclusion)
 
 write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.csv")
@@ -144,57 +144,53 @@ write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plo
 # 3 Data prep for price equations
 # Authors: Emma Ladouceur & Adam T. Clark
 
-bce5$year_trt<-as.factor(bce5$year_trt)
-levels(bce5$year_trt)
-levels(bce5$site_code)
-bce6<-group_by(bce5, site_code,year_trt)
-head(bce6)
+colnames(sp)
+sp$year_trt <- as.factor(sp$year_trt)
+sp$site_code <- as.factor(sp$site_code)
+levels(sp$year_trt)
+levels(sp$site_code)
 
-all<-unite_(bce6, "site.year.id", c("site_code","year_trt"), remove=FALSE)
-all<-unite_(all, "trt_year", c("trt","year_trt"), remove=FALSE)
-all<-unite_(all, "site_trt_year", c("site_code","trt","year_trt"), remove=FALSE)
+pairs_prep <- sp %>% group_by(site_code, year_trt) %>% 
+  unite("site.year.id", c("site_code","year_trt"), remove = FALSE) %>%
+  unite("trt_year", c("trt","year_trt"), remove = FALSE) %>% 
+  unite( "site_trt_year", c("site_code","trt","year_trt"), remove = FALSE)
 
-all$year_trt<-as.numeric(as.character(all$year_trt))
-all$site.year.id<-as.character(all$site.year.id)
-View(all)
-#create index's
-index<-paste(all$site_name, all$site.year.id)
-sindex<-as.character(all$site_code)
-yindex<-as.character(all$year_trt)
-uindex<-sort(unique(index))
-usindex<-sort(unique(sindex))
+pairs_prep$year_trt <- as.numeric(as.character(pairs_prep$year_trt))
+pairs_prep$site.year.id <- as.character(pairs_prep$site.year.id)
 
-uyindex<-sort(unique(yindex))
+# create index's
+index <- paste(pairs_prep$site_name, pairs_prep$site.year.id)
+sindex <- as.character(pairs_prep$site_code)
+yindex <- as.character(pairs_prep$year_trt)
+uindex <- sort(unique(index))
+usindex <- sort(unique(sindex))
+uyindex <- sort(unique(yindex))
 
 # cumulative
-all_lst<-NULL
-n<-1
+pairs_lst <- NULL
+n <- 1
 for (i in 1:length(usindex)){
-  subs<-which(sindex==usindex[i])
-  uindex_small<-sort(unique(all[subs,]$year_trt))
+  subs <- which(sindex==usindex[i])
+  uindex_small<-sort(unique(pairs_prep[subs,]$year_trt))
   
   for(j in 2:length(uindex_small)) {
     subs2<-which(yindex[subs]%in%c(uindex_small[j], "0"))
     
-    all_lst[[n]]<-all[subs[subs2],]
-    names(all_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
+    pairs_lst[[n]]<-pairs_prep[subs[subs2],]
+    names(pairs_lst)[n]<-paste(usindex[i], uindex_small[j], sep="_")
     n<-n+1
   }
   print(i/length(usindex))
 }
 
-
-
-folder = "output_new"
+folder = "pairs prep data"
 # input RDS files for cluster, price analysis
 # if this doesnt work close R and try again only happens because wd has changed
-mapply(saveRDS, all_lst, version=2, file=paste0(folder, "/",names(all_lst), '.rds'))
+mapply(saveRDS, pairs_lst, version =2 , file=paste0(folder, "/",names(all_lst), '.rds'))
 
 
-
-
-# test it out, test the code
-samp <- readRDS("output_new/arch.us_2.rds")
+# test it out, test the code for priceTools we will use on the cluster
+samp <- readRDS("pairs prep data/arch.us_2.rds")
 colnames(samp)
 
 View(samp)

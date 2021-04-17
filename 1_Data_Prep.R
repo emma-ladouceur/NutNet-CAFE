@@ -332,7 +332,7 @@ summary(final_dat)
 # what are the largest bimoass values / species and are they weird ?
 biggest.bm.values <- final_dat %>% select(id, site_code, year_trt, trt, Taxon, category, category.mod, orig.bm.cat,
                                           orig.mass, strip.mass, orig.bm.cat, biomass.sp.full, biomass.m.full) %>%
-  top_frac(.5) %>%  arrange(desc(biomass.sp.full)) 
+  top_frac(.5) %>%arrange(desc(biomass.sp.full)) 
 # need help cleaning this, but lets just pay attention to treatments and data we need
 # in the next script we will do this, and then repeat this excercise, and then revisit this script to fix any errors
 # or special cases
