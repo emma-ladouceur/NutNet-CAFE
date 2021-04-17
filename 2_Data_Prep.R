@@ -13,7 +13,6 @@
 
 # packages
 library(tidyverse)
-library(vegan)
 library(priceTools)
 
 # data
@@ -113,7 +112,7 @@ sp <- species_nn %>% distinct(id,site_code,site_name,block,plot,year_trt,year_ma
   left_join(nat_cov) %>% left_join(int_cov) %>% left_join(unk_cov) %>% 
   arrange(id)
 
-View(sp)
+head(sp)
 
 #  now we revisit the biggest biomass values 
 biggest.bm.values <- sp %>%  filter(year_max >= 3) %>% # out analysis is based on sites 3 years or older
@@ -136,7 +135,7 @@ head(plot)
 
 site.inclusion<-plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
 # 58 sites will be included in our main analysis
-head(site.inclusion)
+View(site.inclusion)
 
 write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.csv")
 
@@ -158,6 +157,9 @@ pairs_prep <- sp %>% group_by(site_code, year_trt) %>%
 pairs_prep$year_trt <- as.numeric(as.character(pairs_prep$year_trt))
 pairs_prep$site.year.id <- as.character(pairs_prep$site.year.id)
 
+pairs_prep %>% filter(site_code == "jena.de") %>%
+  distinct(site_code, year_trt)
+
 # create index's
 index <- paste(pairs_prep$site_name, pairs_prep$site.year.id)
 sindex <- as.character(pairs_prep$site_code)
@@ -166,7 +168,8 @@ uindex <- sort(unique(index))
 usindex <- sort(unique(sindex))
 uyindex <- sort(unique(yindex))
 
-# cumulative
+# cumulative time approach
+# we pair site codes in time to reduce computation time or price partition comparisons
 pairs_lst <- NULL
 n <- 1
 for (i in 1:length(usindex)){
@@ -186,17 +189,17 @@ for (i in 1:length(usindex)){
 folder = "pairs prep data"
 # input RDS files for cluster, price analysis
 # if this doesnt work close R and try again only happens because wd has changed
-mapply(saveRDS, pairs_lst, version =2 , file=paste0(folder, "/",names(all_lst), '.rds'))
+mapply(saveRDS, pairs_lst, version =2 , file=paste0(folder, "/",names(pairs_lst), '.rds'))
 
 
-# test it out, test the code for priceTools we will use on the cluster
+# test it out, test the code for priceTools we will use on the cluster next
 samp <- readRDS("pairs prep data/arch.us_2.rds")
-colnames(samp)
 
-View(samp)
+colnames(samp)
+head(samp)
 
 group.vars <- c('site.year.id','plot','block')
-treat.vars<-c('trt_year')
+treat.vars <- c('trt_year')
 
 grouped.data <- samp %>% group_by(.dots=c(group.vars,treat.vars))
 
@@ -204,43 +207,43 @@ grouped.data <- samp %>% group_by(.dots=c(group.vars,treat.vars))
 res <- pairwise.price(grouped.data, species="Taxon", func="biomass.sp.full")
 
 # Create a single column keeping track of the paired set of seeding treatments & other grouping variables:
-pp<-res
-pp<-group.columns(pp,gps=c(group.vars,treat.vars), drop=T)
+pp <- res
+pp <- group.columns(pp,gps=c(group.vars,treat.vars), drop=T)
 
 
-View(pp)
+head(pp)
 
-
-
-# get max year for filtering
-
-plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-colnames(plot)
-View(p.all)
-
-plot<-plot %>% group_by(site_code) %>% 
-  summarise(min.year = min(year_trt),
-            max.year = max(year_trt)) %>% left_join(plot)
-
-View(plot)
-
-site.inclusion<-plot %>% distinct(site_code,min.year,max.year)
-site.inclusion
-
-
-p.all<-p.all %>% group_by(site_code) %>% 
-  summarise(min.year = min(year.x),
-            max.year = max(year.y)) %>% left_join(p.all)
-
-
-View(p.all)
-price.inclusion<-p.all %>% distinct(site_code,min.year,max.year)
-price.inclusion
-
-write.csv(plot, "~/Dropbox/Projects/NutNet/Data/plot.csv")
-write.csv(p.all, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
+# 
+# 
+# # get max year for filtering
+# 
+# plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+# p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+# 
+# colnames(plot)
+# View(p.all)
+# 
+# plot<-plot %>% group_by(site_code) %>% 
+#   summarise(min.year = min(year_trt),
+#             max.year = max(year_trt)) %>% left_join(plot)
+# 
+# View(plot)
+# 
+# site.inclusion<-plot %>% distinct(site_code,min.year,max.year)
+# site.inclusion
+# 
+# 
+# p.all<-p.all %>% group_by(site_code) %>% 
+#   summarise(min.year = min(year.x),
+#             max.year = max(year.y)) %>% left_join(p.all)
+# 
+# 
+# View(p.all)
+# price.inclusion<-p.all %>% distinct(site_code,min.year,max.year)
+# price.inclusion
+# 
+# write.csv(plot, "~/Dropbox/Projects/NutNet/Data/plot.csv")
+# write.csv(p.all, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
 
 
 

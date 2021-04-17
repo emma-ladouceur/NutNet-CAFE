@@ -47,13 +47,14 @@ clean_cover <- cover %>%
                              "ethamc.au", # 0 biomass at year 0 in strip, but plants in plot- cannot be used
                              "jena.de" # seasonal issue
   )) %>%
-  left_join(jena_cover) %>% # seasonal jena data
+  bind_rows(jena_cover) %>% # seasonal jena data
   filter( live == 1, # keep only live cover
     !functional_group %in% c("BRYOPHYTE", "LICHEN", "CLUBMOSS", "LIVERWORT", "NON-LIVE", "WOODY"), # drop non vascular plants and woody plants
     complete.cases(Family), # only complete cases for 'Family' (bare ground is blank for this field)
     )  %>% 
  unite("id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE) # create unique id
 
+clean_cover %>% filter(site_code == "jena.de")
 summary(clean_cover)
 head(clean_cover)
 
@@ -70,7 +71,7 @@ clean_biomass <- biomass %>%
                            "ethamc.au", # 0 biomass at year 0 in strip, but plants in plot- cannot be used
                            "jena.de"  # seasonal issue
   )) %>%
-  left_join(jena_biomass) %>% # seasonal jena data
+  bind_rows(jena_biomass) %>% # seasonal jena data
   unite( "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE) %>% # make unique id for biomass
   filter( live == 1, # keep only live biomass
          # remove functional groups
@@ -123,7 +124,7 @@ total_biomass   <- calc_biomass %>% ungroup() %>% select(id,site_code,year,year_
 head(total_biomass)
 
 # sites that separated biomass - remove the totals
-sep_biomass <- calc_biomass %>%  select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,category,strip.mass) %>%
+sep_biomass <- calc_biomass %>%  select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,category,mass,strip.mass) %>%
   filter(!orig.bm.cat %in% c("TOTAL","VASCULAR", "LIVE")) # drop total measures of biomass
                                               
 head(sep_biomass)
@@ -179,6 +180,7 @@ colnames(ap_dat_strip)
 
 ap_dat_cat <- ap_cov %>% 
   left_join(ap_bm, by= c("id", "site_code", "year", "year_trt", "trt", "block", "plot", "category" ) )  %>% 
+  mutate(cat.mass = orig.mass) %>%
   mutate(biomass.sp.cat = c( max_cover/cat.cover * cat.mass), # estimate per species biomass from category groups
          biomass.sp.full = biomass.sp.cat, # rename columns to match down the road
          biomass.m.full = "ap category")  %>% left_join(ap_bm) %>%
@@ -203,7 +205,7 @@ colnames(sep_cover)
 sep_cover$category.mod <- as.character(sep_cover$category.mod)
 # rename cover category to match biomass for phlox diffusa in  bnch.us
 sep_cover_mod <- sep_cover %>% 
-  mutate(category.mod = if_else(Taxon == "PHLOX DIFFUSA",   "FORB + PHLOX DIFFUSA", category.mod)) 
+  mutate(category.mod = if_else(Taxon == "PHLOX DIFFUSA", "FORB + PHLOX DIFFUSA", category.mod)) 
 
 sep_cover_calc <- sep_cover_mod %>%
   group_by(id,site_code,year,year_trt,trt,block,plot, category.mod) %>% 
