@@ -81,6 +81,6 @@ sites <- price.pairs %>% distinct(site_code, year_max) %>% filter(year_max >= 3)
 
 View(sites)
 
-write.csv(price.pairs,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.new.csv")
+write.csv(price.pairs,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.csv")
 
 
