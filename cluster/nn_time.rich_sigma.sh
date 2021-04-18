@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#$ -N nn_time.rich
+#$ -N nn_time.rich_sigma
 #$ -S /bin/bash
 #$ -l h_rt=24:00:00
 #$ -l h_vmem=8G
@@ -12,6 +12,6 @@
 module load foss/2019b R/3.6.2-2
 export OFILE=/work/$USER/NutNet/$JOB_NAME-$JOB_ID.Rdata
 export LANG=en_US.UTF-8
-Rscript --vanilla /home/ladouceu/projects/NutNet/nn_time.rich_sigma.R
+Rscript --vanilla /home/ladouceu/projects/NutNet/cluster/nn_time.rich_sigma.R
 
 
