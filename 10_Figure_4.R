@@ -1,23 +1,20 @@
 
+# Author: Emma Ladouceur & Shane A. Blowes
+# Title:
+# Last Updated April 17, 2021
 
-rm(list=ls())
+# 10_Figure 4.R
+# This workflow uses data pulled out of Modelsbelow to produce Figure 4
 
+# packages
 library(tidyverse)
 library(brms)
-library(ggridges)
 library(gridExtra)
 library(grid)
-library("scales")
-
 library(patchwork)
 
 
-# FIGURE 3 CLOUD VERSION
-# EXTRACT 100 POSTERIORS
-
-# models
-
-
+# load modelobjects
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
@@ -25,43 +22,32 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.R
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
-
-
-# site level meta data for posrteriors
-# calculated to site level details found in Climate_Data.R
-# latitude and longitude dont match due to decimal rounding
-# lat.x long.x is nutnet site, lat.y long.y is world clim
+# site level meta data for posteriors
 meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
 
 meta <- meta %>% group_by(site_code) %>% filter(max.year >= 3) %>%
 ungroup()
 
-
 colnames(meta)
-View(meta)
 
+# Similarly  to '7_Model_Data_Posteriors.R' we 
+# Extract 1000 posterior samples from Fixed Effects (Overall/Population/Global Effects) 
+# for the price partitions
+sloss.fixed.p <- posterior_samples(s.loss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sgain.fixed.p <- posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 
-sl.trt.i_fixef <- fixef(sl.3)
-sg.trt.i_fixef <- fixef(sg.3)
-cde.trt.i_fixef <- fixef(CDE.3)
-sloss.trt.i_fixef <- fixef(s.loss.3)
-sgain.trt.i_fixef <- fixef(s.gain.3)
+cde.fixed.p <- posterior_samples(CDE.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
+sl.fixed.p <- posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sg.fixed.p <- posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 
+# except here, we take 50 samples of the posterior distribution from overall effects
+# within the range of 95 % probability to represent uncertainty around these effects
 
-sl.fixed.p<-posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
-sg.fixed.p<-posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
-cde.fixed.p<-posterior_samples(CDE.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
-
-sloss.fixed.p<-posterior_samples(s.loss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
-sgain.fixed.p<-posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
-
-
-head(sl.fixed.p)
-head(sl.trt.i_fixef)
-
-
-sl.fixed.p2 <-sl.fixed.p %>% 
+# note to self/Shane: here i take the mean of each global slope and then add them together in the fig
+# but, should we instead take 1000 samps, then add all together, then take the mean
+# i think the approach i currently take was meant to be a test and i was gonna fix it later but i didnt
+# ask shane to check and for thoughts before i change everything
+sl.fixed.p2 <- sl.fixed.p %>% 
   mutate(sl.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
   mutate(sl.ctl.rate.p=`b_year.y.m`) %>%
   mutate( sl.ctl.rate_global_slope = mean(sl.ctl.rate.p),
@@ -77,7 +63,6 @@ filter(sl.trt.rate.p > quantile(sl.trt.rate.p, probs=0.025),
   select(sl.ctl.rate.p,sl.ctl.rate_global_slope, sl.ctl.rate_upper_slope,sl.ctl.rate_lower_slope,
          sl.trt.rate.p,sl.trt.rate_global_slope, sl.trt.rate_upper_slope,sl.trt.rate_lower_slope) %>%
   sample_n(50) 
-
 
 sg.fixed.p2 <-sg.fixed.p %>% 
   mutate(sg.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
@@ -147,12 +132,12 @@ sgain.fixed.p2 <-sgain.fixed.p %>%
          sgain.trt.rate.p,sgain.trt.rate_global_slope, sgain.trt.rate_upper_slope,sgain.trt.rate_lower_slope) %>% sample_n(50) 
 
 
-cde.s<-cde.fixed.p2
-loss.s<- sl.fixed.p2 %>% bind_cols(sloss.fixed.p2)
-gains.s<- sg.fixed.p2 %>% bind_cols(sgain.fixed.p2)
-loss.s$Vector="Losses"
-gains.s$Vector="Gains"
-cde.s$Vector="Persistent Sp."
+cde.s <- cde.fixed.p2  
+
+loss.s <- sl.fixed.p2 %>% bind_cols(sloss.fixed.p2) 
+
+gains.s <- sg.fixed.p2 %>% bind_cols(sgain.fixed.p2) 
+
 loss.gain <- loss.s %>% bind_cols(gains.s)
 
 all.effs <- loss.gain %>% bind_cols(cde.fixed.p2)
@@ -160,20 +145,192 @@ all.effs <- loss.gain %>% bind_cols(cde.fixed.p2)
 head(all.effs)
 colnames(all.effs)
 
+fig_4 <- ggplot()+
+  geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+  theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                     strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+# posterior uncertainty samples for Controls (small dashed lines)
+  # species loss (x-axis) & SL (y-axis)
+geom_segment(data = all.effs,  # segments
+             aes(x = 0,
+                 xend = sloss.ctl.rate.p ,
+                 y = 0,
+                 yend = sl.ctl.rate.p  ),
+             colour= "#B40F20", linetype=2,
+             size = 0.2,  alpha = 0.2,
+             arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate.p, # points
+                                  y=  sl.ctl.rate.p  ),
+             colour="black",size=0.2,alpha = 0.2)+
+  # species gain (x-axis) & SG (y-axis)
+  geom_segment(data = all.effs, # segment
+               aes(x = sloss.ctl.rate.p,
+                   xend =  sloss.ctl.rate.p + sgain.ctl.rate.p ,
+                   y = sl.ctl.rate.p,
+                   yend = sl.ctl.rate.p+ sg.ctl.rate.p ),
+               colour= "#046C9A",linetype=2,
+               size = 0.2,  alpha = 0.2,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate.p+ sgain.ctl.rate.p , # points
+                                  y=  sl.ctl.rate.p + sg.ctl.rate.p ) ,
+             colour="black",
+             size=0.2,alpha = 0.2)+
+  # persistent species (cde/ps) (y axis only)
+  geom_segment(data = all.effs, # segment
+               aes(x =  sloss.ctl.rate.p + sgain.ctl.rate.p,
+                   xend =  sloss.ctl.rate.p + sgain.ctl.rate.p,
+                   y =  sl.ctl.rate.p+sg.ctl.rate.p,
+                   yend = sl.ctl.rate.p+sg.ctl.rate.p + cde.ctl.rate.p ), 
+               colour=  "#F98400",linetype=2,
+               size = 0.2,  alpha = 0.2,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, # points
+                                 y= sl.ctl.rate.p+sg.ctl.rate.p+cde.ctl.rate.p ),
+             colour="#F98400",size=0.1,alpha = 0.2) +
+  # Overall effects in Controls (thick dashed lines) 
+  # species loss (x-axis) & SL (y-axis)
+  geom_segment(data = all.effs %>% distinct(sloss.ctl.rate_global_slope,sl.ctl.rate_global_slope), # segments
+               aes(x = 0,
+                   xend = sloss.ctl.rate_global_slope,
+                   y = 0,
+                   yend = sl.ctl.rate_global_slope  ),
+               colour= "#B40F20", linetype=2,
+               size = 1.5, alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate_global_slope, # points
+                                  y=  sl.ctl.rate_global_slope ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  # species gain (x-axis) & SG (y-axis)
+  geom_segment(data = all.effs %>% # segment
+                 distinct(sloss.ctl.rate_global_slope,sgain.ctl.rate_global_slope,sl.ctl.rate_global_slope,sg.ctl.rate_global_slope),
+               aes(x = sloss.ctl.rate_global_slope,
+                   xend = sloss.ctl.rate_global_slope +  sgain.ctl.rate_global_slope,
+                   y = sl.ctl.rate_global_slope,
+                   yend =  sl.ctl.rate_global_slope+sg.ctl.rate_global_slope),
+               colour= "#046C9A",linetype=2,
+               size = 1.5,alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope, # point
+                                  y= sl.ctl.rate_global_slope+ sg.ctl.rate_global_slope ) ,
+             colour="#046C9A",
+             size=0.2,alpha = 0.4)+
+  # persistent species (cde/ps) (y axis only)
+  geom_segment(data = all.effs %>% #segment
+                 distinct(sloss.ctl.rate_global_slope,sgain.ctl.rate_global_slope,sl.ctl.rate_global_slope,sg.ctl.rate_global_slope,cde.ctl.rate_global_slope ),
+               aes(x = sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
+                   xend = sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
+                   y = sl.ctl.rate_global_slope+sg.ctl.rate_global_slope,
+                   yend = sl.ctl.rate_global_slope+sg.ctl.rate_global_slope+cde.ctl.rate_global_slope ), 
+               colour=  "#F98400",linetype=2,
+               size = 1.5,alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, # points
+                                 y=  sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope+cde.ctl.rate_global_slope),
+             colour="#F98400",size=0.1,alpha = 0.4) +
+ # posterior uncertainty samples for treatments (NPK) (thin solid lines)
+  # species loss (x-axis) and SL (y-axis)
+  geom_segment(data = all.effs, # segment
+               aes(x = 0,
+                   xend = sloss.trt.rate.p  ,
+                   y = 0,
+                   yend = sl.trt.rate.p   ),
+               colour= "#B40F20",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.trt.rate.p , # points
+                                  y=  sl.trt.rate.p  ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  # species gain (x-axis) & SG (y-axis)
+  geom_segment(data = all.effs,  #segment
+               aes(x = sloss.trt.rate.p ,
+                   xend = (sloss.trt.rate.p)+(sgain.trt.rate.p ) ,
+                   y = sl.trt.rate.p ,
+                   yend = (sl.trt.rate.p)+(sg.trt.rate.p  ) ),
+               colour= "#046C9A",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs, aes(x= (sloss.trt.rate.p)+(sgain.trt.rate.p ) , #points
+                                  y= (sl.trt.rate.p)+(sg.trt.rate.p ) ),
+             colour="#046C9A",
+             size=0.2,alpha = 0.4)+
+  # persistent species (cde/ps) (y axis only)
+  geom_segment(data = all.effs, #segment
+               aes(x = (sloss.trt.rate.p)+(sgain.trt.rate.p),
+                   xend = (sloss.trt.rate.p)+(sgain.trt.rate.p),
+                   y = (sl.trt.rate.p)+(sg.trt.rate.p ),
+                   yend =(sl.trt.rate.p)+(sg.trt.rate.p)+ (cde.trt.rate.p  )),
+               colour= "#F98400",
+               size = 0.2,  alpha = 0.4,
+               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, # point
+                                 y= (sl.trt.rate.p)+(sg.trt.rate.p)+(cde.trt.rate.p) ),
+             colour="#F98400",size=0.1,alpha = 0.4) +
+  #   # Overall effects in Treatments (NPK) (thick solid lines) 
+  # species loss (x-axis) and SL (y-axis)
+  geom_segment(data = all.effs %>% distinct(sloss.trt.rate_global_slope , sloss.ctl.rate_global_slope,sl.trt.rate_global_slope, sl.ctl.rate_global_slope),
+               aes(x = 0,
+                   xend = sloss.trt.rate_global_slope ,
+                   y = 0,
+                   yend = sl.trt.rate_global_slope ),
+               colour= "#B40F20",
+               size = 1.5, #alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  geom_point(data = all.effs, aes(x= sloss.trt.rate_global_slope , #loss
+                                  y=  sl.trt.rate_global_slope ),
+             colour="#B40F20",size=0.2,alpha = 0.4)+
+  # species gain (x-axis) & SG (y-axis)
+    geom_segment(data = all.effs %>% distinct(sloss.trt.rate_global_slope , sloss.ctl.rate_global_slope,sgain.trt.rate_global_slope , sgain.ctl.rate_global_slope,sl.trt.rate_global_slope, sl.ctl.rate_global_slope, sg.trt.rate_global_slope , sg.ctl.rate_global_slope),
+               aes(x = sloss.trt.rate_global_slope,
+                   xend = (sloss.trt.rate_global_slope ) + (sgain.trt.rate_global_slope ),
+                   y = sl.trt.rate_global_slope ,
+                   yend = (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope ) ),
+               colour= "#046C9A",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  geom_point(data = all.effs, aes(x=  (sloss.trt.rate_global_slope ) + (sgain.trt.rate_global_slope ) , #losses
+                                  y=  (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope ),
+  ), colour="#046C9A", size=0.2,alpha = 0.4) +
+  # persistent species (cde/ps) (y axis only)
+  geom_segment(data = all.effs %>% distinct(sloss.trt.rate_global_slope , sloss.ctl.rate_global_slope,sgain.trt.rate_global_slope , sgain.ctl.rate_global_slope,sl.trt.rate_global_slope, sl.ctl.rate_global_slope, sg.trt.rate_global_slope , sg.ctl.rate_global_slope,cde.trt.rate_global_slope, cde.ctl.rate_global_slope),
+               aes(x = (sloss.trt.rate_global_slope ) + (sgain.trt.rate_global_slope ),
+                   xend = (sloss.trt.rate_global_slope)+(sgain.trt.rate_global_slope ),
+                   y = (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope ),
+                   yend = (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope)+(cde.trt.rate_global_slope) ), 
+               colour= "#F98400",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  geom_point(data = all.effs,aes(x=0, #persistent
+                                 y=  (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope)+(cde.trt.rate_global_slope ) ),
+             colour="#F98400",size=0.1,alpha = 0.4) +
+  scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
+  scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
+   annotate("text", x = -0.015, y = 0.75, label = "t0") +
+   annotate("text", x = -0.415, y = 7.25, label = "tn") +
+  annotate("text", x = 0.03, y = -1.5, label = "tn") +
+  labs(x = 'Rate of change in species (species/year)',
+       y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
+      title = '')
 
-
-
+  
+fig_4
+  
 
 # GET LEGENDS
+cde.s <- cde.fixed.p2  %>%
+  mutate( Vector = "Persistent Sp.")
 
+loss.s <- sl.fixed.p2 %>% bind_cols(sloss.fixed.p2) %>%
+  mutate( Vector = "Losses")
 
-sgain.effs$response <- factor(sgain.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+gains.s <- sg.fixed.p2 %>% bind_cols(sgain.fixed.p2) %>%
+  mutate( Vector = "Gains")
 
-
-fixed.leg<-ggplot()+
-  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  # Fiexed effects section
-  # black thick arrow background so we can see the arrows
+# legend for overall effects (thick lines)
+fixed.leg <- ggplot() +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + 
+  theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), 
+                                     panel.grid.minor = element_blank(), 
+                                     strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_segment(data = cde.s,
                aes(x = 0,
                    xend = 0,
@@ -188,7 +345,7 @@ fixed.leg<-ggplot()+
                aes(x = 0,
                    xend = sloss.trt.rate_global_slope,
                    y = 0,
-                   yend = sl.trt.rate_global_slope,colour= Vector,),
+                   yend = sl.trt.rate_global_slope, colour= Vector,),
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_point(data = loss.s, aes(x= sloss.trt.rate_global_slope, #loss
@@ -211,8 +368,8 @@ fixed.leg<-ggplot()+
 
 fixed.leg
 
-
-post.leg<-ggplot()+
+# legend for posterior samples (thin lines)
+post.leg <- ggplot()+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_segment(data = cde.s,
                aes(x = 0,
@@ -246,199 +403,8 @@ post.leg
 
 
 
-
-View(all.effs)
-
-price.cloud<-ggplot()+
-  geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-# controls
-geom_segment(data = all.effs,
-             aes(x = 0,
-                 xend = sloss.ctl.rate.p ,
-                 y = 0,
-                 yend = sl.ctl.rate.p  ),
-             colour= "#B40F20", linetype=2,
-             size = 0.2,  alpha = 0.2,
-             arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.ctl.rate.p, #loss
-                                  y=  sl.ctl.rate.p  ),
-             colour="black",size=0.2,alpha = 0.2)+
-  geom_segment(data = all.effs,
-               aes(x = sloss.ctl.rate.p,
-                   xend =  sloss.ctl.rate.p+sgain.ctl.rate.p ,
-                   y = sl.ctl.rate.p,
-                   yend = sl.ctl.rate.p+ sg.ctl.rate.p ),
-               colour= "#046C9A",linetype=2,
-               size = 0.2,  alpha = 0.2,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.ctl.rate.p+ sgain.ctl.rate.p , #losses
-                                  y=  sl.ctl.rate.p+sg.ctl.rate.p ) ,
-             colour="black",
-             size=0.2,alpha = 0.2)+
-  
-  geom_segment(data = all.effs,
-               aes(x =  sloss.ctl.rate.p+sgain.ctl.rate.p,
-                   xend =  sloss.ctl.rate.p+sgain.ctl.rate.p,
-                   y =  sl.ctl.rate.p+sg.ctl.rate.p,
-                   yend = sl.ctl.rate.p+sg.ctl.rate.p+cde.ctl.rate.p ), 
-               colour=  "#F98400",linetype=2,
-               size = 0.2,  alpha = 0.2,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs,aes(x=0, #persistent
-                                 y= sl.ctl.rate.p+sg.ctl.rate.p+cde.ctl.rate.p ),
-             colour="#F98400",size=0.1,alpha = 0.2) +
-  
-  # Fixed effects section
-  # CONTROLS
-  geom_segment(data = all.effs %>% distinct(sloss.ctl.rate_global_slope,sl.ctl.rate_global_slope),
-               aes(x = 0,
-                   xend = sloss.ctl.rate_global_slope,
-                   y = 0,
-                   yend = sl.ctl.rate_global_slope  ),
-               colour= "#B40F20", linetype=2,
-               size = 1.5, alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.ctl.rate_global_slope, #loss
-                                  y=  sl.ctl.rate_global_slope ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
-  # geom_errorbar(data = all.effs,aes(x=sloss.ctl.rate_global_slope,
-  #                                   ymin = sl.ctl.rate_lower_slope, ymax = sl.ctl.rate_upper_slope),width=0,colour = "black", size = 0.55,alpha=0.3) +
-  # geom_errorbarh(data = all.effs,aes(y=sl.ctl.rate_global_slope,
-  #                                    xmin = sloss.ctl.rate_lower_slope, xmax = sloss.ctl.rate_upper_slope),height=0,colour = "black", size = 0.55,alpha=0.3) +
-  geom_segment(data = all.effs %>% distinct(sloss.ctl.rate_global_slope,sgain.ctl.rate_global_slope,sl.ctl.rate_global_slope,sg.ctl.rate_global_slope),
-               aes(x = sloss.ctl.rate_global_slope,
-                   xend = sloss.ctl.rate_global_slope +  sgain.ctl.rate_global_slope,
-                   y = sl.ctl.rate_global_slope,
-                   yend =  sl.ctl.rate_global_slope+sg.ctl.rate_global_slope),
-               colour= "#046C9A",linetype=2,
-               size = 1.5,alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope, #losses
-                                  y= sl.ctl.rate_global_slope+ sg.ctl.rate_global_slope ) ,
-             colour="#046C9A",
-             size=0.2,alpha = 0.4)+
-  # geom_errorbar(data = all.effs,aes(x=sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
-  #                                   ymin = sl.ctl.rate_lower_slope+sg.ctl.rate_lower_slope, ymax = sl.ctl.rate_upper_slope+sg.ctl.rate_upper_slope),width=0,colour = "black", size = 0.55,alpha=0.3) +
-  # geom_errorbarh(data = all.effs,aes(y=sl.ctl.rate_global_slope+sg.ctl.rate_global_slope,
-  #                                    xmin = sloss.ctl.rate_lower_slope+sgain.ctl.rate_lower_slope, xmax = sloss.ctl.rate_upper_slope+sgain.ctl.rate_upper_slope),height=0,colour = "black", size = 0.55,alpha=0.3) +
-  geom_segment(data = all.effs %>% distinct(sloss.ctl.rate_global_slope,sgain.ctl.rate_global_slope,sl.ctl.rate_global_slope,sg.ctl.rate_global_slope,cde.ctl.rate_global_slope ),
-               aes(x = sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
-                   xend = sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
-                   y = sl.ctl.rate_global_slope+sg.ctl.rate_global_slope,
-                   yend = sl.ctl.rate_global_slope+sg.ctl.rate_global_slope+cde.ctl.rate_global_slope ), 
-               colour=  "#F98400",linetype=2,
-               size = 1.5,alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = all.effs,aes(x=0, #persistent
-                                 y=  sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope+cde.ctl.rate_global_slope),
-             colour="#F98400",size=0.1,alpha = 0.4) +
-  # geom_errorbar(data = all.effs,aes(x=sloss.ctl.rate_global_slope+sgain.ctl.rate_global_slope,
-  #                                   ymin = sl.ctl.rate_lower_slope+sg.ctl.rate_lower_slope+cde.ctl.rate_lower_slope, ymax = sl.ctl.rate_upper_slope+sg.ctl.rate_upper_slope+cde.ctl.rate_upper_slope),width=0,colour = "black", size = 0.55,alpha=0.3) +
-  #treatment effects
-  geom_segment(data = all.effs,
-               aes(x = 0,
-                   xend = sloss.trt.rate.p  ,
-                   y = 0,
-                   yend = sl.trt.rate.p   ),
-               colour= "#B40F20",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.trt.rate.p , #loss
-                                  y=  sl.trt.rate.p  ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
-  geom_segment(data = all.effs,
-               aes(x = sloss.trt.rate.p ,
-                   xend = (sloss.trt.rate.p)+(sgain.trt.rate.p ) ,
-                   y = sl.trt.rate.p ,
-                   yend = (sl.trt.rate.p)+(sg.trt.rate.p  ) ),
-               colour= "#046C9A",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs, aes(x= (sloss.trt.rate.p)+(sgain.trt.rate.p ) , #losses
-                                  y= (sl.trt.rate.p)+(sg.trt.rate.p ) ),
-             colour="#046C9A",
-             size=0.2,alpha = 0.4)+
-  geom_segment(data = all.effs,
-               aes(x = (sloss.trt.rate.p)+(sgain.trt.rate.p),
-                   xend = (sloss.trt.rate.p)+(sgain.trt.rate.p),
-                   y = (sl.trt.rate.p)+(sg.trt.rate.p ),
-                   yend =(sl.trt.rate.p)+(sg.trt.rate.p)+ (cde.trt.rate.p  )),
-               colour= "#F98400",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = all.effs,aes(x=0, #persistent
-                                 y= (sl.trt.rate.p)+(sg.trt.rate.p)+(cde.trt.rate.p) ),
-             colour="#F98400",size=0.1,alpha = 0.4) +
-  
-  # Fiexed effects section
-  # black thick arrow background so we can see the arrows
-  geom_segment(data = all.effs %>% distinct(sloss.trt.rate_global_slope , sloss.ctl.rate_global_slope,sl.trt.rate_global_slope, sl.ctl.rate_global_slope),
-               aes(x = 0,
-                   xend = sloss.trt.rate_global_slope ,
-                   y = 0,
-                   yend = sl.trt.rate_global_slope ),
-               colour= "#B40F20",
-               size = 1.5, #alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = all.effs, aes(x= sloss.trt.rate_global_slope , #loss
-                                  y=  sl.trt.rate_global_slope ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
-  # geom_errorbar(data = all.effs,aes(x=sloss.trt.rate_global_slope + sloss.ctl.rate_global_slope,
-  #                                   ymin = sl.trt.rate_lower_slope + sl.ctl.rate_lower_slope, ymax = sl.trt.rate_upper_slope + sl.ctl.rate_upper_slope),width=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
-  # geom_errorbarh(data = all.effs,aes(y=sl.trt.rate_global_slope + sl.ctl.rate_global_slope,
-  #                                    xmin = sloss.trt.rate_lower_slope + sloss.ctl.rate_lower_slope, xmax = sloss.trt.rate_upper_slope + sloss.ctl.rate_upper_slope),height=0,colour = "#B40F20", size = 0.55,alpha=0.3) +
-  geom_segment(data = all.effs %>% distinct(sloss.trt.rate_global_slope , sloss.ctl.rate_global_slope,sgain.trt.rate_global_slope , sgain.ctl.rate_global_slope,sl.trt.rate_global_slope, sl.ctl.rate_global_slope, sg.trt.rate_global_slope , sg.ctl.rate_global_slope),
-               aes(x = sloss.trt.rate_global_slope,
-                   xend = (sloss.trt.rate_global_slope ) + (sgain.trt.rate_global_slope ),
-                   y = sl.trt.rate_global_slope ,
-                   yend = (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope ) ),
-               colour= "#046C9A",
-               size = 1.5,#alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = all.effs, aes(x=  (sloss.trt.rate_global_slope ) + (sgain.trt.rate_global_slope )  , #losses
-                                  y=  (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope ) ,
-  ) ,
-  colour="#046C9A",
-  size=0.2,alpha = 0.4)+
-  # geom_errorbar(data = all.effs, aes(x= (sloss.trt.rate_global_slope+sloss.ctl.rate_global_slope) + (sgain.trt.rate_global_slope + sgain.ctl.rate_global_slope),
-  #                                    ymin =  (sl.trt.rate_lower_slope + sl.ctl.rate_lower_slope)+(sg.trt.rate_lower_slope + sg.ctl.rate_lower_slope)  , 
-  #                                    ymax = (sl.trt.rate_upper_slope+sl.ctl.rate_upper_slope)+(sg.trt.rate_upper_slope + sg.ctl.rate_upper_slope)),
-  #               width=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
-  # geom_errorbarh(data = all.effs,aes(y=(sl.trt.rate_global_slope+sl.ctl.rate_global_slope)+ (sg.trt.rate_global_slope + sg.trt.rate_global_slope),
-  #                                    xmin =  (sloss.trt.rate_lower_slope+sloss.ctl.rate_lower_slope)+(sgain.trt.rate_lower_slope + sgain.ctl.rate_lower_slope)  ,
-  #                                    xmax =  (sloss.trt.rate_upper_slope+sloss.ctl.rate_upper_slope)+(sgain.trt.rate_upper_slope + sgain.ctl.rate_upper_slope) ) ,
-  #                height=0,colour = "#046C9A", size = 0.55,alpha=0.3) +
-  geom_segment(data = all.effs %>% distinct(sloss.trt.rate_global_slope , sloss.ctl.rate_global_slope,sgain.trt.rate_global_slope , sgain.ctl.rate_global_slope,sl.trt.rate_global_slope, sl.ctl.rate_global_slope, sg.trt.rate_global_slope , sg.ctl.rate_global_slope,cde.trt.rate_global_slope, cde.ctl.rate_global_slope),
-               aes(x = (sloss.trt.rate_global_slope ) + (sgain.trt.rate_global_slope ),
-                   xend = (sloss.trt.rate_global_slope)+(sgain.trt.rate_global_slope ),
-                   y = (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope ),
-                   yend = (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope)+(cde.trt.rate_global_slope) ), 
-               colour= "#F98400",
-               size = 1.5,#alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = all.effs,aes(x=0, #persistent
-                                 y=  (sl.trt.rate_global_slope) + (sg.trt.rate_global_slope)+(cde.trt.rate_global_slope ) ),
-             colour="#F98400",size=0.1,alpha = 0.4) +
-  # geom_errorbar(data = all.effs,aes(x=(sloss.trt.rate_global_slope + sloss.ctl.rate_global_slope) + (sgain.trt.rate_global_slope + sgain.ctl.rate_global_slope),
-  #                                   ymin = (sl.trt.rate_lower_slope+sl.ctl.rate_lower_slope)+(sg.trt.rate_lower_slope+ sg.ctl.rate_lower_slope)+(cde.trt.rate_lower_slope + cde.ctl.rate_lower_slope), ymax = (sl.trt.rate_upper_slope+ sl.ctl.rate_upper_slope)+(sg.trt.rate_upper_slope+sg.ctl.rate_upper_slope)+(cde.trt.rate_upper_slope+ cde.ctl.rate_upper_slope) ),width=0,colour = "#816687", size = 0.55,alpha=0.3) +
-  
-  # ylim(-11,35) +
-  #  xlim(-0.65,0)+
-  scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
-  scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
-   annotate("text", x = -0.015, y = 0.75, label = "t0") +
-   annotate("text", x = -0.415, y = 7.25, label = "tn") +
-  annotate("text", x = 0.03, y = -1.5, label = "tn") +
-  labs(x = 'Rate of change in species (species/year)',
-       y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
-      # title= 'Rate of change / year '
-      title = '')
-
-  
-price.cloud  
-  
-#extract legend
-#https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+# extract legends
+# Source: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
 g_legend<-function(a.gplot){
   tmp <- ggplot_gtable(ggplot_build(a.gplot))
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
@@ -450,7 +416,7 @@ p.legend<-g_legend(post.leg)
 
 
 
-(price.cloud ) / (f.legend) / (p.legend) +
+(fig_4 ) / (f.legend) / (p.legend) +
   plot_layout(heights = c(10,0.5,0.5))
 
 

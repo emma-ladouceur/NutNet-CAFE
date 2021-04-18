@@ -1,40 +1,42 @@
 
+# Author: Emma Ladouceur & Shane A. Blowes
+# Title:
+# Last Updated April 17, 2021
 
+# 5 Pull Data out of models and prep for visualization
+# models have been run on a cluster and each have an R script and a submit script (.sh)
+# see R scripts for code to run models
+# models are large and take a few hours to run
 
+# load packages
 library(tidyverse)
 library(brms)
-library(ggridges)
-library(gridExtra)
-library(grid)
-library("scales")
 
 
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.g
+# load models
+# model object names follow each model
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.3
 
-
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
-
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
-load('~/Dropbox/Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
-
-
-meta <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 meta <- meta %>% group_by(site_code) %>% filter(max.year >= 3) %>%
   ungroup()
 
 # STUDY LEVEL POSTERIORS
-
 study_levels <- plot.rich.3$data %>% 
   as_tibble() %>% 
   distinct(site_code) %>% 
   mutate(level =  site_code) %>%
   nest_legacy(level)
 
+# extract 1000 study-level posterior samples for each site, and treatment  (Control, NPK) for each model  
 study_sample_posterior <- study_levels %>%
   mutate( rich.ctl.study = purrr::map(data, ~posterior_samples(plot.rich.3,
                                                          pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
@@ -104,8 +106,6 @@ study_sample_posterior <- study_levels %>%
 View(study_sample_posterior)
 
 
-
-
 rich_study_posterior <- study_sample_posterior  %>% 
   dplyr::select(-data) %>% 
   unnest_legacy(rich.ctl.study,rich.npk.study) %>%
@@ -160,12 +160,11 @@ sgain_study_posterior <- study_sample_posterior  %>%
 head(sgain_study_posterior)
 
 
-# FIXED EFFECTS POSTERIORS
-
+# Extract 1000 posterior samples from Fixed Effects (Overall/Population/Global Effects) 
+# richness and biomass
 rich.fixed.p<-posterior_samples(plot.rich.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000)))
 bm.fixed.p<-posterior_samples(plot.bm.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
-
-
+# price  reponses
 sl.fixed.p<-posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sg.fixed.p<-posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 cde.fixed.p<-posterior_samples(CDE.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
@@ -175,15 +174,34 @@ sgain.fixed.p<-posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 1000, 1
 
 
 
+# select columns of interests and givemeaningful names
 rich_global_posterior <-  rich.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(rich.ctl.global =`b_year_trt`,
          rich.npk.global =`b_trtNPK:year_trt`,
-         rich.trt.global =(`b_year_trt`+`b_trtNPK:year_trt`)) %>%
+         rich.trt.global = (`b_year_trt`+`b_trtNPK:year_trt`)) %>%
   dplyr::select(-c(`b_year_trt`,`b_trtNPK:year_trt`))
 
 head(rich_global_posterior)
 nrow(rich_global_posterior)
 
+# take the mean quantiles of the fixed effects posteriors for each treatment
+rich.p.npk <-  rich_global_posterior %>% 
+  mutate( response="NPK", eff = mean(rich.trt.global),
+          eff_lower = quantile(rich.trt.global, probs=0.025),
+          eff_upper = quantile(rich.trt.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+
+rich.p.ctl <-  rich_global_posterior %>% 
+  mutate( response="Control", eff = mean(rich.ctl.global),
+          eff_lower = quantile(rich.ctl.global, probs=0.025),
+          eff_upper = quantile(rich.ctl.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+# combine them into one data frame
+global.rich.p <- bind_rows(rich.p.npk,rich.p.ctl)
+
+global.rich.p
+
+# biomass
 bm_global_posterior <-  bm.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(bm.ctl.global =`b_year_trt`,
          bm.npk.global=`b_trtNPK:year_trt`,
@@ -192,7 +210,25 @@ bm_global_posterior <-  bm.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year
 
 head(bm_global_posterior)
 
+# take the mean quantiles of the fixed effects posteriors for each treatment
+bm.p.npk <-  bm_global_posterior %>% 
+  mutate( response="NPK", eff = mean(bm.trt.global),
+          eff_lower = quantile(bm.trt.global, probs=0.025),
+          eff_upper = quantile(bm.trt.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
 
+bm.p.ctl <-  bm_global_posterior %>% 
+  mutate( response="Control", eff = mean(bm.ctl.global),
+          eff_lower = quantile(bm.ctl.global, probs=0.025),
+          eff_upper = quantile(bm.ctl.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+# combine them into one data frame
+global.bm.p <- bind_rows(bm.p.npk,bm.p.ctl)
+
+global.bm.p
+
+
+# SL : biomass change associated with species loss
 sl_global_posterior <-  sl.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sl.ctl.global =`b_year.y.m`,
          sl.npk.global=`b_trt.yNPK:year.y.m`,
@@ -201,6 +237,25 @@ sl_global_posterior <-  sl.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:ye
 
 head(sl_global_posterior)
 
+# take the mean quantiles of the fixed effects posteriors for each treatment
+sl.p.npk <-  sl_global_posterior %>% 
+  mutate( response="NPK", eff = mean(sl.trt.global),
+          eff_lower = quantile(sl.trt.global, probs=0.025),
+          eff_upper = quantile(sl.trt.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+
+sl.p.ctl <-  sl_global_posterior %>% 
+  mutate( response="Control", eff = mean(sl.ctl.global),
+          eff_lower = quantile(sl.ctl.global, probs=0.025),
+          eff_upper = quantile(sl.ctl.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+# combine them into one data frame
+global.sl.p <- bind_rows(sl.p.npk,sl.p.ctl)
+
+global.sl.p
+
+
+# SG : biomass change associated with species gains
 sg_global_posterior <-  sg.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sg.ctl.global =`b_year.y.m`,
          sg.npk.global=`b_trt.yNPK:year.y.m`,
@@ -210,6 +265,24 @@ sg_global_posterior <-  sg.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:ye
 head(sg_global_posterior)
 
 
+# take the mean quantiles of the fixed effects posteriors for each treatment
+sg.p.npk <-  sg_global_posterior %>% 
+  mutate( response="NPK", eff = mean(sg.trt.global),
+          eff_lower = quantile(sg.trt.global, probs=0.025),
+          eff_upper = quantile(sg.trt.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+
+sg.p.ctl <-  sg_global_posterior %>% 
+  mutate( response="Control", eff = mean(sg.ctl.global),
+          eff_lower = quantile(sg.ctl.global, probs=0.025),
+          eff_upper = quantile(sg.ctl.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+# combine them into one data frame
+global.sg.p <- bind_rows(sg.p.npk,sg.p.ctl)
+
+global.sg.p
+
+# species loss
 sloss_global_posterior <-  sloss.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sloss.ctl.global =`b_year.y.m`,
          sloss.npk.global=`b_trt.yNPK:year.y.m`,
@@ -218,8 +291,24 @@ sloss_global_posterior <-  sloss.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.y
 
 head(sloss_global_posterior)
 
+# take the mean quantiles of the fixed effects posteriors for each treatment
+sloss.p.npk <-  sloss_global_posterior %>% 
+  mutate( response="NPK", eff = mean(sloss.trt.global),
+          eff_lower = quantile(sloss.trt.global, probs=0.025),
+          eff_upper = quantile(sloss.trt.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
 
+sloss.p.ctl <-  sloss_global_posterior %>% 
+  mutate( response="Control", eff = mean(sloss.ctl.global),
+          eff_lower = quantile(sloss.ctl.global, probs=0.025),
+          eff_upper = quantile(sloss.ctl.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+# combine them into one data frame
+global.sloss.p <- bind_rows(sloss.p.npk,sloss.p.ctl)
 
+global.sloss.p
+
+# species gain
 sgain_global_posterior <-  sgain.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(sgain.ctl.global =`b_year.y.m`,
          sgain.npk.global=`b_trt.yNPK:year.y.m`,
@@ -228,7 +317,25 @@ sgain_global_posterior <-  sgain.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.y
 
 head(sgain_global_posterior)
 
+# take the mean quantiles of the fixed effects posteriors for each treatment
+sgain.p.npk <-  sgain_global_posterior %>% 
+  mutate( response="NPK", eff = mean(sgain.trt.global),
+          eff_lower = quantile(sgain.trt.global, probs=0.025),
+          eff_upper = quantile(sgain.trt.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
 
+sgain.p.ctl <-  sgain_global_posterior %>% 
+  mutate( response="Control", eff = mean(sgain.ctl.global),
+          eff_lower = quantile(sgain.ctl.global, probs=0.025),
+          eff_upper = quantile(sgain.ctl.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+# combine them into one data frame
+global.sgain.p <- bind_rows(sgain.p.npk,sgain.p.ctl)
+
+global.sgain.p
+
+
+# cde or biomass change associated with persistent species
 cde_global_posterior <-  cde.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
   mutate(cde.ctl.global =`b_year.y.m`,
          cde.npk.global=`b_trt.yNPK:year.y.m`,
@@ -237,8 +344,29 @@ cde_global_posterior <-  cde.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:
 
 head(cde_global_posterior)
 
+# take the mean quantiles of the fixed effects posteriors for each treatment
+cde.p.npk <-  cde_global_posterior %>% 
+  mutate( response="NPK", eff = mean(cde.trt.global),
+          eff_lower = quantile(cde.trt.global, probs=0.025),
+          eff_upper = quantile(cde.trt.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
 
-# richness
+cde.p.ctl <-  cde_global_posterior %>% 
+  mutate( response="Control", eff = mean(cde.ctl.global),
+          eff_lower = quantile(cde.ctl.global, probs=0.025),
+          eff_upper = quantile(cde.ctl.global, probs=0.975))  %>%
+  dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
+# combine them into one data frame
+global.cde.p <- bind_rows(cde.p.npk,cde.p.ctl)
+
+global.cde.p
+
+# use the mean and quantiles summaries for the inset plots in Figure 2
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
+save(global.rich.p, global.bm.p,global.sl.p,global.sg.p,global.cde.p,global.sloss.p,global.sgain.p, file = 'global.p.effs.Rdata')
+
+
+# combine 1000 posterior samples with 1000 study levels posteriors to get study level effects
 rich.site.p <- rich_study_posterior %>% group_by(site_code) %>%
   nest() 
 
@@ -325,7 +453,7 @@ cde.p <- cde.site.p %>%
 head(cde.p)
 
 
-
+# calculate the mean and quantiles for every study and keep only the effects we are interested in
 study.rich.p.npk <-  rich.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(rich.study.trt.effect),
           eff_lower = quantile(rich.study.trt.effect, probs=0.025),
@@ -447,16 +575,17 @@ study.sgain.p <- bind_rows(study.sgain.p.npk,study.sgain.p.ctl)
 
 View(study.sgain.p)
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+# we save this for Figure ##
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(study.rich.p, study.bm.p,study.sl.p,study.sg.p,study.cde.p,study.sloss.p,study.sgain.p, file = 'study.p.effs.Rdata')
 
 
 
-load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
-load('~/Dropbox/Projects/NutNet/Data/p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/p.effs.Rdata')
 
 
-
+# label the posteriors from each model in a column, 'Model
 study.rich.p$Model<- "Species Richness"
 study.bm.p$Model<- "Biomass"
 study.sloss.p$Model<- "Species Loss"
@@ -466,7 +595,7 @@ study.sg.p$Model<- "Change in Biomass Due to Species Gain"
 study.cde.p$Model<- "Persistent Species Change in Biomass"
 
 
-
+# bind all the posteriors together
 p.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.p) %>% bind_rows(study.sgain.p) %>%
   bind_rows(study.sl.p) %>% bind_rows(study.sg.p) %>% bind_rows(study.cde.p) %>%
   mutate(Treatment = response,
@@ -478,13 +607,14 @@ p.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.p) %>%
 
 View(p.all)
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+# For Figure ##
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(p.all, file = 'study.p.all.Rdata')
 
 
 
 
-load('~/Dropbox/Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
 
 sloss.t <- study.sloss.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
   mutate(sloss.trt.rate.p = eff) %>%
@@ -548,6 +678,8 @@ price.eff<-left_join(sg.sl.eff,cde.eff)
 
 all.effs <- left_join(price.eff,sloss.sgain.effs)
 
-setwd('~/Dropbox/Projects/NutNet/Data/')
+View(all.effs)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(all.effs, file = 'study.price.p.effs.Rdata')
 
