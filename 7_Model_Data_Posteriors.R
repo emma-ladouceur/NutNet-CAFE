@@ -376,9 +376,6 @@ rich.p <- rich.site.p %>%
   unnest() %>% mutate(rich.study.trt.effect = (rich.trt.study + rich.trt.global)) %>%
   mutate(rich.study.ctl.effect = (rich.ctl.study + rich.ctl.global))
 
-View(rich.p)
-
-
 # biomass
 bm.site.p <- bm_study_posterior %>% group_by(site_code) %>%
   nest() 
@@ -387,10 +384,6 @@ bm.p <- bm.site.p %>%
   mutate(data = purrr::map(data, ~ mutate(.x,cbind(bm_global_posterior)))) %>%
   unnest() %>% mutate(bm.study.trt.effect = (bm.trt.study + bm.trt.global))  %>%
   mutate(bm.study.ctl.effect = (bm.ctl.study + bm.ctl.global))
-
-
-head(bm.p)
-
 
 
 sl.site.p <- sl_study_posterior %>% group_by(site_code) %>%
@@ -402,9 +395,6 @@ sl.p <- sl.site.p %>%
   mutate(sl.study.ctl.effect = (sl.ctl.study + sl.ctl.global))
 
 
-head(sl.p)
-
-
 sg.site.p <- sg_study_posterior %>% group_by(site_code) %>%
   nest() 
 
@@ -412,9 +402,6 @@ sg.p <- sg.site.p %>%
   mutate(data = purrr::map(data, ~ mutate(.x,cbind(sg_global_posterior)))) %>%
   unnest() %>% mutate(sg.study.trt.effect = (sg.trt.study + sg.trt.global))  %>%
   mutate(sg.study.ctl.effect = (sg.ctl.study + sg.ctl.global))
-
-
-head(sg.p)
 
 
 
@@ -425,9 +412,6 @@ sloss.p <- sloss.site.p %>%
   mutate(data = purrr::map(data, ~ mutate(.x,cbind(sloss_global_posterior)))) %>%
   unnest() %>% mutate(sloss.study.trt.effect = (sloss.trt.study + sloss.trt.global))  %>%
   mutate(sloss.study.ctl.effect = (sloss.ctl.study + sloss.ctl.global))
-
-
-head(sloss.p)
 
 
 sgain.site.p <- sgain_study_posterior %>% group_by(site_code) %>%
@@ -609,7 +593,7 @@ study.cde.p$Model<- "Persistent Species Change in Biomass"
 
 
 # bind all the posteriors together
-p.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.p) %>% bind_rows(study.sgain.p) %>%
+p.study.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.p) %>% bind_rows(study.sgain.p) %>%
   bind_rows(study.sl.p) %>% bind_rows(study.sg.p) %>% bind_rows(study.cde.p) %>%
   mutate(Treatment = response,
          Estimate = eff,
@@ -618,15 +602,15 @@ p.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.p) %>%
   select(-response,-eff,-eff_upper,-eff_lower)
 
 
-View(p.all)
+View(p.study.all)
 
-# For Figure ## ????
+# For Shiny App Study Level Stats and Table
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(p.all, file = 'study.p.all.Rdata')
+save(p.study.all, file = 'study.p.all.Rdata')
 
 
 
-# Figure 5
+# Figure 5 & Shiny App
 sloss.t <- study.sloss.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
   mutate(sloss.trt.rate.p = eff) %>%
   select(-response,-eff)
