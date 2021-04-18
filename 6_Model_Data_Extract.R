@@ -1,6 +1,6 @@
 
 
-# Author: Emma Ladouceur & Shane A. Blowes
+# Authors: Emma Ladouceur & Shane A. Blowes
 # Title:
 # Last Updated April 17, 2021
 

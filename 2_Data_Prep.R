@@ -192,6 +192,12 @@ folder = "pairs prep data"
 mapply(saveRDS, pairs_lst, version =2 , file=paste0(folder, "/",names(pairs_lst), '.rds'))
 
 
+# following this, the scripts starting with 'Price Pairs' are used to send these dat to the cluster
+# this can be run on a local machine, but will take time, and code eeds to be adapted
+# a test script is below
+# if written in a loop, for each data subset we have prepared, it wont take long
+
+
 # test it out, test the code for priceTools we will use on the cluster next
 samp <- readRDS("pairs prep data/arch.us_2.rds")
 
@@ -212,38 +218,3 @@ pp <- group.columns(pp,gps=c(group.vars,treat.vars), drop=T)
 
 
 head(pp)
-
-# 
-# 
-# # get max year for filtering
-# 
-# plot <- read.csv("~/Dropbox/Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-# p.all <- read.csv("~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-# 
-# colnames(plot)
-# View(p.all)
-# 
-# plot<-plot %>% group_by(site_code) %>% 
-#   summarise(min.year = min(year_trt),
-#             max.year = max(year_trt)) %>% left_join(plot)
-# 
-# View(plot)
-# 
-# site.inclusion<-plot %>% distinct(site_code,min.year,max.year)
-# site.inclusion
-# 
-# 
-# p.all<-p.all %>% group_by(site_code) %>% 
-#   summarise(min.year = min(year.x),
-#             max.year = max(year.y)) %>% left_join(p.all)
-# 
-# 
-# View(p.all)
-# price.inclusion<-p.all %>% distinct(site_code,min.year,max.year)
-# price.inclusion
-# 
-# write.csv(plot, "~/Dropbox/Projects/NutNet/Data/plot.csv")
-# write.csv(p.all, "~/Dropbox/Projects/NutNet/Data/nutnet_cumulative_time.csv")
-
-
-

@@ -1,5 +1,5 @@
 
-# Author: Emma Ladouceur & Shane A. Blowes
+# Authors: Emma Ladouceur & Shane A. Blowes
 # Title:
 # Last Updated April 17, 2021
 
@@ -172,9 +172,7 @@ cde.fixed.p<-posterior_samples(CDE.3, "^b",subset = floor(runif(n = 1000, 1, max
 sloss.fixed.p<-posterior_samples(s.loss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sgain.fixed.p<-posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 
-
-
-# select columns of interests and givemeaningful names
+# select columns of interests and give meaningful names
 rich_global_posterior <-  rich.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
   mutate(rich.ctl.global =`b_year_trt`,
          rich.npk.global =`b_trtNPK:year_trt`,
@@ -361,7 +359,10 @@ global.cde.p <- bind_rows(cde.p.npk,cde.p.ctl)
 
 global.cde.p
 
-# use the mean and quantiles summaries for the inset plots in Figure 2
+# use the mean and quantiles for :
+# Inset effect plots in Figure 2 a & b,
+# In Figure 2c for overall effects
+# Inset effect plots in Figure 3 b-f
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(global.rich.p, global.bm.p,global.sl.p,global.sg.p,global.cde.p,global.sloss.p,global.sgain.p, file = 'global.p.effs.Rdata')
 
@@ -502,8 +503,7 @@ study.sl.p.ctl <-  sl.p %>% group_by(site_code) %>%
 
 study.sl.p <- bind_rows(study.sl.p.npk,study.sl.p.ctl)
 
-View(study.sl.p)
-
+head(study.sl.p)
 
 
 
@@ -521,10 +521,7 @@ study.sg.p.ctl <-  sg.p %>% group_by(site_code) %>%
 
 study.sg.p <- bind_rows(study.sg.p.npk,study.sg.p.ctl)
 
-View(study.sg.p)
-
-
-
+head(study.sg.p)
 
 study.cde.p.npk <-  cde.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(cde.study.trt.effect),
@@ -539,9 +536,6 @@ study.cde.p.ctl <-  cde.p %>% group_by(site_code) %>%
   dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
 
 study.cde.p <- bind_rows(study.cde.p.npk,study.cde.p.ctl)
-
-
-
 
 study.sloss.p.npk <-  sloss.p %>% group_by(site_code) %>%
   mutate( response="NPK", eff = mean(sloss.study.trt.effect),
@@ -575,15 +569,34 @@ study.sgain.p <- bind_rows(study.sgain.p.npk,study.sgain.p.ctl)
 
 View(study.sgain.p)
 
-# we save this for Figure ##
+# we use this in:
+# Figure 2c
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(study.rich.p, study.bm.p,study.sl.p,study.sg.p,study.cde.p,study.sloss.p,study.sgain.p, file = 'study.p.effs.Rdata')
 
+# Use these same data to calculate categories for:
+# Figure 5 and Figure S5
+study.rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
+
+study.bm.p2 <- study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) 
+
+study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2) %>% filter(response == "NPK")
+
+colnames(study.effs.p)
+
+study.effs.p$Quadrant <- ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff > 0, '+biomass -rich',
+                                ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff < 0,  '-biomass -rich',
+                                       ifelse(study.effs.p$r.eff  > 0 & study.effs.p$b.eff > 0,  '+biomass +rich',
+                                              ifelse(study.effs.p$r.eff > 0 & study.effs.p$b.eff < 0, '-biomass +rich','other'))))
+
+study.effs.p$Quadrant <- factor(study.effs.p$Quadrant, levels= c("+biomass -rich",  "+biomass +rich", "-biomass -rich", "-biomass +rich"))
+
+Quads <- study.effs.p %>% select(site_code, Quadrant)
+
+write.csv(Quads,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv" )
 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/p.effs.Rdata')
-
+# use same data again for:
 
 # label the posteriors from each model in a column, 'Model
 study.rich.p$Model<- "Species Richness"
@@ -607,15 +620,13 @@ p.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.p) %>%
 
 View(p.all)
 
-# For Figure ##
+# For Figure ## ????
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(p.all, file = 'study.p.all.Rdata')
 
 
 
-
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
-
+# Figure 5
 sloss.t <- study.sloss.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
   mutate(sloss.trt.rate.p = eff) %>%
   select(-response,-eff)
@@ -635,7 +646,6 @@ sgain.c <- study.sgain.p %>% select(site_code,eff,response) %>% filter(response 
   select(-response,-eff)
 
 sgain.eff <- left_join(sgain.t,sgain.c)
-
 
 sl.t <- study.sl.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
   mutate(sl.trt.rate.p = eff) %>%
@@ -667,18 +677,20 @@ cde.c <- study.cde.p %>% select(site_code,eff,response) %>% filter(response == "
 
 cde.eff <- left_join(cde.t,cde.c)
 
-
 sloss.sgain.effs<- left_join(sloss.eff,sgain.eff)
 
 sg.sl.eff<-left_join(sg.eff,sl.eff)
 
-
 price.eff<-left_join(sg.sl.eff,cde.eff)
-
 
 all.effs <- left_join(price.eff,sloss.sgain.effs)
 
 View(all.effs)
+
+# For : Figure 5 to plot mean NPK study-level effects
+ all.effs <- all.effs %>% left_join(Quads) %>% select(-X)
+
+head(all.effs)
 
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(all.effs, file = 'study.price.p.effs.Rdata')

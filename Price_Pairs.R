@@ -32,7 +32,7 @@ treat.vars<-c('trt_year')
 
 grouped.data <- table %>% group_by(.dots=c(group.vars,treat.vars))
 
-res <- pairwise.price(grouped.data, species="Taxon", func="biomass.sp.full")
+qstatres <- pairwise.price(grouped.data, species="Taxon", func="biomass.sp.full")
 
 pp <- res
 pp <- group.columns(pp,gps=c(group.vars,treat.vars), drop=T)

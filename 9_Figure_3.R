@@ -1,5 +1,5 @@
 
-# Author: Emma Ladouceur & Shane A. Blowes
+# Authors: Emma Ladouceur & Shane A. Blowes
 # Title:
 # Last Updated April 17, 2021
 
@@ -200,8 +200,8 @@ fig_3c_r
 
 cde_coef3$xs<-1
 
-cde_fitted.npk$Model <- "D) Biomass change cssociated with persistent species (PS)"
-cde_fitted.ctl$Model <- "D) Biomass change cssociated with persistent species (PS)"
+cde_fitted.npk$Model <- "D) Biomass change associated with persistent species (PS)"
+cde_fitted.ctl$Model <- "D) Biomass change associated with persistent species (PS)"
 cde_fitted.npk <- cde_fitted.npk %>% rename(Treatment = trt.y) 
 cde_fitted.ctl <- cde_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
@@ -477,7 +477,7 @@ fig_3f_e <- ggplot() +
                                  ymax = eff_upper,color=response),
                 width = 0, size = 0.7) +
   labs(x = '',
-       y='Slope') +
+       y= 'Slope') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(0,5,10)) +
   scale_color_manual(values = c("#000000","#046C9A")) +

@@ -1,6 +1,6 @@
 
 
-# Author: Emma Ladouceur
+# Authors: Emma Ladouceur & Adam T. Clark
 # Title:
 # Last Updated April 15, 2021
 # This script cleans data to living herbaceous species only and calculates per species biomass according to total plot biomass or
