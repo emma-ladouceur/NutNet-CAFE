@@ -48,6 +48,9 @@ species_nn <- biomass_exp  %>%
 
 colnames(species_nn)
 
+View(species_nn %>% distinct(site_code,site_name,year_max) %>% filter(year_max >= 3))
+  
+
 # plot richness
 
 rich_plot <- species_nn %>%  group_by(id,site_code, year_trt,block,plot,subplot.cov) %>%
