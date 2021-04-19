@@ -78,7 +78,7 @@ p.all <- global.rich.p %>% bind_rows(global.bm.p) %>% bind_rows(global.sloss.p) 
 
 head(p.all)
 
-write.csv(p.all, '~/Dropbox/Projects/NutNet/Data/Table_S2.csv')
+write.csv(p.all, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S2.csv')
 
 
 
