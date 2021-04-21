@@ -13,13 +13,19 @@
 # packages
 library(tidyverse)
 library(brms)
+library(bayesplot)
 
 # plot level data
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 plot <- plot %>% filter(max.year >= 3)
 
-View(plot)
+head(plot)
+
+plot$site_code <- as.factor(plot$site_code)
+plot$block<-as.factor(plot$block)
+plot$plot<-as.factor(plot$plot)
+plot$year_trt<-as.factor(plot$year_trt)
 
 # model objects
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
@@ -27,11 +33,31 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.
 
 # species richness model
 
-
+#  model summary
 summary(plot.rich.3)
+# caterpillar plots
+plot(plot.rich.3)
+# predicted values vs. observed
+color_scheme_set("darkgray")
+fig_s3a <- pp_check(plot.rich.3) + theme_classic() + 
+  labs(x= "Species richness", y = "Density")
+
+fig_s3a
+
+# residuals (this take a minute)
+rich.m <- residuals(plot.rich.3)
+rich.m <-as.data.frame(rich.m)
+rr.plot <- cbind(plot,rich.m$Estimate)
+head(rr.plot)
+
+par(mfrow=c(2,2))
+with(rr.plot, plot(site_code, rich.m$Estimate))
+with(rr.plot, plot(block, rich.m$Estimate))
+with(rr.plot, plot(year_trt, rich.m$Estimate))
+with(rr.plot, plot(plot, rich.m$Estimate))
 
 
-# each of these steps takes a few minutes because the model objects are large
+# each of these steps may take a few minutes because the model objects are large
 # fixed effects
 plot.rich_fitted <- cbind(plot.rich.3$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
@@ -100,6 +126,35 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata
 
 
 # biomass model 
+
+
+#  model summary
+summary(plot.bm.3)
+# caterpillar plots
+plot(plot.bm.3)
+# predicted values vs. observed
+#color_scheme_set("darkgray")
+fig_s3b <- pp_check(plot.bm.3) + theme_classic() + 
+  labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
+  scale_x_continuous(limits = c(-1000, 2000))
+
+fig_s3b
+
+# residuals (this take a minute)
+colnames(plot)
+plot.bm <- plot %>% filter(!is.na(plot.mass))
+bm.m <- residuals(plot.bm.3)
+bm.m <- as.data.frame(bm.m)
+br.plot <- cbind(plot.bm, bm.m$Estimate)
+head(br.plot)
+
+par(mfrow=c(2,2))
+with(br.plot, plot(site_code, bm.m$Estimate))
+with(br.plot, plot(block, bm.m$Estimate))
+with(br.plot, plot(year_trt, bm.m$Estimate))
+with(br.plot, plot(plot, bm.m$Estimate))
+
+
 # fixed effects
 plot.bm_fitted <- cbind(plot.bm.3$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects

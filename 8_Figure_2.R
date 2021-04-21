@@ -271,7 +271,8 @@ fig_2b_r <- ggplot() +
                                  "NPK" = "#0B775E", drop =FALSE))+
   ylim(0,2000)+
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
-  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                                 strip.background = element_blank(),legend.position="none",
                     strip.text = element_text(size=14),
                      plot.margin= margin(t = 0.1, r = 0.2, b =0.2, l = 0.2, unit = "cm"),
                     )
