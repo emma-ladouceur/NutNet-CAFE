@@ -9,7 +9,7 @@
 # 1 produces the final biomass/ species dataset 
 # 2 the plot dataset with measures of species richness across plots and sites
 # 3 preps data for price equation comparisons, which just pairs data into temporal subsets for meaningful comparisons
-# and outputs subsets of the data in paris
+# and outputs subsets of the data in pairs
 
 # packages
 library(tidyverse)
@@ -196,7 +196,7 @@ mapply(saveRDS, pairs_lst, version =2 , file=paste0(folder, "/",names(pairs_lst)
 
 
 # following this, the scripts starting with 'Price Pairs' are used to send these dat to the cluster
-# this can be run on a local machine, but will take time, and code eeds to be adapted
+# this can be run on a local machine, but will take time, and code needs to be adapted
 # a test script is below
 # if written in a loop, for each data subset we have prepared, it wont take long
 
