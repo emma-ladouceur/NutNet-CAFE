@@ -81,6 +81,8 @@ sg.fixed.p2 <-sg.fixed.p %>%
          sg.trt.rate.p,sg.trt.rate_global_slope, sg.trt.rate_upper_slope,sg.trt.rate_lower_slope) %>% sample_n(50) 
 
 
+nrow(sg.fixed.p2)
+
 cde.fixed.p2 <-cde.fixed.p %>% 
   mutate(cde.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
   mutate(cde.ctl.rate.p=`b_year.y.m`) %>%
@@ -143,7 +145,7 @@ loss.gain <- loss.s %>% bind_cols(gains.s)
 all.effs <- loss.gain %>% bind_cols(cde.fixed.p2)
 
 head(all.effs)
-colnames(all.effs)
+nrow(all.effs)
 
 fig_4 <- ggplot()+
   geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 

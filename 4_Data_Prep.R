@@ -6,7 +6,7 @@
 
 # 4 Data Prep
 # This workflow uses the data produced by the script 'Price_Pairs.R", which is submitted to the cluster
-# by Submit Script "Price_Pairs_Submit.sh" and wrapper submit script, "Price_Pairs_Wrapper.sh"
+# by wrapper submit script, "Price_Pairs_Wrapper.sh" and nested Submit Script "Price_Pairs_Submit.sh" a
 # In this script we prune the pairwise comparisons down to only meaningful temporal pairings
 
 # packagaes
