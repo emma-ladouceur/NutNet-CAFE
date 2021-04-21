@@ -1,6 +1,5 @@
 # NutNet
-Community assembly and ecosystem function (CAFE) responses to Nutrient addition
-
+Temporal Community Assembly and the Functioning of Ecosystems (CAFE) responses to Nutrient addition in a globally distributed experiment: The Nutrient Network.
 
 ### Data
 Will detail data provided here.
