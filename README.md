@@ -27,7 +27,7 @@ R Script file names- which are listed below, are numbered and listed in the orde
 **4_Data_Prep.R** This workflow uses the data produced by the script 'Price_Pairs.R", which is submitted to the cluster by wrapper submit script, "Price_Pairs_Wrapper.sh" and nested Submit Script "Price_Pairs_Submit.sh". In this script we prune the pairwise comparisons down to only meaningful temporal pairings.
 
 **FOLDERs: cluster -> univariate models, multivariate models**
-- *A submit script ('.sh') and an R Script ('.R') for every statistical model, named intuitively*
+- *A submit script ('.sh') to send each R script to the cluster, and an R Script ('.R') for every statistical model, named intuitively*
 
 **5_Model_Data_Extract.R** This workflow pulls Data out of *Richness & Biomass* model objects and preps data for visualization in Figure 2. Models have been run on a cluster and each have an R script and a submit script (.sh)
 
