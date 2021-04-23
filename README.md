@@ -12,8 +12,7 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **1_Data_Prep.R** This script cleans data to living herbaceous vascular species only and calculates per species biomass according to total plot biomass or life form group (graminoid, forb, legume etc.)
 **2_Data_Prep.R** This workflow takes cleaned, filter data (woody non-vasculars removed) per species biomass estimate data and re-calculates measures of species richness
-**3_Data_Prep.R** Preps data for price equation comparisons, which just pairs data into temporal subsets for meaningful comparisons
-# and outputs subsets of the data in pairs
+**3_Data_Prep.R** Preps data for price equation comparisons, which just pairs data into temporal subsets for meaningful comparisons and outputs subsets of the data in pairs
 **FOLDER: cluster -> price_pairs**
 -**Price_Pairs_Wrapper.sh** This is a wrapper script to submit multiple jobs for every subsetted dataset to the cluster
 -**Price_Pairs_Submit.sh** This is the submit script for the cluster
