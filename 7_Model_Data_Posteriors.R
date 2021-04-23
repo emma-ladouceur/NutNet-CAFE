@@ -554,12 +554,12 @@ study.sgain.p <- bind_rows(study.sgain.p.npk,study.sgain.p.ctl)
 View(study.sgain.p)
 
 # we use this in:
-# Figure 2c
+# Figure 2c study level effects
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(study.rich.p, study.bm.p,study.sl.p,study.sg.p,study.cde.p,study.sloss.p,study.sgain.p, file = 'study.p.effs.Rdata')
 
 # Use these same data to calculate categories for:
-# Figure 5 and Figure S5
+# Figure 2c, Figure 5, Figure S1,  Figure S5, Table S1
 study.rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
 
 study.bm.p2 <- study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) 
@@ -604,7 +604,7 @@ p.study.all <- study.rich.p %>% bind_rows(study.bm.p) %>% bind_rows(study.sloss.
 
 View(p.study.all)
 
-# For Shiny App Study Level Stats and Table
+# For Shiny App Study Level Stats and Study-Level Table
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(p.study.all, file = 'study.p.all.Rdata')
 

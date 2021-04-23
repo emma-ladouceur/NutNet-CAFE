@@ -379,6 +379,10 @@ fig_4 <- ggplot() +
                                       y= sl.sg.cde.trt_global_slope ) ,
              colour="#046C9A",
              size=0.2,alpha = 0.4) +
+  # point at 0 , 0
+  geom_point(data = added.p.effs, aes(x= 0, # points
+                                      y=  0  ),
+             colour="black",size=2, alpha = 0.7) +
   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
   scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
   annotate("text", x = -0.015, y = 0.75, label = "t0") +
@@ -425,9 +429,6 @@ fixed.leg <- ggplot() +
                    yend = cde.trt_global_slope,colour= Vector ), 
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = cde.s,aes(x=0, #persistent
-                              y=  cde.trt_global_slope),
-             colour="#816687",size=0.1,alpha = 0.4) +
   geom_segment(data = loss.s,
                aes(x = 0,
                    xend = sloss.trt_global_slope,
@@ -435,9 +436,6 @@ fixed.leg <- ggplot() +
                    yend = sl.trt_global_slope, colour= Vector,),
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = loss.s, aes(x= sloss.trt_global_slope, #loss
-                                y=  sl.trt_global_slope ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
   geom_segment(data = gains.s,
                aes(x = 0,
                    xend =  sgain.trt_global_slope,
@@ -445,10 +443,6 @@ fixed.leg <- ggplot() +
                    yend =  sg.trt_global_slope, colour= Vector),
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = gains.s, aes(x= sgain.trt_global_slope, #losses
-                                 y=  sg.trt_global_slope ) ,
-             colour="#3B9AB2",
-             size=0.2,alpha = 0.4)+
   scale_color_manual(name='Overall Effects',breaks=c("Losses","Gains","Persistent Sp."),
                      values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))
 
@@ -457,7 +451,9 @@ fixed.leg
 
 # legend for posterior samples (thin lines)
 post.leg <- ggplot()+
-  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 ) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_segment(data = cde.s,
                aes(x = 0,
                    xend = 0,
