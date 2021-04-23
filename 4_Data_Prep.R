@@ -66,7 +66,7 @@ price.pairs <- price.all %>% separate(trt_year,into=c("trt_year.x","trt_year.y")
   mutate(s.loss = (x.rich - c.rich), # calculate species loss
          s.gain = (y.rich - c.rich), # calculate species gain
          s.loss.n = (s.loss * - 1) , # convert species loss to negative
-        year.y.m = (year.y - mean(year.y) ) ) # centre year
+         year.y.m = (year.y - mean(year.y) ) ) # centre year
 
 
 head(price.pairs)

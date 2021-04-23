@@ -16,26 +16,34 @@ library(viridis)
 
 # data
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv", sep=",", header=T)
+quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
+
 
 nn_plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+  left_join(quads, by= "site_code") %>%
   ungroup()
 
+colnames(nn_plot)
 
 # Supplementary Figures
 
 # Figure S1
-n_map_dat <- nn_plot %>% distinct( site_code, latitude, longitude, year_trt,continent) %>%
-  group_by(site_code, latitude, longitude, continent) %>%
-  summarise('Length of study' = max(year_trt)) %>% filter(!`Length of study` == 0) %>% droplevels()
+n_map_dat <- nn_plot %>% distinct( site_code, latitude, longitude, year_trt,continent, Quadrant) %>%
+  group_by(site_code, latitude, longitude, continent, Quadrant) %>%
+  summarise('Length of study' = max(year_trt)) %>% filter(!`Length of study` == 0) %>% droplevels() %>%
+  ungroup %>%
+  mutate( 'Overall Site Response to NPK' = Quadrant) 
+
+colnames(n_map_dat)
 
 # Get the world polygon
 world <- map_data("world")
 
 fig_s1 <- n_map_dat %>%
-  group_by(latitude, longitude, site_code, `Length of study`, continent) %>%
+  group_by(latitude, longitude, site_code, `Length of study`, continent, `Overall Site Response to NPK`) %>%
   ggplot() +
   geom_polygon(data = world, aes(x=long, y = lat, group = group), fill="grey", alpha=0.7) +
-  geom_point(aes(x=longitude, y=latitude, color=`Length of study`, size=`Length of study`), alpha=0.5) +
+  geom_point(aes(x=longitude, y=latitude, color=`Length of study`, shape= `Overall Site Response to NPK`),size = 2, alpha=0.8) +
   geom_label_repel(
     aes(x=longitude, y=latitude, label = site_code),family = 'Times',
     segment.size = 0.5, segment.alpha = 0.5,
@@ -49,7 +57,7 @@ fig_s1 <- n_map_dat %>%
   theme(
     panel.spacing=unit(c(0,0,0,0), "null"),
     plot.margin=grid::unit(c(1,1,1,1), "cm"),
-    legend.position=c(0.13,0.001),
+    legend.position=c(0.25,0.001),
     legend.direction="horizontal"
   ) +
   ggplot2::annotate("text", x = -185, y = -34, hjust = 0, size = 7, label = paste("The Nutrient Network"), color = "Black") +
@@ -61,8 +69,7 @@ fig_s1 <- n_map_dat %>%
 
 fig_s1
 
-# Save as PNG
-ggsave('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Plots/Figure_S1.png', width = 36, height = 15.22, units = "in", dpi = 90)
+# LANDSCAPE 9 X 14
 
 # Figure S2
 colnames(nn_plot)

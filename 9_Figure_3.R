@@ -85,9 +85,10 @@ fig_3a <- ggplot(data=conceptdat)+
   scale_y_continuous(breaks=c(0)) +
   scale_x_continuous(breaks=c(0)) +
   labs(x = 'Change in Species',
-       y = 'Change in  Biomass') + theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+       y = 'Change in  Biomass') + theme_bw(base_size=14) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                                                      plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                                                     strip.text = element_text(size=14))
+                                                     strip.text = element_text(size=17))
 
 fig_3a
 
@@ -102,12 +103,14 @@ sloss.trt_fitted.npk <- sloss.trt_fitted.npk %>% rename(Treatment = trt.y)
 sloss.trt_fitted.ctl <- sloss.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sloss <- bind_rows(sloss.trt_fitted.npk,sloss.trt_fitted.ctl)
 
+
+View(fitted.sloss)
 fitted.sloss$Treatment <- factor(fitted.sloss$Treatment , levels=c("NPK","Control"))
 
 
 fig_3b_r <- ggplot() +
-  geom_hline(yintercept = 0,linetype="longdash") +
   facet_grid(~Model)+
+  geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = sloss.trt_fitted.npk,
              aes(x = year.y, y = s.loss.n),color="black", alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
@@ -131,12 +134,15 @@ fig_3b_r <- ggplot() +
               fill="black",alpha = 0.5) +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   labs(x = 'Year',
-       y = expression(paste('Species Loss')), title= '') +
+       y = expression(paste('Species Loss')), 
+       #title= 'B) Species loss (s.loss)'
+       title='') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
-  theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                                  strip.background = element_blank(),legend.position="none",
                                   plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                                  strip.text = element_text(size=14),
+                                  strip.text = element_text(size=17),
   )
 
 
@@ -147,9 +153,8 @@ fig_3b_r
 
 sgain.trt_coef3$xs<-1
 
-sgain.trt_fitted.npk$Model<-"C) Species gain (s.gain)"
-sgain.trt_fitted.ctl$Model<-"C) Species gain (s.gain)"
-
+sgain.trt_fitted.npk$Model<-"B) Species gain (s.gain)"
+sgain.trt_fitted.ctl$Model<-"B) Species gain (s.gain)"
 sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sgain<-bind_rows(sgain.trt_fitted.npk,sgain.trt_fitted.ctl)
@@ -180,13 +185,14 @@ fig_3c_r <- ggplot()  +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   ylim(0,20) +
   labs(x = 'Year',
-       y = expression(paste('Species Gain')), title= '') +
+       y = expression(paste('Species Gain')), 
+  title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A",
                                  drop =FALSE))+
   theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
                      plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                     strip.text = element_text(size=14)
+                     strip.text = element_text(size=17)
                      )
 
 
@@ -200,8 +206,6 @@ fig_3c_r
 
 cde_coef3$xs<-1
 
-cde_fitted.npk$Model <- "D) Biomass change associated with persistent species (PS)"
-cde_fitted.ctl$Model <- "D) Biomass change associated with persistent species (PS)"
 cde_fitted.npk <- cde_fitted.npk %>% rename(Treatment = trt.y) 
 cde_fitted.ctl <- cde_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
@@ -209,7 +213,6 @@ fitted.cde$Treatment <- factor(fitted.cde$Treatment , levels=c("NPK","Control"))
 
 fig_3d_r <- ggplot() +
   geom_hline(yintercept = 0,linetype="longdash") +
-  facet_grid(~Model) +
   geom_point(data = cde_fitted.npk,
              aes(x = year.y, y = CDE),color="black", alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
@@ -232,11 +235,11 @@ fig_3d_r <- ggplot() +
   ylim(-500,1000)+
   labs(x='Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-       title= '',  color='Starting Richness') +
+       title= 'D) Biomass change associated \n with persistent species (PS)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#F98400",drop =FALSE))+
   theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                                  legend.position="none", plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                                  legend.position="none", plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                   strip.text = element_text(size=14)
   )
 
@@ -246,15 +249,12 @@ fig_3d_r
 
 sl.trt_coef3$xs<-1
 
-sl.trt_fitted.npk$Model<-"E) Biomass change associated with species loss (SL)"
-sl.trt_fitted.ctl$Model<-"E) Biomass change associated with species loss (SL)"
 sl.trt_fitted.npk <- sl.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sl<-bind_rows(sl.trt_fitted.npk,sl.trt_fitted.ctl)
 fitted.sl$Treatment <- factor(fitted.sl$Treatment , levels=c("NPK","Control"))
 
 fig_3e_r <- ggplot() +
-  facet_grid(~Model)+
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL),color="black",alpha=0.2,
@@ -281,12 +281,13 @@ fig_3e_r <- ggplot() +
   ylim(-400,5) +
   labs(x='Year',
        #x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), title= '') +
+       y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
+       title= 'E) Biomass change associated \n with species loss (SL)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
   theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                                   strip.background = element_blank(),legend.position="none",
-                     plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                     plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                      strip.text = element_text(size=14)
                      )
 
@@ -298,8 +299,6 @@ fig_3e_r
 
 sg.trt_coef3$xs<-1
 
-sg.trt_fitted.npk$Model <- "F) Biomass change associated with species gain (SG)"
-sg.trt_fitted.ctl$Model <- "F) Biomass change associated with species gain (SG)"
 sg.trt_fitted.npk <- sg.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sg.trt_fitted.ctl <- sg.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sg<-bind_rows(sg.trt_fitted.npk,sg.trt_fitted.ctl)
@@ -309,7 +308,6 @@ fitted.sg$Treatment <- factor(fitted.sg$Treatment , levels=c("NPK","Control"))
 fig_3f_r <- ggplot()  +
   geom_hline(yintercept = 0,linetype="longdash") +
   # data
-  facet_grid(~Model) +
   geom_point(data = sg.trt_fitted.npk,
              aes(x = year.y, y = SG), color="black",alpha =0.2,
              size = .7, position = position_jitter(width = 0.45)) +
@@ -333,11 +331,12 @@ fig_3f_r <- ggplot()  +
   ylim(0,400) +
   labs(x = 'Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-       title= '', color='Treatment') +
+       title= 'F) Biomass change associated \n with species gain (SG)',
+       color='Treatment') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A", drop =FALSE))+
   theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="none", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
+                     legend.position="none", plot.margin= margin(t = 0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
                      strip.text = element_text(size=14)
                      )
 
@@ -350,7 +349,6 @@ sg.trt_fitted.npk$Plot <- "Pairwise Plot"
 sg.trt_coef3$Site <- "Site"
 
 fig_3_legend <- ggplot()  +
-  facet_grid(~Model) +
   geom_point(data = sg.trt_fitted.npk,
              aes(x = year.y, y = SG, fill="Pairwise Plot"), alpha =0.2,
              size = .7, position = position_jitter(width = 0.45)) +
@@ -461,7 +459,7 @@ fig_3e_e <-ggplot() +
                                  ymax = eff_upper,color=response),
                 width = 0, size = 0.7) +
   labs(x = '',
-       y='') +
+       y='Slope') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(0,-8)) +
   scale_color_manual(values = c("#000000","#B40F20")) +
@@ -493,19 +491,19 @@ fig_3f_e
 
 # Inset effect plots within regression plots
 
-fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 7, xmax = 12, 
+fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 6.5, xmax = 12.75, 
                                          ymin = -20, ymax = -11)
 
-fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 7, xmax = 12, 
+fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 6.5, xmax = 12.75, 
                                          ymin = 11, ymax = 20)
 
-fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 7, xmax = 12, 
+fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 6.5, xmax = 12.75, 
                                         ymin = 400, ymax = 1050)
 
-fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 7, xmax = 12, 
+fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 6.5, xmax = 12.75, 
                                    ymin = -400, ymax = -255)
 
-fig_3f <- fig_3f_r +  annotation_custom(ggplotGrob(fig_3f_e), xmin = 7, xmax = 12, 
+fig_3f <- fig_3f_r +  annotation_custom(ggplotGrob(fig_3f_e), xmin = 6.5, xmax = 12.75, 
                                    ymin = 255, ymax = 400)
 
 # put everything together with patchwork

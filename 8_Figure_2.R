@@ -74,6 +74,10 @@ fig_2c <- ggplot()+
                                    xmin = r.eff_lower, xmax = r.eff_upper),height=0,colour = "#0B775E", size = 2, alpha=0.9) +
   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
+  annotate("text", x = -2.5, y = 200, label = "+biomass -rich") +
+  annotate("text", x = 1.5, y = 200, label = "+biomass +rich") +
+  annotate("text", x = -2.5, y = -200, label = "-biomass -rich") +
+  annotate("text", x = 1.5, y = -200, label = "-biomass +rich") +
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = ' C)') + theme_classic(base_size=14 ) +
@@ -144,8 +148,8 @@ fig_2c_legend <- grid.arrange(oc.leg,sc.leg,ncol=2,nrow=1)
 
 
 # Richness & Biomass Regressions
-plot.rich_fitted.npk$Model <- "Species Richness"
-plot.rich_fitted.ctl$Model <- "Species Richness"
+plot.rich_fitted.npk$Model <- "A) Species Richness"
+plot.rich_fitted.ctl$Model <- "A) Species Richness"
 plot.rich_fitted.npk <- plot.rich_fitted.npk %>% rename(Treatment = trt) 
 plot.rich_fitted.ctl <- plot.rich_fitted.ctl %>% rename(Treatment = trt) 
 fitted.rich <- bind_rows(plot.rich_fitted.npk,plot.rich_fitted.ctl)
@@ -180,12 +184,12 @@ fig_2a_r <- ggplot() +
               alpha = 0.5) +
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   labs(x='Year',
-       y = ' Species richness', title= 'A)') +
+       y = ' Species richness', title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#0B775E", drop =FALSE))+
   theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                  strip.background = element_blank(),legend.position="none",
-                   strip.text = element_text(size=14),
+                                 strip.text = element_text(size=17),
                      plot.margin= margin(t = 0.1, r = 0.2, b = 0.2, l = 0.2, unit = "cm"),
                     )
 
@@ -222,16 +226,18 @@ fig_2ab_legend <- ggplot() +
   scale_fill_manual(values = c("black", drop =FALSE))+
   scale_color_manual(values = c("black",drop =FALSE))+
   theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                 strip.background = element_blank(),legend.position="bottom",
-                     plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),legend.spacing.x = unit(0.25, 'cm'))
+                                 strip.background = element_blank(),
+                                 legend.position="bottom",
+                     plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                     legend.spacing.x = unit(0.25, 'cm'))
 
 fig_2ab_legend
 
 
 
 # Biomass Regression
-plot.bm_fitted.npk$Model<-"Biomass"
-plot.bm_fitted.ctl$Model<-"Biomass"
+plot.bm_fitted.npk$Model<-"B) Biomass"
+plot.bm_fitted.ctl$Model<-"B) Biomass"
 plot.bm_fitted.npk <- plot.bm_fitted.npk %>% rename(Treatment = trt) 
 plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% rename(Treatment = trt) 
 fitted.bm<-bind_rows(plot.bm_fitted.npk,plot.bm_fitted.ctl)
@@ -266,14 +272,14 @@ fig_2b_r <- ggplot() +
               aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
   labs(x='Year',
-       y = expression(paste('Biomass (g/',m^2, ')')), title= 'B)') +
+       y = expression(paste('Biomass (g/',m^2, ')')), title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#0B775E", drop =FALSE))+
   ylim(0,2000)+
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                                  strip.background = element_blank(),legend.position="none",
-                    strip.text = element_text(size=14),
+                                 strip.text = element_text(size=17),
                      plot.margin= margin(t = 0.1, r = 0.2, b =0.2, l = 0.2, unit = "cm"),
                     )
 
@@ -337,11 +343,11 @@ g_legend<-function(a.gplot){
 fig_2ab_legend <- g_legend(fig_2ab_legend)
 
 # use grid extra to add inset effect plots to regression
-fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 7, xmax = 12, 
-                                ymin = 28, ymax = 40)
+fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 6.5, xmax = 12.75, 
+                                ymin = 25, ymax = 42)
 
-fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 7, xmax = 12, 
-                             ymin = 1400 ,ymax = 2000)
+fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 6.5, xmax = 12.75, 
+                             ymin = 1200 ,ymax = 2075)
 
 
 # use patchwork to put everything together
