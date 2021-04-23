@@ -47,35 +47,35 @@ sg.fixed.p <- posterior_samples(sg.3, "^b",subset = floor(runif(n = 2000, 1, max
 # i think the approach i currently take was meant to be a test and i was gonna fix it later but i didnt
 # ask shane to check and for thoughts before i change everything
 sl.fixed.p2 <- sl.fixed.p %>% 
-  mutate(sl.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
-  select(sl.ctl.rate.p,
-         sl.trt.rate.p) 
+  mutate(sl.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
+  select(sl.ctl.p,
+         sl.trt.p) 
 
 sg.fixed.p2 <-sg.fixed.p %>% 
-  mutate(sg.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
-  mutate(sg.ctl.rate.p=`b_year.y.m`) %>%
-  select(sg.ctl.rate.p,
-         sg.trt.rate.p,)
+  mutate(sg.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
+  mutate(sg.ctl.p=`b_year.y.m`) %>%
+  select(sg.ctl.p,
+         sg.trt.p,)
 
 cde.fixed.p2 <-cde.fixed.p %>% 
-  mutate(cde.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
-  mutate(cde.ctl.rate.p=`b_year.y.m`) %>%
-  select(cde.ctl.rate.p,
-         cde.trt.rate.p,) 
+  mutate(cde.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
+  mutate(cde.ctl.p=`b_year.y.m`) %>%
+  select(cde.ctl.p,
+         cde.trt.p,) 
 
 
 sloss.fixed.p2 <-sloss.fixed.p %>% 
-  mutate(sloss.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
-  mutate(sloss.ctl.rate.p=`b_year.y.m`) %>%
-  select(sloss.ctl.rate.p,
-         sloss.trt.rate.p,) 
+  mutate(sloss.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
+  mutate(sloss.ctl.p=`b_year.y.m`) %>%
+  select(sloss.ctl.p,
+         sloss.trt.p,) 
 
 
 sgain.fixed.p2 <-sgain.fixed.p %>% 
-  mutate(sgain.trt.rate.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
-  mutate(sgain.ctl.rate.p=`b_year.y.m`) %>%
-  select(sgain.ctl.rate.p,
-         sgain.trt.rate.p)
+  mutate(sgain.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
+  mutate(sgain.ctl.p=`b_year.y.m`) %>%
+  select(sgain.ctl.p,
+         sgain.trt.p)
 
 
 cde.s <- cde.fixed.p2  
@@ -94,124 +94,124 @@ nrow(all.effs)
 effs_calc <- all.effs %>%
   # add posterior samples together
   mutate( # controls
-          sloss.sgain.ctl.p = (sloss.ctl.rate.p + sgain.ctl.rate.p),
-          sl.sg.ctl.p = (sl.ctl.rate.p + sg.ctl.rate.p),
-          sl.sg.cde.ctl.p = (sl.ctl.rate.p + sg.ctl.rate.p + cde.ctl.rate.p),
+          sloss.sgain.ctl.p = (sloss.ctl.p + sgain.ctl.p),
+          sl.sg.ctl.p = (sl.ctl.p + sg.ctl.p),
+          sl.sg.cde.ctl.p = (sl.ctl.p + sg.ctl.p + cde.ctl.p),
           #  npk treatments
-          sloss.sgain.trt.p = (sloss.trt.rate.p + sgain.trt.rate.p),
-          sl.sg.trt.p = (sl.trt.rate.p + sg.trt.rate.p),
-          sl.sg.cde.trt.p = (sl.trt.rate.p + sg.trt.rate.p + cde.trt.rate.p)) %>%
+          sloss.sgain.trt.p = (sloss.trt.p + sgain.trt.p),
+          sl.sg.trt.p = (sl.trt.p + sg.trt.p),
+          sl.sg.cde.trt.p = (sl.trt.p + sg.trt.p + cde.trt.p)) %>%
   # select columns we need
-  select(sloss.ctl.rate.p, sloss.sgain.ctl.p, sl.ctl.rate.p, sl.sg.ctl.p, sl.sg.cde.ctl.p,
-         sloss.trt.rate.p, sloss.sgain.trt.p, sl.trt.rate.p, sl.sg.trt.p, sl.sg.cde.trt.p)
+  select(sloss.ctl.p, sloss.sgain.ctl.p, sl.ctl.p, sl.sg.ctl.p, sl.sg.cde.ctl.p,
+         sloss.trt.p, sloss.sgain.trt.p, sl.trt.p, sl.sg.trt.p, sl.sg.cde.trt.p)
 
 # take mean and quantiles within probs
 #controls
 sloss.ctl.effs <- effs_calc %>%
-  select(sloss.ctl.rate.p) %>%
+  select(sloss.ctl.p) %>%
   # sloss control
-  mutate( sloss.ctl.rate_global_slope = mean(sloss.ctl.rate.p),
-          sloss.ctl.rate_lower_slope = quantile(sloss.ctl.rate.p, probs=0.025),
-          sloss.ctl.rate_upper_slope = quantile(sloss.ctl.rate.p, probs=0.975) )  %>%
-  filter(sloss.ctl.rate.p > quantile(sloss.ctl.rate.p, probs=0.025),
-         sloss.ctl.rate.p < quantile(sloss.ctl.rate.p, probs=0.975)) %>% sample_n(50) 
+  mutate( sloss.ctl_global_slope = mean(sloss.ctl.p),
+          sloss.ctl_lower_slope = quantile(sloss.ctl.p, probs=0.025),
+          sloss.ctl_upper_slope = quantile(sloss.ctl.p, probs=0.975) )  %>%
+  filter(sloss.ctl.p > quantile(sloss.ctl.p, probs=0.025),
+         sloss.ctl.p < quantile(sloss.ctl.p, probs=0.975)) %>% sample_n(50) 
 
 sloss.sgain.ctl.effs <- effs_calc %>% 
   select(sloss.sgain.ctl.p) %>%
   # sloss + sgain control
-  mutate( sloss.sgain.ctl.rate_global_slope = mean(sloss.sgain.ctl.p),
-          sloss.sgain.ctl.rate_lower_slope = quantile(sloss.sgain.ctl.p, probs=0.025),
-          sloss.sgain.ctl.rate_upper_slope = quantile(sloss.sgain.ctl.p, probs=0.975) )  %>%
+  mutate( sloss.sgain.ctl_global_slope = mean(sloss.sgain.ctl.p),
+          sloss.sgain.ctl_lower_slope = quantile(sloss.sgain.ctl.p, probs=0.025),
+          sloss.sgain.ctl_upper_slope = quantile(sloss.sgain.ctl.p, probs=0.975) )  %>%
   filter(sloss.sgain.ctl.p > quantile(sloss.sgain.ctl.p, probs=0.025),
          sloss.sgain.ctl.p < quantile(sloss.sgain.ctl.p, probs=0.975)) %>% sample_n(50) 
 
 sl.ctl.effs <- effs_calc %>% 
-  select(sl.ctl.rate.p) %>%
+  select(sl.ctl.p) %>%
   # sl control
-  mutate( sl.ctl.rate_global_slope = mean(sl.ctl.rate.p),
-          sl.ctl.rate_lower_slope = quantile(sl.ctl.rate.p, probs=0.025),
-          sl.ctl.rate_upper_slope = quantile(sl.ctl.rate.p, probs=0.975) )  %>%
-  filter(sl.ctl.rate.p > quantile(sl.ctl.rate.p, probs=0.025),
-         sl.ctl.rate.p < quantile(sl.ctl.rate.p, probs=0.975)) %>% sample_n(50) 
+  mutate( sl.ctl_global_slope = mean(sl.ctl.p),
+          sl.ctl_lower_slope = quantile(sl.ctl.p, probs=0.025),
+          sl.ctl_upper_slope = quantile(sl.ctl.p, probs=0.975) )  %>%
+  filter(sl.ctl.p > quantile(sl.ctl.p, probs=0.025),
+         sl.ctl.p < quantile(sl.ctl.p, probs=0.975)) %>% sample_n(50) 
 
 sl.sg.ctl.effs <- effs_calc %>% 
   select(sl.sg.ctl.p) %>%
   # sl + sg control
-  mutate( sl.sg.ctl.rate_global_slope = mean(sl.sg.ctl.p),
-          sl.sg.ctl.rate_lower_slope = quantile(sl.sg.ctl.p, probs=0.025),
-          sl.sg.ctl.rate_upper_slope = quantile(sl.sg.ctl.p, probs=0.975) )  %>%
+  mutate( sl.sg.ctl_global_slope = mean(sl.sg.ctl.p),
+          sl.sg.ctl_lower_slope = quantile(sl.sg.ctl.p, probs=0.025),
+          sl.sg.ctl_upper_slope = quantile(sl.sg.ctl.p, probs=0.975) )  %>%
   filter(sl.sg.ctl.p > quantile(sl.sg.ctl.p, probs=0.025),
          sl.sg.ctl.p < quantile(sl.sg.ctl.p, probs=0.975)) %>% sample_n(50)
 
 sl.sg.cde.ctl.effs <- effs_calc %>% 
   select(sl.sg.cde.ctl.p) %>%
   # sl + sg + cde control
-  mutate( sl.sg.cde.ctl.rate_global_slope = mean(sl.sg.cde.ctl.p),
-          sl.sg.cde.ctl.rate_lower_slope = quantile(sl.sg.cde.ctl.p, probs=0.025),
-          sl.sg.cde.ctl.rate_upper_slope = quantile(sl.sg.cde.ctl.p, probs=0.975) )  %>%
+  mutate( sl.sg.cde.ctl_global_slope = mean(sl.sg.cde.ctl.p),
+          sl.sg.cde.ctl_lower_slope = quantile(sl.sg.cde.ctl.p, probs=0.025),
+          sl.sg.cde.ctl_upper_slope = quantile(sl.sg.cde.ctl.p, probs=0.975) )  %>%
   filter(sl.sg.cde.ctl.p > quantile(sl.sg.cde.ctl.p, probs=0.025),
          sl.sg.cde.ctl.p < quantile(sl.sg.cde.ctl.p, probs=0.975)) %>% sample_n(50) 
 
 # treatments
 sloss.trt.effs <- effs_calc %>% 
-  select(sloss.trt.rate.p) %>%
+  select(sloss.trt.p) %>%
   # sloss treatment
-  mutate( sloss.trt.rate_global_slope = mean(sloss.trt.rate.p),
-          sloss.trt.rate_lower_slope = quantile(sloss.trt.rate.p, probs=0.025),
-          sloss.trt.rate_upper_slope = quantile(sloss.trt.rate.p, probs=0.975) )  %>%
-  filter(sloss.trt.rate.p > quantile(sloss.trt.rate.p, probs=0.025),
-         sloss.trt.rate.p < quantile(sloss.trt.rate.p, probs=0.975)) %>% sample_n(50) 
+  mutate( sloss.trt_global_slope = mean(sloss.trt.p),
+          sloss.trt_lower_slope = quantile(sloss.trt.p, probs=0.025),
+          sloss.trt_upper_slope = quantile(sloss.trt.p, probs=0.975) )  %>%
+  filter(sloss.trt.p > quantile(sloss.trt.p, probs=0.025),
+         sloss.trt.p < quantile(sloss.trt.p, probs=0.975)) %>% sample_n(50) 
 
 sloss.sgain.trt.effs <- effs_calc %>% 
   select(sloss.sgain.trt.p) %>%
   # sloss + sgain treatment
-  mutate( sloss.sgain.trt.rate_global_slope = mean(sloss.sgain.trt.p),
-          sloss.sgain.trt.rate_lower_slope = quantile(sloss.sgain.trt.p, probs=0.025),
-          sloss.sgain.trt.rate_upper_slope = quantile(sloss.sgain.trt.p, probs=0.975) )  %>%
+  mutate( sloss.sgain.trt_global_slope = mean(sloss.sgain.trt.p),
+          sloss.sgain.trt_lower_slope = quantile(sloss.sgain.trt.p, probs=0.025),
+          sloss.sgain.trt_upper_slope = quantile(sloss.sgain.trt.p, probs=0.975) )  %>%
   filter(sloss.sgain.trt.p > quantile(sloss.sgain.trt.p, probs=0.025),
          sloss.sgain.trt.p < quantile(sloss.sgain.trt.p, probs=0.975)) %>% sample_n(50) 
 
 sl.trt.effs <- effs_calc %>% 
-  select(sl.trt.rate.p) %>%
+  select(sl.trt.p) %>%
   # sl treatment
-  mutate( sl.trt.rate_global_slope = mean(sl.trt.rate.p),
-          sl.trt.rate_lower_slope = quantile(sl.trt.rate.p, probs=0.025),
-          sl.trt.rate_upper_slope = quantile(sl.trt.rate.p, probs=0.975) )  %>%
-  filter(sl.trt.rate.p > quantile(sl.trt.rate.p, probs=0.025),
-         sl.trt.rate.p < quantile(sl.trt.rate.p, probs=0.975)) %>% sample_n(50)
+  mutate( sl.trt_global_slope = mean(sl.trt.p),
+          sl.trt_lower_slope = quantile(sl.trt.p, probs=0.025),
+          sl.trt_upper_slope = quantile(sl.trt.p, probs=0.975) )  %>%
+  filter(sl.trt.p > quantile(sl.trt.p, probs=0.025),
+         sl.trt.p < quantile(sl.trt.p, probs=0.975)) %>% sample_n(50)
 
 sl.sg.trt.effs <- effs_calc %>% 
   select(sl.sg.trt.p) %>%
   # sl + sg treatment
-  mutate( sl.sg.trt.rate_global_slope = mean(sl.sg.trt.p),
-          sl.sg.trt.rate_lower_slope = quantile(sl.sg.trt.p, probs=0.025),
-          sl.sg.trt.rate_upper_slope = quantile(sl.sg.trt.p, probs=0.975) )  %>%
+  mutate( sl.sg.trt_global_slope = mean(sl.sg.trt.p),
+          sl.sg.trt_lower_slope = quantile(sl.sg.trt.p, probs=0.025),
+          sl.sg.trt_upper_slope = quantile(sl.sg.trt.p, probs=0.975) )  %>%
   filter(sl.sg.trt.p > quantile(sl.sg.trt.p, probs=0.025),
          sl.sg.trt.p < quantile(sl.sg.trt.p, probs=0.975)) %>% sample_n(50) 
 
 sl.sg.cde.trt.effs <- effs_calc %>% 
   select(sl.sg.cde.trt.p) %>%
   # sl + sg + cde treatment
-  mutate( sl.sg.cde.trt.rate_global_slope = mean(sl.sg.cde.trt.p),
-          sl.sg.cde.trt.rate_lower_slope = quantile(sl.sg.cde.trt.p, probs=0.025),
-          sl.sg.cde.trt.rate_upper_slope = quantile(sl.sg.cde.trt.p, probs=0.975) )  %>%
+  mutate( sl.sg.cde.trt_global_slope = mean(sl.sg.cde.trt.p),
+          sl.sg.cde.trt_lower_slope = quantile(sl.sg.cde.trt.p, probs=0.025),
+          sl.sg.cde.trt_upper_slope = quantile(sl.sg.cde.trt.p, probs=0.975) )  %>%
   filter(sl.sg.cde.trt.p > quantile(sl.sg.cde.trt.p, probs=0.025),
          sl.sg.cde.trt.p < quantile(sl.sg.cde.trt.p, probs=0.975)) %>% sample_n(50) 
 
 
 added.p.effs <- sloss.ctl.effs %>% cbind(sloss.sgain.ctl.effs, sl.ctl.effs, sl.sg.ctl.effs, sl.sg.cde.ctl.effs,
                                          sloss.trt.effs, sloss.sgain.trt.effs, sl.trt.effs, sl.sg.trt.effs, sl.sg.cde.trt.effs) %>% 
-  select(sloss.ctl.rate_global_slope, sloss.sgain.ctl.p, 
-         sloss.sgain.ctl.rate_global_slope, sloss.ctl.rate.p,
-         sl.ctl.rate_global_slope,sl.ctl.rate.p,
-         sl.sg.ctl.rate_global_slope, sl.sg.ctl.p,
-         sl.sg.cde.ctl.rate_global_slope,sl.sg.cde.ctl.p,
+  select(sloss.ctl_global_slope, sloss.sgain.ctl.p, 
+         sloss.sgain.ctl_global_slope, sloss.ctl.p,
+         sl.ctl_global_slope,sl.ctl.p,
+         sl.sg.ctl_global_slope, sl.sg.ctl.p,
+         sl.sg.cde.ctl_global_slope,sl.sg.cde.ctl.p,
          # treatments
-         sloss.trt.rate_global_slope, sloss.trt.rate.p,
-         sloss.sgain.trt.rate_global_slope,sloss.sgain.trt.p,
-         sl.trt.rate_global_slope,sl.trt.rate.p,
-         sl.sg.trt.rate_global_slope, sl.sg.trt.p,
-         sl.sg.cde.trt.rate_global_slope,sl.sg.cde.trt.p) 
+         sloss.trt_global_slope, sloss.trt.p,
+         sloss.sgain.trt_global_slope,sloss.sgain.trt.p,
+         sl.trt_global_slope,sl.trt.p,
+         sl.sg.trt_global_slope, sl.sg.trt.p,
+         sl.sg.cde.trt_global_slope,sl.sg.cde.trt.p) 
   
   
 nrow(added.p.effs)
@@ -226,20 +226,20 @@ fig_4 <- ggplot() +
   # species loss (x-axis) & SL (y-axis)
   geom_segment(data = added.p.effs,  # segments
                aes(x = 0,
-                   xend = sloss.ctl.rate.p,
+                   xend = sloss.ctl.p,
                    y = 0,
-                   yend = sl.ctl.rate.p  ),
+                   yend = sl.ctl.p  ),
                colour= "#B40F20", linetype=2,
                size = 0.2,  alpha = 0.2,
                arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.ctl.rate.p, # points
-                                  y=  sl.ctl.rate.p  ),
+  geom_point(data = added.p.effs, aes(x= sloss.ctl.p, # points
+                                  y=  sl.ctl.p  ),
              colour="black",size=0.2,alpha = 0.2) +
   # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs, # segment
-               aes(x = sloss.ctl.rate.p,
+               aes(x = sloss.ctl.p,
                    xend =  sloss.sgain.ctl.p ,
-                   y = sl.ctl.rate.p,
+                   y = sl.ctl.p,
                    yend = sl.sg.ctl.p ),
                colour= "#046C9A",linetype=2,
                size = 0.2,  alpha = 0.2,
@@ -262,65 +262,65 @@ fig_4 <- ggplot() +
              colour="#F98400",size=0.1,alpha = 0.2) +
   # Overall effects in Controls (thick dashed lines) 
   # species loss (x-axis) & SL (y-axis)
-  geom_segment(data = added.p.effs %>% distinct(sloss.ctl.rate_global_slope,
-                                                sl.ctl.rate_global_slope), # segments
+  geom_segment(data = added.p.effs %>% distinct(sloss.ctl_global_slope,
+                                                sl.ctl_global_slope), # segments
                aes(x = 0,
-                   xend = sloss.ctl.rate_global_slope,
+                   xend = sloss.ctl_global_slope,
                    y = 0,
-                   yend = sl.ctl.rate_global_slope  ),
+                   yend = sl.ctl_global_slope  ),
                colour= "#B40F20", linetype=2,
                size = 1.5, alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.ctl.rate_global_slope, # points
-                                  y=  sl.ctl.rate_global_slope ),
+  geom_point(data = added.p.effs, aes(x= sloss.ctl_global_slope, # points
+                                  y=  sl.ctl_global_slope ),
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs %>% 
-                 distinct(sloss.ctl.rate_global_slope,sloss.sgain.ctl.rate_global_slope,
-                          sl.ctl.rate_global_slope,sl.sg.ctl.rate_global_slope),
-               aes(x = sloss.ctl.rate_global_slope,
-                   xend = sloss.sgain.ctl.rate_global_slope,
-                   y = sl.ctl.rate_global_slope,
-                   yend =  sl.sg.ctl.rate_global_slope),
+                 distinct(sloss.ctl_global_slope,sloss.sgain.ctl_global_slope,
+                          sl.ctl_global_slope,sl.sg.ctl_global_slope),
+               aes(x = sloss.ctl_global_slope,
+                   xend = sloss.sgain.ctl_global_slope,
+                   y = sl.ctl_global_slope,
+                   yend =  sl.sg.ctl_global_slope),
                colour= "#046C9A",linetype=2,
                size = 1.5,alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl.rate_global_slope, # point
-                                  y= sl.sg.ctl.rate_global_slope ) ,
+  geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl_global_slope, # point
+                                  y= sl.sg.ctl_global_slope ) ,
              colour="#046C9A",
              size=0.2,alpha = 0.4) +
   # persistent species (cde/ps) (y axis only)
   geom_segment(data = added.p.effs %>% #segment
-                 distinct( sloss.sgain.ctl.rate_global_slope,sl.sg.ctl.rate_global_slope,
-                           sl.sg.cde.ctl.rate_global_slope),
-               aes(x = sloss.sgain.ctl.rate_global_slope,
-                   xend = sloss.sgain.ctl.rate_global_slope,
-                   y = sl.sg.ctl.rate_global_slope,
-                   yend = sl.sg.cde.ctl.rate_global_slope), 
+                 distinct( sloss.sgain.ctl_global_slope,sl.sg.ctl_global_slope,
+                           sl.sg.cde.ctl_global_slope),
+               aes(x = sloss.sgain.ctl_global_slope,
+                   xend = sloss.sgain.ctl_global_slope,
+                   y = sl.sg.ctl_global_slope,
+                   yend = sl.sg.cde.ctl_global_slope), 
                colour=  "#F98400",linetype=2,
                size = 1.5,alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
   geom_point(data = added.p.effs,aes(x=0, # points
-                                 y=  sl.sg.cde.ctl.rate_global_slope),
+                                 y=  sl.sg.cde.ctl_global_slope),
              colour="#F98400",size=0.1,alpha = 0.4) +
   # posterior uncertainty samples for treatments (NPK) (thin solid lines)
   # species loss (x-axis) and SL (y-axis)
   geom_segment(data = added.p.effs, # segment
                aes(x = 0,
-                   xend = sloss.trt.rate.p  ,
+                   xend = sloss.trt.p  ,
                    y = 0,
-                   yend = sl.trt.rate.p   ),
+                   yend = sl.trt.p   ),
                colour= "#B40F20",
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.trt.rate.p , # points
-                                  y=  sl.trt.rate.p  ),
+  geom_point(data = added.p.effs, aes(x= sloss.trt.p , # points
+                                  y=  sl.trt.p  ),
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs,  #segment
-               aes(x = sloss.trt.rate.p ,
+               aes(x = sloss.trt.p ,
                    xend = sloss.sgain.trt.p ,
-                   y = sl.trt.rate.p ,
+                   y = sl.trt.p ,
                    yend = sl.sg.trt.p ),
                colour= "#046C9A",
                size = 0.2,  alpha = 0.4,
@@ -343,43 +343,43 @@ fig_4 <- ggplot() +
              colour="#F98400",size=0.1,alpha = 0.4) +
   #   # Overall effects in Treatments (NPK) (thick solid lines) 
   # species loss (x-axis) and SL (y-axis)
-  geom_segment(data = added.p.effs %>% distinct(sloss.trt.rate_global_slope , sloss.ctl.rate_global_slope,
-                                                sl.trt.rate_global_slope, sl.ctl.rate_global_slope),
+  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global_slope , sloss.ctl_global_slope,
+                                                sl.trt_global_slope, sl.ctl_global_slope),
                aes(x = 0,
-                   xend = sloss.trt.rate_global_slope ,
+                   xend = sloss.trt_global_slope ,
                    y = 0,
-                   yend = sl.trt.rate_global_slope ),
+                   yend = sl.trt_global_slope ),
                colour= "#B40F20",
                size = 1.5, #alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.trt.rate_global_slope , #loss
-                                  y=  sl.trt.rate_global_slope ),
+  geom_point(data = added.p.effs, aes(x= sloss.trt_global_slope , #loss
+                                  y=  sl.trt_global_slope ),
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
-  geom_segment(data = added.p.effs %>% distinct(sloss.trt.rate_global_slope ,sloss.sgain.trt.rate_global_slope, 
-                                                sl.trt.rate_global_slope, sl.sg.trt.rate_global_slope ),
-               aes(x = sloss.trt.rate_global_slope,
-                   xend = sloss.sgain.trt.rate_global_slope,
-                   y = sl.trt.rate_global_slope ,
-                   yend = sl.sg.trt.rate_global_slope ),
+  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global_slope ,sloss.sgain.trt_global_slope, 
+                                                sl.trt_global_slope, sl.sg.trt_global_slope ),
+               aes(x = sloss.trt_global_slope,
+                   xend = sloss.sgain.trt_global_slope,
+                   y = sl.trt_global_slope ,
+                   yend = sl.sg.trt_global_slope ),
                colour= "#046C9A",
                size = 1.5,#alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x=  sloss.sgain.trt.rate_global_slope, #losses
-                                  y=  sl.sg.trt.rate_global_slope,
+  geom_point(data = added.p.effs, aes(x=  sloss.sgain.trt_global_slope, #losses
+                                  y=  sl.sg.trt_global_slope,
   ), colour="#046C9A", size=0.2,alpha = 0.4) +
   # persistent species (cde/ps) (y axis only)
-  geom_segment(data = added.p.effs %>% distinct(sloss.trt.rate_global_slope ,sloss.sgain.trt.rate_global_slope, 
-                                                sl.trt.rate_global_slope, sl.sg.trt.rate_global_slope,sl.sg.cde.trt.rate_global_slope ),
-               aes(x = sloss.sgain.trt.rate_global_slope,
-                   xend = sloss.sgain.trt.rate_global_slope,
-                   y = sl.sg.trt.rate_global_slope,
-                   yend = sl.sg.cde.trt.rate_global_slope ), 
+  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global_slope ,sloss.sgain.trt_global_slope, 
+                                                sl.trt_global_slope, sl.sg.trt_global_slope,sl.sg.cde.trt_global_slope ),
+               aes(x = sloss.sgain.trt_global_slope,
+                   xend = sloss.sgain.trt_global_slope,
+                   y = sl.sg.trt_global_slope,
+                   yend = sl.sg.cde.trt_global_slope ), 
                colour= "#F98400",
                size = 1.5,#alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
   geom_point(data = added.p.effs,aes(x=0, #persistent
-                                 y=  sl.sg.cde.trt.rate_global_slope ),
+                                 y=  sl.sg.cde.trt_global_slope ),
              colour="#F98400",size=0.1,alpha = 0.4) +
   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
   scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
@@ -396,12 +396,22 @@ fig_4
 
 # GET LEGENDS
 cde.s <- cde.fixed.p2  %>%
+  mutate( cde.ctl_global_slope = mean(cde.ctl.p),
+          cde.trt_global_slope = mean(cde.trt.p)) %>%
   mutate( Vector = "Persistent Sp.")
 
 loss.s <- sl.fixed.p2 %>% bind_cols(sloss.fixed.p2) %>%
+  mutate( sl.ctl_global_slope = mean(sl.ctl.p),
+          sl.trt_global_slope = mean(sl.trt.p),
+          sloss.ctl_global_slope = mean(sloss.ctl.p),
+          sloss.trt_global_slope = mean(sloss.trt.p)) %>%
   mutate( Vector = "Losses")
 
 gains.s <- sg.fixed.p2 %>% bind_cols(sgain.fixed.p2) %>%
+  mutate( sg.ctl_global_slope = mean(sg.ctl.p),
+          sg.trt_global_slope = mean(sg.trt.p),
+          sgain.ctl_global_slope = mean(sgain.ctl.p),
+          sgain.trt_global_slope = mean(sgain.trt.p)) %>%
   mutate( Vector = "Gains")
 
 # legend for overall effects (thick lines)
@@ -414,31 +424,31 @@ fixed.leg <- ggplot() +
                aes(x = 0,
                    xend = 0,
                    y = 0,
-                   yend = cde.trt.rate_global_slope,colour= Vector ), 
+                   yend = cde.trt_global_slope,colour= Vector ), 
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_point(data = cde.s,aes(x=0, #persistent
-                              y=  cde.trt.rate_global_slope),
+                              y=  cde.trt_global_slope),
              colour="#816687",size=0.1,alpha = 0.4) +
   geom_segment(data = loss.s,
                aes(x = 0,
-                   xend = sloss.trt.rate_global_slope,
+                   xend = sloss.trt_global_slope,
                    y = 0,
-                   yend = sl.trt.rate_global_slope, colour= Vector,),
+                   yend = sl.trt_global_slope, colour= Vector,),
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = loss.s, aes(x= sloss.trt.rate_global_slope, #loss
-                                y=  sl.trt.rate_global_slope ),
+  geom_point(data = loss.s, aes(x= sloss.trt_global_slope, #loss
+                                y=  sl.trt_global_slope ),
              colour="#B40F20",size=0.2,alpha = 0.4)+
   geom_segment(data = gains.s,
                aes(x = 0,
-                   xend =  sgain.trt.rate_global_slope,
+                   xend =  sgain.trt_global_slope,
                    y = 0,
-                   yend =  sg.trt.rate_global_slope, colour= Vector),
+                   yend =  sg.trt_global_slope, colour= Vector),
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = gains.s, aes(x= sgain.trt.rate_global_slope, #losses
-                                 y=  sg.trt.rate_global_slope ) ,
+  geom_point(data = gains.s, aes(x= sgain.trt_global_slope, #losses
+                                 y=  sg.trt_global_slope ) ,
              colour="#3B9AB2",
              size=0.2,alpha = 0.4)+
   scale_color_manual(name='Overall Effects',breaks=c("Losses","Gains","Persistent Sp."),
@@ -454,21 +464,21 @@ post.leg <- ggplot()+
                aes(x = 0,
                    xend = 0,
                    y = 0,
-                   yend = cde.trt.rate.p ,colour= Vector),
+                   yend = cde.trt.p ,colour= Vector),
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_segment(data = loss.s,
                aes(x = 0,
-                   xend = sloss.trt.rate.p ,
+                   xend = sloss.trt.p ,
                    y = 0,
-                   yend = sl.trt.rate.p ,colour= Vector ),
+                   yend = sl.trt.p ,colour= Vector ),
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_segment(data = gains.s,
                aes(x = 0,
-                   xend = sgain.trt.rate.p ,
+                   xend = sgain.trt.p ,
                    y = 0,
-                   yend = sg.trt.rate.p ,
+                   yend = sg.trt.p ,
                    colour= Vector), size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   scale_color_manual(name='Uncertainty',breaks=c("Losses","Gains","Persistent Sp."),

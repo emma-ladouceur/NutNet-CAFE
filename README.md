@@ -36,13 +36,13 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **9_Figure_3**  The script produces Figure 3 a) - f).
 
-**10_Figure_4.2.R**
+**10_Figure_4.2.R** This might be a more accurate version of Figure 4.
 
-**11_Figure_4.3.R**
+**11_Figure_4.3.R** This... will be Figure 4 with PS plotted first.
 
-**10_Figure_4.R** This script produces Figure 4.
+**10_Figure_4.R** This script produces Figure 4 currently in MS.
 
-**11_Figure_5.R** This script produces Figure 5.
+**11_Figure_5.R** This script produces Figure 5 a)- e).
 
 **12_Supplementary_Figures.R** This script produces Figure S1, S2, S5.
 
