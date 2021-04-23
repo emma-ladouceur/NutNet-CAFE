@@ -2,13 +2,13 @@
 
 Code Authors: Emma Ladouceur, [Shane A. Blowes](https://github.com/sablowes) & [Adam T. Clark](https://github.com/adamtclark)
  
-Community Assembly and the Functioning of Ecosystems (CAFE) : temporal responses to Nutrient addition in a globally distributed experiment: The Nutrient Network.
+Community Assembly and the Functioning of Ecosystems (CAFE) : temporal responses to Nutrient addition in a globally distributed experiment: [The Nutrient Network](https://nutnet.org/home).
 
 ### Data
 Will detail data provided here.
 
 ### **R Scripts** 
-R Script file names- which are listed below, are numbered and listed in the order they should be used. Price equation partitions and statistical models are run on the cluster, which means this workflow can not be perfectly run through continuously on a local machine. However, code from cluster scripts can be used pedagogicly or be adapted to run o a local machine, just be aware they take time and require immense computation power.
+R Script file names- which are listed below, are numbered and listed in the order they should be used. Price equation partitions and statistical models are run on the cluster, which means this workflow can not be perfectly run through continuously on a local machine. However, code from cluster scripts can be used pedagogicly or be adapted to run on a local machine, just be aware they take a few hours each and require substantial computation power.
 
 **1_Data_Prep.R** This script cleans data to living herbaceous vascular species only and calculates per species biomass according to total plot biomass or life form group (graminoid, forb, legume etc.)
 
