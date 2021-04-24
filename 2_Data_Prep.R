@@ -114,7 +114,7 @@ sp <- species_nn %>% distinct(id,site_code,site_name,block,plot,year_trt,year_ma
   left_join(nat_cov) %>% left_join(int_cov) %>% left_join(unk_cov) %>% 
   arrange(id)
 
-head(sp)
+colnames(sp)
 
 #  now we revisit the biggest biomass values 
 biggest.bm.values <- sp %>%  filter(year_max >= 3) %>% # out analysis is based on sites 3 years or older
@@ -129,11 +129,13 @@ View(biggest.bm.values)
 # species biomass data for NPK and Control plots for appropriate sites to match price calcs
 write.csv(sp, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/biomass_sp_CAFE.csv")
 
+View(sp)
+
 # 2 plot and site data 
-plot <- sp %>% select(-c(Taxon, max_cover,local_provenance,category.mod,cat.cover,subplot.bm,local_lifeform,local_lifespan,functional_group,category,strip.mass,cat.mass,biomass.sp.cat,biomass.sp.plot,biomass.sp.full,biomass.m.full)) %>%
+plot <- sp %>% select(-c(Taxon, max_cover,local_provenance,category.mod,cat.cover,subplot.bm,local_lifeform,local_lifespan,functional_group,category,orig.bm.cat,orig.mass,cat.mass,biomass.sp.cat,biomass.sp.plot,biomass.sp.full,biomass.m.full)) %>%
   distinct(id, .keep_all = T)
 
-head(plot)
+View(plot)
 
 site.inclusion<-plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
 # 58 sites will be included in our main analysis
@@ -142,9 +144,5 @@ View(site.inclusion)
 write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.csv")
 
 
-
-p <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-head(p)
 
 
