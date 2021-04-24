@@ -46,8 +46,8 @@ species_nn <- biomass_exp  %>%
   select(id,site_code,site_name,year,year_trt,year_max,trt,block,plot,plot.cover,orig.bm.cat,category.mod,cat.cover,subplot.cov,subplot.bm,local_lifeform,local_lifespan,local_provenance,functional_group,Taxon,max_cover,category,orig.mass,strip.mass,cat.mass,biomass.sp.plot,biomass.sp.cat,biomass.sp.full,biomass.m.full)
 
 colnames(species_nn)
-
-View(species_nn %>% distinct(site_code,site_name,year_max) %>% filter(year_max >= 3))
+View(species_nn)
+View(species_nn %>% distinct(site_code,site_name,year_trt,year_max) %>% filter(year_max >= 3))
   
 
 # plot richness
@@ -140,4 +140,11 @@ site.inclusion<-plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
 View(site.inclusion)
 
 write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.csv")
+
+
+
+p <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+head(p)
+
 
