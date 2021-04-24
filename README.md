@@ -11,7 +11,7 @@ Species level data is not provided. Data openly available to produce results inc
 
 **nutnet_cumulative_time.csv** Includes details about  pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with  persistent species (PS). These data are needed to run models associated with and produce Figure 3, 4, & 5.
 
-**Model Objects**  The data listed above are used in statistical models,  then model objects are saved and provided. Data is extracted from these model objects  and are saved as data objects which are also provided, and then can then be used to produce figures without running the models. 
+**Model Objects**  The data listed above are used in statistical models, then model objects are saved and provided. Data is extracted from these model objects  and are saved as data objects which are also provided, and then can then be used to produce figures without running the models. 
 
 
 ### **R Scripts** 
@@ -43,11 +43,9 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **9_Figure_3**  The script produces Figure 3 a) - f).
 
-**10_Figure_4.2.R** This might be a more accurate version of Figure 4.
-
-**11_Figure_4.3.R** This... will be Figure 4 with PS plotted first.
-
 **10_Figure_4.R** This script produces Figure 4 currently in MS.
+
+**10_Figure_4.2.R** This is Figure 4 with the PS effect plotted first. Might become supplementary.
 
 **11_Figure_5.R** This script produces Figure 5 a)- e).
 
@@ -56,9 +54,4 @@ R Script file names- which are listed below, are numbered and listed in the orde
 **13_Supplementary_Figure_S4.R** This script produces Figure S4.
 
 **14_Supplementary_Tables** This script produces Tables S1 & S2.
-
-
-
-
-
 

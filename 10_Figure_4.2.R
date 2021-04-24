@@ -48,6 +48,7 @@ sg.fixed.p <- posterior_samples(sg.3, "^b",subset = floor(runif(n = 2000, 1, max
 # ask shane to check and for thoughts before i change everything
 sl.fixed.p2 <- sl.fixed.p %>% 
   mutate(sl.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
+  mutate(sl.ctl.p=`b_year.y.m`) %>%
   select(sl.ctl.p,
          sl.trt.p) 
 
@@ -95,18 +96,27 @@ effs_calc <- all.effs %>%
   # add posterior samples together
   mutate( # controls
           sloss.sgain.ctl.p = (sloss.ctl.p + sgain.ctl.p),
-          sl.sg.ctl.p = (sl.ctl.p + sg.ctl.p),
+          sl.cde.ctl.p = (sl.ctl.p + cde.ctl.p),
           sl.sg.cde.ctl.p = (sl.ctl.p + sg.ctl.p + cde.ctl.p),
           #  npk treatments
           sloss.sgain.trt.p = (sloss.trt.p + sgain.trt.p),
-          sl.sg.trt.p = (sl.trt.p + sg.trt.p),
+          sl.cde.trt.p = (sl.trt.p + cde.trt.p),
           sl.sg.cde.trt.p = (sl.trt.p + sg.trt.p + cde.trt.p)) %>%
   # select columns we need
-  select(sloss.ctl.p, sloss.sgain.ctl.p, sl.ctl.p, sl.sg.ctl.p, sl.sg.cde.ctl.p,
-         sloss.trt.p, sloss.sgain.trt.p, sl.trt.p, sl.sg.trt.p, sl.sg.cde.trt.p)
+  select(cde.ctl.p, sloss.ctl.p, sloss.sgain.ctl.p,  sl.cde.ctl.p, sl.sg.cde.ctl.p,
+        cde.trt.p,  sloss.trt.p, sloss.sgain.trt.p,  sl.cde.trt.p, sl.sg.cde.trt.p)
 
 # take mean and quantiles within probs
 #controls
+cde.ctl.effs <- effs_calc %>%
+  select(cde.ctl.p) %>%
+  # cde control
+  mutate( cde.ctl_global_slope = mean(cde.ctl.p),
+          cde.ctl_lower_slope = quantile(cde.ctl.p, probs=0.025),
+          cde.ctl_upper_slope = quantile(cde.ctl.p, probs=0.975) )  %>%
+  filter(cde.ctl.p > quantile(cde.ctl.p, probs=0.025),
+         cde.ctl.p < quantile(cde.ctl.p, probs=0.975)) %>% sample_n(50) 
+
 sloss.ctl.effs <- effs_calc %>%
   select(sloss.ctl.p) %>%
   # sloss control
@@ -125,23 +135,15 @@ sloss.sgain.ctl.effs <- effs_calc %>%
   filter(sloss.sgain.ctl.p > quantile(sloss.sgain.ctl.p, probs=0.025),
          sloss.sgain.ctl.p < quantile(sloss.sgain.ctl.p, probs=0.975)) %>% sample_n(50) 
 
-sl.ctl.effs <- effs_calc %>% 
-  select(sl.ctl.p) %>%
-  # sl control
-  mutate( sl.ctl_global_slope = mean(sl.ctl.p),
-          sl.ctl_lower_slope = quantile(sl.ctl.p, probs=0.025),
-          sl.ctl_upper_slope = quantile(sl.ctl.p, probs=0.975) )  %>%
-  filter(sl.ctl.p > quantile(sl.ctl.p, probs=0.025),
-         sl.ctl.p < quantile(sl.ctl.p, probs=0.975)) %>% sample_n(50) 
 
-sl.sg.ctl.effs <- effs_calc %>% 
-  select(sl.sg.ctl.p) %>%
+sl.cde.ctl.effs <- effs_calc %>% 
+  select(sl.cde.ctl.p) %>%
   # sl + sg control
-  mutate( sl.sg.ctl_global_slope = mean(sl.sg.ctl.p),
-          sl.sg.ctl_lower_slope = quantile(sl.sg.ctl.p, probs=0.025),
-          sl.sg.ctl_upper_slope = quantile(sl.sg.ctl.p, probs=0.975) )  %>%
-  filter(sl.sg.ctl.p > quantile(sl.sg.ctl.p, probs=0.025),
-         sl.sg.ctl.p < quantile(sl.sg.ctl.p, probs=0.975)) %>% sample_n(50)
+  mutate( sl.cde.ctl_global_slope = mean(sl.cde.ctl.p),
+          sl.cde.ctl_lower_slope = quantile(sl.cde.ctl.p, probs=0.025),
+          sl.cde.ctl_upper_slope = quantile(sl.cde.ctl.p, probs=0.975) )  %>%
+  filter(sl.cde.ctl.p > quantile(sl.cde.ctl.p, probs=0.025),
+         sl.cde.ctl.p < quantile(sl.cde.ctl.p, probs=0.975)) %>% sample_n(50)
 
 sl.sg.cde.ctl.effs <- effs_calc %>% 
   select(sl.sg.cde.ctl.p) %>%
@@ -153,6 +155,16 @@ sl.sg.cde.ctl.effs <- effs_calc %>%
          sl.sg.cde.ctl.p < quantile(sl.sg.cde.ctl.p, probs=0.975)) %>% sample_n(50) 
 
 # treatments
+cde.trt.effs <- effs_calc %>% 
+  select(cde.trt.p) %>%
+  # sloss treatment
+  mutate( cde.trt_global_slope = mean(cde.trt.p),
+          cde.trt_lower_slope = quantile(cde.trt.p, probs=0.025),
+          cde.trt_upper_slope = quantile(cde.trt.p, probs=0.975) )  %>%
+  filter(cde.trt.p > quantile(cde.trt.p, probs=0.025),
+         cde.trt.p < quantile(cde.trt.p, probs=0.975)) %>% sample_n(50) 
+
+
 sloss.trt.effs <- effs_calc %>% 
   select(sloss.trt.p) %>%
   # sloss treatment
@@ -171,23 +183,14 @@ sloss.sgain.trt.effs <- effs_calc %>%
   filter(sloss.sgain.trt.p > quantile(sloss.sgain.trt.p, probs=0.025),
          sloss.sgain.trt.p < quantile(sloss.sgain.trt.p, probs=0.975)) %>% sample_n(50) 
 
-sl.trt.effs <- effs_calc %>% 
-  select(sl.trt.p) %>%
-  # sl treatment
-  mutate( sl.trt_global_slope = mean(sl.trt.p),
-          sl.trt_lower_slope = quantile(sl.trt.p, probs=0.025),
-          sl.trt_upper_slope = quantile(sl.trt.p, probs=0.975) )  %>%
-  filter(sl.trt.p > quantile(sl.trt.p, probs=0.025),
-         sl.trt.p < quantile(sl.trt.p, probs=0.975)) %>% sample_n(50)
-
-sl.sg.trt.effs <- effs_calc %>% 
-  select(sl.sg.trt.p) %>%
+sl.cde.trt.effs <- effs_calc %>% 
+  select(sl.cde.trt.p) %>%
   # sl + sg treatment
-  mutate( sl.sg.trt_global_slope = mean(sl.sg.trt.p),
-          sl.sg.trt_lower_slope = quantile(sl.sg.trt.p, probs=0.025),
-          sl.sg.trt_upper_slope = quantile(sl.sg.trt.p, probs=0.975) )  %>%
-  filter(sl.sg.trt.p > quantile(sl.sg.trt.p, probs=0.025),
-         sl.sg.trt.p < quantile(sl.sg.trt.p, probs=0.975)) %>% sample_n(50) 
+  mutate( sl.cde.trt_global_slope = mean(sl.cde.trt.p),
+          sl.cde.trt_lower_slope = quantile(sl.cde.trt.p, probs=0.025),
+          sl.cde.trt_upper_slope = quantile(sl.cde.trt.p, probs=0.975) )  %>%
+  filter(sl.cde.trt.p > quantile(sl.cde.trt.p, probs=0.025),
+         sl.cde.trt.p < quantile(sl.cde.trt.p, probs=0.975)) %>% sample_n(50) 
 
 sl.sg.cde.trt.effs <- effs_calc %>% 
   select(sl.sg.cde.trt.p) %>%
@@ -199,18 +202,19 @@ sl.sg.cde.trt.effs <- effs_calc %>%
          sl.sg.cde.trt.p < quantile(sl.sg.cde.trt.p, probs=0.975)) %>% sample_n(50) 
 
 
-added.p.effs <- sloss.ctl.effs %>% cbind(sloss.sgain.ctl.effs, sl.ctl.effs, sl.sg.ctl.effs, sl.sg.cde.ctl.effs,
-                                         sloss.trt.effs, sloss.sgain.trt.effs, sl.trt.effs, sl.sg.trt.effs, sl.sg.cde.trt.effs) %>% 
-  select(sloss.ctl_global_slope, sloss.sgain.ctl.p, 
-         sloss.sgain.ctl_global_slope, sloss.ctl.p,
-         sl.ctl_global_slope,sl.ctl.p,
-         sl.sg.ctl_global_slope, sl.sg.ctl.p,
+added.p.effs <- cde.ctl.effs %>% cbind( sloss.ctl.effs, sloss.sgain.ctl.effs,  sl.cde.ctl.effs, sl.sg.cde.ctl.effs,
+                                         cde.trt.effs, sloss.trt.effs, sloss.sgain.trt.effs,  sl.cde.trt.effs, sl.sg.cde.trt.effs) %>% 
+  select(# controls
+         cde.ctl_global_slope, cde.ctl.p, 
+         sloss.ctl_global_slope, sloss.ctl.p, 
+         sloss.sgain.ctl_global_slope, sloss.sgain.ctl.p,
+         sl.cde.ctl_global_slope, sl.cde.ctl.p,
          sl.sg.cde.ctl_global_slope,sl.sg.cde.ctl.p,
          # treatments
+         cde.trt_global_slope, cde.trt.p, 
          sloss.trt_global_slope, sloss.trt.p,
          sloss.sgain.trt_global_slope,sloss.sgain.trt.p,
-         sl.trt_global_slope,sl.trt.p,
-         sl.sg.trt_global_slope, sl.sg.trt.p,
+         sl.cde.trt_global_slope, sl.cde.trt.p,
          sl.sg.cde.trt_global_slope,sl.sg.cde.trt.p) 
   
   
@@ -223,164 +227,162 @@ fig_4 <- ggplot() +
   theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                      strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   # posterior uncertainty samples for Controls (small dashed lines)
+  # persistent species
+  geom_segment(data = added.p.effs,  # segments
+               aes(x = 0,
+                   xend = 0,
+                   y = 0,
+                   yend = cde.ctl.p  ),
+               colour= "#F98400", linetype=2,
+               size = 0.2,  alpha = 0.2,
+               arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = added.p.effs, aes(x= 0, # points
+                                      y=  cde.ctl.p  ),
+             colour="black",size=0.2,alpha = 0.2) +
   # species loss (x-axis) & SL (y-axis)
   geom_segment(data = added.p.effs,  # segments
                aes(x = 0,
                    xend = sloss.ctl.p,
-                   y = 0,
-                   yend = sl.ctl.p  ),
+                   y = cde.ctl.p,
+                   yend = sl.cde.ctl.p  ),
                colour= "#B40F20", linetype=2,
                size = 0.2,  alpha = 0.2,
                arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_point(data = added.p.effs, aes(x= sloss.ctl.p, # points
-                                  y=  sl.ctl.p  ),
+                                  y=  sl.cde.ctl.p  ),
              colour="black",size=0.2,alpha = 0.2) +
   # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs, # segment
                aes(x = sloss.ctl.p,
                    xend =  sloss.sgain.ctl.p ,
-                   y = sl.ctl.p,
-                   yend = sl.sg.ctl.p ),
+                   y = sl.cde.ctl.p,
+                   yend = sl.sg.cde.ctl.p ),
                colour= "#046C9A",linetype=2,
                size = 0.2,  alpha = 0.2,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl.p, # points
-                                  y=  sl.sg.ctl.p ) ,
+                                  y=  sl.sg.cde.ctl.p ) ,
              colour="black",
              size=0.2,alpha = 0.2) +
-  # persistent species (cde/ps) (y axis only)
-  geom_segment(data = added.p.effs, # segment
-               aes(x =  sloss.sgain.ctl.p,
-                   xend =  sloss.sgain.ctl.p,
-                   y =  sl.sg.ctl.p,
-                   yend = sl.sg.cde.ctl.p ), 
-               colour=  "#F98400",linetype=2,
-               size = 0.2,  alpha = 0.2,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs,aes(x=0, # points
-                                 y= sl.sg.cde.ctl.p),
-             colour="#F98400",size=0.1,alpha = 0.2) +
   # Overall effects in Controls (thick dashed lines) 
+  # persistent species 
+  geom_segment(data = added.p.effs %>% distinct(cde.ctl_global_slope), # segments
+               aes(x = 0,
+                   xend = 0,
+                   y = 0,
+                   yend = cde.ctl_global_slope  ),
+               colour= "#F98400", linetype=2,
+               size = 1.5, alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
   # species loss (x-axis) & SL (y-axis)
-  geom_segment(data = added.p.effs %>% distinct(sloss.ctl_global_slope,
-                                                sl.ctl_global_slope), # segments
+  geom_segment(data = added.p.effs %>% distinct(cde.ctl_global_slope,sloss.ctl_global_slope,
+                                                sl.cde.ctl_global_slope), # segments
                aes(x = 0,
                    xend = sloss.ctl_global_slope,
-                   y = 0,
-                   yend = sl.ctl_global_slope  ),
+                   y = cde.ctl_global_slope,
+                   yend = sl.cde.ctl_global_slope  ),
                colour= "#B40F20", linetype=2,
                size = 1.5, alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
   geom_point(data = added.p.effs, aes(x= sloss.ctl_global_slope, # points
-                                  y=  sl.ctl_global_slope ),
+                                  y=  sl.cde.ctl_global_slope ),
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs %>% 
                  distinct(sloss.ctl_global_slope,sloss.sgain.ctl_global_slope,
-                          sl.ctl_global_slope,sl.sg.ctl_global_slope),
+                          sl.cde.ctl_global_slope,sl.sg.cde.ctl_global_slope),
                aes(x = sloss.ctl_global_slope,
                    xend = sloss.sgain.ctl_global_slope,
-                   y = sl.ctl_global_slope,
-                   yend =  sl.sg.ctl_global_slope),
+                   y = sl.cde.ctl_global_slope,
+                   yend =  sl.sg.cde.ctl_global_slope),
                colour= "#046C9A",linetype=2,
                size = 1.5,alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
   geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl_global_slope, # point
-                                  y= sl.sg.ctl_global_slope ) ,
+                                  y= sl.sg.cde.ctl_global_slope ) ,
              colour="#046C9A",
              size=0.2,alpha = 0.4) +
-  # persistent species (cde/ps) (y axis only)
-  geom_segment(data = added.p.effs %>% #segment
-                 distinct( sloss.sgain.ctl_global_slope,sl.sg.ctl_global_slope,
-                           sl.sg.cde.ctl_global_slope),
-               aes(x = sloss.sgain.ctl_global_slope,
-                   xend = sloss.sgain.ctl_global_slope,
-                   y = sl.sg.ctl_global_slope,
-                   yend = sl.sg.cde.ctl_global_slope), 
-               colour=  "#F98400",linetype=2,
-               size = 1.5,alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs,aes(x=0, # points
-                                 y=  sl.sg.cde.ctl_global_slope),
-             colour="#F98400",size=0.1,alpha = 0.4) +
-  # posterior uncertainty samples for treatments (NPK) (thin solid lines)
-  # species loss (x-axis) and SL (y-axis)
+  #TRT
+  # posterior uncertainty samples for Treatments (small solid lines)
+  # persistent species
+  geom_segment(data = added.p.effs,  # segments
+               aes(x = 0,
+                   xend = 0,
+                   y = 0,
+                   yend = cde.trt.p  ),
+               colour= "#F98400", 
+               size = 0.2,  alpha = 0.2,
+               arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = added.p.effs, aes(x= 0, # points
+                                      y=  cde.trt.p  ),
+             colour="black",size=0.2,alpha = 0.2) +
+  # species loss (x-axis) & SL (y-axis)
+  geom_segment(data = added.p.effs,  # segments
+               aes(x = 0,
+                   xend = sloss.trt.p,
+                   y = cde.trt.p,
+                   yend = sl.cde.trt.p  ),
+               colour= "#B40F20", 
+               size = 0.2,  alpha = 0.2,
+               arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_point(data = added.p.effs, aes(x= sloss.trt.p, # points
+                                      y=  sl.cde.trt.p  ),
+             colour="black",size=0.2,alpha = 0.2) +
+  # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs, # segment
-               aes(x = 0,
-                   xend = sloss.trt.p  ,
-                   y = 0,
-                   yend = sl.trt.p   ),
-               colour= "#B40F20",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.trt.p , # points
-                                  y=  sl.trt.p  ),
-             colour="#B40F20",size=0.2,alpha = 0.4) +
-  # species gain (x-axis) & SG (y-axis)
-  geom_segment(data = added.p.effs,  #segment
-               aes(x = sloss.trt.p ,
-                   xend = sloss.sgain.trt.p ,
-                   y = sl.trt.p ,
-                   yend = sl.sg.trt.p ),
-               colour= "#046C9A",
-               size = 0.2,  alpha = 0.4,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.sgain.trt.p , #points
-                                  y= sl.sg.trt.p),
-             colour="#046C9A",
-             size=0.2,alpha = 0.4) +
-  # persistent species (cde/ps) (y axis only)
-  geom_segment(data = added.p.effs, #segment
-               aes(x = sloss.sgain.trt.p,
-                   xend = sloss.sgain.trt.p,
-                   y = sl.sg.trt.p,
+               aes(x = sloss.trt.p,
+                   xend =  sloss.sgain.trt.p ,
+                   y = sl.cde.trt.p,
                    yend = sl.sg.cde.trt.p ),
-               colour= "#F98400",
-               size = 0.2,  alpha = 0.4,
+               colour= "#046C9A",
+               size = 0.2,  alpha = 0.2,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs,aes(x=0, # point
-                                 y= sl.sg.cde.trt.p ),
-             colour="#F98400",size=0.1,alpha = 0.4) +
-  #   # Overall effects in Treatments (NPK) (thick solid lines) 
-  # species loss (x-axis) and SL (y-axis)
-  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global_slope , sloss.ctl_global_slope,
-                                                sl.trt_global_slope, sl.ctl_global_slope),
+  geom_point(data = added.p.effs, aes(x= sloss.sgain.trt.p, # points
+                                      y=  sl.sg.cde.trt.p ) ,
+             colour="black",
+             size=0.2,alpha = 0.2) +
+  # Overall effects in Treatments (thick solid lines) 
+  # persistent species 
+  geom_segment(data = added.p.effs %>% distinct(cde.trt_global_slope), # segments
                aes(x = 0,
-                   xend = sloss.trt_global_slope ,
+                   xend = 0,
                    y = 0,
-                   yend = sl.trt_global_slope ),
-               colour= "#B40F20",
-               size = 1.5, #alpha=0.7,
+                   yend = cde.trt_global_slope  ),
+               colour= "#F98400", 
+               size = 1.5, alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.trt_global_slope , #loss
-                                  y=  sl.trt_global_slope ),
+  # species loss (x-axis) & SL (y-axis)
+  geom_segment(data = added.p.effs %>% distinct(cde.trt_global_slope,sloss.trt_global_slope,
+                                                sl.cde.trt_global_slope), # segments
+               aes(x = 0,
+                   xend = sloss.trt_global_slope,
+                   y = cde.trt_global_slope,
+                   yend = sl.cde.trt_global_slope  ),
+               colour= "#B40F20", 
+               size = 1.5, alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  geom_point(data = added.p.effs, aes(x= sloss.trt_global_slope, # points
+                                      y=  sl.cde.trt_global_slope ),
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
-  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global_slope ,sloss.sgain.trt_global_slope, 
-                                                sl.trt_global_slope, sl.sg.trt_global_slope ),
+  geom_segment(data = added.p.effs %>% 
+                 distinct(sloss.trt_global_slope,sloss.sgain.trt_global_slope,
+                          sl.cde.trt_global_slope,sl.sg.cde.trt_global_slope),
                aes(x = sloss.trt_global_slope,
                    xend = sloss.sgain.trt_global_slope,
-                   y = sl.trt_global_slope ,
-                   yend = sl.sg.trt_global_slope ),
+                   y = sl.cde.trt_global_slope,
+                   yend =  sl.sg.cde.trt_global_slope),
                colour= "#046C9A",
-               size = 1.5,#alpha=0.7,
+               size = 1.5,alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x=  sloss.sgain.trt_global_slope, #losses
-                                  y=  sl.sg.trt_global_slope,
-  ), colour="#046C9A", size=0.2,alpha = 0.4) +
-  # persistent species (cde/ps) (y axis only)
-  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global_slope ,sloss.sgain.trt_global_slope, 
-                                                sl.trt_global_slope, sl.sg.trt_global_slope,sl.sg.cde.trt_global_slope ),
-               aes(x = sloss.sgain.trt_global_slope,
-                   xend = sloss.sgain.trt_global_slope,
-                   y = sl.sg.trt_global_slope,
-                   yend = sl.sg.cde.trt_global_slope ), 
-               colour= "#F98400",
-               size = 1.5,#alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs,aes(x=0, #persistent
-                                 y=  sl.sg.cde.trt_global_slope ),
-             colour="#F98400",size=0.1,alpha = 0.4) +
+  geom_point(data = added.p.effs, aes(x= sloss.sgain.trt_global_slope, # point
+                                      y= sl.sg.cde.trt_global_slope ) ,
+             colour="#046C9A",
+             size=0.2,alpha = 0.4) +
+  # point at 0 , 0
+  geom_point(data = added.p.effs, aes(x= 0, # points
+                                      y=  0  ),
+             colour="black",size=2, alpha = 0.7) +
   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
   scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
   annotate("text", x = -0.015, y = 0.75, label = "t0") +
@@ -427,9 +429,6 @@ fixed.leg <- ggplot() +
                    yend = cde.trt_global_slope,colour= Vector ), 
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = cde.s,aes(x=0, #persistent
-                              y=  cde.trt_global_slope),
-             colour="#816687",size=0.1,alpha = 0.4) +
   geom_segment(data = loss.s,
                aes(x = 0,
                    xend = sloss.trt_global_slope,
@@ -437,9 +436,6 @@ fixed.leg <- ggplot() +
                    yend = sl.trt_global_slope, colour= Vector,),
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = loss.s, aes(x= sloss.trt_global_slope, #loss
-                                y=  sl.trt_global_slope ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
   geom_segment(data = gains.s,
                aes(x = 0,
                    xend =  sgain.trt_global_slope,
@@ -447,10 +443,6 @@ fixed.leg <- ggplot() +
                    yend =  sg.trt_global_slope, colour= Vector),
                size = 1.5,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = gains.s, aes(x= sgain.trt_global_slope, #losses
-                                 y=  sg.trt_global_slope ) ,
-             colour="#3B9AB2",
-             size=0.2,alpha = 0.4)+
   scale_color_manual(name='Overall Effects',breaks=c("Losses","Gains","Persistent Sp."),
                      values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))
 
@@ -459,7 +451,9 @@ fixed.leg
 
 # legend for posterior samples (thin lines)
 post.leg <- ggplot()+
-  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 ) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_segment(data = cde.s,
                aes(x = 0,
                    xend = 0,
