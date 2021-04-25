@@ -94,20 +94,11 @@ calc_cover <- clean_cover %>% group_by(id,site_code,year,year_trt,trt,block,plot
 
 head(calc_cover)
 
-#  calculate plot level biomass
-
-# Special cases
-# Iceland
-is_dat <- clean_biomass %>% 
-  filter(site_code %in% c("ahth.is"),
-         # !category %in% c( "LIVE") 
-  ) # mixed biomass methods and we just keep functional groups (but ask authors to double check)
-
-head(is_dat)
+#  calculate biomass from total biomass samples
 
 head(clean_biomass)
-calc_biomass <- clean_biomass %>% filter(!site_code %in% c("ahth.is")) %>% # remove special case
-  bind_rows(is_dat) %>%  # rejoin with is_dat cleaned
+
+calc_biomass <- clean_biomass %>% 
   group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
   summarise(strip.mass = sum(mass)) %>% # sum strip biomass to strip, specify this is strip mass
   left_join(clean_biomass) %>% 
@@ -118,14 +109,18 @@ calc_biomass <- clean_biomass %>% filter(!site_code %in% c("ahth.is")) %>% # rem
 head(calc_biomass)
 
 # sites that measured total biomass
-total_biomass   <- calc_biomass %>% ungroup() %>% select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,mass,strip.mass) %>%
+total_biomass   <- calc_biomass %>% 
+  # remove these sites because they sorted mass by mostly functional group but occasional pooling of live, vascular or other  mass
+  filter(!site_code %in% c("ahth.is", "cbgb.us", "lakta.se", "look.us", "sevi.us", "thth.is" , "vargrass.no", "varheath.no")) %>%
+  ungroup() %>% select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,mass,strip.mass) %>%
   filter(orig.bm.cat %in% c("TOTAL","VASCULAR", "LIVE")) %>% # filter by total vascular or live biomass
  arrange(id)
 
 head(total_biomass)
 
 # sites that separated biomass - remove the totals
-sep_biomass <- calc_biomass %>%  select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,category,mass,strip.mass) %>%
+sep_biomass <- calc_biomass %>%  
+  select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,category,mass,strip.mass) %>%
   filter(!orig.bm.cat %in% c("TOTAL","VASCULAR", "LIVE")) # drop total measures of biomass
 
 head(sep_biomass)
@@ -142,6 +137,7 @@ head(total_biomass_calc)
 
   
 # special case 
+# shps sorted biomass by annual perennial
 ap_dat <- calc_cover %>%  filter(site_code == "shps.us" ) %>%  # special case
   #select(id, site_code, year, year_trt, trt, block, plot,subplot.cov, plot.cover,local_lifespan,Taxon,max_cover) %>%
   select(id, site_code, year, year_trt, trt, block, plot,subplot.cov,local_lifeform,local_lifespan,functional_group,Taxon, plot.cover,max_cover) %>%
@@ -269,20 +265,22 @@ complete_dat_calc <- total_biomass_calc %>%
   arrange(id)
 
 head(complete_dat_calc)
-# we should have 4  biomass species calculation methods; total (total biomass),  'ap category' (annual perennial), category (functional group categories),
+# we should have 3  biomass species calculation methods; 
+# total (where total biomass measurements were taken),   
+# category (where biomass was sorted by functional group categories,
 # or plot, where strip biomass was substituted for functional group biomass because functional groups between biomass strip
-# ad cover plot dont perfectly match
+# and cover plot don't fully match (e.g., a legume was present in cover but not in biomass samp
 complete_dat_calc$biomass.m.full<- as.factor(complete_dat_calc$biomass.m.full)
 levels(complete_dat_calc$biomass.m.full)
 
 # sanity check: any duplicates?
 # include subplot.cov, because some sites measured multiple subplots within plots for cover, but only one for biomass
-# so these plots appear to be duplicates sometime when in fact, they are not (i think)
 
-dup.summary <- complete_dat_calc %>% group_by(id, subplot.cov, Taxon, biomass.sp.full, biomass.m.full) %>% filter(n()>1) %>% summarize(n=n()) %>%
-  select(id,subplot.cov,Taxon, biomass.sp.full, biomass.m.full,n)
+dup.summary <- complete_dat_calc %>% group_by(id, subplot.cov, subplot.bm, Taxon) %>% filter(n()>1) %>% summarize(n=n()) %>%
+  select(id,subplot.cov,Taxon,n)
 
 head(dup.summary)
+
 
 # what's the diff between calc's?
 complete_dat_calc$biomass.sp.diff <-  abs(complete_dat_calc$biomass.sp.plot - complete_dat_calc$biomass.sp.cat) 
@@ -315,12 +313,6 @@ colnames(comb)
 sum.method <- final_dat %>% distinct(site_code,biomass.m.full)
 head(sum.method)
 
-final_dat %>% ungroup() %>% distinct(site_code, year_trt)
-
-# wait for iceland to update
-
-
-head(final_dat)
 
 write.csv(final_dat, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/biomass_sp.csv")
 
