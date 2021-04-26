@@ -25,14 +25,14 @@ plot$year_trt<-as.factor(plot$year_trt)
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
 
-#sigma objects
+# sigma objects = trt * year_trt
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm-sigma.Rdata') # plot.bm.3_sigma
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich-sigma.Rdata') # plot.rich.3_sigma
 
 
-# addition fixed effects
-#load('~/Desktop/bm-sigma_plus.Rdata') # plot.bm.3_sigma
-load('~/Desktop/rich-sigma_plus.Rdata') # plot.rich.3_sigma_plus
+# addition fixed effects = trt + year_trt
+load('~/Desktop/test_mods/bm-sigma_plus.Rdata') # plot.bm.3_sigma_plus 
+load('~/Desktop/test_mods/rich-sigma_plus.Rdata') # plot.rich.3_sigma_plus
 
 
 
@@ -67,26 +67,19 @@ fig_s3a_sp <- pp_check(plot.rich.3_sigma_plus) + theme_classic() +
 (fig_s3a_s + fig_s3a_sp)
 
 
-fig_s3a %>%
-  posterior_predict(draws = 500) %>%
-  ppc_stat_grouped(y = mtcars$mpg,
-                   group = mtcars$carb,
-                   stat = "median")
-
 
 # first richness model seems to be favored over sigma
-
 
 
 # biomass
 summary(plot.bm.3)
 summary(plot.bm.3_sigma)
-
+summary(plot.bm.3_sigma_plus)
 
 # waic loo
 (waic.b3 <- waic(plot.bm.3))
 (waic.b3_s <- waic(plot.bm.3_sigma))
-
+(waic.b3_sp <- waic(plot.bm.3_sigma_plus))
 loo_compare( waic.b3,waic.b3_s)
 
 #  bm.3 is negative, 3.sigma is 0
@@ -99,8 +92,12 @@ fig_s3b_s <- pp_check(plot.bm.3_sigma) + theme_classic() +
   labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
   scale_x_continuous(limits = c(-1000, 2000))
 
+fig_s3b_sp <- pp_check(plot.bm.3_sigma_plus) + theme_classic() + 
+  labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
+  scale_x_continuous(limits = c(-1000, 2000))
 
-(fig_s3b + fig_s3b_s)
+
+(fig_s3b + fig_s3b_s + fig_s3b_sp)
 
 
 
