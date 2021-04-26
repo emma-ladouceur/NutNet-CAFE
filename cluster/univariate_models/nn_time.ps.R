@@ -19,8 +19,8 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 
 ps.3_sigma <- brm( bf( c.rich ~  trt.y + year.y.m + (trt.y + year.y.m |  site_code/block/plot) + trt.y:year.y.m,
                        sigma ~ 0 + trt.y + (0 + trt.y | site_code) ),
-                  data = p.all, family = student(), cores = 4, iter = 6000, warmup = 1000, chains = 4,
-             control = list(adapt_delta = 0.99))
+                  data = p.all, family = student(), cores = 4, iter = 10000, warmup = 1000, chains = 4,
+             control = list(adapt_delta = 0.99), control = list(max_treedepth = 15 ) )
 
 save(ps.3_sigma,
      file=Sys.getenv('OFILE'))
