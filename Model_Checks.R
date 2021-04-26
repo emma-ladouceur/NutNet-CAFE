@@ -30,15 +30,26 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm-si
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich-sigma.Rdata') # plot.rich.3_sigma
 
 
+# addition fixed effects
+#load('~/Desktop/bm-sigma_plus.Rdata') # plot.bm.3_sigma
+load('~/Desktop/rich-sigma_plus.Rdata') # plot.rich.3_sigma_plus
+
+
+
 # richness
 summary(plot.rich.3)
 summary(plot.rich.3_sigma)
+summary(plot.rich.3_sigma_plus)
+
 
 # waic loo
 (waic.r3 <- waic(plot.rich.3))
 (waic.r3_s <- waic(plot.rich.3_sigma))
+(waic.r3_sp <- waic(plot.rich.3_sigma_plus))
 
-loo_compare(waic.r3,waic.r3_s)
+#loo_compare(waic.r3,waic.r3_s)
+loo_compare(waic.r3_s, waic.r3_sp)
+
 
 #  rich.3 is negative, 3.sigma is 0
 
@@ -50,7 +61,10 @@ fig_s3a <- pp_check(plot.rich.3) + theme_classic() +
 fig_s3a_s <- pp_check(plot.rich.3_sigma) + theme_classic() + 
   labs(x= "Species richness", y = "Density")
 
-(fig_s3a + fig_s3a_s)
+fig_s3a_sp <- pp_check(plot.rich.3_sigma_plus) + theme_classic() + 
+  labs(x= "Species richness", y = "Density")
+
+(fig_s3a_s + fig_s3a_sp)
 
 
 fig_s3a %>%
@@ -124,6 +138,11 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl-sigma.Rdata') # sl.3_sigma2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg-sigma.Rdata') # sg.3_sigma2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde-sigma.Rdata') # CDE.3_sigma2
+
+
+# load new model objects
+# rich, biomass strip, SL, ps, and multi
+
 
 
 # s.loss
