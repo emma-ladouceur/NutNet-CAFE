@@ -77,7 +77,7 @@ treat.vars <- c('trt_year')
 
 grouped.data <- samp %>% group_by(.dots=c(group.vars,treat.vars))
 
-#takes a long time
+#takes a long time if data is big
 res <- pairwise.price(grouped.data, species= "Taxon", func = "biomass.sp.full")
 
 # Create a single column keeping track of the paired set of seeding treatments & other grouping variables:
