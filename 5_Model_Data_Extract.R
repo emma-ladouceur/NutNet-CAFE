@@ -18,7 +18,7 @@ library(bayesplot)
 # plot level data
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-plot <- plot %>% filter(max.year >= 3)
+plot <- plot %>% filter(max.year >= 3) 
 
 head(plot)
 
