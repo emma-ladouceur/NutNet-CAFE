@@ -16,10 +16,10 @@ p.all$plot<-as.factor(p.all$plot)
 # 
 
 p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
-  ungroup()
+  ungroup() %>% unite("site_block_plot", c("site_code", "block", "plot"), remove = FALSE)
 
 
-pp.multi_all <- brm( bf( mvbind(SL,SG,CDE,s.loss.n,s.gain,c.rich) ~ trt.y + year.y.m + (trt.y * year.y.m  | p | site_code) + trt.y:year.y.m, 
+pp.multi_all <- brm( bf( mvbind(SL,SG,CDE,s.loss.n,s.gain,c.rich) ~ trt.y + year.y.m + (trt.y * year.y.m  | p | site_block_plot) + trt.y:year.y.m, 
                     sigma ~ 0 + trt.y + (0 + trt.y | site_code) ), 
                 data = p.all,
                 family=student(),

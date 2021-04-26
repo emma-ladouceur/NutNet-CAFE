@@ -23,8 +23,8 @@ plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.c
 p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 colnames(p.all)
-p.all <- p.all %>% group_by(site_code) %>% filter(max.year >= 3)
-nrow(p.all)
+p.all <- p.all %>% group_by(site_code) %>% filter(max.year >= 3) 
+
 
 p.all$site_code <- as.factor(p.all$site_code)
 p.all$block<-as.factor(p.all$block)
