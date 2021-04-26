@@ -58,8 +58,13 @@ price.pairs <- price.all %>% separate(trt_year,into=c("trt_year.x","trt_year.y")
                      '16 16','17 17','18 18','19 19','20 20','21 21','22 22','23 23','24 24','25 25','26 26','27 27','28 28',
                      '29 29','30 30','31 31','32 32','33 33','34 34','35 35','36 36','37 37', '38 38','39 39','40 40','41 41',
                      '42 42','43 43','44 44','45 45','46 46','47 47','48 48','49 49','50 50','51 51','52 52','53 53','54 54','55 55',
-                     '56 56','57 57','58 58','59 59','60 60','61 61','62 62')) %>%
-  group_by(site_code) %>%
+                     '56 56','57 57','58 58','59 59','60 60','61 61','62 62')) 
+
+
+
+price.pairs$year.y <- as.numeric(price.pairs$year.y)
+ 
+price.pairs.calc <-  price.pairs %>% group_by(site_code) %>%
   summarise(year_min = min(year.x), # min year and  max year for each site
             year_max = max(year.y)) %>% 
   left_join(price.pairs) %>%
@@ -69,20 +74,20 @@ price.pairs <- price.all %>% separate(trt_year,into=c("trt_year.x","trt_year.y")
          year.y.m = (year.y - mean(year.y) ) ) # center year
 
 
-head(price.pairs)
-nrow(price.pairs)
+head(price.pairs.calc)
+nrow(price.pairs.calc)
 # 2,966
 
-price.pairs$year.xy <-as.factor(price.pairs$year.xy)
-price.pairs$plot.x <-as.factor(as.character(price.pairs$plot.x))
-price.pairs$year.y <- as.numeric(price.pairs$year.y)
-price.pairs$year_max <- as.numeric(price.pairs$year_max)
+price.pairs.calc$year.xy <- as.factor(price.pairs.calc$year.xy)
+price.pairs.calc$plot.x <- as.factor(as.character(price.pairs.calc$plot.x))
+price.pairs.calc$year.y <- as.numeric(price.pairs.calc$year.y)
+price.pairs.calc$year_max <- as.numeric(price.pairs.calc$year_max)
 
 #look at what sites will be included in main analysis
-sites <- price.pairs %>% distinct(site_code, year_max) %>% filter(year_max >= 3)
+sites <- price.pairs.calc %>% distinct(site_code, year_max) %>% filter(year_max >= 3)
 
 View(sites)
 
-write.csv(price.pairs,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.csv")
+write.csv(price.pairs.calc,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.csv")
 
 
