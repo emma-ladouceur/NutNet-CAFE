@@ -22,15 +22,16 @@ sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-colnames(p.all)
-p.all <- p.all %>% group_by(site_code) %>% filter(max.year >= 3) 
+p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+colnames(p.all)
+p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
+  filter(year_max >= 3) 
 
 p.all$site_code <- as.factor(p.all$site_code)
 p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
-p.all$year.y<-as.factor(p.all$year.y)
-
+p.all$year.y<-as.numeric(p.all$year.y)
 
 # load model objects
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.3
@@ -38,7 +39,8 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.3
-
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/ps.Rdata') # CDE.3
+load('~/Desktop/test_mods/ps.Rdata') # ps.3_sigma
 
 # Species Loss model
 
@@ -54,9 +56,11 @@ fig_s3c <- pp_check(s.loss.3) + theme_classic() +
 
 fig_s3c
 
+
 # residuals (this take a minute)
 colnames(p.all)
 pairs.sloss <- p.all %>% filter(!is.na(s.loss.n))
+pairs.sloss$year.y <- as.factor(pairs.sloss$year.y)
 sloss.m <- residuals(s.loss.3)
 sloss.m <- as.data.frame(sloss.m)
 head(sloss.m)
@@ -128,7 +132,7 @@ sloss.trt_coef2 <-  bind_cols(sloss.trt_coef$site_code[,,'Intercept'] %>%
                                        TESlope_upper = Q97.5) %>% 
                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat2 %>% 
+  inner_join(p.all %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
@@ -160,6 +164,7 @@ fig_s3d
 # residuals (this take a minute)
 colnames(p.all)
 pairs.sgain <- p.all %>% filter(!is.na(s.gain))
+pairs.sgain$year.y <- as.factor(pairs.sgain$year.y)
 sgain.m <- residuals(s.gain.3)
 sgain.m <- as.data.frame(sgain.m)
 sgain.plot <- cbind(pairs.sgain, sgain.m$Estimate)
@@ -237,6 +242,125 @@ setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(sgain.trt_fitted.npk,sgain.trt_fitted.ctl,obs_nest.sgain,sgain.trt_coef3,file = 'sgain_dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_dat.Rdata')
 
+
+# persistent species model
+
+#  model summary
+summary(ps.3_sigma)
+# caterpillar plots
+plot(ps.3_sigma)
+# predicted values vs. observed
+color_scheme_set("darkgray")
+fig_s3x <- pp_check(ps.3_sigma) + theme_classic() + 
+  labs(x= "Persistent species (p.s)", y = "Density") + 
+  scale_x_continuous(limits = c(-50, 50))
+
+fig_s3x
+
+# residuals (this take a minute)
+colnames(p.all)
+pairs.ps <- p.all %>% filter(!is.na(c.rich))
+pairs.ps$year.y <- as.factor(pairs.ps$year.y)
+ps.m <- residuals(ps.3_sigma)
+ps.m <- as.data.frame(ps.m)
+head(ps.m)
+ps.plot <- cbind(pairs.ps, ps.m$Estimate)
+head(ps.plot)
+
+par(mfrow=c(2,2))
+with(ps.plot, plot(site_code, ps.m$Estimate))
+with(ps.plot, plot(block, ps.m$Estimate))
+with(ps.plot, plot(year.y, ps.m$Estimate))
+with(ps.plot, plot(plot, ps.m$Estimate))
+
+
+# fixed effects
+ps.trt_fitted <- cbind(ps.3_sigma$data,
+                          # get fitted values; setting re_formula = NA means we are getting 'fixed' effects
+                          fitted(ps.3_sigma, re_formula = NA)) %>% 
+  as_tibble() %>% left_join(p.all)
+
+
+ps.trt_fitted.npk <- ps.trt_fitted %>% filter(trt.y %in% c('NPK'))
+ps.trt_fitted.ctl <- ps.trt_fitted  %>% filter(trt.y %in% c('Control'))
+
+ps.trt_fitted
+
+# fixed effect coefficients 
+ps.trt_fixef <- fixef(ps.3_sigma)
+
+# predict estimates for each site across a sequence of year.y (comparison plots age)
+# this takes ~ 5 minutes
+
+head(p.all)
+# 
+# obs_nest.sloss <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code, trt.y) %>% 
+#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
+#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
+#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
+#   mutate(predicted = map(data, ~predict(s.loss.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
+# 
+# View(obs_nest.sloss)
+
+# coefficients for study-level (random) effects
+ps.trt_coef <- coef(ps.3_sigma)
+
+head(ps.trt_coef)
+
+ps.trt_coef2 <-  bind_cols(ps.trt_coef$site_code[,,'Intercept'] %>% # intercept
+                                as_tibble() %>% 
+                                mutate(Intercept = Estimate,
+                                       Intercept_lower = Q2.5,
+                                       Intercept_upper = Q97.5,
+                                       site_code = rownames(ps.trt_coef$site_code[,,'Intercept'])) %>% 
+                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                             ps.trt_coef$site_code[,,'year.y.m'] %>% # control slope
+                                as_tibble() %>% 
+                                mutate(ISlope = Estimate,
+                                       ISlope_lower = Q2.5,
+                                       ISlope_upper = Q97.5) %>% 
+                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           ps.trt_coef$site_code[,,'sigma_trt.yControl'] %>%  # sigma control
+                             as_tibble() %>% 
+                             mutate(ISigma = Estimate,
+                                    ISigma_lower = Q2.5,
+                                    ISigma_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                              ps.trt_coef$site_code[,,'trt.yNPK'] %>%  # treatment
+                                as_tibble() %>% 
+                                mutate(TE = Estimate,
+                                       TE_lower = Q2.5,
+                                       TE_upper = Q97.5) %>% 
+                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                              ps.trt_coef$site_code[,,'trt.yNPK:year.y.m'] %>%  # treatment slope
+                                as_tibble() %>% 
+                                mutate(TESlope = Estimate,
+                                       TESlope_lower = Q2.5,
+                                       TESlope_upper = Q97.5) %>% 
+                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+                           ps.trt_coef$site_code[,,'sigma_trt.yNPK'] %>%  # sigma NPK
+                             as_tibble() %>% 
+                             mutate(TESigma = Estimate,
+                                    TESigma_lower = Q2.5,
+                                    TESigma_upper = Q97.5) %>% 
+                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5)
+                           ) %>% 
+  # join with min and max of the x-values
+  inner_join(p.all %>% 
+               group_by(site_code) %>% 
+               summarise(xmin = min(year.y),
+                         xmax = max(year.y),
+                         cxmin = min(year.y.m),
+                         cxmax = max(year.y.m)),
+             by = 'site_code') 
+
+
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
+save(ps.trt_fitted,ps.trt_fitted.npk,ps.trt_fitted.ctl,ps.trt_coef2,file = 'ps.mod.dat.Rdata')
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/ps.mod.dat.Rdata')
 
 # SL- biomass change associated with species loss
 

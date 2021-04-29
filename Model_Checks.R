@@ -33,7 +33,10 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich-
 # addition fixed effects = trt + year_trt
 load('~/Desktop/test_mods/bm-sigma_plus.Rdata') # plot.bm.3_sigma_plus 
 load('~/Desktop/test_mods/rich-sigma_plus.Rdata') # plot.rich.3_sigma_plus
-
+load('~/Desktop/test_mods/bm_sigma.Rdata') # plot.bm.3_sigma
+load('~/Desktop/test_mods/rich_sigma.Rdata') # plot.rich.3_sigma
+load('~/Desktop/test_mods/bm.Rdata') # plot.bm.3
+load('~/Desktop/test_mods/rich.Rdata') # plot.rich.3
 
 
 # richness
@@ -47,11 +50,12 @@ summary(plot.rich.3_sigma_plus)
 (waic.r3_s <- waic(plot.rich.3_sigma))
 (waic.r3_sp <- waic(plot.rich.3_sigma_plus))
 
-#loo_compare(waic.r3,waic.r3_s)
+loo_compare(waic.r3,waic.r3_s)
 loo_compare(waic.r3_s, waic.r3_sp)
 
 
 #  rich.3 is negative, 3.sigma is 0
+# sigma is better than sigma plus
 
 # pp check
 color_scheme_set("darkgray")
@@ -80,9 +84,13 @@ summary(plot.bm.3_sigma_plus)
 (waic.b3 <- waic(plot.bm.3))
 (waic.b3_s <- waic(plot.bm.3_sigma))
 (waic.b3_sp <- waic(plot.bm.3_sigma_plus))
+
 loo_compare( waic.b3,waic.b3_s)
+loo_compare( waic.b3,waic.b3_sp)
+loo_compare( waic.b3_s,waic.b3_sp)
 
 #  bm.3 is negative, 3.sigma is 0
+# sigma plus is better than sigma
 
 fig_s3b <- pp_check(plot.bm.3) + theme_classic() + 
   labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
@@ -99,7 +107,7 @@ fig_s3b_sp <- pp_check(plot.bm.3_sigma_plus) + theme_classic() +
 
 (fig_s3b + fig_s3b_s + fig_s3b_sp)
 
-
+# the first non-sigma model is favoured
 
 
 
@@ -138,8 +146,15 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde-s
 
 
 # load new model objects
-# rich, biomass strip, SL, ps, and multi
+# try sl and ps again
 
+load('~/Desktop/test_mods/ps.Rdata') # 
+load('~/Desktop/test_mods/sl.Rdata') # 
+
+
+summary(ps.3_sigma)
+
+summary(sl.3_sigma)
 
 
 # s.loss

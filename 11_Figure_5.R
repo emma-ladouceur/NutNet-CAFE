@@ -118,6 +118,41 @@ bm.fixed.p<-posterior_samples(plot.bm.3, "^b" ,subset = floor(runif(n = 1000, 1,
 
 head(rich.fixed.p)
 
+
+rich_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(rich.ctl.study,rich.npk.study) %>%
+  mutate( rich.trt.study = (rich.ctl.study + rich.npk.study)) %>%
+  group_by(site_code) %>%
+  mutate(response = 'rich',
+         rich.ctl.global = rich.fixed.p[,'b_year_trt'],
+         rich.npk.global = rich.fixed.p[,'b_trtNPK:year_trt'],) %>%
+  mutate(rich.trt.global=(rich.ctl.global+ rich.npk.global))
+
+
+rich.p <- rich_posterior %>% inner_join(meta, by = 'site_code') 
+
+
+write.csv(rich.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich_posteriors.csv")
+
+
+bm_posterior <- study_sample_posterior  %>% 
+  select(-data) %>% 
+  unnest_legacy(bm.ctl.study,bm.npk.study) %>%
+  mutate( bm.trt.study = (bm.ctl.study + bm.npk.study)) %>%
+  group_by(site_code) %>%
+  mutate(response = 'bm',
+         bm.ctl.global = bm.fixed.p[,'b_year_trt'],
+         bm.npk.global = bm.fixed.p[,'b_trtNPK:year_trt'],) %>%
+  mutate(bm.trt.global=(bm.ctl.global+ bm.npk.global))
+
+
+bm.p <- bm_posterior %>% inner_join(meta, by = 'site_code') 
+
+
+write.csv(bm.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm_posteriors.csv")
+
+
 sl_posterior <- study_sample_posterior  %>% 
   select(-data) %>% 
   unnest_legacy(sl.ctl.study,sl.npk.study) %>%

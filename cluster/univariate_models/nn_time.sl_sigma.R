@@ -21,7 +21,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 #             control = list(adapt_delta = 0.99) )
 
 
-sl.3_sigma <- brm( bf( SL ~  trt.y + year.y.m + (trt.y + year.y.m |  site_code/block/plot) + trt.y:year.y.m,
+sl.3_sigma <- brm( bf( SL ~  trt.y + year.y.m + (trt.y * year.y.m |  site_code/block/plot) + trt.y:year.y.m,
                        sigma ~ 0 + trt.y + (0 + trt.y | site_code) ),
                    data = p.all, family=student(), cores = 4, iter=15000, warmup = 1000, chains = 4,
                    control = list(adapt_delta = 0.99) )
