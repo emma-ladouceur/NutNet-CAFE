@@ -43,9 +43,14 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **9_Figure_3**  The script produces Figure 3 a) - f).
 
+## **Figure4 is under costruction**
 **10_Figure_4.R** This script produces Figure 4 currently in MS.
 
 **10_Figure_4.2.R** This is Figure 4 with the PS effect plotted first. Might become supplementary.
+
+**10_Figure_4.3.R** This also puts persistent species on the x axis. Does this even make sense? i dont think so.
+
+**10_Figure_4.4.R** This plots persistent species first, and puts persistent species on the x axis. Still doesnt make sense.
 
 **11_Figure_5.R** This script produces Figure 5 a)- e).
 

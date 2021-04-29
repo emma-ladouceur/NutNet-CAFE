@@ -50,60 +50,61 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdat
 # gains "#046C9A"
 # cde "#816687"
 
+# I thik this will now be removed
 #  Figure 3 a)
-Model <- c('A) Conceptual figure')
-conceptdat<- data.frame(Model)
-conceptdat  
-
-fig_3a <- ggplot(data=conceptdat)+
-  facet_grid(~Model)+
-  geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
-  theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  geom_segment(
-               aes(x = -0.5+0.05,
-                   xend = -0.5+0.05,
-                   y = -8+10,
-                   yend = -8+10+4 ), 
-               size = 1.5, color= "#F98400",
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_segment(
-               aes(x = 0,
-                   xend = -0.5,
-                   y = 0,
-                   yend = -8,),
-               size = 1.5, color="#B40F20" ,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_segment(
-               aes(x = -0.5,
-                   xend =  -0.5+0.05,
-                   y = -8,
-                   yend =  -8+10,),
-               size = 1.5, color= "#046C9A",
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_segment(
-               aes(x = 0,
-                   xend = -0.5+0.07,
-                   y = 0,
-                   yend = 0 ), 
-               size = 1.5, color= "#0B775E",
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_segment(
-    aes(x = -0.5+0.07,
-        xend = -0.5+0.07,
-        y = 0,
-        yend = -8+10+4  ), 
-    size = 1.5, color= "#0B775E",
-    arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  scale_y_continuous(breaks=c(0)) +
-  scale_x_continuous(breaks=c(0)) +
-  labs(x = 'Change in Species',
-       y = 'Change in  Biomass') + theme_bw(base_size=14) + 
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
-                                                     plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                                                     strip.text = element_text(size=17))
-
-fig_3a
+# Model <- c('A) Conceptual figure')
+# conceptdat<- data.frame(Model)
+# conceptdat  
+# 
+# fig_3a <- ggplot(data=conceptdat)+
+#   facet_grid(~Model)+
+#   geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+#   theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+#                         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+#   geom_segment(
+#                aes(x = -0.5+0.05,
+#                    xend = -0.5+0.05,
+#                    y = -8+10,
+#                    yend = -8+10+4 ), 
+#                size = 1.5, color= "#F98400",
+#                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+#   geom_segment(
+#                aes(x = 0,
+#                    xend = -0.5,
+#                    y = 0,
+#                    yend = -8,),
+#                size = 1.5, color="#B40F20" ,
+#                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+#   geom_segment(
+#                aes(x = -0.5,
+#                    xend =  -0.5+0.05,
+#                    y = -8,
+#                    yend =  -8+10,),
+#                size = 1.5, color= "#046C9A",
+#                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+#   geom_segment(
+#                aes(x = 0,
+#                    xend = -0.5+0.07,
+#                    y = 0,
+#                    yend = 0 ), 
+#                size = 1.5, color= "#0B775E",
+#                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+#   geom_segment(
+#     aes(x = -0.5+0.07,
+#         xend = -0.5+0.07,
+#         y = 0,
+#         yend = -8+10+4  ), 
+#     size = 1.5, color= "#0B775E",
+#     arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+#   scale_y_continuous(breaks=c(0)) +
+#   scale_x_continuous(breaks=c(0)) +
+#   labs(x = 'Change in Species',
+#        y = 'Change in  Biomass') + theme_bw(base_size=14) + 
+#   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="none",
+#                                                      plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+#                                                      strip.text = element_text(size=17))
+# 
+# fig_3a
 
 
 #  Fig 3b) species loss regression (s.loss)
@@ -121,7 +122,7 @@ View(fitted.sloss)
 fitted.sloss$Treatment <- factor(fitted.sloss$Treatment , levels=c("NPK","Control"))
 
 
-fig_3b_r <- ggplot() +
+fig_3a_r <- ggplot() +
   facet_grid(~Model)+
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = sloss.trt_fitted.npk,
@@ -159,7 +160,7 @@ fig_3b_r <- ggplot() +
   )
 
 
-fig_3b_r
+fig_3a_r
 
 
 # fig 3c species gain regression (s.gain)
@@ -173,7 +174,7 @@ sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% rename(Treatment = trt.y)
 fitted.sgain<-bind_rows(sgain.trt_fitted.npk,sgain.trt_fitted.ctl)
 fitted.sgain$Treatment <- factor(fitted.sgain$Treatment , levels=c("NPK","Control"))
 
-fig_3c_r <- ggplot()  +
+fig_3b_r <- ggplot()  +
   geom_hline(yintercept = 0,linetype="longdash") +
   facet_grid(~Model)+
   geom_point(data = sgain.trt_fitted.npk,
@@ -209,10 +210,10 @@ fig_3c_r <- ggplot()  +
                      )
 
 
-fig_3c_r
+fig_3b_r
 
 
-# persistent species
+# persistent species regression
  ps.trt_coef2$xs<-1
 
 ps.trt_fitted.npk$Model<-"x) Persistent species (s.p)"
@@ -222,11 +223,11 @@ ps.trt_fitted.ctl <- ps.trt_fitted.ctl %>% rename(Treatment = trt.y)
 fitted.ps <- bind_rows(ps.trt_fitted.npk,ps.trt_fitted.ctl)
 
 
-View(fitted.ps)
+View(ps.trt_coef2)
 fitted.ps$Treatment <- factor(fitted.ps$Treatment , levels=c("NPK","Control"))
+fitted.ps
 
-
-fig_3x_r <- ggplot() +
+fig_3c_r <- ggplot() +
   #facet_grid(~Model)+
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = ps.trt_fitted.npk,
@@ -235,8 +236,8 @@ fig_3x_r <- ggplot() +
   geom_segment(data = ps.trt_coef2,
                aes(x = xs, 
                    xend = xmax,
-                   y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
-                   yend = (Intercept + TE + (ISlope+TESlope) * cxmax)
+                   y = ( (Intercept +  TE)  + (ISigma + TESigma) + (ISlope + TESlope) * cxmin),
+                   yend = ( (Intercept +  TE)   + (ISigma + TESigma) + (ISlope + TESlope) * cxmax)
                ),
                color="black",alpha=0.2,size = .7) +
   # uncertainy in fixed effect
@@ -264,7 +265,7 @@ fig_3x_r <- ggplot() +
   )
 
 
-fig_3x_r
+fig_3c_r
 
 # BIOMASS PARTITIONS
 
@@ -277,7 +278,7 @@ cde_fitted.ctl <- cde_fitted.ctl %>% rename(Treatment = trt.y)
 fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
 fitted.cde$Treatment <- factor(fitted.cde$Treatment , levels=c("NPK","Control"))
 
-fig_3d_r <- ggplot() +
+fig_3f_r <- ggplot() +
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = cde_fitted.npk,
              aes(x = year.y, y = CDE),color="black", alpha=0.2,
@@ -309,7 +310,7 @@ fig_3d_r <- ggplot() +
                                   strip.text = element_text(size=14)
   )
 
-fig_3d_r
+fig_3f_r
 
 # Figure 3e Biomass changes associated with species loss (SL)
 
@@ -320,7 +321,7 @@ sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% rename(Treatment = trt.y)
 fitted.sl<-bind_rows(sl.trt_fitted.npk,sl.trt_fitted.ctl)
 fitted.sl$Treatment <- factor(fitted.sl$Treatment , levels=c("NPK","Control"))
 
-fig_3e_r <- ggplot() +
+fig_3d_r <- ggplot() +
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = sl.trt_fitted.npk,
              aes(x = year.y, y = SL),color="black",alpha=0.2,
@@ -358,7 +359,7 @@ fig_3e_r <- ggplot() +
                      )
 
 
-fig_3e_r
+fig_3d_r
 
 
 # Figure 3f Biomass changes associated with species gain (SG)
@@ -371,7 +372,7 @@ fitted.sg<-bind_rows(sg.trt_fitted.npk,sg.trt_fitted.ctl)
 
 fitted.sg$Treatment <- factor(fitted.sg$Treatment , levels=c("NPK","Control"))
 
-fig_3f_r <- ggplot()  +
+fig_3e_r <- ggplot()  +
   geom_hline(yintercept = 0,linetype="longdash") +
   # data
   geom_point(data = sg.trt_fitted.npk,
@@ -406,7 +407,7 @@ fig_3f_r <- ggplot()  +
                      strip.text = element_text(size=14)
                      )
 
-fig_3f_r
+fig_3e_r
 
 
 # Figure 3 Legend
@@ -466,9 +467,9 @@ fig_3_legend <- g_legend(fig_3_legend)
 
 # again using posterior data from '7_Model_Data_Posteriors.R' (loaded at beginning)
 # Global/ Overall/ Population Effects
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdata')
+ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdata')
 
-fig_3b_e <- ggplot() + 
+fig_3a_e <- ggplot() + 
   geom_point(data = global.sloss.p, aes(x = response, y = eff,color=response),size = 2) +
   geom_errorbar(data = global.sloss.p, aes(x = response,ymin = eff_lower,
                                     ymax = eff_upper,color=response),
@@ -482,10 +483,10 @@ fig_3b_e <- ggplot() +
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
                               strip.background = element_blank(),legend.position="none")
 
-fig_3b_e
+fig_3a_e
 
 
-fig_3c_e <- ggplot() + 
+fig_3b_e <- ggplot() + 
   geom_point(data = global.sgain.p, aes(x = response, y = eff,color=response),size = 2) +
   geom_errorbar(data = global.sgain.p, aes(x = response,ymin = eff_lower,
                                     ymax = eff_upper,color=response),
@@ -499,27 +500,28 @@ fig_3c_e <- ggplot() +
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
                               strip.background = element_blank(),legend.position="none")
 
-fig_3c_e
+fig_3b_e
 
-
-fig_3d_e <- ggplot() + 
-  geom_point(data = global.cde.p, aes(x = response, y = eff,color=response),size = 2) +
-  geom_errorbar(data = global.cde.p, aes(x = response,ymin = eff_lower,
-                                  ymax = eff_upper,color=response),
+fig_3c_e <- ggplot() + 
+  geom_point(data = global.ps.p, aes(x = response, y = eff,color=response),size = 2) +
+  geom_errorbar(data = global.ps.p, aes(x = response,ymin = eff_lower,
+                                           ymax = eff_upper,color=response),
                 width = 0, size = 0.7) +
   labs(x = '',
        y='Slope') +
   geom_hline(yintercept = 0, lty = 2) +
-  scale_y_continuous(breaks=c(-8,0,4,14)) +
+  scale_y_continuous(breaks=c(0,0.05,0.3)) +
   scale_color_manual(values = c("#000000","#F98400")) +
   theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
                                strip.background = element_blank(),legend.position="none")
 
-fig_3d_e
+fig_3c_e
 
 
-fig_3e_e <-ggplot() + 
+
+
+fig_3d_e <-ggplot() + 
   geom_point(data = global.sl.p, aes(x = response, y = eff,color=response),size = 2) +
   geom_errorbar(data = global.sl.p, aes(x = response,ymin = eff_lower,
                                  ymax = eff_upper,color=response),
@@ -533,9 +535,9 @@ fig_3e_e <-ggplot() +
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
                               strip.background = element_blank(),legend.position="none")
 
-fig_3e_e
+fig_3d_e
 
-fig_3f_e <- ggplot() + 
+fig_3e_e <- ggplot() + 
   geom_point(data = global.sg.p, aes(x = response, y = eff,color=response),size = 2) +
   geom_errorbar(data = global.sg.p, aes(x = response,ymin = eff_lower,
                                  ymax = eff_upper,color=response),
@@ -549,6 +551,22 @@ fig_3f_e <- ggplot() +
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
                               strip.background = element_blank(),legend.position="none")
 
+fig_3e_e
+
+fig_3f_e <- ggplot() + 
+  geom_point(data = global.cde.p, aes(x = response, y = eff,color=response),size = 2) +
+  geom_errorbar(data = global.cde.p, aes(x = response,ymin = eff_lower,
+                                         ymax = eff_upper,color=response),
+                width = 0, size = 0.7) +
+  labs(x = '',
+       y='Slope') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_y_continuous(breaks=c(-8,0,4,14)) +
+  scale_color_manual(values = c("#000000","#F98400")) +
+  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
+                               strip.background = element_blank(),legend.position="none")
+
 fig_3f_e
 
 # effect plots
@@ -557,20 +575,27 @@ fig_3f_e
 
 # Inset effect plots within regression plots
 
-fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 6.5, xmax = 12.75, 
+fig_3a <- fig_3a_r +  annotation_custom(ggplotGrob(fig_3a_e), xmin = 6.5, xmax = 12.75, 
                                          ymin = -20, ymax = -11)
 
-fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 6.5, xmax = 12.75, 
+fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 6.5, xmax = 12.75, 
                                          ymin = 11, ymax = 20)
 
-fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 6.5, xmax = 12.75, 
-                                        ymin = 400, ymax = 1050)
 
-fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 6.5, xmax = 12.75, 
+fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 6.5, xmax = 12.75, 
+                                        ymin = 21, ymax = 30)
+
+fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 6.5, xmax = 12.75, 
                                    ymin = -400, ymax = -255)
 
-fig_3f <- fig_3f_r +  annotation_custom(ggplotGrob(fig_3f_e), xmin = 6.5, xmax = 12.75, 
+fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 6.5, xmax = 12.75, 
                                    ymin = 255, ymax = 400)
+
+fig_3f <- fig_3f_r +  annotation_custom(ggplotGrob(fig_3f_e), xmin = 6.5, xmax = 12.75, 
+                                        ymin = 400, ymax = 1050)
+
+
+
 
 # put everything together with patchwork
 # Save As LANDSCAPE 11X14
