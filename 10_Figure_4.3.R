@@ -5,7 +5,7 @@
 # Last Updated April 17, 2021
 
 # 10_Figure 4.R
-# This workflow uses data pulled out of Models below to produce Figure 4
+# This workflow uses data pulled out of Models below to produce Figure 4.3
 
 # packages
 library(tidyverse)
