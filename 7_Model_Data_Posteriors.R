@@ -353,12 +353,11 @@ global.sgain.p
 # persistent species
 head(ps.fixed.p)
 
-ps_global_posterior <-  ps.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`,
-                                                     `b_sigma_trt.yControl`, `b_sigma_trt.yNPK`) %>%
-  mutate(ps.ctl.global = (`b_year.y.m` + `b_sigma_trt.yControl`),
-         ps.npk.global= (`b_trt.yNPK:year.y.m` + `b_sigma_trt.yNPK`),
-         ps.trt.global=(`b_year.y.m`+ `b_trt.yNPK:year.y.m`  + `b_sigma_trt.yControl`+ `b_sigma_trt.yNPK` ) ) %>%
-  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`, `b_sigma_trt.yControl`,`b_sigma_trt.yNPK`))
+ps_global_posterior <-  ps.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
+  mutate(ps.ctl.global = (`b_year.y.m` ),
+         ps.npk.global= (`b_trt.yNPK:year.y.m` ),
+         ps.trt.global=(`b_year.y.m` + `b_sigma_trt.yControl`) ) %>%
+  dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`))
 
 head(ps_global_posterior)
 

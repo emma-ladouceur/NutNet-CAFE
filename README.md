@@ -5,7 +5,7 @@ Code Authors: Emma Ladouceur, [Shane A. Blowes](https://github.com/sablowes) & [
 Community Assembly and the Functioning of Ecosystems (CAFE) : temporal responses to Nutrient addition in a globally distributed experiment: [The Nutrient Network](https://nutnet.org/home).
 
 ### Data
-Species level data is not provided. Data openly available to produce results includes;
+Species level data is not provided. Data openly available to reproduce results includes;
 
 **plot.csv** Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure 2.
 

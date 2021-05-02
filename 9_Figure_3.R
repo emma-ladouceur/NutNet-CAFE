@@ -111,8 +111,8 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdat
 
 sloss.trt_coef3$xs<-1
 
-sloss.trt_fitted.npk$Model<-"B) Species loss (s.loss)"
-sloss.trt_fitted.ctl$Model<-"B) Species loss (s.loss)"
+sloss.trt_fitted.npk$Model<-"A) Species loss (s.loss)"
+sloss.trt_fitted.ctl$Model<-"A) Species loss (s.loss)"
 sloss.trt_fitted.npk <- sloss.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sloss.trt_fitted.ctl <- sloss.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sloss <- bind_rows(sloss.trt_fitted.npk,sloss.trt_fitted.ctl)
@@ -216,19 +216,16 @@ fig_3b_r
 # persistent species regression
  ps.trt_coef2$xs<-1
 
-ps.trt_fitted.npk$Model<-"x) Persistent species (s.p)"
-ps.trt_fitted.ctl$Model<-"x) persistent species (s.p)"
+ps.trt_fitted.npk$Model<-"C) Persistent species (p.s)"
+ps.trt_fitted.ctl$Model<-"C) Persistent species (p.s)"
 ps.trt_fitted.npk <- ps.trt_fitted.npk %>% rename(Treatment = trt.y) 
 ps.trt_fitted.ctl <- ps.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.ps <- bind_rows(ps.trt_fitted.npk,ps.trt_fitted.ctl)
-
-
-View(ps.trt_coef2)
 fitted.ps$Treatment <- factor(fitted.ps$Treatment , levels=c("NPK","Control"))
-fitted.ps
+
 
 fig_3c_r <- ggplot() +
-  #facet_grid(~Model)+
+  facet_grid(~Model)+
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = ps.trt_fitted.npk,
              aes(x = year.y, y = c.rich),color="black", alpha=0.2,
@@ -236,8 +233,8 @@ fig_3c_r <- ggplot() +
   geom_segment(data = ps.trt_coef2,
                aes(x = xs, 
                    xend = xmax,
-                   y = ( (Intercept +  TE)  + (ISigma + TESigma) + (ISlope + TESlope) * cxmin),
-                   yend = ( (Intercept +  TE)   + (ISigma + TESigma) + (ISlope + TESlope) * cxmax)
+                   y = ( (Intercept +  TE)   + (ISlope + TESlope) * cxmin),
+                   yend = ( (Intercept +  TE)  + (ISlope + TESlope) * cxmax)
                ),
                color="black",alpha=0.2,size = .7) +
   # uncertainy in fixed effect
@@ -254,12 +251,12 @@ fig_3c_r <- ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   labs(x = 'Year',
        y = expression(paste('Persistent species')), 
-       title= 'Persistent Species') +
+       title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#F98400", drop =FALSE))+
   theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                                  strip.background = element_blank(),legend.position="none",
-                                 plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                                 plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                  strip.text = element_text(size=17),
   )
 
@@ -301,7 +298,7 @@ fig_3f_r <- ggplot() +
   ylim(-500,1000)+
   labs(x='Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-       title= 'D) Biomass change associated \n with persistent species (PS)') +
+       title= 'F) Biomass change associated \n with persistent species (PS)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#F98400",drop =FALSE))+
   theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
@@ -348,7 +345,7 @@ fig_3d_r <- ggplot() +
   labs(x='Year',
        #x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
-       title= 'E) Biomass change associated \n with species loss (SL)') +
+       title= 'D) Biomass change associated \n with species loss (SL)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
   theme_bw(base_size=14 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
@@ -397,7 +394,7 @@ fig_3e_r <- ggplot()  +
   ylim(0,400) +
   labs(x = 'Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-       title= 'F) Biomass change associated \n with species gain (SG)',
+       title= 'E) Biomass change associated \n with species gain (SG)',
        color='Treatment') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A", drop =FALSE))+

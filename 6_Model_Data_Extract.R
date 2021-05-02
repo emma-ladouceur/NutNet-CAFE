@@ -322,12 +322,6 @@ ps.trt_coef2 <-  bind_cols(ps.trt_coef$site_code[,,'Intercept'] %>% # intercept
                                        ISlope_lower = Q2.5,
                                        ISlope_upper = Q97.5) %>% 
                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                           ps.trt_coef$site_code[,,'sigma_trt.yControl'] %>%  # sigma control
-                             as_tibble() %>% 
-                             mutate(ISigma = Estimate,
-                                    ISigma_lower = Q2.5,
-                                    ISigma_upper = Q97.5) %>% 
-                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
                               ps.trt_coef$site_code[,,'trt.yNPK'] %>%  # treatment
                                 as_tibble() %>% 
                                 mutate(TE = Estimate,
@@ -339,14 +333,8 @@ ps.trt_coef2 <-  bind_cols(ps.trt_coef$site_code[,,'Intercept'] %>% # intercept
                                 mutate(TESlope = Estimate,
                                        TESlope_lower = Q2.5,
                                        TESlope_upper = Q97.5) %>% 
-                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-                           ps.trt_coef$site_code[,,'sigma_trt.yNPK'] %>%  # sigma NPK
-                             as_tibble() %>% 
-                             mutate(TESigma = Estimate,
-                                    TESigma_lower = Q2.5,
-                                    TESigma_upper = Q97.5) %>% 
-                             select(-Estimate, -Est.Error, -Q2.5, -Q97.5)
-                           ) %>% 
+                                select(-Estimate, -Est.Error, -Q2.5, -Q97.5)
+                          ) %>% 
   # join with min and max of the x-values
   inner_join(p.all %>% 
                group_by(site_code) %>% 
@@ -408,15 +396,15 @@ sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
 sl.trt_fixef <- fixef(sl.s)
 
 
-obs_nest.sl <- plot %>% 
-  mutate(site_group = site_code) %>%
-  group_by(site_group, site_code, trt.y) %>% 
-  summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-            year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-  nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-  mutate(predicted = map(data, ~predict(sl.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-
-View(obs_nest.sl)
+# obs_nest.sl <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code, trt.y) %>% 
+#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
+#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
+#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
+#   mutate(predicted = map(data, ~predict(sl.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
+# 
+# View(obs_nest.sl)
 
 # coefficients for study-level (random) effects
 sl.trt_coef <- coef(sl.s)
@@ -506,15 +494,15 @@ sg.trt_fitted.ctl<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('Control'),]
 sg.trt_fixef <- fixef(sg.s)
 
 # predicted values
-obs_nest.sg <- plot %>% 
-  mutate(site_group = site_code) %>%
-  group_by(site_group, site_code, trt.y) %>% 
-  summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-            year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-  nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-  mutate(predicted = map(data, ~predict(sg.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-
-View(obs_nest.sg)
+# obs_nest.sg <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code, trt.y) %>% 
+#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
+#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
+#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
+#   mutate(predicted = map(data, ~predict(sg.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
+# 
+# View(obs_nest.sg)
 
 # coefficients for study-level (random) effects
 sg.trt_coef <- coef(sg.s)
@@ -612,15 +600,15 @@ cde_fitted.ctl<-cde_fitted3[cde_fitted3$trt.y %in% c('Control'),]
 cde_fixef <- fixef(CDE.s)
 
 # predicted values
-obs_nest.cde <- plot %>% 
-  mutate(site_group = site_code) %>%
-  group_by(site_group, site_code, trt.y) %>% 
-  summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-            year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-  nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-  mutate(predicted = map(data, ~predict(CDE.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-
-View(obs_nest.cde)
+# obs_nest.cde <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code, trt.y) %>% 
+#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
+#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
+#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
+#   mutate(predicted = map(data, ~predict(CDE.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
+# 
+# View(obs_nest.cde)
 
 # coefficients for study-level (random) effects
 cde_coef <- coef(CDE.s)
