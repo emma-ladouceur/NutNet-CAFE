@@ -12,18 +12,17 @@
 
 # packages
 library(tidyverse)
-library(priceTools)
 
 # data
-biomass <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/biomass_sp.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biomass <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 
 colnames(biomass)
-biomass %>% distinct(site_code, experiment_type, trt)
+View(biomass %>% distinct(site_code, experiment_type, trt))
 
 # clean  data
-biomass_exp <- biomass %>% filter( experiment_type %in% c("Experimental (Full Factorial)", # experiment types we are interested in
-                                              "Experimental (Nutrients Only)"),
+biomass_exp <- biomass %>% filter( !experiment_type %in% c("Observational" # keep only experiment types we are interested in
+                                              ),
                     trt %in% c("NPK", "Control"), # treatments we are interested in
                     !site_code %in% c("nilla.au"), # this site is categorized as full factorial but only has controls
                     !is.na(biomass.sp.full) )  # remove rows with NA under main biomass/species column
@@ -32,7 +31,6 @@ head(biomass_exp)
 colnames(biomass_exp)
 
 biomass_exp %>% distinct(site_code, year_trt)
-
 
 # remove sites that dont have a year 0 or only have year 0
 species_nn <- biomass_exp  %>% 
@@ -47,7 +45,7 @@ species_nn <- biomass_exp  %>%
 
 colnames(species_nn)
 View(species_nn)
-View(species_nn %>% distinct(site_code,site_name,year_trt,year_max) %>% filter(year_max >= 3))
+View(species_nn %>% distinct(site_code,site_name,year_max) %>% filter(year_max >= 3))
   
 
 # plot richness
@@ -127,7 +125,7 @@ View(biggest.bm.values)
 
 # 1 output clean /species biomass data
 # species biomass data for NPK and Control plots for appropriate sites to match price calcs
-write.csv(sp, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/biomass_sp_CAFE.csv")
+write.csv(sp, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv")
 
 View(sp)
 
@@ -141,7 +139,7 @@ site.inclusion<-plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
 # 58 sites will be included in our main analysis
 View(site.inclusion)
 
-write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.csv")
+write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv")
 
 
 

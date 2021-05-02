@@ -254,13 +254,12 @@ fig_3c_r <- ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,12)) +
   labs(x = 'Year',
        y = expression(paste('Persistent species')), 
-       #title= 'B) Species loss (s.loss)'
-       title='') +
+       title= 'Persistent Species') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#F98400", drop =FALSE))+
   theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                                  strip.background = element_blank(),legend.position="none",
-                                 plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                                 plot.margin= margin(t = 0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                  strip.text = element_text(size=17),
   )
 

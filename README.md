@@ -48,7 +48,7 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **10_Figure_4.2.R** This is Figure 4 with the PS effect plotted first. Might become supplementary.
 
-**10_Figure_4.3.R** This also puts persistent species on the x axis. Does this even make sense? i dont think so.
+**10_Figure_4.3.R** This also puts persistent species on the x axis. Does this even make sense? I dont think so. If it does, this is the favoured version.
 
 **10_Figure_4.4.R** This plots persistent species first, and puts persistent species on the x axis. Still doesnt make sense.
 
