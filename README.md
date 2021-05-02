@@ -9,9 +9,9 @@ Species level data is not provided. Data openly available to produce results inc
 
 **plot.csv** Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure 2.
 
-**nutnet_cumulative_time.csv** Includes details about  pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with  persistent species (PS). These data are needed to run models associated with and produce Figure 3, 4, & 5.
+**nutnet_cumulative_time.csv** Includes details about pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with persistent species (PS). These data are needed to run models associated with and to produce Figure 3, 4, & 5.
 
-**Model Objects**  The data listed above are used in statistical models, then model objects are saved and provided. Data is extracted from these model objects  and are saved as data objects which are also provided, and then can then be used to produce figures without running the models. 
+**Model Objects**  The data listed above are used in statistical models, then model objects are saved and provided. Data is extracted from these model objects  and are saved as data objects which are also provided, and then can then be used to produce figures without re-running the models. 
 
 
 ### **R Scripts** 
@@ -39,7 +39,7 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **7_Model_Data_Posteriors.R** This workflow pulls data out of posterior distributions from *Price equation partitions* model objects and prepares it for: Figure 2 & 3 inset plots, Figure 2c, Figure 5, Figure S5, & Shiny App, Also produces 'quadrant categories' used in several Figures and in Table S1.
 
-**8_Figure_2.R** This script produces Figure 2 a) , b) & c).
+**8_Figure_2.R** This script produces Figure 2 a), b) & c).
 
 **9_Figure_3**  The script produces Figure 3 a) - f).
 

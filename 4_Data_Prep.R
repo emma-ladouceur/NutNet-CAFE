@@ -1,15 +1,21 @@
 
 
 # Author: Emma Ladouceur
-# Title:
-# Last Updated April 17, 2021
+# Title: Post-Price equation data clean
+# Last Updated  May 2, 2021
 
-# 4 Data Prep
+#  Produces dataset: 'nutnet_price_all.csv' & 'nutnet_cumulative_tims.csv'
 # This workflow uses the data produced by the script 'Price_Pairs.R", which is submitted to the cluster
-# by wrapper submit script, "Price_Pairs_Wrapper.sh" and nested Submit Script "Price_Pairs_Submit.sh" a
+# by wrapper submit script, "Price_Pairs_Wrapper.sh" and nested Submit Script "Price_Pairs_Submit.sh" 
 # In this script we prune the pairwise comparisons down to only meaningful temporal pairings
+# which we refer to as 'cumulative time' this compares every plot at 'year 0' or year before fertilization
+# to itself at every time of measurement since fertilization treatment
+# this gives us a temporally cumulative time series of pairwise partitioned responses
+# to turn this into a rate over time, we then model the dataset with  time as a continuous predictor
+# but the first step, done here, is prune comparisons down only to the meaningful temporal comparisons we want
+# to prepare for modeling
 
-# packagaes
+# packaaes
 library(tidyverse)
 library(foreach)
 
@@ -19,6 +25,7 @@ p <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/plot.
 # run cluster -based price script, then load the new input
 price.list <- list.files(path = "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/price pairs data/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
 
+# bring in all 428 pairwise price datasets
 price.all <- foreach (file = price.list,.combine=rbind) %do% {
   price.file<-readRDS(file)
   price.file$data
@@ -26,19 +33,19 @@ price.all <- foreach (file = price.list,.combine=rbind) %do% {
 
 head(price.all)
 
-# write data
+# we keep this unpruned version just in case we need to check or change something
 write.csv(price.all,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_price_all.csv")
 
-# load data frame
+# load unpruned data frame
 price.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 # the function compares everything possible so we now need to prune the data back to only meaningful comparisons
 head(price.all)
 nrow(price.all)
-# 94,828
+# 94,828 rows, most of them unnecessary and meaningless
 
-# clean and prune the data
-price.pairs <- price.all %>% separate(trt_year,into=c("trt_year.x","trt_year.y"),sep = " ", remove=FALSE) %>%
+# separate and unite the columns to improve ease of sorting, filtering and pruning the dataset
+price.sort <- price.all %>% separate(trt_year,into=c("trt_year.x","trt_year.y"),sep = " ", remove=FALSE) %>%
   # separate columns for filtering and analysis
   separate(trt_year.y, into=c("trt.y","year.y"),sep = "_", remove=FALSE) %>%
   separate(trt_year.x, into=c("trt.x","year.x"),sep = "_", remove=FALSE) %>%
@@ -49,7 +56,16 @@ price.pairs <- price.all %>% separate(trt_year,into=c("trt_year.x","trt_year.y")
   unite("trt.xy", c("trt.x","trt.y"), sep="_", remove=FALSE) %>%
   unite("year.xy", c("year.x","year.y"), sep="_", remove=FALSE) %>%
   # create unique id
-  unite("unique.id", c("site.year.id","trt_year","block","plot"), sep="_", remove=FALSE) %>%
+  unite("unique.id", c("site.year.id","trt_year","block","plot"), sep="_", remove=FALSE)
+
+# have a look at all the levels that we need to filter
+levels(price.all$trt.xy)
+levels(price.all$block)
+levels(price.all$year.xy)
+levels(price.all$plot)
+
+# filter data down to only the comparisons we want
+price.pairs <-  price.sort  %>%
   # filter for meaningful comparisons
   filter(trt.xy %in% c('Control_Control','NPK_NPK'), # filter treatment comparisons
          block %in% c('1 1','2 2','3 3','4 4','5 5','6 6'), # filter within block comparisons
@@ -61,6 +77,7 @@ price.pairs <- price.all %>% separate(trt_year,into=c("trt_year.x","trt_year.y")
                      '56 56','57 57','58 58','59 59','60 60','61 61','62 62')) 
 
 
+# calculate some of the extra metrics we need for modeling
 
 price.pairs$year.y <- as.numeric(price.pairs$year.y)
  
@@ -83,10 +100,10 @@ price.pairs.calc$plot.x <- as.factor(as.character(price.pairs.calc$plot.x))
 price.pairs.calc$year.y <- as.numeric(price.pairs.calc$year.y)
 price.pairs.calc$year_max <- as.numeric(price.pairs.calc$year_max)
 
-#look at what sites will be included in main analysis
+# look at what sites will be included in main analysis
 sites <- price.pairs.calc %>% distinct(site_code, year_max) %>% filter(year_max >= 3)
 
-View(sites)
+View(sites) # looks good!!
 
 write.csv(price.pairs.calc,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.csv")
 

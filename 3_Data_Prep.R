@@ -1,6 +1,9 @@
 
 # Authors: Emma Ladouceur & Adam T. Clark
-# 3_Data prep for price equations
+# Title: Price equation preparation: site level subsets
+# Last Updated May 2, 2021
+
+# Produces datasets: in folder pairs prep data; 428 datasets subset by site and year_trt
 # 3 preps data for price equation comparisons, which just pairs data into temporal subsets for meaningful comparisons
 # and outputs subsets of the data in pairs
 
