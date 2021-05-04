@@ -16,17 +16,17 @@ library(patchwork)
 
 
 # load modelobjects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/Model_Fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/Model_Fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/Model_Fits/3/cde.Rdata') # CDE.s
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/Model_Fits/3/sgain.Rdata') # s.gain.s
 load('~/Desktop/test_mods/ps.Rdata') # ps.3_sigma
 
 
 # site level meta data for posteriors
-meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 meta <- meta %>% group_by(site_code) %>% filter(max.year >= 3) %>%
   ungroup()
@@ -104,8 +104,8 @@ nrow(all.effs)
 effs_calc <- all.effs %>%
   # add posterior samples together
   mutate( # controls
-    sloss.sgain.ctl.p = (sloss.ctl.p + sgain.ctl.p + ps.ctl.p),
-    sloss.sgain.ps.ctl.p = (sloss.ctl.p + sgain.ctl.p),
+    sloss.sgain.ctl.p = (sloss.ctl.p + sgain.ctl.p ),
+    sloss.sgain.ps.ctl.p = (sloss.ctl.p + sgain.ctl.p + ps.ctl.p),
     sl.sg.ctl.p = (sl.ctl.p + sg.ctl.p),
     sl.sg.cde.ctl.p = (sl.ctl.p + sg.ctl.p + cde.ctl.p),
     #  npk treatments
@@ -419,16 +419,16 @@ fig_4 <- ggplot() +
              colour="#F98400",size=0.1,alpha = 0.4) +
   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
   #scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
-  annotate("text", x = -0.015, y = 0.75, label = "t0") +
-  annotate("text", x = -0.415, y = 7.25, label = "tn") +
-  annotate("text", x = 0.03, y = -1.5, label = "tn") +
+  # annotate("text", x = -0.015, y = 0.75, label = "t0") +
+  # annotate("text", x = -0.415, y = 7.25, label = "tn") +
+  # annotate("text", x = 0.03, y = -1.5, label = "tn") +
   labs(x = 'Rate of change in species (species/year)',
        y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
        title = '')
 
 
 fig_4
-#WTF
+# WTF
 
 
 # GET LEGENDS

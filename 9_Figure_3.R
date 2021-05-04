@@ -17,9 +17,9 @@ library(grid)
 # data
 sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+#p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
@@ -33,17 +33,17 @@ p.all$year.y<-as.numeric(p.all$year.y)
 
 # model object data
 # note to self change sgain model object data to match others
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.n.mod.dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.mod.dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/ps.mod.dat.Rdata') # ps.3_sigma
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/sgain_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/sloss.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/sl.n.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/sg_dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/cde.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/ps.mod.dat.Rdata') # ps.3_sigma
 
 
 # saved posterior data from 7_ Model_Data_Posteriors
 # Global/ Overall/ Population Effects for inset plots
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/global.p.effs.Rdata')
 
 # colors used
 # loss "#B40F20"
@@ -506,7 +506,7 @@ fig_3c_e <- ggplot() +
   labs(x = '',
        y='Slope') +
   geom_hline(yintercept = 0, lty = 2) +
-  scale_y_continuous(breaks=c(0,0.05,0.3)) +
+  scale_y_continuous(breaks=c(0,-0.2,-0.5)) +
   scale_color_manual(values = c("#000000","#F98400")) +
   theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
@@ -591,10 +591,8 @@ fig_3f <- fig_3f_r +  annotation_custom(ggplotGrob(fig_3f_e), xmin = 6.5, xmax =
                                         ymin = 400, ymax = 1050)
 
 
-
-
 # put everything together with patchwork
-# Save As LANDSCAPE 11X14
+# Save As LANDSCAPE 11 X 14
 (fig_3a | fig_3b | fig_3c) / ( fig_3d | fig_3e | fig_3f ) / (fig_3_legend) +
   plot_layout( heights = c(10,10,0.5)) 
 
