@@ -55,7 +55,7 @@ loo_compare(waic.r3_s, waic.r3_sp)
 
 
 #  rich.3 is negative, 3.sigma is 0
-# sigma is better than sigma plus
+
 
 # pp check
 color_scheme_set("darkgray")
