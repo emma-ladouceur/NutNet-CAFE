@@ -11,6 +11,6 @@
 module load foss/2019b R/3.6.2-2
 export OFILE=/work/$USER/NutNet/$SLURM_JOB_NAME-$SLURM_JOB_ID.Rdata
 export LANG=en_US.UTF-8
-Rscript --vanilla /home/ladouceu/projects/NutNet/nn_time.sgain.R
+Rscript --vanilla /home/ladouceu/projects/NutNet-CAFE/cluster/univariate_models/nn_time.sgain.R
 
 
