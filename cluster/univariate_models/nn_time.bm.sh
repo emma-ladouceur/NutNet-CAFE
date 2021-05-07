@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J nn_time.rich
+#SBATCH -J nn_time.bm
 #SBATCH --time=24:00:00
 #SBATCH --mem-per-cpu=8G
 #SBATCH --cpus-per-task=4
