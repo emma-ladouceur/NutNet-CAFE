@@ -14,10 +14,10 @@ plot$plot<-as.factor(plot$plot)
 plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
-plot.bm.3 <- brm( strip.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+bm.3 <- brm( strip.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
                   data = plot , family=student(),  cores = 4,iter=6000, warmup = 1000, chains = 4)
 
 
-save(plot.bm.3,
+save(bm.3,
      file=Sys.getenv('OFILE'))
 
