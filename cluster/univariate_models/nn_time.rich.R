@@ -16,10 +16,10 @@ plot$plot<-as.factor(plot$plot)
  ungroup()
 
 
-plot.rich.3 <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                    data = plot,cores = 4,iter=6000, warmup = 1000, chains = 4)
+rich.3 <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
+                    data = plot ,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
-save(plot.rich.3,
+save(rich.3,
      file=Sys.getenv('OFILE'))
 
 
