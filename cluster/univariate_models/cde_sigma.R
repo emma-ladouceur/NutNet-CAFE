@@ -17,12 +17,12 @@ p.all$plot<-as.factor(p.all$plot)
 p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
-cde.3_sigma <- brm( bf( CDE ~  trt.y + year.y.m + (trt.y * year.y.m |  site_code/block/plot) + trt.y:year.y.m,
+cde.3_sigmai <- brm( bf( CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot) + trt.y:year.y.m,
                      sigma ~ 0 + trt.y + (0 + trt.y | site_code) ),
                   data = p.all, family = student(),cores = 4, iter = 6000, warmup = 1000, chains = 4,
              control = list(adapt_delta = 0.99))
 
-save(cde.3_sigma,
+save(cde.3_sigmai,
      file=Sys.getenv('OFILE'))
 
 
