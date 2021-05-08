@@ -4,7 +4,7 @@
 # Title: Post-Price equation data clean
 # Last Updated  May 2, 2021
 
-#  Produces dataset: 'nutnet_price_all.csv' & 'nutnet_cumulative_tims.csv'
+#  Produces dataset: 'nutnet_price_all.csv' & 'nutnet_cumulative_time.csv'
 # This workflow uses the data produced by the script 'Price_Pairs.R", which is submitted to the cluster
 # by wrapper submit script, "Price_Pairs_Wrapper.sh" and nested Submit Script "Price_Pairs_Submit.sh" 
 # In this script we prune the pairwise comparisons down to only meaningful temporal pairings
