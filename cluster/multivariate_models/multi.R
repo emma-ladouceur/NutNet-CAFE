@@ -23,9 +23,9 @@ load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/multi
 summary(nn.multi.3)
 
 color_scheme_set("darkgray")
-nnb<-pp_check(nn.multi.3, resp = 'plotmass')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
+nnb<-pp_check(nn.multi.3, resp = 'strip')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
                                                                                                                 y = 'Density') 
-nnr<-pp_check(nn.multi.3, resp = 'alldiv')+ theme_classic()+ scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
+nnr<-pp_check(nn.multi.3, resp = 'rich')+ theme_classic()+ scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
                                                                                                            y = 'Density') 
 # Figure S3h
 (nnr | nnb)

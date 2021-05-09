@@ -641,6 +641,8 @@ View(study.sgain.p)
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/')
 save(study.rich.p, study.bm.p,study.sl.p,study.sg.p,study.cde.p,study.sloss.p,study.sgain.p,  file = 'study.p.effs.Rdata')
 
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
+
 # Use these same data to calculate categories for:
 # Figure 2c, Figure 5, Figure S1,  Figure S5, Table S1
 study.rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
@@ -649,7 +651,7 @@ study.bm.p2 <- study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower
 
 study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2) %>% filter(response == "NPK")
 
-colnames(study.effs.p)
+View(study.effs.p)
 
 study.effs.p$Quadrant <- ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff > 0, '+biomass -rich',
                                 ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff < 0,  '-biomass -rich',

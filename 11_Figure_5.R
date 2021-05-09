@@ -258,10 +258,10 @@ write.csv(cde.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteri
 
 # data from 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.price.p.effs.Rdata')
-npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.rate.p,sloss.trt.rate.p,sgain.trt.rate.p, Quadrant) %>%
-  filter(!Quadrant == "-biomass +rich")
+npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.rate.p,sloss.trt.rate.p,sgain.trt.rate.p, Quadrant) #%>%
+  #filter(!Quadrant == "-biomass +rich")
 
-npk.effs$Quadrant<-factor(npk.effs$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
+npk.effs$Quadrant<-factor(npk.effs$Quadrant,  levels=c("-biomass +rich","+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
 
 head(npk.effs)
 
@@ -271,10 +271,10 @@ head(npk.effs)
 
 sloss.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-sloss.ps <- sloss.ps %>%
-  filter(!Quadrant == "-biomass +rich")
+# sloss.ps <- sloss.ps %>%
+#   filter(!Quadrant == "-biomass +rich")
 
-sloss.ps$Quadrant<-factor(sloss.ps$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
+sloss.ps$Quadrant<-factor(sloss.ps$Quadrant,  levels=c("-biomass +rich", "+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
 
 sloss.ps
 
@@ -306,10 +306,10 @@ fig_5a
 
 sgain.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-sgain.ps <- sgain.ps %>% 
-  filter(!Quadrant == "-biomass +rich")
+# sgain.ps <- sgain.ps %>% 
+#   filter(!Quadrant == "-biomass +rich")
 
-sgain.ps$Quadrant<-factor(sgain.ps$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
+sgain.ps$Quadrant<-factor(sgain.ps$Quadrant,  levels=c("-biomass +rich","+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
 
 colnames(sgain.ps)
 sgain.p
@@ -345,10 +345,10 @@ fig_5b
 # species loss (s.loss)
 sl.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-sl.ps <- sl.ps %>%
-  filter(!Quadrant == "-biomass +rich")
+# sl.ps <- sl.ps %>%
+#   filter(!Quadrant == "-biomass +rich")
 
-sl.ps$Quadrant<-factor(sl.ps$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
+sl.ps$Quadrant<-factor(sl.ps$Quadrant,  levels=c("-biomass +rich","+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
 
 head(sl.ps)
 
@@ -385,10 +385,10 @@ fig_5c
 
 sg.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-sg.ps <- sg.ps %>% 
-  filter(!Quadrant == "-biomass +rich")
+# sg.ps <- sg.ps %>% 
+#   filter(!Quadrant == "-biomass +rich")
 
-sg.ps$Quadrant<-factor(sg.ps$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
+sg.ps$Quadrant<-factor(sg.ps$Quadrant,  levels=c("-biomass +rich","+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
 
 sg.ps
 
@@ -425,13 +425,15 @@ fig_5d
 
 cde.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-cde.ps <- cde.ps %>% 
-  filter(!Quadrant == "-biomass +rich")
+# cde.ps <- cde.ps %>% 
+#   filter(!Quadrant == "-biomass +rich")
 
-cde.ps$Quadrant<-factor(cde.ps$Quadrant,  levels=c("+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
+cde.ps$Quadrant<-factor(cde.ps$Quadrant,  levels=c("-biomass +rich","+biomass +rich",  "-biomass -rich" , "+biomass -rich"))
 
 cde.ps
 
+
+View(npk.effs)
 fig_5e <- ggplot() +
   geom_density_ridges(data = cde.ps,
                       aes(x = cde.trt.study + cde.trt.global, 
