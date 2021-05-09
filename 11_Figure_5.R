@@ -5,7 +5,7 @@
 # Last Updated April 17, 2021
 
 # 11_Figure_5.R
-# This workflow uses data pulled out of Modelsbelow to produce Figure 4
+# This workflow uses data pulled out of Models below to produce Figure 4
 
 
 # packages
@@ -19,11 +19,26 @@ library("scales")
 library(stringr)
 
 # models
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # sl.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # sl.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # sg.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
+
+
+
+# selected mods
+load('~/Desktop/mods/sloss_sigmai.Rdata') # s.loss.3_sigma2
+load('~/Desktop/mods/sgain_sigmai.Rdata') # s.gain.3_sigma2
+load('~/Desktop/mods/sl.Rdata') # sl.3_sigma2
+load('~/Desktop/mods/sg.Rdata') # sg.3_sigma2
+load('~/Desktop/mods/cde_sigmai.Rdata') # CDE.3_sigma2
+#selected best mods
+load('~/Desktop/mods/bm_sigmai.Rdata') # bm.3_sigmai 
+load('~/Desktop/mods/rich_sigmai.Rdata') # rich.3_sigmai
+
+
+
 
 # data
 meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -31,11 +46,11 @@ meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.
 head(meta)
 
 # 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.price.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.price.p.effs.Rdata')
 
 
 #  mods study level dat
-study_levels <- plot.rich.3$data %>% 
+study_levels <- rich.3_sigmai$data %>% 
   as_tibble() %>% 
   distinct(site_code) %>% 
   mutate(level =  site_code) %>%
@@ -53,25 +68,25 @@ study_sample_posterior <- study_levels %>%
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000,
                                                                            min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sloss.ctl.study = purrr::map(data, ~posterior_samples(s.loss.3,
+         sloss.ctl.study = purrr::map(data, ~posterior_samples(sloss.3_sigmai,
                                                             pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                             exact = TRUE,
                                                             subset = floor(runif(n = 1000,
                                                                                  min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sgain.ctl.study = purrr::map(data, ~posterior_samples(s.gain.3,
+         sgain.ctl.study = purrr::map(data, ~posterior_samples(sgain.3_sigmai,
                                                             pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                             exact = TRUE,
                                                             subset = floor(runif(n = 1000,
                                                                                  min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          cde.ctl.study = purrr::map(data, ~posterior_samples(CDE.3,
+          cde.ctl.study = purrr::map(data, ~posterior_samples(cde.3_sigmai,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         rich.ctl.study = purrr::map(data, ~posterior_samples(plot.rich.3,
+         rich.ctl.study = purrr::map(data, ~posterior_samples(rich.3_sigmai,
                                                         pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                         exact = TRUE,
                                                         subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         bm.ctl.study = purrr::map(data, ~posterior_samples(plot.bm.3,
+         bm.ctl.study = purrr::map(data, ~posterior_samples(bm.3_sigmai,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
@@ -84,24 +99,24 @@ study_sample_posterior <- study_levels %>%
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000,
                                                                             min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sloss.npk.study = purrr::map(data, ~posterior_samples(s.loss.3, 
+         sloss.npk.study = purrr::map(data, ~posterior_samples(sloss.3_sigmai, 
                                                             pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                             exact = TRUE,
                                                             subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         sgain.npk.study = purrr::map(data, ~posterior_samples(s.gain.3,
+         sgain.npk.study = purrr::map(data, ~posterior_samples(sgain.3_sigmai,
                                                             pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                             exact = TRUE,
                                                             subset = floor(runif(n = 1000,
                                                                                  min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-         cde.npk.study = purrr::map(data, ~posterior_samples(CDE.3,
+         cde.npk.study = purrr::map(data, ~posterior_samples(cde.3_sigmai,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         rich.npk.study = purrr::map(data, ~posterior_samples(plot.rich.3,
+         rich.npk.study = purrr::map(data, ~posterior_samples(rich.3_sigmai,
                                                         pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                         exact = TRUE,
                                                         subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-         bm.npk.study = purrr::map(data, ~posterior_samples(plot.bm.3,
+         bm.npk.study = purrr::map(data, ~posterior_samples(bm.3_sigmai,
                                                       pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                       exact = TRUE,
                                                       subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()))
@@ -110,11 +125,11 @@ study_sample_posterior <- study_levels %>%
 # fixed posteriors
 sl.fixed.p <- posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sg.fixed.p<-posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
-sloss.fixed.p <- posterior_samples(s.loss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
-sgain.fixed.p<-posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
-cde.fixed.p<-posterior_samples(CDE.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
-rich.fixed.p<-posterior_samples(plot.rich.3, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
-bm.fixed.p<-posterior_samples(plot.bm.3, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
+sloss.fixed.p <- posterior_samples(sloss.3_sigmai, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sgain.fixed.p<-posterior_samples(sgain.3_sigmai, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+cde.fixed.p<-posterior_samples(cde.3_sigmai, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+rich.fixed.p<-posterior_samples(rich.3_sigmai, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
+bm.fixed.p<-posterior_samples(bm.3_sigmai, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
 
 head(rich.fixed.p)
 
@@ -133,7 +148,7 @@ rich_posterior <- study_sample_posterior  %>%
 rich.p <- rich_posterior %>% inner_join(meta, by = 'site_code') 
 
 
-write.csv(rich.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich_posteriors.csv")
+write.csv(rich.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/rich_posteriors.csv")
 
 
 bm_posterior <- study_sample_posterior  %>% 
@@ -150,7 +165,7 @@ bm_posterior <- study_sample_posterior  %>%
 bm.p <- bm_posterior %>% inner_join(meta, by = 'site_code') 
 
 
-write.csv(bm.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm_posteriors.csv")
+write.csv(bm.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/bm_posteriors.csv")
 
 
 sl_posterior <- study_sample_posterior  %>% 
@@ -167,7 +182,7 @@ sl_posterior <- study_sample_posterior  %>%
 sl.p<-sl_posterior %>% inner_join(meta, by = 'site_code') 
 
 
-write.csv(sl.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl_posteriors.csv")
+write.csv(sl.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sl_posteriors.csv")
 
 # SLOSS
 sloss_posterior <- study_sample_posterior  %>% 
@@ -183,7 +198,7 @@ sloss_posterior <- study_sample_posterior  %>%
 
 sloss.p<-sloss_posterior %>% inner_join(meta, by = 'site_code') 
 
-write.csv(sloss.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss_posteriors.csv")
+write.csv(sloss.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sloss_posteriors.csv")
 
 
 
@@ -202,7 +217,7 @@ sg_posterior <- study_sample_posterior  %>%
 
 sg.p<-sg_posterior %>% inner_join(meta, by = 'site_code') 
 
-write.csv(sg.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_posteriors.csv")
+write.csv(sg.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sg_posteriors.csv")
 
 
 
@@ -221,7 +236,7 @@ sgain_posterior <- study_sample_posterior  %>%
 
 sgain.p<-sgain_posterior %>% inner_join(meta, by = 'site_code') 
 
-write.csv(sgain.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_posteriors.csv")
+write.csv(sgain.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sgain_posteriors.csv")
 
 
 # CDE
@@ -238,11 +253,11 @@ cde_posterior <- study_sample_posterior  %>%
 
 cde.p<-cde_posterior %>% inner_join(meta, by = 'site_code') 
 
-write.csv(cde.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde_posteriors.csv")
+write.csv(cde.p,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/cde_posteriors.csv")
 
 
 # data from 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.price.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.price.p.effs.Rdata')
 npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.rate.p,sloss.trt.rate.p,sgain.trt.rate.p, Quadrant) %>%
   filter(!Quadrant == "-biomass +rich")
 
@@ -254,7 +269,7 @@ head(npk.effs)
 # https://stackoverflow.com/questions/13223846/ggplot2-two-line-label-with-expression
 
 
-sloss.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sloss.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sloss.ps <- sloss.ps %>%
   filter(!Quadrant == "-biomass +rich")
@@ -289,7 +304,7 @@ fig_5a <- ggplot() +
 fig_5a
 
 
-sgain.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sgain.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sgain.ps <- sgain.ps %>% 
   filter(!Quadrant == "-biomass +rich")
@@ -328,7 +343,7 @@ fig_5b <- ggplot() +
 fig_5b
 
 # species loss (s.loss)
-sl.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sl.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sl.ps <- sl.ps %>%
   filter(!Quadrant == "-biomass +rich")
@@ -368,7 +383,7 @@ fig_5c <- ggplot() +
 fig_5c
 
 
-sg.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+sg.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sg.ps <- sg.ps %>% 
   filter(!Quadrant == "-biomass +rich")
@@ -408,7 +423,7 @@ fig_5d
 
 
 
-cde.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+cde.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 cde.ps <- cde.ps %>% 
   filter(!Quadrant == "-biomass +rich")

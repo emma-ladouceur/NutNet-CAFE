@@ -22,8 +22,6 @@ sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/new/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
 colnames(p.all)
 p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
   filter(year_max >= 3) 
@@ -40,17 +38,24 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rd
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/ps.Rdata') # CDE.3
-load('~/Desktop/test_mods/ps.Rdata') # ps.3_sigma
+
+# selected mods
+load('~/Desktop/mods/sloss_sigmai.Rdata') # s.loss.3_sigma2
+load('~/Desktop/mods/sgain_sigmai.Rdata') # s.gain.3_sigma2
+load('~/Desktop/mods/sl.Rdata') # sl.3_sigma2
+load('~/Desktop/mods/sg.Rdata') # sg.3_sigma2
+load('~/Desktop/mods/cde_sigmai.Rdata') # CDE.3_sigma2
+
 
 # Species Loss model
 
 #  model summary
-summary(s.loss.3)
+summary(sloss.3_sigmai)
 # caterpillar plots
-plot(s.loss.3)
+plot(sloss.3_sigmai)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s3c <- pp_check(s.loss.3) + theme_classic() + 
+fig_s3c <- pp_check(sloss.3_sigmai) + theme_classic() + 
   labs(x= "Species loss (s.loss)", y = "Density") + 
   scale_x_continuous(limits = c(-50, 50))
 
@@ -61,7 +66,7 @@ fig_s3c
 colnames(p.all)
 pairs.sloss <- p.all %>% filter(!is.na(s.loss.n))
 pairs.sloss$year.y <- as.factor(pairs.sloss$year.y)
-sloss.m <- residuals(s.loss.3)
+sloss.m <- residuals(sloss.3_sigmai)
 sloss.m <- as.data.frame(sloss.m)
 head(sloss.m)
 sloss.plot <- cbind(pairs.sloss, sloss.m$Estimate)
@@ -75,9 +80,9 @@ with(sloss.plot, plot(plot, sloss.m$Estimate))
 
 
 # fixed effects
-sloss.trt_fitted <- cbind(s.loss.3$data,
+sloss.trt_fitted <- cbind(sloss.3_sigmai$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(s.loss.3, re_formula = NA)) %>% 
+                          fitted(sloss.3_sigmai, re_formula = NA)) %>% 
   as_tibble()
 
 
@@ -86,25 +91,25 @@ sloss.trt_fitted.ctl <- sloss.trt_fitted  %>% filter(trt.y %in% c('Control'))
 
 
 # fixed effect coefficients 
-sloss.trt_fixef <- fixef(s.loss.3)
+sloss.trt_fixef <- fixef(sloss.3_sigmai)
 
 # predict estimates for each site across a sequence of year.y (comparison plots age)
 # this takes ~ 5 minutes
 
 head(p.all)
 
-obs_nest.sloss <- plot %>% 
-  mutate(site_group = site_code) %>%
-  group_by(site_group, site_code, trt.y) %>% 
-  summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-            year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-  nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-  mutate(predicted = map(data, ~predict(s.loss.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-
-View(obs_nest.sloss)
+# obs_nest.sloss <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code, trt.y) %>% 
+#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
+#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
+#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
+#   mutate(predicted = map(data, ~predict(sloss.3_sigmai, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
+# 
+# View(obs_nest.sloss)
 
 # coefficients for study-level (random) effects
-sloss.trt_coef <- coef(s.loss.s)
+sloss.trt_coef <- coef(sloss.3_sigmai)
 
 sloss.trt_coef2 <-  bind_cols(sloss.trt_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -141,8 +146,8 @@ sloss.trt_coef2 <-  bind_cols(sloss.trt_coef$site_code[,,'Intercept'] %>%
              by = 'site_code') 
 
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(sloss.trt_fitted,sloss.trt_fitted.npk,sloss.trt_fitted.ctl,obs_nest.sloss,sloss.trt_coef3,file = 'sloss.n.mod.dat.Rdata')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(sloss.trt_fitted,sloss.trt_fitted.npk,sloss.trt_fitted.ctl,sloss.trt_coef2,file = 'sloss.n.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.n.mod.dat.Rdata')
 
 
@@ -150,12 +155,12 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.n.mod.dat.Rd
 
 
 #  model summary
-summary(s.gain.3)
+summary(sgain.3_sigmai)
 # caterpillar plots
-plot(s.gain.3)
+plot(sgain.3_sigmai)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s3d <- pp_check(s.gain.3) + theme_classic() + 
+fig_s3d <- pp_check(sgain.3_sigmai) + theme_classic() + 
   labs(x= "Species gain (s.gain)", y = "Density") + 
   scale_x_continuous(limits = c(-50, 50))
 
@@ -165,7 +170,7 @@ fig_s3d
 colnames(p.all)
 pairs.sgain <- p.all %>% filter(!is.na(s.gain))
 pairs.sgain$year.y <- as.factor(pairs.sgain$year.y)
-sgain.m <- residuals(s.gain.3)
+sgain.m <- residuals(sgain.3_sigmai)
 sgain.m <- as.data.frame(sgain.m)
 sgain.plot <- cbind(pairs.sgain, sgain.m$Estimate)
 head(sgain.plot)
@@ -177,31 +182,31 @@ with(sgain.plot, plot(year.y, sgain.m$Estimate))
 with(sgain.plot, plot(plot, sgain.m$Estimate))
 
 
-sgain.trt_fitted <- cbind(s.gain.3$data,
+sgain.trt_fitted <- cbind(sgain.3_sigmai$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(s.gain.s, re_formula = NA)) %>% 
+                          fitted(sgain.3_sigmai, re_formula = NA)) %>% 
   as_tibble() 
 
 
-sgain.trt_fitted.npk<-sgain.trt_fitted3[sgain.trt_fitted3$trt.y %in% c('NPK'),]
-sgain.trt_fitted.ctl<-sgain.trt_fitted3[sgain.trt_fitted3$trt.y %in% c('Control'),]
+sgain.trt_fitted.npk<-sgain.trt_fitted[sgain.trt_fitted$trt.y %in% c('NPK'),]
+sgain.trt_fitted.ctl<-sgain.trt_fitted[sgain.trt_fitted$trt.y %in% c('Control'),]
 
 
 # fixed effect coefficients 
-sgain.trt_fixef <- fixef(s.gain.s)
+sgain.trt_fixef <- fixef(sgain.3_sigmai)
 
-obs_nest.sgain <- plot %>% 
-  mutate(site_group = site_code) %>%
-  group_by(site_group, site_code, trt.y) %>% 
-  summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-            year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-  nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-  mutate(predicted = map(data, ~predict(s.gain.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-
-View(obs_nest.sgain)
+# obs_nest.sgain <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code, trt.y) %>% 
+#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
+#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
+#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
+#   mutate(predicted = map(data, ~predict(sgain.3_sigmai, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
+# 
+# View(obs_nest.sgain)
 
 # coefficients for study-level (random) effects
-sgain.trt_coef <- coef(s.gain.s)
+sgain.trt_coef <- coef(sgain.3_sigmai)
 
 sgain.trt_coef2 <-  bind_cols(sgain.trt_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -229,7 +234,7 @@ sgain.trt_coef2 <-  bind_cols(sgain.trt_coef$site_code[,,'Intercept'] %>%
                                        TESlope_upper = Q97.5) %>% 
                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat2 %>% 
+  inner_join(p.all %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
@@ -238,9 +243,9 @@ sgain.trt_coef2 <-  bind_cols(sgain.trt_coef$site_code[,,'Intercept'] %>%
                          by = 'site_code')) 
 
 # note to self change sgain file name to match others later
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(sgain.trt_fitted.npk,sgain.trt_fitted.ctl,obs_nest.sgain,sgain.trt_coef3,file = 'sgain_dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain_dat.Rdata')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(sgain.trt_fitted.npk,sgain.trt_fitted.ctl,sgain.trt_coef2,file = 'sgain.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.mod.dat.Rdata')
 
 
 # persistent species model
@@ -346,7 +351,7 @@ ps.trt_coef2 <-  bind_cols(ps.trt_coef$site_code[,,'Intercept'] %>% # intercept
 
 
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
 save(ps.trt_fitted,ps.trt_fitted.npk,ps.trt_fitted.ctl,ps.trt_coef2,file = 'ps.mod.dat.Rdata')
 #load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/ps.mod.dat.Rdata')
 
@@ -381,19 +386,19 @@ with(sl.plot, plot(plot, sl.m$Estimate))
 
 
 # fixed effects
-sl.trt_fitted <- cbind(sl.s$data,
+sl.trt_fitted <- cbind(sl.3$data,
                        # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                       fitted(sl.s, re_formula = NA)) %>% 
+                       fitted(sl.3, re_formula = NA)) %>% 
   as_tibble()
 
 
 
-sl.trt_fitted.npk<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('NPK'),]
-sl.trt_fitted.ctl<-sl.trt_fitted3[sl.trt_fitted3$trt.y %in% c('Control'),]
+sl.trt_fitted.npk<-sl.trt_fitted[sl.trt_fitted$trt.y %in% c('NPK'),]
+sl.trt_fitted.ctl<-sl.trt_fitted[sl.trt_fitted$trt.y %in% c('Control'),]
 
 
 # fixed effect coefficients 
-sl.trt_fixef <- fixef(sl.s)
+sl.trt_fixef <- fixef(sl.3)
 
 
 # obs_nest.sl <- plot %>% 
@@ -407,7 +412,7 @@ sl.trt_fixef <- fixef(sl.s)
 # View(obs_nest.sl)
 
 # coefficients for study-level (random) effects
-sl.trt_coef <- coef(sl.s)
+sl.trt_coef <- coef(sl.3)
 
 sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>% 
                              as_tibble() %>% 
@@ -435,7 +440,7 @@ sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>%
                                     TESlope_upper = Q97.5) %>% 
                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat2 %>% 
+  inner_join(p.all %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
@@ -444,8 +449,8 @@ sl.trt_coef2 <-  bind_cols(sl.trt_coef$site_code[,,'Intercept'] %>%
              by = 'site_code') 
 
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(sl.trt_fitted.npk,sl.trt_fitted.ctl,obs_nest.sl,sl.trt_coef3,file = 'sl.n.mod.dat.Rdata')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(sl.trt_fitted.npk,sl.trt_fitted.ctl,sl.trt_coef2,file = 'sl.n.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.n.mod.dat.Rdata')
 
 
@@ -481,17 +486,17 @@ with(sg.plot, plot(plot, sg.m$Estimate))
 
 
 
-sg.trt_fitted <- cbind(sg.s$data,
+sg.trt_fitted <- cbind(sg.3$data,
                        # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                       fitted(sg.s, re_formula = NA)) %>% 
+                       fitted(sg.3, re_formula = NA)) %>% 
   as_tibble() 
 
 
-sg.trt_fitted.npk<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('NPK'),]
-sg.trt_fitted.ctl<-sg.trt_fitted3[sg.trt_fitted3$trt.y %in% c('Control'),]
+sg.trt_fitted.npk<-sg.trt_fitted[sg.trt_fitted$trt.y %in% c('NPK'),]
+sg.trt_fitted.ctl<-sg.trt_fitted[sg.trt_fitted$trt.y %in% c('Control'),]
 
 # fixed effect coefficients 
-sg.trt_fixef <- fixef(sg.s)
+sg.trt_fixef <- fixef(sg.3)
 
 # predicted values
 # obs_nest.sg <- plot %>% 
@@ -505,7 +510,7 @@ sg.trt_fixef <- fixef(sg.s)
 # View(obs_nest.sg)
 
 # coefficients for study-level (random) effects
-sg.trt_coef <- coef(sg.s)
+sg.trt_coef <- coef(sg.3)
 
 
 sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>% 
@@ -534,7 +539,7 @@ sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>%
                                     TESlope_upper = Q97.5) %>% 
                              select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat2 %>% 
+  inner_join(p.all %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
@@ -543,10 +548,9 @@ sg.trt_coef2 <-  bind_cols(sg.trt_coef$site_code[,,'Intercept'] %>%
              by = 'site_code') 
 
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(sg.trt_fitted.npk,sg.trt_fitted.ctl,obs_nest.sg,sg.trt_coef3,file = 'sg_dat.Rdata')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(sg.trt_fitted.npk,sg.trt_fitted.ctl,sg.trt_coef2,file = 'sg.mod.dat.Rdata')
 load('~/Desktop/Academic/R code/NutNet/sg_dat.Rdata')
-
 
 
 
@@ -557,12 +561,12 @@ load('~/Desktop/Academic/R code/NutNet/sg_dat.Rdata')
 
 
 #  model summary
-summary(CDE.3)
+summary(cde.3_sigmai)
 # caterpillar plots
-plot(CDE.3)
+plot(cde.3_sigmai)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s3g <- pp_check(CDE.3) + theme_classic() + 
+fig_s3g <- pp_check(cde.3_sigmai) + theme_classic() + 
   labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with persistent species (PS)')), y = "Density") + 
    scale_x_continuous(limits = c(-1000, 1000))
 
@@ -572,7 +576,7 @@ fig_s3g
 # residuals (this take a minute)
 colnames(p.all)
 pairs.cde <- p.all %>% filter(!is.na(CDE))
-cde.m <- residuals(CDE.3)
+cde.m <- residuals(cde.3_sigmai)
 cde.m <- as.data.frame(cde.m)
 head(cde.m)
 cde.plot <- cbind(pairs.cde, cde.m$Estimate)
@@ -587,17 +591,17 @@ with(cde.plot, plot(plot, cde.m$Estimate))
 
 
 # fixed effects
-cde_fitted <- cbind(CDE.s$data,
+cde_fitted <- cbind(cde.3_sigmai$data,
                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                    fitted(CDE.s, re_formula = NA)) %>% 
+                    fitted(cde.3_sigmai, re_formula = NA)) %>% 
   as_tibble() 
 
 
-cde_fitted.npk<-cde_fitted3[cde_fitted3$trt.y %in% c('NPK'),]
-cde_fitted.ctl<-cde_fitted3[cde_fitted3$trt.y %in% c('Control'),]
+cde_fitted.npk<-cde_fitted[cde_fitted$trt.y %in% c('NPK'),]
+cde_fitted.ctl<-cde_fitted[cde_fitted$trt.y %in% c('Control'),]
 
 # fixed effect coefficients
-cde_fixef <- fixef(CDE.s)
+cde_fixef <- fixef(cde.3_sigmai)
 
 # predicted values
 # obs_nest.cde <- plot %>% 
@@ -606,12 +610,12 @@ cde_fixef <- fixef(CDE.s)
 #   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
 #             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
 #   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-#   mutate(predicted = map(data, ~predict(CDE.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
+#   mutate(predicted = map(data, ~predict(cde.3_sigmai, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
 # 
 # View(obs_nest.cde)
 
 # coefficients for study-level (random) effects
-cde_coef <- coef(CDE.s)
+cde_coef <- coef(cde.3_sigmai)
 
 cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>% 
                           as_tibble() %>% 
@@ -639,17 +643,17 @@ cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>%
                                  TESlope_upper = Q97.5) %>% 
                           select(-Estimate, -Est.Error, -Q2.5, -Q97.5)) %>% 
   # join with min and max of the x-values
-  inner_join(p.dat3 %>% 
+  inner_join(p.all %>% 
                group_by(site_code) %>% 
                summarise(xmin = min(year.y),
                          xmax = max(year.y),
                          cxmin = min(year.y.m),
                          cxmax = max(year.y.m)),
-             by = 'site_code') %>% left_join(start.rich)
+             by = 'site_code') 
 
 
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(cde_fitted.npk,cde_fitted.ctl,obs_nest.cde,cde_coef3,file = 'cde.mod.dat.Rdata')
+save(cde_fitted.npk,cde_fitted.ctl,cde_coef2,file = 'cde.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.mod.dat.Rdata')
 
 

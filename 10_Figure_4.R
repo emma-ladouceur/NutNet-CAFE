@@ -14,12 +14,21 @@ library(patchwork)
 
 
 # load modelobjects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
+# 
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
+# 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
+# selected mods
+load('~/Desktop/mods/sloss_sigmai.Rdata') # s.loss.3_sigma2
+load('~/Desktop/mods/sgain_sigmai.Rdata') # s.gain.3_sigma2
+load('~/Desktop/mods/sl.Rdata') # sl.3_sigma2
+load('~/Desktop/mods/sg.Rdata') # sg.3_sigma2
+load('~/Desktop/mods/cde_sigmai.Rdata') # CDE.3_sigma2
+
 
 # site level meta data for posteriors
 meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -32,10 +41,10 @@ colnames(meta)
 # Similarly  to '7_Model_Data_Posteriors.R' we 
 # Extract 1000 posterior samples from Fixed Effects (Overall/Population/Global Effects) 
 # for the price partitions
-sloss.fixed.p <- posterior_samples(s.loss.3, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
-sgain.fixed.p <- posterior_samples(s.gain.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
+sloss.fixed.p <- posterior_samples(sloss.3_sigmai, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
+sgain.fixed.p <- posterior_samples(sgain.3_sigmai, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 
-cde.fixed.p <- posterior_samples(CDE.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) )
+cde.fixed.p <- posterior_samples(cde.3_sigmai, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) )
 sl.fixed.p <- posterior_samples(sl.3, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
 sg.fixed.p <- posterior_samples(sg.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 
@@ -45,7 +54,7 @@ sg.fixed.p <- posterior_samples(sg.3, "^b",subset = floor(runif(n = 2000, 1, max
 # here we take 1000 samps, then add all together, then take the mean
 sl.fixed.p2 <- sl.fixed.p %>% 
   mutate(sl.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
-  mutate(sg.ctl.p=`b_year.y.m`) %>%
+  mutate(sl.ctl.p=`b_year.y.m`) %>%
   select(sl.ctl.p,
          sl.trt.p) 
 
@@ -381,9 +390,9 @@ fig_4 <- ggplot() +
              colour="#F98400",size=0.1,alpha = 0.4) +
   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
   scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
-  annotate("text", x = -0.015, y = 0.75, label = "t0") +
-  annotate("text", x = -0.415, y = 7.25, label = "tn") +
-  annotate("text", x = 0.03, y = -1.5, label = "tn") +
+  # annotate("text", x = -0.015, y = 0.75, label = "t0") +
+  # annotate("text", x = -0.415, y = 7.25, label = "tn") +
+  # annotate("text", x = 0.03, y = -1.5, label = "tn") +
   labs(x = 'Rate of change in species (species/year)',
        y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
        title = '')

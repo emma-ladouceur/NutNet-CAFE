@@ -22,22 +22,22 @@ plot$site_code <- as.factor(plot$site_code)
 plot$block <- as.factor(plot$block)
 plot$plot <- as.factor(plot$plot)
 
-plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+colnames(plot)
+plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
-# model objects for richness and biomass
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.g
+
+View(plot %>% distinct(site_code, year_max))
 
 # saved model data objects  from '5_Model_Extract.R'
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/rich.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/bm.mod.dat.Rdata')
 
 # saved posterior data from 7_ Model_Data_Posteriors
 # Global/ Overall/ Population Effects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.p.effs.Rdata')
 # Study-level effects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
 
 rich.p2 <- global.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) %>%
   filter(response=="NPK")
@@ -74,13 +74,13 @@ fig_2c <- ggplot()+
                                    xmin = r.eff_lower, xmax = r.eff_upper),height=0,colour = "#0B775E", size = 2, alpha=0.9) +
   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
-  annotate("text", x = -2.5, y = 200, label = "+biomass -rich") +
-  annotate("text", x = 1.5, y = 200, label = "+biomass +rich") +
-  annotate("text", x = -2.5, y = -200, label = "-biomass -rich") +
-  annotate("text", x = 1.5, y = -200, label = "-biomass +rich") +
+  annotate("text", x = -2.5, y = 200, label = "+biomass -rich", size=5) +
+  annotate("text", x = 1.5, y = 200, label = "+biomass +rich", size=5) +
+  annotate("text", x = -2.5, y = -200, label = "-biomass -rich", size=5) +
+  annotate("text", x = 1.5, y = -200, label = "-biomass +rich", size=5) +
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
-       title = ' C)') + theme_classic(base_size=14 ) +
+       title = ' C)') + theme_classic(base_size=16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
@@ -104,7 +104,7 @@ study_2c_legend <- ggplot()+
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = ' C)',  color='',fill='',linetype='') + 
   scale_color_manual(values = c("black", drop =FALSE))+
-  theme_classic(base_size=14 ) +
+  theme_classic(base_size=18 ) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
@@ -125,7 +125,7 @@ overall_2c_legend <- ggplot()+
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = ' C)',  color='',fill='',linetype='') + 
   scale_color_manual(values = c( "#0B775E",drop =FALSE))+
-  theme_classic(base_size=14 ) +
+  theme_classic(base_size=18 ) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
@@ -154,17 +154,19 @@ plot.rich_fitted.npk <- plot.rich_fitted.npk %>% rename(Treatment = trt)
 plot.rich_fitted.ctl <- plot.rich_fitted.ctl %>% rename(Treatment = trt) 
 fitted.rich <- bind_rows(plot.rich_fitted.npk,plot.rich_fitted.ctl)
 
+
 fitted.rich$Treatment <- factor(fitted.rich$Treatment , levels=c("NPK","Control"))
-plot.rich_coef3 <- plot.rich_coef3 %>% filter(!is.na(TESlope))
+plot.rich_coef2 <- plot.rich_coef2 %>% filter(!is.na(TESlope))
+
 
 # note to self: try predicted effects instead of coefficients
 fig_2a_r <- ggplot() +
   facet_wrap(~Model) +
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = plot.rich_fitted.npk,
-             aes(x = year_trt, y = all.div), colour ="black", alpha=0.2,
-             size = .7, position = position_jitter(width = 0.45 )) +
-  geom_segment(data = plot.rich_coef3 ,
+             aes(x = year_trt, y = rich), colour ="black", alpha=0.2,
+             size = .7, position = position_jitter(width = 0.45) ) +
+  geom_segment(data = plot.rich_coef2 ,
                aes(x = xmin, 
                    xend = xmax,
                    y = (Intercept + TE  + (ISlope+TESlope) * xmin),
@@ -182,12 +184,12 @@ fig_2a_r <- ggplot() +
   geom_ribbon(data = plot.rich_fitted.ctl,
               aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
               alpha = 0.5) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12,13)) +
   labs(x='Year',
        y = ' Species richness', title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#0B775E", drop =FALSE))+
-  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                  strip.background = element_blank(),legend.position="none",
                                  strip.text = element_text(size=17),
                      plot.margin= margin(t = 0.1, r = 0.2, b = 0.2, l = 0.2, unit = "cm"),
@@ -197,14 +199,14 @@ fig_2a_r
 
 # legend for richness & biomass regressions
 plot.rich_fitted.npk$Plot <- "Plot"
-plot.rich_coef3$Site <- "Site"
+plot.rich_coef2$Site <- "Site"
 
 fig_2ab_legend <- ggplot() +
   facet_wrap(~Model) +
   geom_point(data = plot.rich_fitted.npk,
-             aes(x = year_trt, y = all.div, fill=Plot), alpha=0.2,
+             aes(x = year_trt, y = rich, fill=Plot), alpha=0.2,
              size = .7, position = position_jitter(width = 0.45 )) +
-  geom_segment(data = plot.rich_coef3 ,
+  geom_segment(data = plot.rich_coef2 ,
                aes(x = xmin, 
                    xend = xmax,
                    y = (Intercept + TE  + (ISlope+TESlope) * xmin),
@@ -225,7 +227,7 @@ fig_2ab_legend <- ggplot() +
        y = ' Species richness', title= '', color='',fill='',linetype='') +
   scale_fill_manual(values = c("black", drop =FALSE))+
   scale_color_manual(values = c("black",drop =FALSE))+
-  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                  strip.background = element_blank(),
                                  legend.position="bottom",
                      plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
@@ -244,16 +246,16 @@ fitted.bm<-bind_rows(plot.bm_fitted.npk,plot.bm_fitted.ctl)
 
 fitted.bm$Treatment <- factor(fitted.bm$Treatment , levels=c("NPK","Control"))
 
-plot.bm_coef3 <- plot.bm_coef3 %>% filter(!is.na(TESlope))
+plot.bm_coef2 <- plot.bm_coef2 %>% filter(!is.na(TESlope))
 
 # note to self:  predicted values instead of coefficients?
 fig_2b_r <- ggplot() +
   geom_hline(yintercept = 0,linetype="longdash") +
   facet_grid(~Model)+
   geom_point(data = plot.bm_fitted.npk,
-             aes(x = year_trt, y = plot.mass), color="black",alpha=0.2,
+             aes(x = year_trt, y = strip.mass), color="black",alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
-  geom_segment(data = plot.bm_coef3,
+  geom_segment(data = plot.bm_coef2,
                aes(x = xmin, 
                    xend = xmax,
                    y = (Intercept + TE  + (ISlope+TESlope) * xmin),
@@ -277,7 +279,7 @@ fig_2b_r <- ggplot() +
                                  "NPK" = "#0B775E", drop =FALSE))+
   ylim(0,2000)+
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
-  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                                  strip.background = element_blank(),legend.position="none",
                                  strip.text = element_text(size=17),
                      plot.margin= margin(t = 0.1, r = 0.2, b =0.2, l = 0.2, unit = "cm"),

@@ -18,34 +18,40 @@ library(bayesplot)
 # plot level data
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-plot <- plot %>% filter(max.year >= 3) 
+plot <- plot %>% filter(year_max >= 3) 
+
+plot %>% distinct(site_code,year_trt)
 
 head(plot)
 
 plot$site_code <- as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
-plot$year_trt<-as.factor(plot$year_trt)
 
 # model objects
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
 
+#selected best mods
+load('~/Desktop/mods/bm_sigmai.Rdata') # bm.3_sigmai 
+load('~/Desktop/mods/rich_sigmai.Rdata') # rich.3_sigmai
+
+
 # species richness model
 
 #  model summary
-summary(plot.rich.3)
+summary(rich.3_sigmai)
 # caterpillar plots
-plot(plot.rich.3)
+plot(rich.3_sigmai)
 # predicted values vs. observed
 color_scheme_set("darkgray")
-fig_s3a <- pp_check(plot.rich.3) + theme_classic() + 
+fig_s3a <- pp_check(rich.3_sigmai) + theme_classic() + 
   labs(x= "Species richness", y = "Density")
 
 fig_s3a
 
 # residuals (this take a minute)
-rich.m <- residuals(plot.rich.3)
+rich.m <- residuals(rich.3_sigmai)
 rich.m <-as.data.frame(rich.m)
 rr.plot <- cbind(plot,rich.m$Estimate)
 head(rr.plot)
@@ -59,29 +65,30 @@ with(rr.plot, plot(plot, rich.m$Estimate))
 
 # each of these steps may take a few minutes because the model objects are large
 # fixed effects
-plot.rich_fitted <- cbind(plot.rich.3$data,
+plot.rich_fitted <- cbind(rich.3_sigmai$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(plot.rich.3, re_formula = NA)) %>% 
+                          fitted(rich.3_sigmai, re_formula = NA)) %>% 
   as_tibble() 
 
 head(plot.rich_fitted)
 
 # fixed effect coefficients 
-plot.rich_fixef <- fixef(plot.rich.3)
+plot.rich_fixef <- fixef(rich.3_sigmai)
 
 # predict estimates for each site across a sequence of year_trt's
 # this takes ~ 5 minutes
-obs_nest.rich <- plot %>% 
-  mutate(site_group = site_code) %>%
-  group_by(site_group, site_code, trt) %>% 
-  summarise(year_trt = seq(min(year_trt), max(year_trt), length.out = 13 )) %>%
-  nest(data = c(site_code,year_trt,trt)) %>%
-  mutate(predicted = map(data, ~predict(plot.rich.3, newdata= .x, re_formula = ~(trt * year_trt | site_code) ))) 
-
-View(obs_nest.rich)
+# obs_nest.rich <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code, trt) %>% 
+#   summarise(year_trt = seq(min(year_trt), max(year_trt), length.out = 13 )) %>%
+#   nest(data = c(site_code,year_trt,trt)) %>%
+#   mutate(predicted = map(data, ~predict(rich.3_sigmai, newdata= .x, re_formula = ~(trt * year_trt | site_code) ))) 
+# 
+# View(obs_nest.rich)
 
 # coefficients for site-level (random) effects
-plot.rich_coef <- coef(plot.rich.3)
+plot.rich_coef <- coef(rich.3_sigmai)
+
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef$site_code[,,'Intercept'] %>% 
                                 as_tibble() %>% 
@@ -120,8 +127,8 @@ head(plot.rich_coef2)
 plot.rich_fitted.npk <- plot.rich_fitted %>% filter(trt %in% c('NPK'))
 plot.rich_fitted.ctl <- plot.rich_fitted %>% filter(trt %in% c('Control'))
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(plot.rich_fitted,plot.rich_fixef,plot.rich_fitted.npk,plot.rich_fitted.ctl,obs_nest.rich,plot.rich_coef2,file = 'rich.mod.dat.Rdata')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(plot.rich_fitted,plot.rich_fixef,plot.rich_fitted.npk,plot.rich_fitted.ctl,plot.rich_coef2,file = 'rich.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata')
 
 
@@ -129,12 +136,12 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata
 
 
 #  model summary
-summary(plot.bm.3)
+summary(bm.3_sigmai)
 # caterpillar plots
-plot(plot.bm.3)
+plot(bm.3_sigmai)
 # predicted values vs. observed
 #color_scheme_set("darkgray")
-fig_s3b <- pp_check(plot.bm.3) + theme_classic() + 
+fig_s3b <- pp_check(bm.3_sigmai) + theme_classic() + 
   labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
   scale_x_continuous(limits = c(-1000, 2000))
 
@@ -143,7 +150,7 @@ fig_s3b
 # residuals (this take a minute)
 colnames(plot)
 plot.bm <- plot %>% filter(!is.na(plot.mass))
-bm.m <- residuals(plot.bm.3)
+bm.m <- residuals(bm.3_sigmai)
 bm.m <- as.data.frame(bm.m)
 br.plot <- cbind(plot.bm, bm.m$Estimate)
 head(br.plot)
@@ -156,27 +163,27 @@ with(br.plot, plot(plot, bm.m$Estimate))
 
 
 # fixed effects
-plot.bm_fitted <- cbind(plot.bm.3$data,
+plot.bm_fitted <- cbind(bm.3_sigmai$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(plot.bm.3, re_formula = NA)) %>% 
+                        fitted(bm.3_sigmai, re_formula = NA)) %>% 
   as_tibble() 
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(plot.bm.3)
+plot.bm_fixef <- fixef(bm.3_sigmai)
 
 # predict estimates for each site across a sequence of year_trt's
 # this takes ~ 5 minutes
-obs_nest.bm <- plot %>% 
-  mutate(site_group = site_code) %>%
-  group_by(site_group, site_code,trt) %>% 
-  summarise(year_trt = seq(min(year_trt), max(year_trt), length.out = 13 )) %>%
-  nest(data = c(site_code,year_trt,trt)) %>%
-  mutate(predicted = map(data, ~predict(plot.bm.3, newdata= .x, re_formula = ~(trt * year_trt | site_code) ))) 
+# obs_nest.bm <- plot %>% 
+#   mutate(site_group = site_code) %>%
+#   group_by(site_group, site_code,trt) %>% 
+#   summarise(year_trt = seq(min(year_trt), max(year_trt), length.out = 13 )) %>%
+#   nest(data = c(site_code,year_trt,trt)) %>%
+#   mutate(predicted = map(data, ~predict(bm.3_sigmai, newdata= .x, re_formula = ~(trt * year_trt | site_code) ))) 
 
 View(obs_nest.bm)
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(plot.bm.3)
+plot.bm_coef <- coef(bm.3_sigmai)
 
 
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
@@ -217,12 +224,9 @@ plot.bm_fitted.npk <- plot.bm_fitted %>% filter(trt %in% c('NPK'))
 plot.bm_fitted.ctl <- plot.bm_fitted %>% filter(trt %in% c('Control'))
 
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-save(plot.bm_fitted,plot.bm_fixef,plot.bm_fitted.npk,plot.bm_fitted.ctl,obs_nest.bm,plot.bm_coef3,file = 'bm.mod.dat.Rdata')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(plot.bm_fitted,plot.bm_fixef,plot.bm_fitted.npk,plot.bm_fitted.ctl,plot.bm_coef2,file = 'bm.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
-
-
-# need p.effs
 
 
 
