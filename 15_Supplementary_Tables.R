@@ -57,15 +57,15 @@ write.csv(table_s1,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Tabl
 
 # Table S2
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.p.effs.Rdata')
 
-global.rich.p$Model <- "Species Richness"
+global.rich.p$Model <- "Species richness"
 global.bm.p$Model <- "Biomass"
-global.sloss.p$Model <- "Species Loss"
-global.sgain.p$Model <- "Species Gain"
-global.sl.p$Model <- "Change Biomass Due to Species Loss"
-global.sg.p$Model <- "Change in Biomass Due to Species Gain"
-global.cde.p$Model <- "Persistent Species Change in Biomass"
+global.sloss.p$Model <- "Species loss (s.loss)"
+global.sgain.p$Model <- "Species gain (s.gain)"
+global.sl.p$Model <- "Biomass chage associated with species loss (SL)"
+global.sg.p$Model <- "Biomass chage associated with species gain (SG)"
+global.cde.p$Model <- "Biomass chage associated with Pprsistent species (PS)"
 
 p.all <- global.rich.p %>% bind_rows(global.bm.p) %>% bind_rows(global.sloss.p) %>% bind_rows(global.sgain.p) %>%
   bind_rows(global.sl.p) %>% bind_rows(global.sg.p) %>% bind_rows(global.cde.p) %>%

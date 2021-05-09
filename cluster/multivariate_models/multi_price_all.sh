@@ -1,16 +1,15 @@
 #!/bin/bash
 
-#$ -N multi_price
-#$ -S /bin/bash
-#$ -l h_rt=24:00:00
-#$ -l h_vmem=8G
-#$ -pe smp 4
+#SBATCH -J multi_price_all
+#SBATCH --time=24:00:00
+#SBATCH --mem-per-cpu=8G
+#SBATCH --cpus-per-task=4
 
-#$ -o /home/$USER/$JOB_NAME-$JOB_ID.out
-#$ -j y
+# Output files should ideally go to /work instead of /home
+#SBATCH -o /work/%u/%x-%j.out
 
 module load foss/2019b R/3.6.2-2
-export OFILE=/work/$USER/NutNet/$JOB_NAME-$JOB_ID.Rdata
+export OFILE=/work/$USER/NutNet/$SLURM_JOB_NAME-$SLURM_JOB_ID.Rdata
 export LANG=en_US.UTF-8
 Rscript --vanilla /home/ladouceu/projects/NutNet-CAFE/cluster/multivariate_models/multi_price_all.R
 

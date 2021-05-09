@@ -363,9 +363,11 @@ summary(sl.3)
 plot(sl.3)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
+
+summary(p.all)
 fig_s3e <- pp_check(sl.3) + theme_classic() + 
   labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with species sloss (SL)')), y = "Density") + 
-   scale_x_continuous(limits = c(-700, 100))
+   scale_x_continuous(limits = c(-1300, 100))
 
 fig_s3e
 
@@ -465,7 +467,7 @@ plot(sg.3)
 # color_scheme_set("darkgray")
 fig_s3f <- pp_check(sg.3) + theme_classic() + 
   labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with species gain (SG)')), y = "Density") + 
-  scale_x_continuous(limits = c(-100, 700))
+  scale_x_continuous(limits = c(-100, 1300))
 
 fig_s3f
 

@@ -417,13 +417,13 @@ fig_3_legend <- ggplot()  +
                aes(x = xs,
                    xend = xmax,
                    y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
-                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),color=Site),
+                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax), color=Site),
                alpha=0.2,size = .7) +
   geom_ribbon(data = sg.trt_fitted.npk,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="#046C9A",alpha = 0.5) +
   geom_line(data = fitted.sg,
-            aes(x = year.y, y = Estimate,linetype=Treatment),
+            aes(x = year.y, y = Estimate, linetype=Treatment),
             size = 1.5) +
   geom_ribbon(data = sg.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
@@ -437,7 +437,8 @@ fig_3_legend <- ggplot()  +
    scale_color_manual(values = c("black",drop =FALSE))+
   theme_bw(base_size=18 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
                      legend.position="left", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
-                     legend.spacing.x = unit(0.25, 'cm'))
+                     legend.spacing.y = unit(0.02, 'cm')
+                     )
 
 
 fig_3_legend

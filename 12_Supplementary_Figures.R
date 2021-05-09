@@ -17,11 +17,13 @@ library(viridis)
 # data
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv", sep=",", header=T)
 quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
+comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-06-May-2021.csv", stringsAsFactors = FALSE)
 
+comb_deets <- comb %>% select(site_code, latitude, longitude, continent)
 
-nn_plot <- plot %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+nn_plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   left_join(quads, by= "site_code") %>%
-  ungroup()
+  ungroup()  %>% left_join(comb_deets)
 
 colnames(nn_plot)
 
@@ -75,9 +77,9 @@ fig_s1
 colnames(nn_plot)
 
  plot_clean <- nn_plot %>% filter( trt == "NPK") %>%
-  drop_na(plot.mass) %>%
+  drop_na(strip.mass) %>%
    group_by(site_code, block,plot,year_trt) %>%
-   select(continent,id,site_code,block, plot,year_trt,all.div,plot.mass) 
+   select(continent,id,site_code,block, plot,year_trt,rich,strip.mass) 
  
 plotzero <- plot_clean %>% filter(year_trt %in% '0') %>% 
     arrange(site_code)
@@ -91,8 +93,8 @@ plot_mx_mn <- plotzero %>%
   bind_rows(plotmax) %>% 
   arrange(site_code) %>%
   group_by(site_code,year_trt) %>%
-  summarise(m.rich = mean(all.div),
-            m.mass = mean(plot.mass)) %>% 
+  summarise(m.rich = mean(rich),
+            m.mass = mean(strip.mass)) %>% 
   mutate( startend = ifelse(year_trt < 1 , 'start',
                          ifelse(year_trt >= 1, 'end', 'other')) )
 
@@ -129,18 +131,18 @@ plot.means <- yr.range %>% left_join(rich.mean) %>%
 
 head(plot.means)
 
-write.csv(plot.means, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure1_dat.csv")
+write.csv(plot.means, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure_S2_dat.csv")
 
 
 
-fig1_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure1_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+figs2_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure_S2_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-head(fig1_dat)
+head(figs2_dat)
 
 ggplot() +
-  geom_point(data = fig1_dat, aes(x = rich.start, y = mass.start),size=1.5, fill="white", shape=1) +
-  geom_point(data = fig1_dat, aes(x = rich.end, y = mass.end),size=1.5, colour="white", shape=2) +
-  geom_segment(data = fig1_dat,aes(x = rich.start,
+  geom_point(data = figs2_dat, aes(x = rich.start, y = mass.start),size=1.5, fill="white", shape=1) +
+  geom_point(data = figs2_dat, aes(x = rich.end, y = mass.end),size=1.5, colour="white", shape=2) +
+  geom_segment(data = figs2_dat,aes(x = rich.start,
                                  xend = rich.end,
                                  y = mass.start,
                                  yend = mass.end,
@@ -165,12 +167,14 @@ ggplot() +
 
 # Figure S5
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
 
-rich.p2 <-rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) %>%
+head(study.rich.p)
+
+rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) %>%
   filter(response == "NPK")
 
-bm.p2<-bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) %>%
+bm.p2<- study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) %>%
   filter(response == "NPK")
 
 effs.p <- rich.p2 %>% left_join(bm.p2)
