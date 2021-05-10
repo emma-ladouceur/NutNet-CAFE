@@ -603,16 +603,17 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.
 # Multivariate Models
 
 # multivariate plot richness + biomass
-load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/multi.Rdata") # object name: nn.multi
+load("~/Desktop/mods/multi/multi_sp.Rdata") # object name: sp.multi
 
 # model summary
-summary(nn.multi.3)
+summary(sp.multi)
 # predicted vs observed values
 #color_scheme_set("darkgray")
-nnb <- pp_check(nn.multi.3, resp = 'plotmass')+ theme_classic() + scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
-                                                                                                                 y = 'Density') 
-nnr <- pp_check(nn.multi.3, resp = 'alldiv')+ theme_classic() + scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
-                                                                                                           y = 'Density') 
+nnb <- pp_check(sp.multi, resp = 'stripmass')+ theme_classic() + scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
+                                                                                                                 y = '')  
+nnr <- pp_check(sp.multi, resp = 'rich')+ theme_classic() + scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
+                                                                                                           y = 'Density') +
+  theme(legend.position= "none")
 # Figure S3h
 fig_s3h <- (nnr  | nnb)
 
@@ -620,7 +621,7 @@ fig_s3h
 
 
 # multivariate price partitions with all responses possible
-load("~/Desktop/mods/multi_price_all.Rdata") # object name: pp.multi_all
+load("~/Desktop/mods/multi/multi_price_all.Rdata") # object name: pp.multi_all
 
 # model summary
 summary(pp.multi_all)
@@ -650,7 +651,50 @@ fig_s3i <- (sloss | sgain | sl | sg | cde)
 
 fig_s3i
 
+# extract all response correlations for  multivariate model,
+#reported in Supplementary Model Information 1.9
+cor <- as.mcmc(pp.multi_all, combine_chains = TRUE, 
+                            pars = "^cor") %>% 
+  as_tibble()
 
 
+names(cor)
+View(cor)
 
+cor_samp <- cor %>% 
+  # select correlation 
+  select("cor_site_code__SL_trt.yNPK__SG_trt.yNPK:year.y.m",
+                           "cor_site_code__SL_trt.yNPK__CDE_trt.yNPK:year.y.m",
+                           "cor_site_code__SG_trt.yNPK__CDE_trt.yNPK:year.y.m",
+                           "cor_site_code__SL_trt.yNPK__slossn_trt.yNPK:year.y.m",
+                           "cor_site_code__SL_trt.yNPK__sgain_trt.yNPK:year.y.m",
+                           "cor_site_code__SG_trt.yNPK__slossn_trt.yNPK:year.y.m",
+                           "cor_site_code__SG_trt.yNPK__sgain_trt.yNPK:year.y.m",
+                           "cor_site_code__CDE_trt.yNPK__slossn_trt.yNPK:year.y.m",
+                           "cor_site_code__CDE_trt.yNPK__sgain_trt.yNPK:year.y.m",
+  "cor_site_code__slossn_trt.yNPK__sgain_trt.yNPK:year.y.m" ) %>%
+  # rename cols
+  mutate( corr_SL_SG = `cor_site_code__SL_trt.yNPK__SG_trt.yNPK:year.y.m`,
+             corr_SL_CDE = `cor_site_code__SL_trt.yNPK__CDE_trt.yNPK:year.y.m`, 
+             corr_SG_CDE = `cor_site_code__SG_trt.yNPK__CDE_trt.yNPK:year.y.m`,
+             corr_SL_sloss = `cor_site_code__SL_trt.yNPK__slossn_trt.yNPK:year.y.m`,
+             corr_SL_sgain = `cor_site_code__SL_trt.yNPK__sgain_trt.yNPK:year.y.m`,
+             corr_SG_sloss = `cor_site_code__SG_trt.yNPK__slossn_trt.yNPK:year.y.m`,
+             corr_SG_sgain = `cor_site_code__SG_trt.yNPK__sgain_trt.yNPK:year.y.m`,
+             corr_CDE_sloss = `cor_site_code__CDE_trt.yNPK__slossn_trt.yNPK:year.y.m`,
+             corr_CDE_sgain = `cor_site_code__CDE_trt.yNPK__sgain_trt.yNPK:year.y.m`,
+             corr_sloss_sgain = `cor_site_code__slossn_trt.yNPK__sgain_trt.yNPK:year.y.m`,
+             ) %>% 
+  # select cols
+  select(corr_SL_SG, corr_SL_CDE, corr_SG_CDE, corr_SL_sloss, corr_SL_sgain, corr_SG_sloss,
+         corr_SG_sgain, corr_CDE_sloss, corr_CDE_sgain, corr_sloss_sgain) %>%
+  gather(metric, correlation, corr_SL_SG:corr_sloss_sgain ) %>%
+  group_by(metric) %>%
+  # calculate mean and uncertainty
+  summarise(corr_coef = mean(correlation),
+            lower_ci = quantile(correlation, probs=0.025),
+            upper_ci = quantile(correlation, probs=0.975)) 
+            
+
+View(cor_samp)
 

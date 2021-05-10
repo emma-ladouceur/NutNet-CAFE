@@ -29,12 +29,12 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 # model objects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
 
 #selected best mods
-load('~/Desktop/mods/bm_sigmai.Rdata') # bm.3_sigmai 
-load('~/Desktop/mods/rich_sigmai.Rdata') # rich.3_sigmai
+load('~/Desktop/mods/3/bm_sigmai.Rdata') # bm.3_sigmai 
+load('~/Desktop/mods/3/rich_sigmai.Rdata') # rich.3_sigmai
 
 
 # species richness model

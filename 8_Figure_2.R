@@ -278,7 +278,7 @@ fig_2b_r <- ggplot() +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#0B775E", drop =FALSE))+
   ylim(0,2000)+
-  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12,13)) +
   theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                                  strip.background = element_blank(),legend.position="none",
                                  strip.text = element_text(size=17),
@@ -354,7 +354,7 @@ fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 6.5, xmax =
 
 # use patchwork to put everything together
 # SAVE AS PORTRAIT 10 X 11
-( fig_2a | fig_2b ) / ( fig_2ab_legend ) / ( fig_2c )/ (fig_2c_legend) + plot_layout(heights = c(10,0.75,10,0.75))
+( fig_2a | fig_2b ) / ( fig_2ab_legend ) / ( fig_2c )/ (fig_2c_legend) + plot_layout(heights = c(10,0.75,13,0.75))
 
 
 

@@ -111,8 +111,8 @@ sloss.trt_coef2$xs<-1
 
 sloss.trt_fitted.npk$Model<-"A) Species loss (s.loss)"
 sloss.trt_fitted.ctl$Model<-"A) Species loss (s.loss)"
-sloss.trt_fitted.npk <- sloss.trt_fitted.npk  %>% left_join(p.all) %>% rename(Treatment = trt.y) 
-sloss.trt_fitted.ctl <- sloss.trt_fitted.ctl %>% left_join(p.all) %>% rename(Treatment = trt.y) 
+sloss.trt_fitted.npk <- sloss.trt_fitted.npk  %>%  rename(Treatment = trt.y) 
+sloss.trt_fitted.ctl <- sloss.trt_fitted.ctl  %>% rename(Treatment = trt.y) 
 fitted.sloss <- bind_rows(sloss.trt_fitted.npk,sloss.trt_fitted.ctl)
 
 
@@ -144,7 +144,7 @@ fig_3a_r <- ggplot() +
   geom_ribbon(data = sloss.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="black",alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   labs(x = 'Year',
        y = expression(paste('Species Loss')), 
        #title= 'B) Species loss (s.loss)'
@@ -167,8 +167,8 @@ sgain.trt_coef2$xs<-1
 
 sgain.trt_fitted.npk$Model<-"B) Species gain (s.gain)"
 sgain.trt_fitted.ctl$Model<-"B) Species gain (s.gain)"
-sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% left_join(p.all) %>% rename(Treatment = trt.y) 
-sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% left_join(p.all) %>% rename(Treatment = trt.y) 
+sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% rename(Treatment = trt.y) 
+sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sgain<-bind_rows(sgain.trt_fitted.npk,sgain.trt_fitted.ctl)
 fitted.sgain$Treatment <- factor(fitted.sgain$Treatment , levels=c("NPK","Control"))
 
@@ -194,7 +194,7 @@ fig_3b_r <- ggplot()  +
   geom_ribbon(data = sgain.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="black",alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(0,20) +
   labs(x = 'Year',
        y = expression(paste('Species Gain')), 
@@ -267,8 +267,8 @@ fig_3b_r
 
 cde_coef2$xs<-1
 
-cde_fitted.npk <- cde_fitted.npk  %>% left_join(p.all) %>% rename(Treatment = trt.y) 
-cde_fitted.ctl <- cde_fitted.ctl %>% left_join(p.all) %>% rename(Treatment = trt.y) 
+cde_fitted.npk <- cde_fitted.npk   %>% rename(Treatment = trt.y) 
+cde_fitted.ctl <- cde_fitted.ctl  %>% rename(Treatment = trt.y) 
 fitted.cde<-bind_rows(cde_fitted.npk,cde_fitted.ctl)
 fitted.cde$Treatment <- factor(fitted.cde$Treatment , levels=c("NPK","Control"))
 
@@ -292,7 +292,7 @@ fig_3e_r <- ggplot() +
   geom_ribbon(data = cde_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="black",alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(-500,1000)+
   labs(x='Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
@@ -310,8 +310,8 @@ fig_3e_r
 
 sl.trt_coef2$xs<-1
 
-sl.trt_fitted.npk <- sl.trt_fitted.npk %>% left_join(p.all) %>% rename(Treatment = trt.y) 
-sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% left_join(p.all) %>% rename(Treatment = trt.y) 
+sl.trt_fitted.npk <- sl.trt_fitted.npk  %>% rename(Treatment = trt.y) 
+sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sl<-bind_rows(sl.trt_fitted.npk,sl.trt_fitted.ctl)
 fitted.sl$Treatment <- factor(fitted.sl$Treatment , levels=c("NPK","Control"))
 
@@ -338,7 +338,7 @@ fig_3c_r <- ggplot() +
   geom_ribbon(data = sl.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="black",alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(-400,5) +
   labs(x='Year',
        #x = 'Years',
@@ -360,8 +360,8 @@ fig_3c_r
 
 sg.trt_coef2$xs<-1
 
-sg.trt_fitted.npk <- sg.trt_fitted.npk %>% left_join(p.all) %>% rename(Treatment = trt.y) 
-sg.trt_fitted.ctl <- sg.trt_fitted.ctl %>% left_join(p.all) %>% rename(Treatment = trt.y) 
+sg.trt_fitted.npk <- sg.trt_fitted.npk %>% rename(Treatment = trt.y) 
+sg.trt_fitted.ctl <- sg.trt_fitted.ctl  %>% rename(Treatment = trt.y) 
 fitted.sg<-bind_rows(sg.trt_fitted.npk,sg.trt_fitted.ctl)
 
 fitted.sg$Treatment <- factor(fitted.sg$Treatment , levels=c("NPK","Control"))
@@ -388,7 +388,7 @@ fig_3d_r <- ggplot()  +
   geom_ribbon(data = sg.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="black",alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(0,400) +
   labs(x = 'Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
@@ -428,7 +428,7 @@ fig_3_legend <- ggplot()  +
   geom_ribbon(data = sg.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="black",alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,12)) +
+  scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(0,400) +
   labs(x = 'Years',
        y='',
@@ -563,28 +563,28 @@ fig_3e_e
 
 # Inset effect plots within regression plots
 
-fig_3a <- fig_3a_r +  annotation_custom(ggplotGrob(fig_3a_e), xmin = 6.5, xmax = 12.75, 
-                                         ymin = -20, ymax = -11)
+fig_3a <- fig_3a_r +  annotation_custom(ggplotGrob(fig_3a_e), xmin = 7.5, xmax = 13.75, 
+                                         ymin = -22.5, ymax = -15.5)
 
-fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 6.5, xmax = 12.75, 
-                                         ymin = 11, ymax = 20)
+fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 7.5, xmax = 13.75, 
+                                         ymin = 14, ymax = 21)
 
 
 # fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 6.5, xmax = 12.75, 
 #                                         ymin = 21, ymax = 30)
 
-fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 6.5, xmax = 12.75, 
-                                   ymin = -400, ymax = -255)
+fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 7.5, xmax = 13.75, 
+                                   ymin = -420, ymax = -295)
 
-fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 6.5, xmax = 12.75, 
-                                   ymin = 255, ymax = 400)
+fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 7.5, xmax = 13.75, 
+                                   ymin = 295, ymax = 420)
 
-fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 6.5, xmax = 12.75, 
-                                        ymin = 400, ymax = 1050)
+fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 7.5, xmax = 13.75, 
+                                        ymin = 570, ymax = 1070)
 
 
 # put everything together with grid arrange and grob
-# Save As LANDSCAPE 11 X 14
+# Save As LANDSCAPE 12 X 14
 
 fig_3 <- grid.arrange(arrangeGrob(fig_3a, fig_3b, fig_3_legend, 
                                   fig_3c , fig_3d , fig_3e, ncol = 3, nrow=2))
