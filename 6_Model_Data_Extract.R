@@ -83,30 +83,18 @@ with(sloss.plot, plot(plot, sloss.m$Estimate))
 sloss.trt_fitted <- cbind(sloss.3_sigmai$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
                           fitted(sloss.3_sigmai, re_formula = NA)) %>% 
-  as_tibble()
+  as_tibble() %>% left_join(p.all)
 
 
 sloss.trt_fitted.npk <- sloss.trt_fitted %>% filter(trt.y %in% c('NPK'))
 sloss.trt_fitted.ctl <- sloss.trt_fitted  %>% filter(trt.y %in% c('Control'))
 
-
+View(sloss.trt_fitted.npk)
 # fixed effect coefficients 
 sloss.trt_fixef <- fixef(sloss.3_sigmai)
 
 # predict estimates for each site across a sequence of year.y (comparison plots age)
 # this takes ~ 5 minutes
-
-head(p.all)
-
-# obs_nest.sloss <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code, trt.y) %>% 
-#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-#   mutate(predicted = map(data, ~predict(sloss.3_sigmai, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-# 
-# View(obs_nest.sloss)
 
 # coefficients for study-level (random) effects
 sloss.trt_coef <- coef(sloss.3_sigmai)
@@ -185,7 +173,7 @@ with(sgain.plot, plot(plot, sgain.m$Estimate))
 sgain.trt_fitted <- cbind(sgain.3_sigmai$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
                           fitted(sgain.3_sigmai, re_formula = NA)) %>% 
-  as_tibble() 
+  as_tibble() %>% left_join(p.all)
 
 
 sgain.trt_fitted.npk<-sgain.trt_fitted[sgain.trt_fitted$trt.y %in% c('NPK'),]
@@ -391,7 +379,7 @@ with(sl.plot, plot(plot, sl.m$Estimate))
 sl.trt_fitted <- cbind(sl.3$data,
                        # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
                        fitted(sl.3, re_formula = NA)) %>% 
-  as_tibble()
+  as_tibble() %>% left_join(p.all)
 
 
 
@@ -491,7 +479,7 @@ with(sg.plot, plot(plot, sg.m$Estimate))
 sg.trt_fitted <- cbind(sg.3$data,
                        # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
                        fitted(sg.3, re_formula = NA)) %>% 
-  as_tibble() 
+  as_tibble() %>% left_join(p.all)
 
 
 sg.trt_fitted.npk<-sg.trt_fitted[sg.trt_fitted$trt.y %in% c('NPK'),]
@@ -500,16 +488,6 @@ sg.trt_fitted.ctl<-sg.trt_fitted[sg.trt_fitted$trt.y %in% c('Control'),]
 # fixed effect coefficients 
 sg.trt_fixef <- fixef(sg.3)
 
-# predicted values
-# obs_nest.sg <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code, trt.y) %>% 
-#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-#   mutate(predicted = map(data, ~predict(sg.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-# 
-# View(obs_nest.sg)
 
 # coefficients for study-level (random) effects
 sg.trt_coef <- coef(sg.3)
@@ -596,7 +574,7 @@ with(cde.plot, plot(plot, cde.m$Estimate))
 cde_fitted <- cbind(cde.3_sigmai$data,
                     # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
                     fitted(cde.3_sigmai, re_formula = NA)) %>% 
-  as_tibble() 
+  as_tibble() %>% left_join(p.all)
 
 
 cde_fitted.npk<-cde_fitted[cde_fitted$trt.y %in% c('NPK'),]

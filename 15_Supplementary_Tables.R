@@ -82,3 +82,23 @@ write.csv(p.all, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_
 
 
 
+tabs1 <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S1.csv", sep=",", header=T)
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv", sep=",", header=T)
+comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-06-May-2021.csv", stringsAsFactors = FALSE)
+figs2_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure_S2_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+comb_deets <- comb %>% select(site_code,site_name, latitude, longitude, continent)
+
+nn_plot <-  plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
+  left_join(tabs1, by= "site_code") %>%
+  ungroup()  %>% left_join(comb_deets) %>% left_join(figs2_dat) %>%
+  select(site_code,site_name,country, habitat, Quadrant, year_max,  rich.start, rich.end, mass.start,mass.end,latitude,longitude) %>%
+  distinct()
+
+View(nn_plot)
+
+write.csv(nn_plot, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_App.csv')
+
+
+
