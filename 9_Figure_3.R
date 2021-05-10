@@ -485,7 +485,7 @@ fig_3b_e <- ggplot() +
   labs(x = '',
        y='Slope') +
   geom_hline(yintercept = 0, lty = 2) +
-  scale_y_continuous(breaks=c(0,0.05,0.3)) +
+  scale_y_continuous(breaks=c(0,0.1, 0.2)) +
   scale_color_manual(values = c("#000000","#046C9A")) +
   theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),

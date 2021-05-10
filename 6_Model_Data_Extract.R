@@ -619,42 +619,36 @@ fig_s3h <- (nnr  | nnb)
 fig_s3h
 
 
-# multivariate price species partitions
-load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/multi_sp.Rdata") # object name: sp.multi
+# multivariate price partitions with all responses possible
+load("~/Desktop/mods/multi_price_all.Rdata") # object name: pp.multi_all
 
 # model summary
-summary(sp.multi)
+summary(pp.multi_all)
 
 # predicted vs observed values
-#color_scheme_set("darkgray")
-sloss <- pp_check(sp.multi, resp = 'slossn')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ labs(x=expression(paste('s.loss')),
-                                                                                                           y = 'Density') 
-sgain <- pp_check(sp.multi, resp = 'sgain')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ labs(x='s.gain',
-                                                                                                          y = 'Density') 
+color_scheme_set("darkgray")
+sloss <- pp_check(pp.multi_all, resp = 'slossn')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ labs(x=expression(paste('s.loss')),
+                                                                                                             y = 'Density') +
+  theme(legend.position= "none")
+sgain <- pp_check(pp.multi_all, resp = 'sgain')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ labs(x='s.gain',
+                                                                                                            y = '') +
+  theme(legend.position= "none")
 
-# Figure S3i
- fig_s3i <- (sloss | sgain)
- fig_s3i
+sl <- pp_check(pp.multi_all, resp = 'SL')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 200))+ labs(x=expression(paste('SL')),
+                                                                                                         y = '') +
+  theme(legend.position= "bottom")
+sg <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-200, 1000))+ labs(x='SG',
+                                                                                                         y = '') +
+  theme(legend.position= "none")
 
-# multivariate price biomass partitions
-load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/multi_price.Rdata") # object name: pp.multi
-
-# model summary
-summary(pp.multi)
-
-# predicted vs observed values
-#color_scheme_set("darkgray")
-sl <- pp_check(pp.multi, resp = 'SL')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 200))+ labs(x=expression(paste('SL')),
-                                                                                                         y = 'Density') 
-sg <- pp_check(pp.multi, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-200, 1000))+ labs(x='SG',
-                                                                                                         y = 'Density') 
-
-cde <- pp_check(pp.multi, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 1000))+ labs(x='PS',
-                                                                                                           y = 'Density') 
+cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 1000))+ labs(x='PS', y = '') +
+  theme(legend.position= "none")
+           
+                                                                                                                                                                                                                                                                                                                                                                                                                       
 # Figure S3j
-fig_s3j <- (sl | sg | cde)
+fig_s3i <- (sloss | sgain | sl | sg | cde)
 
-fig_s3j
+fig_s3i
 
 
 

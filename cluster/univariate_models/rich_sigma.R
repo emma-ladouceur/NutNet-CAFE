@@ -11,16 +11,16 @@ plot$site_code<-as.factor(plot$site_code)
 plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
- plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
- ungroup()
+ # plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
+ # ungroup()
 
-rich.3_sigmai <- brm( bf( rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot) + trt:year_trt, 
+rich.all_sigmai <- brm( bf( rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot) + trt:year_trt, 
                               sigma ~ 0 + trt + (0 + trt | site_code) ), 
                     data = plot,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
 
 
-save(rich.3_sigmai,
+save(rich.all_sigmai,
      file=Sys.getenv('OFILE'))
 
 
