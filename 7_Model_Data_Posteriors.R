@@ -649,6 +649,7 @@ study.rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_l
 
 study.bm.p2 <- study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) 
 
+View(study.bm.p)
 study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2) %>% filter(response == "NPK")
 
 View(study.effs.p)

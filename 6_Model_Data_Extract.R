@@ -183,16 +183,6 @@ sgain.trt_fitted.ctl<-sgain.trt_fitted[sgain.trt_fitted$trt.y %in% c('Control'),
 # fixed effect coefficients 
 sgain.trt_fixef <- fixef(sgain.3_sigmai)
 
-# obs_nest.sgain <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code, trt.y) %>% 
-#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-#   mutate(predicted = map(data, ~predict(sgain.3_sigmai, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-# 
-# View(obs_nest.sgain)
-
 # coefficients for study-level (random) effects
 sgain.trt_coef <- coef(sgain.3_sigmai)
 
@@ -286,16 +276,7 @@ ps.trt_fixef <- fixef(ps.3_sigma)
 # this takes ~ 5 minutes
 
 head(p.all)
-# 
-# obs_nest.sloss <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code, trt.y) %>% 
-#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-#   mutate(predicted = map(data, ~predict(s.loss.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-# 
-# View(obs_nest.sloss)
+
 
 # coefficients for study-level (random) effects
 ps.trt_coef <- coef(ps.3_sigma)
@@ -391,15 +372,6 @@ sl.trt_fitted.ctl<-sl.trt_fitted[sl.trt_fitted$trt.y %in% c('Control'),]
 sl.trt_fixef <- fixef(sl.3)
 
 
-# obs_nest.sl <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code, trt.y) %>% 
-#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-#   mutate(predicted = map(data, ~predict(sl.3, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-# 
-# View(obs_nest.sl)
 
 # coefficients for study-level (random) effects
 sl.trt_coef <- coef(sl.3)
@@ -583,16 +555,6 @@ cde_fitted.ctl<-cde_fitted[cde_fitted$trt.y %in% c('Control'),]
 # fixed effect coefficients
 cde_fixef <- fixef(cde.3_sigmai)
 
-# predicted values
-# obs_nest.cde <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code, trt.y) %>% 
-#   summarise(year.y = seq(min(year.y), max(year.y), length.out = 13 ),
-#             year.y.m = seq(min(year.y.m), max(year.y.m), length.out = 13) ) %>%
-#   nest(data = c(site_code,year.y, year.y.m, trt.y)) %>%
-#   mutate(predicted = map(data, ~predict(cde.3_sigmai, newdata= .x, re_formula = ~(trt.y * year.y.m | site_code) )))
-# 
-# View(obs_nest.cde)
 
 # coefficients for study-level (random) effects
 cde_coef <- coef(cde.3_sigmai)
@@ -634,7 +596,7 @@ cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>%
 
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
 save(cde_fitted.npk,cde_fitted.ctl,cde_coef2,file = 'cde.mod.dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.mod.dat.Rdata')
 
 
 
