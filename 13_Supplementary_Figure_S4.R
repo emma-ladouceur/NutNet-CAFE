@@ -1,4 +1,5 @@
 
+
 # Authors: Emma Ladouceur 
 # Title:
 # Last Updated April 18, 2021
@@ -18,45 +19,45 @@ plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.c
 
 
 # model objects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/bm.Rdata') # plot.bm.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/rich.Rdata') # plot.rich.g
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/bm_sigma.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/rich_sigma.Rdata') # plot.rich.g
 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm_sigmai.Rdata') # plot.bm.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich_sigmai.Rdata') # plot.rich.3
 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/5/bm.Rdata') # plot.bm.5
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/5/rich.Rdata') # plot.rich.5
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/bm_sigma.Rdata') # plot.bm.5
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/rich_sigma.Rdata') # plot.rich.5
 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/bm.Rdata') # plot.bm.6
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/rich.Rdata') # plot.rich.6
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/bm_sigma.Rdata') # plot.bm.6
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/rich_sigma.Rdata') # plot.rich.6
 
 
-plot.rich.im_fixef <- as.data.frame(fixef(plot.rich.g))
-plot.bm.im_fixef <- as.data.frame(fixef(plot.bm.s))
+rich.im_fixef <- as.data.frame(fixef(rich.all_sigmai))
+bm.im_fixef <- as.data.frame(fixef(bm.all_sigmai))
 
-plot.rich.im_fixef.3 <- as.data.frame(fixef(plot.rich.3))
-plot.bm.im_fixef.3 <- as.data.frame(fixef(plot.bm.3))
+rich.im_fixef.3 <- as.data.frame(fixef(rich.3_sigmai))
+bm.im_fixef.3 <- as.data.frame(fixef(bm.3_sigmai))
 
-plot.rich.im_fixef.5 <- as.data.frame(fixef(plot.rich.5))
-plot.bm.im_fixef.5 <- as.data.frame(fixef(plot.bm.5))
+rich.im_fixef.10 <- as.data.frame(fixef(rich.10_sigmai))
+bm.im_fixef.10 <- as.data.frame(fixef(bm.10_sigmai))
 
-plot.rich.im_fixef.6 <- as.data.frame(fixef(plot.rich.6))
-plot.bm.im_fixef.6 <- as.data.frame(fixef(plot.bm.6))
+rich.im_fixef.6 <- as.data.frame(fixef(rich.6_sigmai))
+bm.im_fixef.6 <- as.data.frame(fixef(bm.6_sigmai))
 
-plot.rich.im_fixef
+rich.im_fixef
 
 
 rich.f <-bind_rows(
-  plot.rich.im_fixef['year_trt',] %>% 
+  rich.im_fixef['year_trt',] %>% 
     mutate(response='All years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.rich.im_fixef['trtNPK:year_trt',] %>% 
+  rich.im_fixef['trtNPK:year_trt',] %>% 
     mutate(response='All years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
@@ -69,13 +70,13 @@ rich.f
 
 
 rich.f.3 <-bind_rows(
-  plot.rich.im_fixef.3['year_trt',] %>% 
+  rich.im_fixef.3['year_trt',] %>% 
     mutate(response='=>3 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.rich.im_fixef.3['trtNPK:year_trt',] %>% 
+  rich.im_fixef.3['trtNPK:year_trt',] %>% 
     mutate(response='=>3 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
@@ -85,31 +86,31 @@ rich.f.3 <-bind_rows(
   mutate(response='=>3 years',)
 
 
-rich.f.5 <-bind_rows(
-  plot.rich.im_fixef.5['year_trt',] %>% 
+rich.f.10 <-bind_rows(
+  rich.im_fixef.10['year_trt',] %>% 
     mutate(response='=>5 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.rich.im_fixef.5['trtNPK:year_trt',] %>% 
+  rich.im_fixef.10['trtNPK:year_trt',] %>% 
     mutate(response='=>5 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope))%>%
-  mutate(response='=>5 years')
+  mutate(response='=>10 years')
 
 
 rich.f.6 <-bind_rows(
-  plot.rich.im_fixef.6['year_trt',] %>% 
+  rich.im_fixef.6['year_trt',] %>% 
     mutate(response='=>6 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.rich.im_fixef.6['trtNPK:year_trt',] %>% 
+  rich.im_fixef.6['trtNPK:year_trt',] %>% 
     mutate(response='=>6 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
@@ -120,7 +121,7 @@ rich.f.6 <-bind_rows(
 
 rich.f.6
 
-rich.effs <- bind_rows(rich.f,rich.f.3,rich.f.5,rich.f.6)
+rich.effs <- bind_rows(rich.f,rich.f.3,rich.f.10,rich.f.6)
 
 rich.effs
 
@@ -129,7 +130,7 @@ write.csv(rich.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/ri
 rich.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-rich.effs$response <- factor(rich.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+rich.effs$response <- factor(rich.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
 
 sp.slope <- ggplot() + 
   geom_point(data =rich.effs, aes(x = response, y = trt_slope, color=response),size = 2) +
@@ -149,13 +150,13 @@ sp.slope
 
 
  bm.f <-bind_rows(
-  plot.bm.im_fixef['year_trt',] %>% 
+  bm.im_fixef['year_trt',] %>% 
     mutate(response='All years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.bm.im_fixef['trtNPK:year_trt',] %>% 
+  bm.im_fixef['trtNPK:year_trt',] %>% 
     mutate(response='All years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
@@ -167,13 +168,13 @@ sp.slope
 
 
 bm.f.3 <-bind_rows(
-  plot.bm.im_fixef.3['year_trt',] %>% 
+  bm.im_fixef.3['year_trt',] %>% 
     mutate(response='=>3 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.bm.im_fixef.3['trtNPK:year_trt',] %>% 
+  bm.im_fixef.3['trtNPK:year_trt',] %>% 
     mutate(response='=>3 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
@@ -183,30 +184,30 @@ bm.f.3 <-bind_rows(
   mutate(response='=>3 years')
 
 
-bm.f.5 <-bind_rows(
-  plot.bm.im_fixef.5['year_trt',] %>% 
+bm.f.10 <-bind_rows(
+  bm.im_fixef.10['year_trt',] %>% 
     mutate(response='=>5 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.bm.im_fixef.5['trtNPK:year_trt',] %>% 
+  bm.im_fixef.10['trtNPK:year_trt',] %>% 
     mutate(response='=>5 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
-  mutate(response='=>5 years')
+  mutate(response='=>10 years')
 
 bm.f.6 <-bind_rows(
-  plot.bm.im_fixef.6['year_trt',] %>% 
+  bm.im_fixef.6['year_trt',] %>% 
     mutate(response='=>6 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  plot.bm.im_fixef.6['trtNPK:year_trt',] %>% 
+  bm.im_fixef.6['trtNPK:year_trt',] %>% 
     mutate(response='=>6 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
@@ -217,7 +218,7 @@ bm.f.6 <-bind_rows(
 
 
 
-bm.effs <- bind_rows(bm.f,bm.f.3,bm.f.5,bm.f.6)
+bm.effs <- bind_rows(bm.f,bm.f.3,bm.f.10,bm.f.6)
 
 bm.effs
 write.csv(bm.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.effs.inclusion.csv')
@@ -225,7 +226,7 @@ write.csv(bm.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.e
 bm.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-bm.effs$response <- factor(bm.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+bm.effs$response <- factor(bm.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
 
 
 bm.slope<-ggplot() + 
@@ -250,57 +251,59 @@ bm.slope
 
 # price effects
 
+rm(list = ls())
+
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/cde.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sloss.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/cde_sigma.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sloss_sigma.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sgain_sigma.Rdata') # s.gain.s
 
 
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde_sigmai.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss_sigmai.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain_sigmai.Rdata') # s.gain.s
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sl.Rdata') # sl.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/cde.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sloss.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/5/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/cde_sigma.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sloss_sigma.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sgain_sigma.Rdata') # s.gain.s
 
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde_sigma.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss_sigma.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain_sigma.Rdata') # s.gain.s
 
-sl.trt.i_fixef <- as.data.frame(fixef(sl.s))
-sg.trt.i_fixef <- as.data.frame(fixef(sg.s))
-cde.trt.i_fixef <- as.data.frame(fixef(CDE.s))
-sloss.trt.i_fixef <- as.data.frame(fixef(s.loss.s))
-sgain.trt.i_fixef <- as.data.frame(fixef(s.gain.s))
+sl.trt.i_fixef <- as.data.frame(fixef(sl.all))
+sg.trt.i_fixef <- as.data.frame(fixef(sg.all))
+cde.trt.i_fixef <- as.data.frame(fixef(cde.all_sigmai))
+sloss.trt.i_fixef <- as.data.frame(fixef(sloss.all_sigmai))
+sgain.trt.i_fixef <- as.data.frame(fixef(sgain.all_sigmai))
 
 
 sl.trt.i_fixef.3 <- as.data.frame(fixef(sl.3))
 sg.trt.i_fixef.3 <- as.data.frame(fixef(sg.3))
-cde.trt.i_fixef.3 <- as.data.frame(fixef(CDE.3))
-sloss.trt.i_fixef.3 <- as.data.frame(fixef(s.loss.3))
-sgain.trt.i_fixef.3 <- as.data.frame(fixef(s.gain.3))
+cde.trt.i_fixef.3 <- as.data.frame(fixef(cde.3_sigmai))
+sloss.trt.i_fixef.3 <- as.data.frame(fixef(sloss.3_sigmai))
+sgain.trt.i_fixef.3 <- as.data.frame(fixef(sgain.3_sigmai))
 
-sl.trt.i_fixef.5 <- as.data.frame(fixef(sl.5))
-sg.trt.i_fixef.5 <- as.data.frame(fixef(sg.5))
-cde.trt.i_fixef.5 <- as.data.frame(fixef(CDE.5))
-sloss.trt.i_fixef.5 <- as.data.frame(fixef(s.loss.5))
-sgain.trt.i_fixef.5 <- as.data.frame(fixef(s.gain.5))
+sl.trt.i_fixef.10 <- as.data.frame(fixef(sl.10))
+sg.trt.i_fixef.10 <- as.data.frame(fixef(sg.10))
+cde.trt.i_fixef.10 <- as.data.frame(fixef(cde.10_sigmai))
+sloss.trt.i_fixef.10 <- as.data.frame(fixef(sloss.10_sigmai))
+sgain.trt.i_fixef.10 <- as.data.frame(fixef(sgain.10_sigmai))
 
 sl.trt.i_fixef.6 <- as.data.frame(fixef(sl.6))
 sg.trt.i_fixef.6 <- as.data.frame(fixef(sg.6))
-cde.trt.i_fixef.6 <- as.data.frame(fixef(CDE.6))
-sloss.trt.i_fixef.6 <- as.data.frame(fixef(s.loss.6))
-sgain.trt.i_fixef.6 <- as.data.frame(fixef(s.gain.6))
+cde.trt.i_fixef.6 <- as.data.frame(fixef(cde.6_sigmai))
+sloss.trt.i_fixef.6 <- as.data.frame(fixef(sloss.6_sigmai))
+sgain.trt.i_fixef.6 <- as.data.frame(fixef(sgain.6_sigmai))
 
 
 sl.f <-bind_rows(
@@ -335,21 +338,21 @@ sl.f.3 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>3 years')
 
-sl.f.5 <-bind_rows(
-  sl.trt.i_fixef.5['year.y.m',] %>% 
-    mutate(response='=>5 years',
+sl.f.10 <-bind_rows(
+  sl.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  sl.trt.i_fixef.5['trt.yNPK:year.y.m',] %>% 
-    mutate(response='=>5 years',
+  sl.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
-  mutate(response='=>5 years')
+  mutate(response='=>10 years')
 
 sl.f.6 <-bind_rows(
   sl.trt.i_fixef.6['year.y.m',] %>% 
@@ -368,14 +371,14 @@ sl.f.6 <-bind_rows(
   mutate(response='=>6 years')
 
 
-sl.effs <- bind_rows(sl.f,sl.f.3,sl.f.5,sl.f.6)
+sl.effs <- bind_rows(sl.f,sl.f.3,sl.f.10,sl.f.6)
 
 
 write.csv(sl.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.effs.inclusion.csv')
 
 sl.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-sl.effs$response <- factor(sl.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sl.effs$response <- factor(sl.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
 
 
 sl.slope<-ggplot() + 
@@ -426,21 +429,21 @@ sg.f.3 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>3 years')
 
-sg.f.5 <-bind_rows(
-  sg.trt.i_fixef.5['year.y.m',] %>% 
-    mutate(response='=>5 years',
+sg.f.10 <-bind_rows(
+  sg.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  sg.trt.i_fixef.5['trt.yNPK:year.y.m',] %>% 
-    mutate(response='=>5 years',
+  sg.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
-  mutate(response='=>5 years')
+  mutate(response='=>10 years')
 
 sg.f.6 <-bind_rows(
   sg.trt.i_fixef.6['year.y.m',] %>% 
@@ -458,14 +461,14 @@ sg.f.6 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>6 years')
 
-sg.effs <- bind_rows(sg.f,sg.f.3,sg.f.5,sg.f.6)
+sg.effs <- bind_rows(sg.f,sg.f.3,sg.f.10,sg.f.6)
 
 write.csv(sg.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg.effs.inclusion.csv')
 
 sg.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-sg.effs$response <- factor(sg.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sg.effs$response <- factor(sg.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
 
 
 sg.slope<-ggplot() + 
@@ -518,21 +521,21 @@ cde.f.3 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>3 years')
 
-cde.f.5 <-bind_rows(
-  cde.trt.i_fixef.5['year.y.m',] %>% 
-    mutate(response='=>5 years',
+cde.f.10 <-bind_rows(
+  cde.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  cde.trt.i_fixef.5['trt.yNPK:year.y.m',] %>% 
-    mutate(response='=>5 years',
+  cde.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
-  mutate(response='=>5 years')
+  mutate(response='=>10 years')
 
 cde.f.6 <-bind_rows(
   cde.trt.i_fixef.6['year.y.m',] %>% 
@@ -550,14 +553,14 @@ cde.f.6 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>6 years')
 
-cde.effs <- bind_rows(cde.f,cde.f.3,cde.f.5,cde.f.6)
+cde.effs <- bind_rows(cde.f,cde.f.3,cde.f.10,cde.f.6)
 
 write.csv(cde.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.effs.inclusion.csv')
 
 cde.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-cde.effs$response <- factor(cde.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+cde.effs$response <- factor(cde.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
 
 
 cde.slope<-ggplot() + 
@@ -611,21 +614,21 @@ sloss.f.3 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>3 years')
 
-sloss.f.5 <-bind_rows(
-  sloss.trt.i_fixef.5['year.y.m',] %>% 
-    mutate(response='=>5 years',
+sloss.f.10 <-bind_rows(
+  sloss.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  sloss.trt.i_fixef.5['trt.yNPK:year.y.m',] %>% 
-    mutate(response='=>5 years',
+  sloss.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
-  mutate(response='=>5 years')
+  mutate(response='=>10 years')
 
 sloss.f.6 <-bind_rows(
   sloss.trt.i_fixef.6['year.y.m',] %>% 
@@ -643,14 +646,14 @@ sloss.f.6 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>6 years')
 
-sloss.effs <- bind_rows(sloss.f,sloss.f.3,sloss.f.5,sloss.f.6)
+sloss.effs <- bind_rows(sloss.f,sloss.f.3,sloss.f.10,sloss.f.6)
 
 write.csv(sloss.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.effs.inclusion.csv')
 
 sloss.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-sloss.effs$response <- factor(sloss.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sloss.effs$response <- factor(sloss.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
 
 
 sloss.slope<-ggplot() + 
@@ -703,21 +706,21 @@ sgain.f.3 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>3 years')
 
-sgain.f.5 <-bind_rows(
-  sgain.trt.i_fixef.5['year.y.m',] %>% 
-    mutate(response='=>5 years',
+sgain.f.10 <-bind_rows(
+  sgain.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
       trt_slope = Estimate,
       trt_upper_slope = Q97.5,
       trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-  sgain.trt.i_fixef.5['trt.yNPK:year.y.m',] %>% 
-    mutate(response='=>5 years',
+  sgain.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
            trt_slope = Estimate,
            trt_upper_slope = Q97.5,
            trt_lower_slope = Q2.5) %>%
     select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
-  mutate(response='=>5 years')
+  mutate(response='=>10 years')
 
 
 sgain.f.6 <-bind_rows(
@@ -736,14 +739,14 @@ sgain.f.6 <-bind_rows(
 ) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
   mutate(response='=>6 years')
 
-sgain.effs <- bind_rows(sgain.f,sgain.f.3,sgain.f.5,sgain.f.6)
+sgain.effs <- bind_rows(sgain.f,sgain.f.3,sgain.f.10,sgain.f.6)
 
 write.csv(sgain.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.effs.inclusion.csv')
 
 sgain.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-sgain.effs$response <- factor(sgain.effs$response , levels=c("All years","=>3 years","=>5 years", "=>6 years"))
+sgain.effs$response <- factor(sgain.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
 
 
 sgain.slope<-ggplot() + 
