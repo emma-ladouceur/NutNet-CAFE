@@ -136,7 +136,7 @@ plot <- sp %>% select(-c(Taxon, max_cover,local_provenance,category.mod,cat.cove
 View(plot)
 
 site.inclusion<-plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
-# 58 sites will be included in our main analysis
+# 59 sites will be included in our main analysis
 View(site.inclusion)
 
 write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv")
