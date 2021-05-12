@@ -24,25 +24,16 @@ library(grid)
 library("scales")
 library(stringr)
 
-# models
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
-# 
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # sl.s
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # sg.s
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg.Rdata') # sg.s
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
 
 # selected mods
-load('~/Desktop/mods/sloss_sigmai.Rdata') # s.loss.3_sigma2
-load('~/Desktop/mods/sgain_sigmai.Rdata') # s.gain.3_sigma2
-load('~/Desktop/mods/sl.Rdata') # sl.3_sigma2
-load('~/Desktop/mods/sg.Rdata') # sg.3_sigma2
-load('~/Desktop/mods/cde_sigmai.Rdata') # CDE.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss_sigmai.Rdata') # s.loss.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain_sigmai.Rdata') # s.gain.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3_sigma2
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde_sigmai.Rdata') # CDE.3_sigma2
 #selected best mods
-load('~/Desktop/mods/bm_sigmai.Rdata') # bm.3_sigmai 
-load('~/Desktop/mods/rich_sigmai.Rdata') # rich.3_sigmai
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm_sigmai.Rdata') # bm.3_sigmai 
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich_sigmai.Rdata') # rich.3_sigmai
 
 
 
@@ -59,9 +50,9 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p
 # run code from Figure 5 first to produce datasets loaded below
 
 # data for the site level means and overall medians of each cat
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/study.price.p.effs.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.price.p.effs.Rdata')
 npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.rate.p,sloss.trt.rate.p,sgain.trt.rate.p) %>%
-  left_join(meta)
+  left_join(enviro_dat)
 
 head(npk.effs)
 
@@ -93,10 +84,10 @@ fig_s6a <- ggplot() +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Effect of NPK on species loss / year')),
         title= 'A) Species Richness',
-        y= 'Annual Precip'
+        y= 'Annual precipitation (mm)'
   )+
  # scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
-  scale_y_reverse(
+  scale_y_continuous(
     breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
     expand = c(0, 0)
   ) +
@@ -131,15 +122,16 @@ fig_s6b <- ggplot() +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Effect of NPK on species loss / year')),
         title= 'B) Biomass',
-        y= 'Annual Precip'
+        y= ''
   )+
   #scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
-  scale_y_reverse(
+  scale_y_continuous(
     breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
     expand = c(0, 0)
   ) +
   theme(panel.grid = element_blank(),
         legend.key = element_blank(),
+        axis.text.y = element_blank(),
         legend.position="none")
 
 fig_s6b
@@ -170,10 +162,10 @@ fig_s6c <- ggplot() +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Effect of NPK on species loss / year')),
         title= 'C) Species loss (s.loss)',
-        y= 'Annual Precip'
+        y= 'Annual precipitation (mm)'
   )+
   scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
-  scale_y_reverse(
+  scale_y_continuous(
      breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
      expand = c(0, 0)
   ) +
@@ -205,10 +197,10 @@ fig_s6d <- ggplot() +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Effect of NPK on species gain / year')),
         title= 'D) Species gain (s.gain)',
-        y= 'Annual Precip '
+        y= ' '
   )+
   scale_x_continuous(breaks=c(-1,0,1), limits=c(-1.5,1.5))+
-  scale_y_reverse(
+  scale_y_continuous(
     breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
     expand = c(0, 0)
   ) +
@@ -241,18 +233,17 @@ fig_s6e <- ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   scale_x_continuous(breaks=c(-40,-20,-10,-5,0,10), limits=c(-40,15))+
-  scale_y_reverse(
+  scale_y_continuous(
     breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
     expand = c(0, 0)
   ) +
   labs( 
     x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
     title= 'E) Biomass change associated \n with species loss (SL)',
-    y= 'Annual Precip'
+    y= 'Annual precipitation (mm)'
   ) +
   theme(panel.grid = element_blank(),
         legend.key = element_blank(),
-        axis.text.y = element_blank(),
         axis.title.x=element_text( hjust=0.5, 
                                    margin = margin(t = 16, r = 0, b = 0, l = 0)), 
         legend.position="none") 
@@ -283,10 +274,10 @@ fig_s6f <- ggplot() +
   labs( #x = '',
     x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
     title= 'F) Biomass change associated \n with species gain (SG)',
-    y= 'Annual Precip '
+    y= ' '
   )+
   scale_x_continuous(breaks=c(-10,0,5,10,20,40,60,80), limits=c(-20,80))+
-  scale_y_reverse(
+  scale_y_continuous(
     breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
     expand = c(0, 0)
   ) +
@@ -323,10 +314,10 @@ fig_s6g <- ggplot() +
   labs(#x='', 
     x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
     title= 'G) Biomass change associated \n with persistent species (PS)',
-    y= 'Annual Precip'
+    y= ''
   )+
   scale_x_continuous(breaks=c(-150,-100,-50,-25,0,25,50,100), limits=c(-175,100))+
-  scale_y_reverse(
+  scale_y_continuous(
     breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
     expand = c(0, 0)
   ) +
@@ -349,8 +340,7 @@ fig_s6g <- ggplot() +
 fig_s6g
 
 
-# LANDSCAPE 7 X 19
-# Figure 5
+# PORTRAIT 12 x 15
 ( fig_s6a |  fig_s6b)/( fig_s6c | fig_s6d)/(  fig_s6e | fig_s6f | fig_s6g)
 
 

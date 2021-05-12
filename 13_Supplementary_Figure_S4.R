@@ -280,6 +280,7 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde_s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss_sigma.Rdata') # s.loss.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain_sigma.Rdata') # s.gain.s
 
+
 sl.trt.i_fixef <- as.data.frame(fixef(sl.all))
 sg.trt.i_fixef <- as.data.frame(fixef(sg.all))
 cde.trt.i_fixef <- as.data.frame(fixef(cde.all_sigmai))

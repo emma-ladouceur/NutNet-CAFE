@@ -21,6 +21,7 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 plot$year_trt<-as.factor(plot$year_trt)
 
+
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/Model_fits/3/sg-sigma.Rdata') # sg.3_sigma2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/old/Model_fits/3/sl-sigma.Rdata') # sg.3_sigma2
 
