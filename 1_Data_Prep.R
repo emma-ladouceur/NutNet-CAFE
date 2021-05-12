@@ -11,22 +11,22 @@
 library(tidyverse)
 
 # master data
-comb   <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/NutNet data/comb-by-plot-02-April-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-cover   <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/NutNet data/full-cover-02-April-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
-biomass <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/NutNet data/full-biomass-02-April-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+comb   <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/NutNet data/comb-by-plot-06-May-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+cover   <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/NutNet data/full-cover-06-May-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+biomass <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/NutNet data/full-biomass-06-May-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
 # seasonal data
 seas_cover   <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/Cover and biomass by date/full-cover-by-date-30-04-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 seas_biomass <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/Cover and biomass by date/full-biomass-by-date-30-04-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
-# seasonal data for Jena
+# look  @ seasonal data for Jena
 seas_cover %>% filter( site_code %in% "jena.de")  %>% distinct(site_code, date, year_trt)
 
 # jena year 0 was only sampled in September so we remove this aggregated data from main data set and use 
 # seasonal data for august/september- the late sampling- only for every subsequent year
 jena_cover <- seas_cover %>% filter( site_code %in% "jena.de" ) %>%
   separate(date, c("samp_yr", "samp_month", "samp_day"), sep="-") %>%
-  filter(samp_month %in% c("08" , "09")) # only august- september data
+  filter(samp_month %in% c("08" , "09")) # keep only august- september data
 
 head(jena_cover)
 
@@ -43,42 +43,28 @@ colnames(cover)
 cover$functional_group <- as.factor(cover$functional_group)
 levels(cover$functional_group)
 
-# additional data from KBS & Texas Temple
-seas_cover$site_code <- as.factor(seas_cover$site_code)
-levels(seas_cover$site_code)
-
-xtra_cover <- seas_cover %>% filter( site_code %in% c("temple.us", "kbs.us" )) %>%
-  filter(!site_code %in% "kbs.us" | !year %in% "2020") %>%  # remove kbs 2020
-   filter(!site_code %in% "temple.us" | !year < "2020") %>%  # keep only temple 2020
-  # temple  cover was sampled twice within a year, so we aggregate by year for max cover
-  group_by(year, site_name, site_code, block, plot, subplot, year_trt, trt, Family, Taxon, live, local_provenance, local_lifeform, functional_group, N_fixer, ps_path) %>%
-  summarise(max_cover = max(max_cover)) %>% ungroup()
-
-xtra_biomass <- seas_biomass %>% filter( site_code %in% c("temple.us", "kbs.us" )) %>%
-  filter(!site_code %in% "kbs.us" | !year %in% "2020") %>%  # remove kbs 2020
-  filter(!site_code %in% "temple.us" | !year < "2020")  # keep only temple 2020
-  
-xtra_cover %>% distinct(site_code, year_trt, year)
-xtra_biomass %>% distinct(site_code, year_trt, year)
-
  
 # clean cover data
 clean_cover <- cover %>%
   filter(!site_code %in% c("amlr.is", # fertilized 2 months before 1st measurement, no true year 0
                            "ethamc.au", # 0 biomass at year 0 in strip, but plants in plot- cannot be used
-                           "jena.de", # seasonal issue
-                           "kbs.us"  # remove kbs
+                           "jena.de" , # seasonal issue,
+                           "gce_brackish.us", # gce is a new site, doesnt meet rules for inclusion (only year 0 so far)
+                           "gce_fresh.us" # and so i havnt bothered to look carefully at the data , so instead i remove it here
   )) %>%
-  bind_rows(jena_cover, xtra_cover) %>% # seasonal jena data and kbs, temple 2020 data
+  bind_rows(jena_cover) %>% # seasonal Jena data 
+  filter(!site_code %in% "kbs.us" | !year %in% "2020") %>%  # remove kbs 2020 because it was sampled in September  (Re: COVID) and is weird
   filter( live == 1, # keep only live cover
-          !functional_group %in% c("BRYOPHYTE", "LICHEN", "CLUBMOSS", "LIVERWORT", "NON-LIVE", "WOODY"), # drop non vascular plants and woody plants
+          # keep only live, vascular herbaceous species
+          !functional_group %in% c("BRYOPHYTE", "LICHEN", "CLUBMOSS", "LIVERWORT", "NON-LIVE", "WOODY"),
           complete.cases(Family), # only complete cases for 'Family' (bare ground is blank for this field)
   )  %>% 
   unite("id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE) # create unique id
 
+# double check kbs and temple
 clean_cover %>% distinct(site_code, year_trt, year) %>% filter(site_code %in% c("kbs.us","temple.us")) %>%
   arrange(site_code, year_trt)
-
+# yep its all there!
 
 # biomass clean up
 head(biomass)
@@ -91,12 +77,14 @@ clean_biomass <- biomass %>%
   filter(!site_code %in% c("amlr.is", # fertilized 2 months before 1st measurement, no true year 0
                            "ethamc.au", # 0 biomass at year 0 in strip, but plants in plot- cannot be used
                            "jena.de", # seasonal issue
-                           "kbs.us" 
+                           "gce_brackish.us", # gce is a new site, doesnt meet rules for inclusion (only year 0 so far)
+                           "gce_fresh.us" # and so i havnt bothered to look carefully at the data , so instead i remove it here
   )) %>%
-  bind_rows(jena_biomass, xtra_biomass) %>% # seasonal jena data, and kbs temple data
+  bind_rows(jena_biomass) %>% # seasonal jena data, and kbs temple data
+  filter(!site_code %in% "kbs.us" | !year %in% "2020") %>%  #  remove kbs 2020 because it was sampled in September and is weird
   unite( "id", c("site_code","year","year_trt","trt","block","plot"), remove=FALSE) %>% # make unique id for biomass
   filter( live == 1, # keep only live biomass
-          # remove functional groups
+          # keep only live, vascular herbaceous species
           !category %in% c("BRYOPHYTE", "DOWNED WOODY DEBRIS","FUNGUS",
                            "LICHEN","LITTER","NON-VASCULAR","STANDING DEAD","WOODY" ) # drop non-vascular plants and woody plants
   ) 
@@ -335,7 +323,7 @@ View(site_include)
 
 
 
-write.csv(final_dat, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp.csv")
+#write.csv(final_dat, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp.csv")
 
 
 
