@@ -51,7 +51,9 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **13_Supplementary_Figure_S4.R** This script produces Figure S4.
 
-**14_Supplementary_Tables** This script produces Figure S6.
+**14_Supplementary_Figure_S6** This script produces Figure S6.
 
-**15_Supplementary_Tables** This script produces Tables S1 & S2.
+**15_Supplementary_Figure_S7** This script may not be included in final version.
+
+**16_Supplementary_Tables** This script produces Tables S1, S2 & App Table.
 
