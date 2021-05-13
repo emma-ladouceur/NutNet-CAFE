@@ -1,7 +1,7 @@
 
 # Authors: Emma Ladouceur & Adam T. Clark
 # Title: Estimate per species Biomass
-# Last Updated:  May 2, 2021
+# Last Updated:  May 13, 2021
 
 # Produces dataset : 'biomass_sp.csv'
 # This script cleans data to living herbaceous species only and calculates per species biomass according to total plot biomass or
@@ -109,7 +109,7 @@ head(clean_biomass)
 
 calc_biomass <- clean_biomass %>% 
   group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>%
-  summarise(strip.mass = sum(mass)) %>% # sum strip biomass to strip, specify this is strip mass
+  summarise(strip.mass = sum(mass)) %>% # sum strip biomass categories (usually functional group) to strip, specify this is strip mass
   left_join(clean_biomass) %>% 
   arrange(site_code,year_trt,trt,block,plot,subplot,category) %>% ungroup() %>%
   mutate(orig.bm.cat = category, # identify biomass functional group categories
@@ -127,14 +127,14 @@ total_biomass   <- calc_biomass %>%
 
 head(total_biomass)
 
-# sites that separated biomass - remove the totals
+# sites that separated biomass into functional groups - remove the totals
 sep_biomass <- calc_biomass %>%  
   select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,category,mass,strip.mass) %>%
   filter(!orig.bm.cat %in% c("TOTAL","VASCULAR", "LIVE")) # drop total measures of biomass
 
 head(sep_biomass)
 
-# per species biomass estimates for sites that measures total biomass
+# per species biomass estimates for sites that measures total biomass of a strip
 total_biomass_calc <- total_biomass %>% left_join(calc_cover, by= c("id", "site_code", "year", "year_trt", "trt", "block", "plot" ) ) %>%
   select(-c(site_name, Family, live, local_provenance)) %>% 
   group_by(id) %>% 
@@ -146,12 +146,12 @@ head(total_biomass_calc)
 
   
 # special case 
-# shps sorted biomass by annual perennial
+# shps.us sorted biomass by annual perennial
 ap_dat <- calc_cover %>%  filter(site_code == "shps.us" ) %>%  # special case
   #select(id, site_code, year, year_trt, trt, block, plot,subplot.cov, plot.cover,local_lifespan,Taxon,max_cover) %>%
   select(id, site_code, year, year_trt, trt, block, plot,subplot.cov,local_lifeform,local_lifespan,functional_group,Taxon, plot.cover,max_cover) %>%
   mutate(category = local_lifespan) %>%
-  mutate(category = if_else(Taxon == "ANTENNARIA SP.", # categorize Antennaria as perennial so it will match
+  mutate(category = if_else(Taxon == "ANTENNARIA SP.", # categorize Antennaria as perennial so it will match (looked it up and this is the best group)
                             "PERENNIAL",
                             category)) 
 
@@ -184,7 +184,7 @@ sep_cover_calc <- sep_cover_mod %>%
 head(sep_cover_calc)
 
 # double check phlox diffusa case
-bnch <- sep_cover_calc %>% filter(site_code=="bnch.us" & year=="2018" & trt == "NPK") 
+bnch <- sep_cover_calc %>% filter(site_code == "bnch.us" & year == "2018" & trt == "NPK") 
 head(bnch, n=20) # yep all good
 
 # prep biomass data
@@ -201,6 +201,7 @@ sep_biomass_calc <- sep_biomass %>% ungroup() %>%
 # sanity check phlox diffusa
 bnch <- sep_biomass_calc %>% filter(site_code =="bnch.us" & year == "2018" & trt == "NPK") 
 bnch
+# looks good 
 
 head(sep_cover_calc)
 head(sep_biomass_calc)
@@ -231,17 +232,17 @@ head(sep_dat)
 # some plots have a functional group that was not recorded in biomass but was in cover
 # so the biomass for that particular species comes up as a 0
 # for these whole plots, we use plot level biomass to calculate per species biomass
-# we replace all per species biomass estimates done from catgoeries with plot level, only on a plot case-by-case basis where this happened
+# we replace all per species biomass estimates done from categories with plot level, only on a plot case-by-case basis where this happened
 
 
-# replace Na's with 0's (theres a mixture)
+# replace Na's with 0's (there's a mixture)
 sep_dat_na <- sep_dat %>% 
   select(id,cat.mass,biomass.sp.cat,biomass.sp.plot,Taxon) %>%
   replace(is.na(.), 0) %>%
   filter(cat.mass == 0 , biomass.sp.cat == 0, biomass.sp.plot > 0 ) %>% # where category mass is 0 and biomass sp calc'd by category is 0
   distinct(id) %>%
   arrange(id) %>% left_join(sep_dat) %>% 
-  mutate(biomass.m.plot = "plot") %>% # label these calculation's as being calc'd from plot level results (biomass method)
+  mutate(biomass.m.plot = "plot") %>% # label these calculation's as being calc'd from plot level results ( to record biomass calc method)
   mutate(biomass.sp = biomass.sp.plot)  
 
 head(sep_dat_na)
@@ -258,16 +259,16 @@ sep_dat_clean <- sep_dat_combine %>%
                                   biomass.sp.cat, # we replace rows with 'NA's' in biomass.sp (plot level) with biomass.sp.cat to complete the rows
                                   biomass.sp),
          biomass.m.full = ifelse(is.na(biomass.m.plot), # biomass.m.full becomes our column that tells us how each row was calculated (method)
-                                 biomass.m.cat,   # this was done at the plot level
+                                 biomass.m.cat,   # this was done at the plot level (not the site level)
                                  biomass.m.plot) ) %>%
   select(-biomass.sp,-biomass.m.plot,-biomass.m.cat) %>% 
-  #bind_rows(ap_dat) %>% # add in annual perennial sorted data
   distinct() %>% arrange(id)
 
 head(sep_dat_clean)
 
 strip_mass <- calc_biomass %>% distinct(id, strip.mass)
 
+# bring total strip calc and category calc's together
 complete_dat_calc <- total_biomass_calc %>% 
   bind_rows(sep_dat_clean) %>% select(-strip.mass) %>% 
   left_join(strip_mass) %>% 
@@ -278,7 +279,7 @@ head(complete_dat_calc)
 # total (where total biomass measurements were taken),   
 # category (where biomass was sorted by functional group categories,
 # or plot, where strip biomass was substituted for functional group biomass because functional groups between biomass strip
-# and cover plot don't fully match (e.g., a legume was present in cover but not in biomass samp
+# and cover plots don't fully match (e.g., a legume was present in cover but not in biomass samp.
 complete_dat_calc$biomass.m.full<- as.factor(complete_dat_calc$biomass.m.full)
 levels(complete_dat_calc$biomass.m.full)
 
@@ -311,7 +312,7 @@ biggest.bm.values <- final_dat %>% select(id, site_code, year_trt, trt, Taxon, c
                                           orig.mass, strip.mass, orig.bm.cat, biomass.sp.full, biomass.m.full) %>%
   top_frac(.5) %>%arrange(desc(biomass.sp.full)) 
 # need help cleaning this, but lets just pay attention to treatments and data we need
-# in the next script we will do this, and then repeat this excercise, and then revisit this script to fix any errors
+# in the next script we will do this, and then repeat this exercise, and then revisit this script to fix any errors
 # or special cases
 head(biggest.bm.values)
 
@@ -322,8 +323,7 @@ site_include <- final_dat %>% ungroup() %>% distinct(site_code, year_trt)
 View(site_include)
 
 
-
-#write.csv(final_dat, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp.csv")
+write.csv(final_dat, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp.csv")
 
 
 

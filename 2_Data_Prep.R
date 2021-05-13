@@ -1,7 +1,7 @@
 
 # Author: Emma Ladouceur
 # Title: Re-calculate richness
-# Last Updated:  May 2, 2021
+# Last Updated:  May 13, 2021
 
 #  Produces datasets: 'biomass_sp_CAFE.csv', & 'plot.csv'
 # This work flow takes cleaned, filter data (woody non-vasculars removed) per species biomass estimate data and re-calculates measures of species richness
@@ -32,7 +32,7 @@ colnames(biomass_exp)
 
 biomass_exp %>% distinct(site_code, year_trt)
 
-# remove sites that dont have a year 0 or only have year 0
+# remove sites that don't have a year 0 or only have year 0
 species_nn <- biomass_exp  %>% 
   group_by(site_code) %>% # group by site
   summarise(year_min = min(year_trt),  # get minimum year for each study
@@ -135,7 +135,7 @@ plot <- sp %>% select(-c(Taxon, max_cover,local_provenance,category.mod,cat.cove
 
 View(plot)
 
-site.inclusion<-plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
+site.inclusion <- plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3)
 # 59 sites will be included in our main analysis
 View(site.inclusion)
 
