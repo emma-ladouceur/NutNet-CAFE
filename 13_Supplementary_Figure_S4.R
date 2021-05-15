@@ -260,7 +260,6 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sl
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sgain_sigma.Rdata') # s.gain.s
 
 
-
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde_sigmai.Rdata') # CDE.s
@@ -278,8 +277,8 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sl.Rd
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sg.Rdata') # sg.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde_sigma.Rdata') # CDE.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss_sigma.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain_sigma.Rdata') # s.gain.s
-
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain_sigma.Rdata') # s.gain.s
+load('~/Desktop/sgain.6.Rdata') # s.gain.s
 
 sl.trt.i_fixef <- as.data.frame(fixef(sl.all))
 sg.trt.i_fixef <- as.data.frame(fixef(sg.all))
@@ -304,7 +303,7 @@ sl.trt.i_fixef.6 <- as.data.frame(fixef(sl.6))
 sg.trt.i_fixef.6 <- as.data.frame(fixef(sg.6))
 cde.trt.i_fixef.6 <- as.data.frame(fixef(cde.6_sigmai))
 sloss.trt.i_fixef.6 <- as.data.frame(fixef(sloss.6_sigmai))
-sgain.trt.i_fixef.6 <- as.data.frame(fixef(sgain.6_sigmai))
+sgain.trt.i_fixef.6 <- as.data.frame(fixef(sgain.6))
 
 
 sl.f <-bind_rows(

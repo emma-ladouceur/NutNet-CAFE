@@ -141,3 +141,25 @@ fig_S7a <- ggplot() +
 
 fig_S7a
 
+
+
+
+sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+colnames(sp)
+
+sp_rel <- sp %>% group_by(id) %>%
+  summarise( rel_plot_bm = sum(biomass.sp.full)) %>%
+  ungroup() %>%
+  left_join(sp) %>%
+  mutate( rel_cover = max_cover/plot.cover,
+               rel_strip_bm = biomass.sp.full/strip.mass) 
+
+
+ggplot() + geom_point( data = sp_rel, aes(x = rel_cover, y = rel_strip_bm), alpha = 0.5) +
+  theme_classic()
+  
+  
+
+
