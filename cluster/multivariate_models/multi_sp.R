@@ -13,10 +13,10 @@ p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 # 
 p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
-  ungroup()
+  ungroup() %>% unite("site_block_plot", c(site_code, block, plot), sep="_")
 
 
-sp.multi <- brm(mvbind(rich, strip.mass) ~ trt * year_trt + (trt * year_trt  | p | site_code),
+sp.multi <- brm(mvbind(rich, strip.mass) ~ trt * year_trt + (trt * year_trt  | p | site_block_plot),
                 data = p.all, family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4)
 
 

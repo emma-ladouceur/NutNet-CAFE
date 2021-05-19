@@ -11,7 +11,10 @@ library(patchwork)
 # plot level data
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-plot <- plot %>% filter(max.year >= 3)
+
+plot <- plot %>% filter(year_max >= 3) %>% unite("site_block_plot", c(site_code, block, plot), sep="_")
+
+
 
 head(plot)
 
@@ -129,7 +132,8 @@ fig_S7a <- ggplot() +
   geom_errorbar(data = fitted.plot, aes(x = Treatment,ymin = eff_lower,
                                         ymax = eff_upper,color=Treatment),
                 width = 0, size = 0.7) +
-  labs(x = '',
+  labs( title = 'a)',
+    x = '',
        y='Slope') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_y_continuous(breaks=c(0,30)) +
@@ -154,12 +158,17 @@ sp_rel <- sp %>% group_by(id) %>%
   ungroup() %>%
   left_join(sp) %>%
   mutate( rel_cover = max_cover/plot.cover,
-               rel_strip_bm = biomass.sp.full/strip.mass) 
+               rel_strip_bm = biomass.sp.full/strip.mass,
+          ) 
 
 
-ggplot() + geom_point( data = sp_rel, aes(x = rel_cover, y = rel_strip_bm), alpha = 0.5) +
+ fig_S7b <- ggplot() + geom_point( data = sp_rel, aes(x = rel_cover, y = rel_strip_bm), alpha = 0.2) +
+   labs( title = 'b)',
+     x = 'Species percent cover relative to plot',
+         y = 'Per species biomass estimate relative to strip')+
   theme_classic()
+ 
   
-  
+fig_S7 <-  (fig_S7a + fig_S7b)
 
-
+fig_S7
