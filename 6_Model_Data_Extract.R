@@ -22,7 +22,7 @@ sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-colnames(p.all)
+head(p.all)
 p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
   filter(year_max >= 3) 
 
@@ -603,7 +603,8 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.
 # Multivariate Models
 
 # multivariate plot richness + biomass
-load("~/Desktop/mods/multi/multi_sp.Rdata") # object name: sp.multi
+load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/multi/multi_sp.Rdata") # object name: pp.multi_all
+
 
 # model summary
 summary(sp.multi)
@@ -621,7 +622,7 @@ fig_s3h
 
 
 # multivariate price partitions with all responses possible
-load("~/Desktop/mods/multi/multi_price_all.Rdata") # object name: pp.multi_all
+load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/multi/multi_price_all.Rdata") # object name: pp.multi_all
 
 # model summary
 summary(pp.multi_all)
@@ -652,7 +653,7 @@ fig_s3i <- (sloss | sgain | sl | sg | cde)
 fig_s3i
 
 # extract all response correlations for  multivariate model,
-#reported in Supplementary Model Information 1.9
+# reported in Supplementary Model Information 1.9
 cor <- as.mcmc(pp.multi_all, combine_chains = TRUE, 
                             pars = "^cor") %>% 
   as_tibble()

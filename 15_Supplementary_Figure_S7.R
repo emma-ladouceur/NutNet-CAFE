@@ -157,18 +157,37 @@ sp_rel <- sp %>% group_by(id) %>%
   summarise( rel_plot_bm = sum(biomass.sp.full)) %>%
   ungroup() %>%
   left_join(sp) %>%
-  mutate( rel_cover = max_cover/plot.cover,
-               rel_strip_bm = biomass.sp.full/strip.mass,
+  mutate( rel_cover_plot = max_cover/plot.cover,
+          rel_cover_cat = max_cover/cat.cover,
+               rel_strip_bm_full = biomass.sp.full/strip.mass,
+          rel_strip_bm_cat = biomass.sp.cat/cat.mass,
+          rel_strip_bm_plot = biomass.sp.plot/strip.mass,
           ) 
 
 
- fig_S7b <- ggplot() + geom_point( data = sp_rel, aes(x = rel_cover, y = rel_strip_bm), alpha = 0.2) +
-   labs( title = 'b)',
+ fig_S7a <- ggplot() + geom_point( data = sp_rel, aes(x = rel_cover_plot, y = rel_strip_bm_full), alpha = 0.2) +
+   labs( title = 'a) Full',
      x = 'Species percent cover relative to plot',
          y = 'Per species biomass estimate relative to strip')+
   theme_classic()
  
+ 
+ fig_S7b <- ggplot() + geom_point( data = sp_rel, aes(x = rel_cover_cat, y = rel_strip_bm_cat), alpha = 0.2) +
+   labs( title = 'b) Category',
+         x = 'Species percent cover relative to plot',
+         y = 'Per species biomass estimate relative to strip')+
+   theme_classic()
+ 
+ fig_S7b
+ 
+ 
+ fig_S7c <- ggplot() + geom_point( data = sp_rel_plot, aes(x = rel_cover, y = rel_strip_bm_plot), alpha = 0.2) +
+   labs( title = 'c) Plot',
+         x = 'Species percent cover relative to plot',
+         y = 'Per species biomass estimate relative to strip')+
+   theme_classic()
+ 
   
-fig_S7 <-  (fig_S7a + fig_S7b)
+fig_S7 <-  (fig_S7a + fig_S7b + fig_S7c)
 
 fig_S7
