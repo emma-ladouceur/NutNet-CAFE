@@ -20,6 +20,6 @@ sg.3_cover <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/
               control = list(adapt_delta = 0.99) )
 
 
-save(sg.3-cover,
+save(sg.3_cover,
      file=Sys.getenv('OFILE'))
 
