@@ -23,7 +23,11 @@ library(foreach)
 # plot data
 p <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 # run cluster -based price script, then load the new input
-price.list <- list.files(path = "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/price pairs data/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
+# price.list <- list.files(path = "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/price pairs data/biomass/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
+
+# run for percent cover for supplementary information
+price.list <- list.files(path = "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/price pairs data/cover/", pattern = ".rds$", recursive = TRUE, full.names = TRUE)
+
 
 # bring in all 428 pairwise price datasets
 price.all <- foreach (file = price.list,.combine=rbind) %do% {
@@ -34,15 +38,17 @@ price.all <- foreach (file = price.list,.combine=rbind) %do% {
 head(price.all)
 
 # we keep this unpruned version just in case we need to check or change something
-write.csv(price.all,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_price_all.csv")
+#write.csv(price.all,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_price_all.csv")
+write.csv(price.all,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_price_all_cover.csv")
 
 # load unpruned data frame
-price.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+#price.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_price_all.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+price.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_price_all_cover.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 # the function compares everything possible so we now need to prune the data back to only meaningful comparisons
 head(price.all)
 nrow(price.all)
-# 94,828 rows, most of them unnecessary and meaningless
+# 947,518 rows, most of them unnecessary and meaningless
 
 
 # separate and unite the columns to improve ease of sorting, filtering and pruning the dataset
@@ -117,6 +123,8 @@ sites <- price.pairs.calc %>% distinct(site_code, year_max) %>% filter(year_max 
 
 View(sites) # looks good!!
 
-write.csv(price.pairs.calc,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv")
-
+# biomass
+#write.csv(price.pairs.calc,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv")
+# cover
+write.csv(price.pairs.calc,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time_cover.csv")
 
