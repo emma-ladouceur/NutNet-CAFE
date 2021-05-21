@@ -14,7 +14,7 @@ library(priceTools)
 # data
 sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
-colnames(sp)
+head(sp)
 sp$year_trt <- as.factor(sp$year_trt)
 sp$site_code <- as.factor(sp$site_code)
 levels(sp$year_trt)
