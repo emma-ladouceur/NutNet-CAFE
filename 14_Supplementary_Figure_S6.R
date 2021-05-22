@@ -1,348 +1,775 @@
 
 
-
-
-# Supplementary ggridges with precip
-
-
-
-# Authors: Emma Ladouceur & Shane A. Blowes
+# Authors: Emma Ladouceur 
 # Title:
-# Last Updated April 17, 2021
+# Last Updated April 18, 2021
 
-# 11_Figure_5.R
-# This workflow uses data pulled out of Modelsbelow to produce Figure 4
-
+# 13_Supplementary_Figure_S4.R
+# This workflow makes Supplementary Figures S6
 
 # packages
-library(patchwork)
 library(tidyverse)
+library(ggplot2)
 library(brms)
-library(ggridges)
-library(gridExtra)
-library(grid)
-library("scales")
-library(stringr)
-
-
-# selected mods
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss_sigmai.Rdata') # s.loss.3_sigma2
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain_sigmai.Rdata') # s.gain.3_sigma2
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3_sigma2
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3_sigma2
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde_sigmai.Rdata') # CDE.3_sigma2
-#selected best mods
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm_sigmai.Rdata') # bm.3_sigmai 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich_sigmai.Rdata') # rich.3_sigmai
-
-
+library(wesanderson)
+library(patchwork)
 
 # data
-enviro_dat <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/site-worldclim-9-April-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-colnames(meta)
-
-head(meta)
-
-# 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.price.p.effs.Rdata')
-
-# run code from Figure 5 first to produce datasets loaded below
-
-# data for the site level means and overall medians of each cat
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.price.p.effs.Rdata')
-npk.effs <- all.effs %>% select(site_code,sg.trt.rate.p, sl.trt.rate.p,cde.trt.rate.p,sloss.trt.rate.p,sgain.trt.rate.p) %>%
-  left_join(enviro_dat)
-
-head(npk.effs)
-
-# for axis titles with expressions
-# https://stackoverflow.com/questions/13223846/ggplot2-two-line-label-with-expression
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-rich.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/rich_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-rich.ps <- rich.ps %>% left_join(enviro_dat)
-head(rich.ps)
-summary(rich.ps)
-
-fig_s6a <- ggplot() +
-  geom_density_ridges(data = rich.ps, #%>% arrange(desc(MAP_v2)) %>%
-                      #                       mutate(site_code= fct_reorder(site_code, MAP_v2)),
-                      aes(x = rich.trt.study + rich.trt.global, 
-                          y =  MAP_v2, group = MAP_v2
-                      ), fill= "#0B775E",
-                      scale = 1, alpha = 0.3,
-                      linetype = 0,
-                      scale = 10, size = 0.25, rel_min_height = 0.03) +
-  # geom_point(data =npk.effs, aes(y = Quadrant, x = rich.trt.rate.p),
-  #            colour= "#B40F20", shape=1, size = 2,  position = position_jitter(height = 0.02 )) +
-  # geom_point(data= rich.ps %>% group_by(Quadrant) %>%
-  #              summarise(mean.s.eff = median(rich.trt.study + rich.trt.global)), 
-  #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species loss / year')),
-        title= 'A) Species Richness',
-        y= 'Annual precipitation (mm)'
-  )+
- # scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
-  scale_y_continuous(
-    breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
-    expand = c(0, 0)
-  ) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        legend.position="none")
-
-fig_s6a
+# model objects
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/bm_sigma.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/rich_sigma.Rdata') # plot.rich.g
 
 
-bm.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-bm.ps <- bm.ps %>% left_join(enviro_dat)
-head(bm.ps)
-summary(bm.ps)
-
-fig_s6b <- ggplot() +
-  geom_density_ridges(data = bm.ps, #%>% arrange(desc(MAP_v2)) %>%
-                      #                       mutate(site_code= fct_reorder(site_code, MAP_v2)),
-                      aes(x = bm.trt.study + bm.trt.global, 
-                          y =  MAP_v2, group = MAP_v2
-                      ), fill= "#0B775E",
-                      scale = 1, alpha = 0.3,
-                      linetype = 0,
-                      scale = 10, size = 0.25, rel_min_height = 0.03) +
-  # geom_point(data =npk.effs, aes(y = Quadrant, x = bm.trt.rate.p),
-  #            colour= "#B40F20", shape=1, size = 2,  position = position_jitter(height = 0.02 )) +
-  # geom_point(data= bm.ps %>% group_by(Quadrant) %>%
-  #              summarise(mean.s.eff = median(bm.trt.study + bm.trt.global)), 
-  #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species loss / year')),
-        title= 'B) Biomass',
-        y= ''
-  )+
-  #scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
-  scale_y_continuous(
-    breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
-    expand = c(0, 0)
-  ) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position="none")
-
-fig_s6b
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm_sigmai.Rdata') # plot.bm.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich_sigmai.Rdata') # plot.rich.3
 
 
-
-sloss.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sloss_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-sloss.ps <- sloss.ps %>% left_join(enviro_dat)
-head(sloss.ps)
-summary(sloss.ps)
-
-fig_s6c <- ggplot() +
-   geom_density_ridges(data = sloss.ps, #%>% arrange(desc(MAP_v2)) %>%
-  #                       mutate(site_code= fct_reorder(site_code, MAP_v2)),
-                      aes(x = sloss.trt.study + sloss.trt.global, 
-                          y =  MAP_v2, group = MAP_v2
-                      ), fill="#B40F20",
-                      scale = 1, alpha = 0.3,
-                      linetype = 0,
-                      scale = 10, size = 0.25, rel_min_height = 0.03) +
-  # geom_point(data =npk.effs, aes(y = Quadrant, x = sloss.trt.rate.p),
-  #            colour= "#B40F20", shape=1, size = 2,  position = position_jitter(height = 0.02 )) +
-  # geom_point(data= sloss.ps %>% group_by(Quadrant) %>%
-  #              summarise(mean.s.eff = median(sloss.trt.study + sloss.trt.global)), 
-  #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species loss / year')),
-        title= 'C) Species loss (s.loss)',
-        y= 'Annual precipitation (mm)'
-  )+
-  scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
-  scale_y_continuous(
-     breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
-     expand = c(0, 0)
-  ) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        legend.position="none")
-
-fig_s6c
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/bm_sigma.Rdata') # plot.bm.5
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/rich_sigma.Rdata') # plot.rich.5
 
 
-sgain.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-sgain.ps <- sgain.ps %>% left_join(enviro_dat)
-
-fig_s6d <- ggplot() +
-  geom_density_ridges(data = sgain.ps,
-                      aes(x = sgain.trt.study + sgain.trt.global, 
-                          y = MAP_v2, group = MAP_v2
-                      ), fill="#3B9AB2",
-                      scale = 1, alpha = 0.3,
-                      linetype = 0,
-                      scale = 10, size = 0.25, rel_min_height = 0.03) +
-  # geom_point(data =npk.effs, aes(y = Quadrant, x = sgain.trt.rate.p),
-  #            colour= "#3B9AB2",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
-  # geom_point(data= sgain.ps %>% group_by(Quadrant) %>%
-  #              summarise(mean.s.eff = median(sgain.trt.study + sgain.trt.global)), 
-  #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species gain / year')),
-        title= 'D) Species gain (s.gain)',
-        y= ' '
-  )+
-  scale_x_continuous(breaks=c(-1,0,1), limits=c(-1.5,1.5))+
-  scale_y_continuous(
-    breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
-    expand = c(0, 0)
-  ) +
-  theme(panel.grid = element_blank(),
-        axis.title.x = element_text(hjust = 0.5),
-        legend.key = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position="none") 
-
-fig_s6d
-
-# species loss (s.loss)
-sl.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-sl.ps <- sl.ps %>% left_join(enviro_dat)
-
-fig_s6e <- ggplot() +
-  geom_density_ridges(data = sl.ps,
-                      aes(x = sl.trt.study + sl.trt.global, 
-                          y = MAP_v2, group = MAP_v2
-                      ), fill="#B40F20",
-                      scale = 1, alpha = 0.3,
-                      linetype = 0,
-                      scale = 10, size = 0.25, rel_min_height = 0.03) +
-  # geom_point(data =npk.effs, aes(y = Quadrant, x = sl.trt.rate.p),
-  #            colour= "#B40F20",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
-  # geom_point(data= sl.ps %>% group_by(Quadrant) %>%
-  #              summarise(mean.s.eff = median(sl.trt.study + sl.trt.global)), 
-  #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw(base_size=14) +
-  scale_x_continuous(breaks=c(-40,-20,-10,-5,0,10), limits=c(-40,15))+
-  scale_y_continuous(
-    breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
-    expand = c(0, 0)
-  ) +
-  labs( 
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
-    title= 'E) Biomass change associated \n with species loss (SL)',
-    y= 'Annual precipitation (mm)'
-  ) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        axis.title.x=element_text( hjust=0.5, 
-                                   margin = margin(t = 16, r = 0, b = 0, l = 0)), 
-        legend.position="none") 
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/bm_sigma.Rdata') # plot.bm.6
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/rich_sigma.Rdata') # plot.rich.6
 
 
-fig_s6e
+rich.im_fixef <- as.data.frame(fixef(rich.all_sigmai))
+bm.im_fixef <- as.data.frame(fixef(bm.all_sigmai))
+
+rich.im_fixef.3 <- as.data.frame(fixef(rich.3_sigmai))
+bm.im_fixef.3 <- as.data.frame(fixef(bm.3_sigmai))
+
+rich.im_fixef.10 <- as.data.frame(fixef(rich.10_sigmai))
+bm.im_fixef.10 <- as.data.frame(fixef(bm.10_sigmai))
+
+rich.im_fixef.6 <- as.data.frame(fixef(rich.6_sigmai))
+bm.im_fixef.6 <- as.data.frame(fixef(bm.6_sigmai))
+
+rich.im_fixef
 
 
-sg.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+rich.f <-bind_rows(
+  rich.im_fixef['year_trt',] %>% 
+    mutate(response='All years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  rich.im_fixef['trtNPK:year_trt',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='All years',)
 
-sg.ps <- sg.ps %>% left_join(enviro_dat)
+rich.f
 
-fig_s6f <- ggplot() +
-  geom_density_ridges(data = sg.ps,
-                      aes(x = sg.trt.study + sg.trt.global, 
-                          y = MAP_v2, group = MAP_v2
-                      ), fill="#3B9AB2",
-                      scale = 1, alpha = 0.3,
-                      linetype = 0,
-                      scale = 10, size = 0.25, rel_min_height = 0.03) +
-  # geom_point(data =npk.effs, aes(y = Quadrant, x = sg.trt.rate.p),
-  #            colour= "#3B9AB2",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
-  # geom_point(data= sg.ps %>% group_by(Quadrant) %>%
-  #              summarise(mean.s.eff = median(sg.trt.study + sg.trt.global)), 
-  #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw(base_size=14) +
-  labs( #x = '',
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
-    title= 'F) Biomass change associated \n with species gain (SG)',
-    y= ' '
-  )+
-  scale_x_continuous(breaks=c(-10,0,5,10,20,40,60,80), limits=c(-20,80))+
-  scale_y_continuous(
-    breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
-    expand = c(0, 0)
-  ) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.x=element_text( hjust=0.5,
-                                   margin = margin(t = 16, r = 0, b = 0, l = 0)), 
-        legend.position="none")
 
-fig_s6f
+rich.f.3 <-bind_rows(
+  rich.im_fixef.3['year_trt',] %>% 
+    mutate(response='=>3 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  rich.im_fixef.3['trtNPK:year_trt',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>3 years',)
+
+
+rich.f.10 <-bind_rows(
+  rich.im_fixef.10['year_trt',] %>% 
+    mutate(response='=>5 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  rich.im_fixef.10['trtNPK:year_trt',] %>% 
+    mutate(response='=>5 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope))%>%
+  mutate(response='=>10 years')
+
+
+rich.f.6 <-bind_rows(
+  rich.im_fixef.6['year_trt',] %>% 
+    mutate(response='=>6 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  rich.im_fixef.6['trtNPK:year_trt',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>6 years')
+
+rich.f.6
+
+rich.effs <- bind_rows(rich.f,rich.f.3,rich.f.10,rich.f.6)
+
+rich.effs
+
+write.csv(rich.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.effs.inclusion.csv')
+
+rich.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+rich.effs$response <- factor(rich.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
+
+sp.slope <- ggplot() + 
+  geom_point(data =rich.effs, aes(x = response, y = trt_slope, color=response),size = 2) +
+  geom_errorbar(data = rich.effs, aes(x = response,ymin = trt_lower_slope,
+                                    ymax = trt_upper_slope, color=response),
+                width = 0, size = 0.7) +
+  labs(x = '',
+       y= expression(paste('Change in species richness / year ')),
+       title='a) NPK effect on change in species richness / year') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+
+
+sp.slope
+
+
+ bm.f <-bind_rows(
+  bm.im_fixef['year_trt',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  bm.im_fixef['trtNPK:year_trt',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+   mutate(response='All years')
 
 
 
-cde.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/cde_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-cde.ps <- cde.ps %>% left_join(enviro_dat)
-
-fig_s6g <- ggplot() +
-  geom_density_ridges(data = cde.ps,
-                      aes(x = cde.trt.study + cde.trt.global, 
-                          y = MAP_v2, group = MAP_v2
-                      ), fill="#F98400",
-                      scale = 1, alpha = 0.3,
-                      linetype = 0,
-                      scale = 10, size = 0.25, rel_min_height = 0.03) +
-  # geom_point(data =npk.effs, aes(y = Quadrant, x = cde.trt.rate.p),
-  #            colour= "#F98400",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
-  # geom_point(data= cde.ps %>% group_by(Quadrant) %>%
-  #              summarise(mean.s.eff = median(cde.trt.study + cde.trt.global)), 
-  #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
-  geom_vline(xintercept = 0, lty = 2) +
-  theme_bw(base_size=14) +
-  labs(#x='', 
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
-    title= 'G) Biomass change associated \n with persistent species (PS)',
-    y= ''
-  )+
-  scale_x_continuous(breaks=c(-150,-100,-50,-25,0,25,50,100), limits=c(-175,100))+
-  scale_y_continuous(
-    breaks = c(200, 500, 800, 900, 1000, 1500, 1800),
-    expand = c(0, 0)
-  ) +
-  # geom_text(data = cde.ps %>%
-  #             group_by(Quadrant) %>%
-  #             mutate(n_sites = n_distinct(site_code)) %>%
-  #             ungroup() %>%
-  #             distinct(Quadrant, n_sites, .keep_all = T),
-  #           aes(x=-100, y=Quadrant,
-  #               label=paste('n[sites] == ', n_sites)),
-  #           size=6,
-  #           nudge_y = 0.5, parse = T) +
-  theme(panel.grid = element_blank(),
-        legend.key = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.x=element_text(  hjust=0.5,
-                                    margin = margin(t = 16, r = 0, b = 0, l = 0)), 
-        legend.position="none")
-
-fig_s6g
+bm.f.3 <-bind_rows(
+  bm.im_fixef.3['year_trt',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  bm.im_fixef.3['trtNPK:year_trt',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>3 years')
 
 
-# PORTRAIT 12 x 15
-( fig_s6a |  fig_s6b)/( fig_s6c | fig_s6d)/(  fig_s6e | fig_s6f | fig_s6g)
+bm.f.10 <-bind_rows(
+  bm.im_fixef.10['year_trt',] %>% 
+    mutate(response='=>5 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  bm.im_fixef.10['trtNPK:year_trt',] %>% 
+    mutate(response='=>5 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>10 years')
 
+bm.f.6 <-bind_rows(
+  bm.im_fixef.6['year_trt',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  bm.im_fixef.6['trtNPK:year_trt',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>6 years')
+
+
+
+bm.effs <- bind_rows(bm.f,bm.f.3,bm.f.10,bm.f.6)
+
+bm.effs
+write.csv(bm.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.effs.inclusion.csv')
+
+bm.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/bm.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+bm.effs$response <- factor(bm.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
+
+
+bm.slope<-ggplot() + 
+  geom_point(data =bm.effs, aes(x = response, y = trt_slope,color=response),size = 2) +
+  geom_errorbar(data = bm.effs, aes(x = response,ymin = trt_lower_slope,
+                                    ymax = trt_upper_slope,color=response),
+                width = 0, size = 0.7) +
+  labs(x = '',
+       y= expression(paste('Change in biomass (g/' ,m^2, ') / year ')),
+       title='b) NPK effect on change in biomass / year') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+
+bm.slope
+
+(sp.slope)/(bm.slope)
+
+
+
+
+# price effects
+
+rm(list = ls())
+
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/cde_sigma.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sloss_sigma.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sgain_sigma.Rdata') # s.gain.s
+
+
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde_sigmai.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss_sigmai.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain_sigmai.Rdata') # s.gain.s
+
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/cde_sigma.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sloss_sigma.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sgain_sigma.Rdata') # s.gain.s
+
+
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde_sigma.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss_sigma.Rdata') # s.loss.s
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain_sigma.Rdata') # s.gain.s
+load('~/Desktop/sgain.6.Rdata') # s.gain.s
+
+sl.trt.i_fixef <- as.data.frame(fixef(sl.all))
+sg.trt.i_fixef <- as.data.frame(fixef(sg.all))
+cde.trt.i_fixef <- as.data.frame(fixef(cde.all_sigmai))
+sloss.trt.i_fixef <- as.data.frame(fixef(sloss.all_sigmai))
+sgain.trt.i_fixef <- as.data.frame(fixef(sgain.all_sigmai))
+
+
+sl.trt.i_fixef.3 <- as.data.frame(fixef(sl.3))
+sg.trt.i_fixef.3 <- as.data.frame(fixef(sg.3))
+cde.trt.i_fixef.3 <- as.data.frame(fixef(cde.3_sigmai))
+sloss.trt.i_fixef.3 <- as.data.frame(fixef(sloss.3_sigmai))
+sgain.trt.i_fixef.3 <- as.data.frame(fixef(sgain.3_sigmai))
+
+sl.trt.i_fixef.10 <- as.data.frame(fixef(sl.10))
+sg.trt.i_fixef.10 <- as.data.frame(fixef(sg.10))
+cde.trt.i_fixef.10 <- as.data.frame(fixef(cde.10_sigmai))
+sloss.trt.i_fixef.10 <- as.data.frame(fixef(sloss.10_sigmai))
+sgain.trt.i_fixef.10 <- as.data.frame(fixef(sgain.10_sigmai))
+
+sl.trt.i_fixef.6 <- as.data.frame(fixef(sl.6))
+sg.trt.i_fixef.6 <- as.data.frame(fixef(sg.6))
+cde.trt.i_fixef.6 <- as.data.frame(fixef(cde.6_sigmai))
+sloss.trt.i_fixef.6 <- as.data.frame(fixef(sloss.6_sigmai))
+sgain.trt.i_fixef.6 <- as.data.frame(fixef(sgain.6))
+
+
+sl.f <-bind_rows(
+  sl.trt.i_fixef['year.y.m',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='All years',)
+
+sl.f.3 <-bind_rows(
+  sl.trt.i_fixef.3['year.y.m',] %>% 
+    mutate(response='=>3 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt.i_fixef.3['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>3 years')
+
+sl.f.10 <-bind_rows(
+  sl.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>10 years')
+
+sl.f.6 <-bind_rows(
+  sl.trt.i_fixef.6['year.y.m',] %>% 
+    mutate(response='=>6 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sl.trt.i_fixef.6['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+)  %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>6 years')
+
+
+sl.effs <- bind_rows(sl.f,sl.f.3,sl.f.10,sl.f.6)
+
+
+write.csv(sl.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.effs.inclusion.csv')
+
+sl.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sl.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+sl.effs$response <- factor(sl.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
+
+
+sl.slope<-ggplot() + 
+  geom_point(data =sl.effs, aes(x = response, y = trt_slope,color=response),size = 2) +
+  geom_errorbar(data = sl.effs, aes(x = response,ymin = trt_lower_slope,
+                                    ymax = trt_upper_slope,color=response),
+                width = 0, size = 0.7) +
+  labs(x = '',
+       y= expression(paste('Biomass change (g/' ,m^2, ') / year ')),
+       title='e) NPK effect on biomass change / year \n associated with species loss (SL)') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+sl.slope
+
+
+
+sg.f <-bind_rows(
+  sg.trt.i_fixef['year.y.m',] %>% 
+    mutate(response='All years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sg.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='All years',)
+
+sg.f.3 <-bind_rows(
+  sg.trt.i_fixef.3['year.y.m',] %>% 
+    mutate(response='=>3 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sg.trt.i_fixef.3['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>3 years')
+
+sg.f.10 <-bind_rows(
+  sg.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sg.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>10 years')
+
+sg.f.6 <-bind_rows(
+  sg.trt.i_fixef.6['year.y.m',] %>% 
+    mutate(response='=>6 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sg.trt.i_fixef.6['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>6 years')
+
+sg.effs <- bind_rows(sg.f,sg.f.3,sg.f.10,sg.f.6)
+
+write.csv(sg.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg.effs.inclusion.csv')
+
+sg.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sg.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+sg.effs$response <- factor(sg.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
+
+
+sg.slope<-ggplot() + 
+  geom_point(data =sg.effs, aes(x = response, y = trt_slope,color=response),size = 2) +
+  geom_errorbar(data = sg.effs, aes(x = response,ymin = trt_lower_slope,
+                                    ymax = trt_upper_slope,color=response),
+                width = 0, size = 0.7) +
+  labs(x = 'Site',
+       y = 'Slope') +
+  labs(x = '',
+       y= expression(paste('Biomass change (g/' ,m^2, ') / Year ')),
+       title='f) NPK effect on biomass change / year \n associated with species gain (SG)') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+sg.slope
+
+
+
+cde.f <-bind_rows(
+  cde.trt.i_fixef['year.y.m',] %>% 
+    mutate(response='All years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+ cde.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='All years',)
+
+cde.f.3 <-bind_rows(
+  cde.trt.i_fixef.3['year.y.m',] %>% 
+    mutate(response='=>3 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  cde.trt.i_fixef.3['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>3 years')
+
+cde.f.10 <-bind_rows(
+  cde.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  cde.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>10 years')
+
+cde.f.6 <-bind_rows(
+  cde.trt.i_fixef.6['year.y.m',] %>% 
+    mutate(response='=>6 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  cde.trt.i_fixef.6['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>6 years')
+
+cde.effs <- bind_rows(cde.f,cde.f.3,cde.f.10,cde.f.6)
+
+write.csv(cde.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.effs.inclusion.csv')
+
+cde.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/cde.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+cde.effs$response <- factor(cde.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
+
+
+cde.slope<-ggplot() + 
+  geom_point(data =cde.effs, aes(x = response, y = trt_slope,color=response),size = 2) +
+  geom_errorbar(data = cde.effs, aes(x = response,ymin = trt_lower_slope,
+                                    ymax = trt_upper_slope,color=response),
+                width = 0, size = 0.7) +
+  labs(x = 'Site',
+       y = 'Slope') +
+  labs(x = '',
+       y= expression(paste('Biomass change (g/' ,m^2, ') / Year ')),
+       title='g) NPK effect on biomass change / year \n associated with persistent species (PS)') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+cde.slope
+
+
+
+
+sloss.f <-bind_rows(
+  sloss.trt.i_fixef['year.y.m',] %>% 
+    mutate(response='All years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sloss.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='All years',)
+
+sloss.f.3 <-bind_rows(
+  sloss.trt.i_fixef.3['year.y.m',] %>% 
+    mutate(response='=>3 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sloss.trt.i_fixef.3['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>3 years')
+
+sloss.f.10 <-bind_rows(
+  sloss.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sloss.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>10 years')
+
+sloss.f.6 <-bind_rows(
+  sloss.trt.i_fixef.6['year.y.m',] %>% 
+    mutate(response='=>6 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sloss.trt.i_fixef.6['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>6 years')
+
+sloss.effs <- bind_rows(sloss.f,sloss.f.3,sloss.f.10,sloss.f.6)
+
+write.csv(sloss.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.effs.inclusion.csv')
+
+sloss.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sloss.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+sloss.effs$response <- factor(sloss.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
+
+
+sloss.slope<-ggplot() + 
+  geom_point(data =sloss.effs, aes(x = response, y = trt_slope,color=response),size = 2) +
+  geom_errorbar(data = sloss.effs, aes(x = response,ymin = trt_lower_slope,
+                                    ymax = trt_upper_slope,color=response),
+                width = 0, size = 0.7) +
+  labs(x = 'Site',
+       y = 'Slope') +
+  labs(x = '',
+       y= expression(paste('Species loss / year ')),
+       title='c) NPK effect on species loss  / year') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+sloss.slope
+
+
+
+sgain.f <-bind_rows(
+  sgain.trt.i_fixef['year.y.m',] %>% 
+    mutate(response='All years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sgain.trt.i_fixef['trt.yNPK:year.y.m',] %>% 
+    mutate(response='All years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='All years',)
+
+sgain.f.3 <-bind_rows(
+  sgain.trt.i_fixef.3['year.y.m',] %>% 
+    mutate(response='=>3 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sgain.trt.i_fixef.3['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>3 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>3 years')
+
+sgain.f.10 <-bind_rows(
+  sgain.trt.i_fixef.10['year.y.m',] %>% 
+    mutate(response='=>10 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sgain.trt.i_fixef.10['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>10 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>10 years')
+
+
+sgain.f.6 <-bind_rows(
+  sgain.trt.i_fixef.6['year.y.m',] %>% 
+    mutate(response='=>6 years',
+      trt_slope = Estimate,
+      trt_upper_slope = Q97.5,
+      trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+  sgain.trt.i_fixef.6['trt.yNPK:year.y.m',] %>% 
+    mutate(response='=>6 years',
+           trt_slope = Estimate,
+           trt_upper_slope = Q97.5,
+           trt_lower_slope = Q2.5) %>%
+    select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
+) %>% summarise(trt_slope=sum(trt_slope),trt_upper_slope=sum(trt_upper_slope),trt_lower_slope=sum(trt_lower_slope)) %>%
+  mutate(response='=>6 years')
+
+sgain.effs <- bind_rows(sgain.f,sgain.f.3,sgain.f.10,sgain.f.6)
+
+write.csv(sgain.effs, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.effs.inclusion.csv')
+
+sgain.effs <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.effs.inclusion.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+
+
+sgain.effs$response <- factor(sgain.effs$response , levels=c("All years","=>3 years","=>6 years", "=>10 years"))
+
+
+sgain.slope<-ggplot() + 
+  geom_point(data =sgain.effs, aes(x = response, y = trt_slope,color=response),size = 2) +
+  geom_errorbar(data = sgain.effs, aes(x = response,ymin = trt_lower_slope,
+                                    ymax = trt_upper_slope,color=response),
+                width = 0, size = 0.7) +
+  labs(x = 'Site',
+       y = 'Slope') +
+  labs(x = '',
+       y= expression(paste('Species gain / year ')),
+       title='d) NPK effect on species gain  / year') +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   strip.background = element_rect(colour="black", fill="white"),legend.position="none")
+sgain.slope
+
+# LANDSCAPE 10 X 15
+fig_s6 <- (sp.slope | bm.slope)/(sloss.slope | sgain.slope)/(sl.slope | sg.slope | cde.slope)
+
+
+fig_s6
 
 
 

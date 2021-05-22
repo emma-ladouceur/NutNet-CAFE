@@ -3,7 +3,7 @@
 # Last Updated April 18, 2021
 
 # 12_Supplementary_Figures.R
-# This workflow make Supplementary Figures S1, S2, & S5
+# This workflow make Supplementary Figures S1, S2, & S7
 # Figures S3 a-# found in ###
 
 # packages
@@ -198,7 +198,7 @@ View(study.effs.p)
 study.effs.p$Quadrant <- factor(study.effs.p$Quadrant, levels= c("-rich +biomass",  "+rich +biomass", "-rich -biomass", "+rich -biomass"))
 
 
-fig_s5 <- ggplot()+
+fig_s7 <- ggplot()+
   facet_wrap(~Quadrant) +
   geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_point(data= study.effs.p, aes(x= r.eff , y= b.eff), colour="black",alpha=0.2,size=2) +
@@ -210,6 +210,6 @@ fig_s5 <- ggplot()+
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = ' ')+ theme_classic(base_size=14) + theme(strip.text = element_text(size=14))
 
-fig_s5
+fig_s7
 
 

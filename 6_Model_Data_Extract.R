@@ -55,11 +55,11 @@ summary(sloss.3_sigmai)
 plot(sloss.3_sigmai)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s3c <- pp_check(sloss.3_sigmai) + theme_classic() + 
+fig_s5c <- pp_check(sloss.3_sigmai) + theme_classic() + 
   labs(x= "Species loss (s.loss)", y = "Density") + 
   scale_x_continuous(limits = c(-50, 50))
 
-fig_s3c
+fig_s5c
 
 
 # residuals (this take a minute)
@@ -148,11 +148,11 @@ summary(sgain.3_sigmai)
 plot(sgain.3_sigmai)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s3d <- pp_check(sgain.3_sigmai) + theme_classic() + 
+fig_s5d <- pp_check(sgain.3_sigmai) + theme_classic() + 
   labs(x= "Species gain (s.gain)", y = "Density") + 
   scale_x_continuous(limits = c(-50, 50))
 
-fig_s3d
+fig_s5d
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -234,11 +234,11 @@ summary(ps.3_sigma)
 plot(ps.3_sigma)
 # predicted values vs. observed
 color_scheme_set("darkgray")
-fig_s3x <- pp_check(ps.3_sigma) + theme_classic() + 
+fig_s5x <- pp_check(ps.3_sigma) + theme_classic() + 
   labs(x= "Persistent species (p.s)", y = "Density") + 
   scale_x_continuous(limits = c(-50, 50))
 
-fig_s3x
+fig_s5x
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -334,11 +334,11 @@ plot(sl.3)
 # color_scheme_set("darkgray")
 
 summary(p.all)
-fig_s3e <- pp_check(sl.3) + theme_classic() + 
+fig_s5e <- pp_check(sl.3) + theme_classic() + 
   labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with species sloss (SL)')), y = "Density") + 
    scale_x_continuous(limits = c(-1300, 100))
 
-fig_s3e
+fig_s5e
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -425,11 +425,11 @@ summary(sg.3)
 plot(sg.3)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s3f <- pp_check(sg.3) + theme_classic() + 
+fig_s5f <- pp_check(sg.3) + theme_classic() + 
   labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with species gain (SG)')), y = "Density") + 
   scale_x_continuous(limits = c(-100, 1300))
 
-fig_s3f
+fig_s5f
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -518,12 +518,12 @@ summary(cde.3_sigmai)
 plot(cde.3_sigmai)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s3g <- pp_check(cde.3_sigmai) + theme_classic() + 
+fig_s5g <- pp_check(cde.3_sigmai) + theme_classic() + 
   labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with persistent species (PS)')), y = "Density") + 
    scale_x_continuous(limits = c(-1000, 1000))
 
 
-fig_s3g
+fig_s5g
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -615,10 +615,10 @@ nnb <- pp_check(sp.multi, resp = 'stripmass')+ theme_classic() + scale_x_continu
 nnr <- pp_check(sp.multi, resp = 'rich')+ theme_classic() + scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
                                                                                                            y = 'Density') +
   theme(legend.position= "none")
-# Figure S3h
-fig_s3h <- (nnr  | nnb)
+# Figure s5h
+fig_s5h <- (nnr  | nnb)
 
-fig_s3h
+fig_s5h
 
 
 # multivariate price partitions with all responses possible
@@ -647,10 +647,10 @@ cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(
   theme(legend.position= "none")
            
                                                                                                                                                                                                                                                                                                                                                                                                                        
-# Figure S3j
-fig_s3i <- (sloss | sgain | sl | sg | cde)
+# Figure s5j
+fig_s5i <- (sloss | sgain | sl | sg | cde)
 
-fig_s3i
+fig_s5i
 
 # extract all response correlations for  multivariate model,
 # reported in Supplementary Model Information 1.9

@@ -33,9 +33,9 @@ R Script file names- which are listed below, are numbered and listed in the orde
 **FOLDER: cluster -> univariate models, multivariate models**
 - *A submit script ('.sh') to send each R script to the cluster, and an R Script ('.R') for every statistical model, named intuitively*
 
-**5_Model_Data_Extract.R** This workflow pulls Data out of *Richness & Biomass* model objects and preps data for visualization in Figure 2. Models have been run on a cluster and each have an R script and a submit script (.sh) (see folder above)
+**5_Model_Data_Extract.R** This workflow pulls Data out of *Richness & Biomass* model objects and preps data for visualization in Figure 2 & Figure S5 a) & b). Models have been run on a cluster and each have an R script and a submit script (.sh) (see folder above)
 
-**6_Model_Data_Extract.R** This workflow pulls Data out of *Price equation partitions* model objects and preps data for visualization in Figure 3. Models have been run on a cluster and each have an R script and a submit script (.sh)
+**6_Model_Data_Extract.R** This workflow pulls Data out of *Price equation partitions* model objects and preps data for visualization in Figure 3 & Figure S5c-h. Models have been run on a cluster and each have an R script and a submit script (.sh)
 
 **7_Model_Data_Posteriors.R** This workflow pulls data out of posterior distributions from *Price equation partitions* model objects and prepares it for: Figure 2 & 3 inset plots, Figure 2c, Figure 5, Figure S5, & Shiny App, Also produces 'quadrant categories' used in several Figures and in Table S1.
 
@@ -47,13 +47,13 @@ R Script file names- which are listed below, are numbered and listed in the orde
 
 **11_Figure_5.R** This script produces Figure 5 a)- e).
 
-**12_Supplementary_Figures.R** This script produces Figure S1, S2, S5.
+**12_Supplementary_Figures.R** This script produces Figure S1, S2, S7.
 
-**13_Supplementary_Figure_S4.R** This script produces Figure S4.
+**13_Supplementary_Figure_S3_4** This script produces Figure S3 & S4
 
-**14_Supplementary_Figure_S6** This script produces Figure S6.
+**14_Supplementary_Figure_S6.R** This script produces Figure S6.
 
-**15_Supplementary_Figure_S7** This script is under construction.
+**15_Supplementary_Figure_S8** This script produces Figure S8.
 
 **16_Supplementary_Tables** This script produces Tables S1, S2 & App Table.
 

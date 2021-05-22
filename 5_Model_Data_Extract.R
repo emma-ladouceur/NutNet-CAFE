@@ -45,10 +45,10 @@ summary(rich.3_sigmai)
 plot(rich.3_sigmai)
 # predicted values vs. observed
 color_scheme_set("darkgray")
-fig_s3a <- pp_check(rich.3_sigmai) + theme_classic() + 
+fig_s5a <- pp_check(rich.3_sigmai) + theme_classic() + 
   labs(x= "Species richness", y = "Density")
 
-fig_s3a
+fig_s5a
 
 # residuals (this take a minute)
 rich.m <- residuals(rich.3_sigmai)
@@ -141,11 +141,11 @@ summary(bm.3_sigmai)
 plot(bm.3_sigmai)
 # predicted values vs. observed
 #color_scheme_set("darkgray")
-fig_s3b <- pp_check(bm.3_sigmai) + theme_classic() + 
+fig_s5b <- pp_check(bm.3_sigmai) + theme_classic() + 
   labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
   scale_x_continuous(limits = c(-1000, 2000))
 
-fig_s3b
+fig_s5b
 
 # residuals (this take a minute)
 colnames(plot)
