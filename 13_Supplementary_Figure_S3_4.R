@@ -1,8 +1,4 @@
 
-
-rm(list = ls())
-
-
 library(tidyverse)
 library(brms)
 library(bayesplot)
@@ -30,8 +26,8 @@ sp_rel <- sp %>% group_by(id) %>%
 
 fig_S3a <- ggplot() + geom_point( data = sp_rel, aes(x = rel_cover_cat, y = rel_strip_bm_cat), alpha = 0.2) +
   labs( title = 'a) Functional Group Category',
-        x = 'Species percent cover relative to plot',
-        y = 'Per species biomass estimate relative to strip')+
+        x = 'Species cover relative to functional group',
+        y = 'Per species biomass estimate relative to functional group biomass')+
   theme_classic()
 
 fig_S3a

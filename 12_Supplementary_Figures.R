@@ -140,8 +140,10 @@ figs2_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Fi
 head(figs2_dat)
 
 ggplot() +
+  facet_wrap(~year.max)+
   geom_point(data = figs2_dat, aes(x = rich.start, y = mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data = figs2_dat, aes(x = rich.end, y = mass.end),size=1.5, colour="white", shape=2) +
+  geom_text_repel(data = figs2_dat, aes(x = rich.start, y = mass.start, label = rownames(figs2_dat) ) ) +
   geom_segment(data = figs2_dat,aes(x = rich.start,
                                  xend = rich.end,
                                  y = mass.start,
