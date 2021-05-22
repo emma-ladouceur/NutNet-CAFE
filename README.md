@@ -7,24 +7,26 @@ Community Assembly and the Functioning of Ecosystems (CAFE) : temporal responses
 ### Data
 Species level data is not provided. Data openly available to reproduce results includes;
 
-**plot.csv** Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure 2.
+**plot.csv** Data used for the plot-level in main analysis. Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure 2.
 
-**nutnet_cumulative_time.csv** Includes details about pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with persistent species (PS). These data are needed to run models associated with and to produce Figure 3, 4, & 5.
+**nutnet_cumulative_time.csv** Data used for main analysis. Price equation partition outputs using per species biomass estimates.  Includes details about pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with persistent species (PS). These data are needed to run models associated with and to produce Figure 3, 4, & 5.
+
+**nutnet_cumulative_time_cover.csv** Price equation partition outputs using per species cover. Used for Figure S4.
 
 **Model Objects**  The data listed above are used in statistical models, then model objects are saved and provided. Data is extracted from these model objects  and are saved as data objects which are also provided, and then can then be used to produce figures without re-running the models. 
 
 
 ### **R Scripts** 
-R Script file names- which are listed below, are numbered and listed in the order they should be used. Price equation partitions and statistical models are run on the cluster, which means this workflow can not be perfectly run through continuously on a local machine. However, code from cluster scripts can be used pedagogicly or be adapted to run on a local machine, just be aware they take a few hours each and require substantial computation power.
+R Script file names- which are listed below, are numbered and listed in the order they should be used. Price equation partitions and statistical models are run on the cluster, which means this workflow can not be perfectly run through continuously on a local machine. However, code from cluster scripts can be used pedagogically or be adapted to run on a local machine, just be aware they take a few hours each and require substantial computation power.
 
-**1_Data_Prep.R** This script cleans data to living herbaceous vascular species only and calculates per species biomass according to total plot biomass and life form group (graminoid, forb, legume etc.). Original data associasted with this code not provided.
+**1_Data_Prep.R** This script cleans data to living herbaceous vascular species only and calculates per species biomass according to total plot biomass and life form group (graminoid, forb, legume etc.). Original data associated with this code not provided.
 
-**2_Data_Prep.R** This workflow takes cleaned, filtered data (woody non-vasculars removed) per species biomass estimate data and re-calculates measures of species richness. Original data associated with this code not provided.
+**2_Data_Prep.R** This workflow takes cleaned, filtered data (woody and non-vascular species removed) per species biomass estimate data and re-calculates measures of species richness. Original data associated with this code not provided.
 
 **3_Data_Prep.R** This preps data for price equation comparisons, which just pairs data into temporal subsets for every site for meaningful comparisons and outputs subsets of the data in pairs
 
 **FOLDER: cluster -> price_pairs**
-- *Price_Pairs_Wrapper.sh* This is a wrapper script to submit multiple jobs for every subsetted dataset to the cluster
+- *Price_Pairs_Wrapper.sh* This is a wrapper script to submit multiple jobs for every subset to the cluster
 - *Price_Pairs_Submit.sh* This is the submit script to submit each job to the cluster
 - *Price_Pairs.R* This is the R script that runs in the cluster iteratively over every subset of data
 
