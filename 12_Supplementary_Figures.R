@@ -51,7 +51,7 @@ fig_s1 <- n_map_dat %>%
     segment.size = 0.5, segment.alpha = 0.5,
     size = 3,
     box.padding = 0.1, point.padding = 0.3, fill = NA,
-    segment.color = 'grey50') +
+    segment.color = 'grey50', max.overlaps = Inf) +
   scale_color_viridis(discrete=FALSE,name="Length of Study") +
   scale_size_continuous(range=c(2,8), name="Length of Study") +
   coord_equal() +
@@ -69,9 +69,10 @@ fig_s1 <- n_map_dat %>%
   scale_x_continuous(expand = c(0.006, 0.006)) +
   coord_equal() 
 
+# LANDSCAPE 9 X 14
 fig_s1
 
-# LANDSCAPE 9 X 14
+
 
 # Figure S2
 colnames(nn_plot)
@@ -139,7 +140,7 @@ figs2_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Fi
 
 head(figs2_dat)
 
-ggplot() +
+fig_s2<-ggplot() +
   facet_wrap(~year.max)+
   geom_point(data = figs2_dat, aes(x = rich.start, y = mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data = figs2_dat, aes(x = rich.end, y = mass.end),size=1.5, colour="white", shape=2) +
@@ -161,13 +162,10 @@ ggplot() +
                      strip.background = element_blank(),plot.title = element_text(size=12),
                      legend.position="bottom")
 
-
-# Figure S3: See  ####
-
-# Figure S4 See 13_Supplementary_Figure_S4
+fig_s2
 
 
-# Figure S5
+# Figure S7
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
 

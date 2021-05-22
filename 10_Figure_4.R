@@ -14,26 +14,17 @@ library(patchwork)
 
 
 # load modelobjects
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
-# 
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
-# 
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
 
-# selected mods
-load('~/Desktop/mods/sloss_sigmai.Rdata') # s.loss.3_sigma2
-load('~/Desktop/mods/sgain_sigmai.Rdata') # s.gain.3_sigma2
-load('~/Desktop/mods/sl.Rdata') # sl.3_sigma2
-load('~/Desktop/mods/sg.Rdata') # sg.3_sigma2
-load('~/Desktop/mods/cde_sigmai.Rdata') # CDE.3_sigma2
-
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
 # site level meta data for posteriors
 meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-meta <- meta %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+meta <- meta %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
 colnames(meta)
@@ -41,10 +32,10 @@ colnames(meta)
 # Similarly  to '7_Model_Data_Posteriors.R' we 
 # Extract 1000 posterior samples from Fixed Effects (Overall/Population/Global Effects) 
 # for the price partitions
-sloss.fixed.p <- posterior_samples(sloss.3_sigmai, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
-sgain.fixed.p <- posterior_samples(sgain.3_sigmai, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
+sloss.fixed.p <- posterior_samples(sloss.3, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
+sgain.fixed.p <- posterior_samples(sgain.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 
-cde.fixed.p <- posterior_samples(cde.3_sigmai, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) )
+cde.fixed.p <- posterior_samples(cde.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) )
 sl.fixed.p <- posterior_samples(sl.3, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
 sg.fixed.p <- posterior_samples(sg.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 

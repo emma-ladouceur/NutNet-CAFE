@@ -52,11 +52,11 @@ fig_S3
 
 
 #plot cover
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/cover/cover_sigma.Rdata') # cover.3_sigmai
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm_sigmai.Rdata') # rich.3_sigmai
-load('~/Desktop/nn mods/cde.Rdata') # rich.3_sigmai
-load('~/Desktop/nn mods/sl.Rdata') # rich.3_sigmai
-load('~/Desktop/nn mods/sg.Rdata') # rich.3_sigmai
+load('~/Desktop/nn mods/cover_plot.Rdata') # cover.3i
+load('~/Desktop/nn mods/bm.Rdata') # rich.3i
+load('~/Desktop/nn mods/cde_cover.Rdata') # rich.3i
+load('~/Desktop/nn mods/sl_cover.Rdata') # rich.3i
+load('~/Desktop/nn mods/sg_cover.Rdata') # rich.3i
 # produced in '7_Model_Data_Posteriors.R' (biomass models)
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.p.effs.Rdata')
 
@@ -73,19 +73,19 @@ cde.fixed.p <- posterior_samples(cde.3_cover, "^b",subset = floor(runif(n = 1000
 
 
 #  model summary
-summary(cover.3_sigmai)
+summary(cover.3i)
 # caterpillar plots
-#plot(cover.3_sigmai)
+#plot(cover.3i)
 # predicted values vs. observed
 color_scheme_set("darkgray")
-fig_s3b <- pp_check(cover.3_sigmai) + theme_classic() + 
+fig_s3b <- pp_check(cover.3i) + theme_classic() + 
   labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
   scale_x_continuous(limits = c(-1000, 2000))
 
 fig_s3b
 
 
-cover.fixed.p<-posterior_samples(cover.3_sigmai, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+cover.fixed.p<-posterior_samples(cover.3i, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 
 # biomass
 cover_global_posterior <-  cover.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
