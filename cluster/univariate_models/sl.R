@@ -17,7 +17,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
 sl.3_cover <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all, family=student(), cores = 4, iter=15000,warmup = 1000, chains = 4,
+                 data = p.all, family=student(), cores = 4, iter=20000,warmup = 1000, chains = 4,
             control = list(adapt_delta = 0.99) )
 
 
