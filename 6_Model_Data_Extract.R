@@ -583,7 +583,7 @@ cde_coef2 <-  bind_cols(cde_coef$site_code[,,'Intercept'] %>%
              by = 'site_code') 
 
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/')
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
 save(cde_fitted.npk,cde_fitted.ctl,cde_coef2,file = 'cde.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.mod.dat.Rdata')
 
