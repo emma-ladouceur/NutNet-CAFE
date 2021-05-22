@@ -72,16 +72,6 @@ head(plot.rich_fitted)
 # fixed effect coefficients 
 plot.rich_fixef <- fixef(rich.3)
 
-# predict estimates for each site across a sequence of year_trt's
-# this takes ~ 5 minutes
-# obs_nest.rich <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code, trt) %>% 
-#   summarise(year_trt = seq(min(year_trt), max(year_trt), length.out = 13 )) %>%
-#   nest(data = c(site_code,year_trt,trt)) %>%
-#   mutate(predicted = map(data, ~predict(rich.3, newdata= .x, re_formula = ~(trt * year_trt | site_code) ))) 
-# 
-# View(obs_nest.rich)
 
 # coefficients for site-level (random) effects
 plot.rich_coef <- coef(rich.3)
@@ -168,16 +158,6 @@ plot.bm_fitted <- cbind(bm.3$data,
 # fixed effect coefficients (I want these for the coefficient plot)
 plot.bm_fixef <- fixef(bm.3)
 
-# predict estimates for each site across a sequence of year_trt's
-# this takes ~ 5 minutes
-# obs_nest.bm <- plot %>% 
-#   mutate(site_group = site_code) %>%
-#   group_by(site_group, site_code,trt) %>% 
-#   summarise(year_trt = seq(min(year_trt), max(year_trt), length.out = 13 )) %>%
-#   nest(data = c(site_code,year_trt,trt)) %>%
-#   mutate(predicted = map(data, ~predict(bm.3, newdata= .x, re_formula = ~(trt * year_trt | site_code) ))) 
-
-View(obs_nest.bm)
 
 # coefficients for experiment-level (random) effects
 plot.bm_coef <- coef(bm.3)
