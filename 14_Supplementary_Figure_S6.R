@@ -1,8 +1,9 @@
 
+rm(list = ls())
 
 # Authors: Emma Ladouceur 
 # Title:
-# Last Updated April 18, 2021
+# Last Updated May 22, 2021
 
 # 13_Supplementary_Figure_S4.R
 # This workflow makes Supplementary Figures S6
@@ -19,33 +20,40 @@ plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.c
 
 
 # model objects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/bm_sigma.Rdata') # plot.bm.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/rich_sigma.Rdata') # plot.rich.g
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/bm.Rdata') # plot.bm.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/full/rich.Rdata') # plot.rich.g
 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm_sigmai.Rdata') # plot.bm.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich_sigmai.Rdata') # plot.rich.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/bm.Rdata') # plot.bm.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/rich.Rdata') # plot.rich.3
 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/bm_sigma.Rdata') # plot.bm.5
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/rich_sigma.Rdata') # plot.rich.5
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/bm.Rdata') # plot.bm.5
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/rich.Rdata') # plot.rich.5
 
 
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/bm_sigma.Rdata') # plot.bm.6
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/rich_sigma.Rdata') # plot.rich.6
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/bm.Rdata') # plot.bm.6
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/rich.Rdata') # plot.rich.6
 
 
-rich.im_fixef <- as.data.frame(fixef(rich.all_sigmai))
-bm.im_fixef <- as.data.frame(fixef(bm.all_sigmai))
+load('~/Desktop/nn mods/bm.6.Rdata') # rich.3i
+load('~/Desktop/nn mods/rich.6.Rdata') # rich.3i
+load('~/Desktop/nn mods/bm.10.Rdata') # rich.3i
+load('~/Desktop/nn mods/rich.10.Rdata') # rich.3i
+load('~/Desktop/nn mods/bm.all.Rdata') # rich.3i
+load('~/Desktop/nn mods/rich.all.Rdata') # rich.3i
 
-rich.im_fixef.3 <- as.data.frame(fixef(rich.3_sigmai))
-bm.im_fixef.3 <- as.data.frame(fixef(bm.3_sigmai))
+rich.im_fixef <- as.data.frame(fixef(rich.all))
+bm.im_fixef <- as.data.frame(fixef(bm.all))
 
-rich.im_fixef.10 <- as.data.frame(fixef(rich.10_sigmai))
-bm.im_fixef.10 <- as.data.frame(fixef(bm.10_sigmai))
+rich.im_fixef.3 <- as.data.frame(fixef(rich.3))
+bm.im_fixef.3 <- as.data.frame(fixef(bm.3))
 
-rich.im_fixef.6 <- as.data.frame(fixef(rich.6_sigmai))
-bm.im_fixef.6 <- as.data.frame(fixef(bm.6_sigmai))
+rich.im_fixef.10 <- as.data.frame(fixef(rich.10))
+bm.im_fixef.10 <- as.data.frame(fixef(bm.10))
+
+rich.im_fixef.6 <- as.data.frame(fixef(rich.6))
+bm.im_fixef.6 <- as.data.frame(fixef(bm.6))
 
 rich.im_fixef
 
@@ -255,54 +263,68 @@ rm(list = ls())
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/cde_sigma.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sloss_sigma.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sgain_sigma.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/full/sgain.Rdata') # s.gain.s
 
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde_sigmai.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss_sigmai.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain_sigmai.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/cde_sigma.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sloss_sigma.Rdata') # s.loss.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sgain_sigma.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/10/sgain.Rdata') # s.gain.s
 
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sg.Rdata') # sg.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde_sigma.Rdata') # CDE.s
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss_sigma.Rdata') # s.loss.s
-#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain_sigma.Rdata') # s.gain.s
-load('~/Desktop/sgain.6.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde.Rdata') # CDE.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss.Rdata') # s.loss.s
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain.Rdata') # s.gain.s
+
+
+load('~/Desktop/nn mods/cde.6.Rdata') # rich.3i
+load('~/Desktop/nn mods/sloss.6.Rdata') # rich.3i
+load('~/Desktop/nn mods/sgain.6.Rdata') # rich.3i
+
+load('~/Desktop/nn mods/cde.10.Rdata') # rich.3i
+load('~/Desktop/nn mods/sloss.10.Rdata') # rich.3i
+load('~/Desktop/nn mods/sgain.10.Rdata') # rich.3i
+
+load('~/Desktop/nn mods/cde.all.Rdata') # rich.3i
+load('~/Desktop/nn mods/sloss.all.Rdata') # rich.3i
+load('~/Desktop/nn mods/sgain.all.Rdata') # rich.3i
+
+
 
 sl.trt.i_fixef <- as.data.frame(fixef(sl.all))
 sg.trt.i_fixef <- as.data.frame(fixef(sg.all))
-cde.trt.i_fixef <- as.data.frame(fixef(cde.all_sigmai))
-sloss.trt.i_fixef <- as.data.frame(fixef(sloss.all_sigmai))
-sgain.trt.i_fixef <- as.data.frame(fixef(sgain.all_sigmai))
+cde.trt.i_fixef <- as.data.frame(fixef(cde.all))
+sloss.trt.i_fixef <- as.data.frame(fixef(sloss.all))
+sgain.trt.i_fixef <- as.data.frame(fixef(sgain.all))
 
 
 sl.trt.i_fixef.3 <- as.data.frame(fixef(sl.3))
 sg.trt.i_fixef.3 <- as.data.frame(fixef(sg.3))
-cde.trt.i_fixef.3 <- as.data.frame(fixef(cde.3_sigmai))
-sloss.trt.i_fixef.3 <- as.data.frame(fixef(sloss.3_sigmai))
-sgain.trt.i_fixef.3 <- as.data.frame(fixef(sgain.3_sigmai))
+cde.trt.i_fixef.3 <- as.data.frame(fixef(cde.3))
+sloss.trt.i_fixef.3 <- as.data.frame(fixef(sloss.3))
+sgain.trt.i_fixef.3 <- as.data.frame(fixef(sgain.3))
 
 sl.trt.i_fixef.10 <- as.data.frame(fixef(sl.10))
 sg.trt.i_fixef.10 <- as.data.frame(fixef(sg.10))
-cde.trt.i_fixef.10 <- as.data.frame(fixef(cde.10_sigmai))
-sloss.trt.i_fixef.10 <- as.data.frame(fixef(sloss.10_sigmai))
-sgain.trt.i_fixef.10 <- as.data.frame(fixef(sgain.10_sigmai))
+cde.trt.i_fixef.10 <- as.data.frame(fixef(cde.10))
+sloss.trt.i_fixef.10 <- as.data.frame(fixef(sloss.10))
+sgain.trt.i_fixef.10 <- as.data.frame(fixef(sgain.10))
 
 sl.trt.i_fixef.6 <- as.data.frame(fixef(sl.6))
 sg.trt.i_fixef.6 <- as.data.frame(fixef(sg.6))
-cde.trt.i_fixef.6 <- as.data.frame(fixef(cde.6_sigmai))
-sloss.trt.i_fixef.6 <- as.data.frame(fixef(sloss.6_sigmai))
+cde.trt.i_fixef.6 <- as.data.frame(fixef(cde.6))
+sloss.trt.i_fixef.6 <- as.data.frame(fixef(sloss.6))
 sgain.trt.i_fixef.6 <- as.data.frame(fixef(sgain.6))
 
 

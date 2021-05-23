@@ -52,8 +52,8 @@ fig_S3
 
 
 #plot cover
-load('~/Desktop/nn mods/cover_plot.Rdata') # cover.3i
-load('~/Desktop/nn mods/bm.Rdata') # rich.3i
+load('~/Desktop/nn mods/cover_plot.Rdata') # cover.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # rich.3i
 load('~/Desktop/nn mods/cde_cover.Rdata') # rich.3i
 load('~/Desktop/nn mods/sl_cover.Rdata') # rich.3i
 load('~/Desktop/nn mods/sg_cover.Rdata') # rich.3i
@@ -73,7 +73,7 @@ cde.fixed.p <- posterior_samples(cde.3_cover, "^b",subset = floor(runif(n = 1000
 
 
 #  model summary
-summary(cover.3i)
+summary(cover.3)
 # caterpillar plots
 #plot(cover.3i)
 # predicted values vs. observed
@@ -85,7 +85,7 @@ fig_s3b <- pp_check(cover.3i) + theme_classic() +
 fig_s3b
 
 
-cover.fixed.p<-posterior_samples(cover.3i, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+cover.fixed.p<-posterior_samples(cover.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 
 # biomass
 cover_global_posterior <-  cover.fixed.p %>% dplyr::select(`b_year_trt`,`b_trtNPK:year_trt`) %>%
