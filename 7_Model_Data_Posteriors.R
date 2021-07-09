@@ -663,7 +663,7 @@ study.sgain.p$Model<- "Species gain (s.gain)"
 #study.ps.p$Model<- "Persistent Species"
 study.sl.p$Model<- "Biomass change associated with species loss (SL)"
 study.sg.p$Model<- "Biomass change associated with species gain (SG)"
-study.cde.p$Model<- "Biomass change associated with persistent species (SG)"
+study.cde.p$Model<- "Biomass change associated with persistent species (PS)"
 
 
 # bind all the posteriors together

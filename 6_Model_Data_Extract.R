@@ -593,10 +593,13 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.
 
 # multivariate plot richness + biomass
 load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/multi/multi_sp.Rdata") # object name: pp.multi_all
+load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/multi/multi_sp-2.Rdata") # object name: pp.multi_all
 
 
 # model summary
 summary(sp.multi)
+
+
 # predicted vs observed values
 #color_scheme_set("darkgray")
 nnb <- pp_check(sp.multi, resp = 'stripmass')+ theme_classic() + scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),

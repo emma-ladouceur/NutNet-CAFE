@@ -250,8 +250,9 @@ plot.bm_coef2 <- plot.bm_coef2 %>% filter(!is.na(TESlope))
 
 # note to self:  predicted values instead of coefficients?
 fig_2b_r <- ggplot() +
+  facet_wrap(~site_code) +
   geom_hline(yintercept = 0,linetype="longdash") +
-  facet_grid(~Model)+
+  #facet_grid(~Model)+
   geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = strip.mass), color="black",alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +

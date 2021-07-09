@@ -41,7 +41,31 @@ fig_S3b <- ggplot() + geom_point( data = sp_rel, aes(x = rel_cover_plot, y = rel
 
 
 
-fig_S3 <-  (fig_S3a + fig_S3b)
+head(sp)
+
+sp_diff <- sp %>% mutate(diff.biomass = biomass.sp.plot - biomass.sp.cat)
+
+head(sp_diff)
+
+fig_S3c <- ggplot() + 
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_point(data=sp_diff %>% filter(category.mod %in% c("FORB" , "LEGUME" , "GRAMINOID")),
+                        aes(x=category.mod, y= diff.biomass), #binaxis = "y", stackdir = "center", 
+              size=0.2,alpha=0.1,
+              position=position_jitter(0.2)
+              ) + 
+  stat_summary(data=sp_diff %>% filter(category.mod %in% c("FORB" , "LEGUME" , "GRAMINOID")),
+               aes(x=category.mod, y= diff.biomass, color = category.mod),fun.data="mean_sdl",  fun.args = list(mult=1), 
+               geom="pointrange") + 
+ scale_color_manual(values = c("#00AFBB", "#E7B800", "#FC4E07")) +
+  ylim(-50,50) +
+  theme_classic() +
+  labs( x= "Functional Group" , y= "Difference in per species biomass estimates",
+        title= "c)" ) + theme(legend.position="none")
+
+fig_S3c
+
+fig_S3 <-  (fig_S3a + fig_S3b)/(fig_S3c)
 
 fig_S3
 
