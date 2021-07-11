@@ -49,8 +49,8 @@ plot(sloss.3)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
 fig_s5c <- pp_check(sloss.3) + theme_classic() + 
-  labs(x= "Species loss (s.loss)", y = "Density") + 
-  scale_x_continuous(limits = c(-50, 50))
+  labs(title = "c)", x= "Species loss (s.loss)", y = "Density") + 
+  scale_x_continuous(limits = c(-50, 50)) + theme(legend.position="none")
 
 fig_s5c
 
@@ -138,8 +138,8 @@ plot(sgain.3)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
 fig_s5d <- pp_check(sgain.3) + theme_classic() + 
-  labs(x= "Species gain (s.gain)", y = "Density") + 
-  scale_x_continuous(limits = c(-50, 50))
+  labs( title = "d)", x= "Species gain (s.gain)", y = "") + 
+  scale_x_continuous(limits = c(-50, 50)) + theme(legend.position="none")
 
 fig_s5d
 
@@ -324,8 +324,11 @@ plot(sl.3)
 
 summary(p.all)
 fig_s5e <- pp_check(sl.3) + theme_classic() + 
-  labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with species sloss (SL)')), y = "Density") + 
-   scale_x_continuous(limits = c(-1300, 100))
+  labs( title = "e)",
+    x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with species sloss (SL)'))),
+         #expression(paste('Biomass change (g/' ,m^2, ') \n associated with species sloss (SL)')), 
+       y = "Density") + 
+   scale_x_continuous(limits = c(-1300, 100)) + theme(legend.position="none")
 
 fig_s5e
 
@@ -415,8 +418,10 @@ plot(sg.3)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
 fig_s5f <- pp_check(sg.3) + theme_classic() + 
-  labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with species gain (SG)')), y = "Density") + 
-  scale_x_continuous(limits = c(-100, 1300))
+  labs(title = "f)",
+    x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with species gain (SG)'))),
+    y = "") + 
+  scale_x_continuous(limits = c(-100, 1300)) + theme(legend.position="none")
 
 fig_s5f
 
@@ -508,8 +513,10 @@ plot(cde.3)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
 fig_s5g <- pp_check(cde.3) + theme_classic() + 
-  labs(x= expression(paste('Biomass change (g/' ,m^2, ') associated with persistent species (PS)')), y = "Density") + 
-   scale_x_continuous(limits = c(-1000, 1000))
+  labs( title = "g)",
+    x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with persistent species (PS)'))),
+    y = "") + 
+   scale_x_continuous(limits = c(-1000, 1000)) + theme(legend.position="none")
 
 
 fig_s5g
@@ -588,13 +595,27 @@ save(cde_fitted.npk,cde_fitted.ctl,cde_coef2,file = 'cde.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.mod.dat.Rdata')
 
 
+# Figure S5 a-g with patchwork
+
+# extract legend
+# Sourced from: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+fig_5s_legend <- g_legend(fig_s5a)
+
+fig_s5 <- (fig_s5a + theme(legend.position="none")| fig_s5b) / ( fig_s5c | fig_s5d ) / ( fig_s5e | fig_s5f | fig_s5g) / (fig_5s_legend) + plot_layout(heights = c(10,10,10,0.75))
+
+fig_s5
+
 
 # Multivariate Models
 
 # multivariate plot richness + biomass
 load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/multi/multi_sp.Rdata") # object name: pp.multi_all
-load("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/multi/multi_sp-2.Rdata") # object name: pp.multi_all
-
 
 # model summary
 summary(sp.multi)
@@ -602,13 +623,19 @@ summary(sp.multi)
 
 # predicted vs observed values
 #color_scheme_set("darkgray")
+
+
 nnb <- pp_check(sp.multi, resp = 'stripmass')+ theme_classic() + scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
-                                                                                                                 y = '')  
+                                                                                                                 y = '')  +
+  theme(legend.position= "bottom")
 nnr <- pp_check(sp.multi, resp = 'rich')+ theme_classic() + scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
                                                                                                            y = 'Density') +
   theme(legend.position= "none")
+
+fig_5sh_legend <- g_legend(nnb)
+
 # Figure s5h
-fig_s5h <- (nnr  | nnb)
+fig_s5h <- (nnr  | nnb +  theme(legend.position= "none")) /(fig_5sh_legend) + plot_layout(heights = c(10,0.75))
 
 fig_s5h
 
@@ -629,18 +656,18 @@ sgain <- pp_check(pp.multi_all, resp = 'sgain')+ theme_classic()+ scale_x_contin
   theme(legend.position= "none")
 
 sl <- pp_check(pp.multi_all, resp = 'SL')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 200))+ labs(x=expression(paste('SL')),
-                                                                                                         y = '') +
-  theme(legend.position= "bottom")
+                                                                                                         y = 'Density') +
+  theme(legend.position= "none")
 sg <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-200, 1000))+ labs(x='SG',
                                                                                                          y = '') +
-  theme(legend.position= "none")
+  theme(legend.position= "bottom")
 
 cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 1000))+ labs(x='PS', y = '') +
   theme(legend.position= "none")
            
                                                                                                                                                                                                                                                                                                                                                                                                                        
 # Figure s5j
-fig_s5i <- (sloss | sgain | sl | sg | cde)
+fig_s5i <- (sloss | sgain )/( sl | sg | cde) + plot_layout(heights = c(10,10))
 
 fig_s5i
 

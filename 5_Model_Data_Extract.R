@@ -43,7 +43,7 @@ plot(rich.3)
 # predicted values vs. observed
 color_scheme_set("darkgray")
 fig_s5a <- pp_check(rich.3) + theme_classic() + 
-  labs(x= "Species richness", y = "Density")
+  labs( title = "a)", x= "Species richness", y = "Density") + theme(legend.position="bottom")
 
 fig_s5a
 
@@ -129,8 +129,8 @@ plot(bm.3)
 # predicted values vs. observed
 #color_scheme_set("darkgray")
 fig_s5b <- pp_check(bm.3) + theme_classic() + 
-  labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
-  scale_x_continuous(limits = c(-1000, 2000))
+  labs(title = "b)", x = expression(paste('Biomass (g/',m^2, ')')) , y = "") + 
+  scale_x_continuous(limits = c(-1000, 2000)) + theme(legend.position="none")
 
 fig_s5b
 
