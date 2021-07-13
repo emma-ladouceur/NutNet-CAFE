@@ -32,8 +32,8 @@ treat.vars<-c('trt_year')
 
 grouped.data <- table %>% group_by(.dots=c(group.vars,treat.vars))
 
-#res <- pairwise.price(grouped.data, species="Taxon", func="biomass.sp.full")
-res <- pairwise.price(grouped.data, species="Taxon", func="max_cover")
+res <- pairwise.price(grouped.data, species="Taxon", func="biomass.sp.full") # per species biomass as a response
+#res <- pairwise.price(grouped.data, species="Taxon", func="max_cover") # with cover as a response
 
 
 pp <- res

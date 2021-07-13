@@ -95,6 +95,10 @@ head(clean_biomass)
 # calculate plot level cover 
 colnames(clean_cover)
 
+View(clean_cover %>% group_by(site_code) %>% summarise(max_year = max(year_trt)) %>% distinct(site_code, max_year))
+View(clean_biomass %>% group_by(site_code) %>% summarise(max_year = max(year_trt)) %>% distinct(site_code, max_year))
+
+
 calc_cover <- clean_cover %>% group_by(id,site_code,year,year_trt,trt,block,plot,subplot) %>% 
   summarise(plot.cover = sum(max_cover)) %>% # summarize by subplot because  at least one site measured 2 subplots in a year (but think its an observational site)
   left_join(clean_cover) %>%  # rejoin with cover data
@@ -117,6 +121,7 @@ calc_biomass <- clean_biomass %>%
 
 head(calc_biomass)
 
+
 # sites that measured total biomass
 total_biomass   <- calc_biomass %>% 
   # remove these sites because they sorted mass by mostly functional group but occasional pooling of live, vascular or other  mass
@@ -127,12 +132,19 @@ total_biomass   <- calc_biomass %>%
 
 head(total_biomass)
 
+View(total_biomass %>% group_by(site_code) %>% #summarise(max_year = max(year_trt)) %>% 
+       distinct(site_code, year_trt))
+
+
+
+
 # sites that separated biomass into functional groups - remove the totals
 sep_biomass <- calc_biomass %>%  
   select(id,site_code,year,year_trt,trt,block,plot,subplot.bm,orig.bm.cat,category,mass,strip.mass) %>%
   filter(!orig.bm.cat %in% c("TOTAL","VASCULAR", "LIVE")) # drop total measures of biomass
 
 head(sep_biomass)
+
 
 # per species biomass estimates for sites that measures total biomass of a strip
 total_biomass_calc <- total_biomass %>% left_join(calc_cover, by= c("id", "site_code", "year", "year_trt", "trt", "block", "plot" ) ) %>%
@@ -144,7 +156,7 @@ total_biomass_calc <- total_biomass %>% left_join(calc_cover, by= c("id", "site_
 
 head(total_biomass_calc) 
 
-  
+
 # special case 
 # shps.us sorted biomass by annual perennial
 ap_dat <- calc_cover %>%  filter(site_code == "shps.us" ) %>%  # special case
@@ -182,6 +194,10 @@ sep_cover_calc <- sep_cover_mod %>%
   left_join(sep_cover_mod) %>% ungroup() 
 
 head(sep_cover_calc)
+
+View(sep_cover_calc %>% group_by(site_code) %>% #summarise(max_year = max(year_trt)) %>% 
+       distinct(site_code, year_trt))
+
 
 # double check phlox diffusa case
 bnch <- sep_cover_calc %>% filter(site_code == "bnch.us" & year == "2018" & trt == "NPK") 
@@ -228,6 +244,11 @@ sep_dat <- sep_dat_cat %>% left_join(sep_dat_strip)
 
 head(sep_dat)
 
+View(sep_dat %>% group_by(site_code, year_trt) %>% summarise(max_year = max(year_trt)) %>% 
+       distinct(site_code, year_trt))
+
+View(sep_dat %>% filter(site_code == "smith.us"))
+
 # last steps! almost there!
 # some plots have a functional group that was not recorded in biomass but was in cover
 # so the biomass for that particular species comes up as a 0
@@ -250,8 +271,9 @@ head(sep_dat)
 
 sep_dat_combine <- sep_dat %>% # combine sep dat and NA dat
   left_join(sep_dat_na) %>%
-  mutate(biomass.m.cat = "category") # label biomass method 'category'
-
+  mutate(biomass.m.cat = "category")  %>% # label biomass method 'category'
+  filter(!cat.mass == 0 | biomass.sp.cat == 0 | biomass.sp.plot == 0 ) # remove  rows when there is no calculation for any biomass
+   
 head(sep_dat_combine)
 
 sep_dat_clean <- sep_dat_combine %>% 
@@ -275,6 +297,8 @@ complete_dat_calc <- total_biomass_calc %>%
   arrange(id)
 
 head(complete_dat_calc)
+
+
 # we should have 3  biomass species calculation methods; 
 # total (where total biomass measurements were taken),   
 # category (where biomass was sorted by functional group categories,
