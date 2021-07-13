@@ -21,7 +21,7 @@ sl.all <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot
             control = list(adapt_delta = 0.99) )
 
 
-save(sl.3_cover,
+save(sl.all,
      file=Sys.getenv('OFILE'))
 
 
