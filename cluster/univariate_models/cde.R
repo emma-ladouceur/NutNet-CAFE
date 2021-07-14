@@ -14,14 +14,14 @@ p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 
 
-p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
+p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 6) %>%
   ungroup()
 
-cde.3 <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+cde.6 <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                   data = p.all, family = student(),cores = 4, iter = 6000, warmup = 1000, chains = 4,
              control = list(adapt_delta = 0.99))
 
-save(cde.3,
+save(cde.6,
      file=Sys.getenv('OFILE'))
 
 
