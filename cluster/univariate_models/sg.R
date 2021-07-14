@@ -20,6 +20,6 @@ sg.all<- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot)
               control = list(adapt_delta = 0.99) )
 
 
-save(sg.all
+save(sg.all,
      file=Sys.getenv('OFILE'))
 
