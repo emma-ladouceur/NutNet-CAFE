@@ -1,7 +1,7 @@
 
 # Authors: Emma Ladouceur & Adam T. Clark
 # Title: Estimate per species Biomass
-# Last Updated:  May 13, 2021
+# Last Updated:  July 13, 2021
 
 # Produces dataset : 'biomass_sp.csv'
 # This script cleans data to living herbaceous species only and calculates per species biomass according to total plot biomass or

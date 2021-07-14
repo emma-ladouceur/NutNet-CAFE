@@ -123,6 +123,7 @@ biggest.bm.values <- sp %>%  filter(year_max >= 3) %>% # out analysis is based o
 # need help thinking if any of these need to be cleaned/ remove, fixed or whats gone on with strange values
 View(biggest.bm.values)
 
+
 # 1 output clean /species biomass data
 # species biomass data for NPK and Control plots for appropriate sites to match price calcs
 write.csv(sp, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv")

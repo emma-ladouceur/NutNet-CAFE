@@ -70,7 +70,7 @@ mapply(saveRDS, pairs_lst, version =2 , file=paste0(folder, "/",names(pairs_lst)
 
 
 # test it out, test the code for priceTools we will use on the cluster next
-samp <- readRDS("pairs prep data/arch.us_2.rds")
+samp <- readRDS("pairs prep data/smith.us_10.rds")
 
 colnames(samp)
 head(samp)
@@ -89,3 +89,5 @@ pp <- group.columns(pp,gps=c(group.vars,treat.vars), drop=T)
 
 
 head(pp)
+
+View(pp)
