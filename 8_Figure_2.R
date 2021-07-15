@@ -202,7 +202,7 @@ plot.rich_fitted.npk$Plot <- "Plot"
 plot.rich_coef2$Site <- "Site"
 
 fig_2ab_legend <- ggplot() +
-  facet_wrap(~Model) +
+  #facet_wrap(~Model) +
   geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich, fill=Plot), alpha=0.2,
              size = .7, position = position_jitter(width = 0.45 )) +
@@ -250,9 +250,9 @@ plot.bm_coef2 <- plot.bm_coef2 %>% filter(!is.na(TESlope))
 
 # note to self:  predicted values instead of coefficients?
 fig_2b_r <- ggplot() +
-  facet_wrap(~site_code) +
+ # facet_wrap(~site_code) +
   geom_hline(yintercept = 0,linetype="longdash") +
-  #facet_grid(~Model)+
+  facet_grid(~Model)+
   geom_point(data = plot.bm_fitted.npk,
              aes(x = year_trt, y = strip.mass), color="black",alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
@@ -343,7 +343,7 @@ g_legend<-function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
-fig_2ab_legend <- g_legend(fig_2ab_legend)
+fig_2ab_leg <- g_legend(fig_2ab_legend)
 
 # use grid extra to add inset effect plots to regression
 fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 6.5, xmax = 12.75, 
@@ -355,7 +355,7 @@ fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 6.5, xmax =
 
 # use patchwork to put everything together
 # SAVE AS PORTRAIT 10 X 11
-( fig_2a | fig_2b ) / ( fig_2ab_legend ) / ( fig_2c )/ (fig_2c_legend) + plot_layout(heights = c(10,0.75,13,0.75))
+( fig_2a | fig_2b ) / ( fig_2ab_leg ) / ( fig_2c )/ (fig_2c_legend) + plot_layout(heights = c(10,0.75,13,0.75))
 
 
 
