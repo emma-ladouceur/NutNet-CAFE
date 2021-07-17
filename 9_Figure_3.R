@@ -39,6 +39,8 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.
 #load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/ps.mod.dat.Rdata') # ps.3_sigma
 
 
+
+
 # saved posterior data from 7_ Model_Data_Posteriors
 # Global/ Overall/ Population Effects for inset plots
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.p.effs.Rdata')
@@ -460,6 +462,8 @@ fig_3_legend <- g_legend(fig_3_legend)
 # Global/ Overall/ Population Effects
  load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.p.effs.Rdata')
 
+ View(global.sloss.p)
+ 
 fig_3a_e <- ggplot() + 
   geom_point(data = global.sloss.p, aes(x = response, y = eff,color=response),size = 2) +
   geom_errorbar(data = global.sloss.p, aes(x = response,ymin = eff_lower,
@@ -565,6 +569,7 @@ fig_3e_e
 
 fig_3a <- fig_3a_r +  annotation_custom(ggplotGrob(fig_3a_e), xmin = 7.5, xmax = 13.75, 
                                          ymin = -22.5, ymax = -15.5)
+
 
 fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 7.5, xmax = 13.75, 
                                          ymin = 14, ymax = 21)

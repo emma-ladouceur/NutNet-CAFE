@@ -394,66 +394,89 @@ fig_4
 
 # GET LEGENDS
 cde.s <- cde.fixed.p2  %>%
-  mutate( cde.ctl_global_slope = mean(cde.ctl.p),
-          cde.trt_global_slope = mean(cde.trt.p)) %>%
+  mutate( Control = mean(cde.ctl.p),
+         NPK = mean(cde.trt.p)) %>%
+  select(-cde.ctl.p,-cde.trt.p) %>% distinct() %>%
+  gather(Treatment, Estimate, Control:NPK) %>% 
   mutate( Vector = "Persistent Sp.")
 
-loss.s <- sl.fixed.p2 %>% bind_cols(sloss.fixed.p2) %>%
-  mutate( sl.ctl_global_slope = mean(sl.ctl.p),
-          sl.trt_global_slope = mean(sl.trt.p),
-          sloss.ctl_global_slope = mean(sloss.ctl.p),
-          sloss.trt_global_slope = mean(sloss.trt.p)) %>%
+
+loss.s <- sl.fixed.p2 %>% 
+  mutate( Control = mean(sl.ctl.p),
+          NPK = mean(sl.trt.p)) %>%
+  select(-sl.ctl.p,-sl.trt.p) %>% distinct() %>%
+  gather(Treatment, Estimate, Control:NPK ) %>% 
   mutate( Vector = "Losses")
 
-gains.s <- sg.fixed.p2 %>% bind_cols(sgain.fixed.p2) %>%
-  mutate( sg.ctl_global_slope = mean(sg.ctl.p),
-          sg.trt_global_slope = mean(sg.trt.p),
-          sgain.ctl_global_slope = mean(sgain.ctl.p),
-          sgain.trt_global_slope = mean(sgain.trt.p)) %>%
+gains.s <- sg.fixed.p2 %>% 
+  mutate( Control = mean(sg.ctl.p),
+          NPK = mean(sg.trt.p)) %>%
+  select(-sg.ctl.p,-sg.trt.p) %>% distinct() %>%
+  gather(Treatment, Estimate, Control:NPK) %>% 
   mutate( Vector = "Gains")
 
+leg.dat <- bind_rows(cde.s, loss.s, gains.s) %>%
+  unite(vec_trt,  Vector,  Treatment, sep=" " , remove= FALSE) %>%
+  mutate(vec_trt = factor(vec_trt, levels = c("Losses Control", "Losses NPK", "Gains Control", "Gains NPK", "Persistent Sp. Control", "Persistent Sp. NPK")))
+
+head(leg.dat)
+
 # legend for overall effects (thick lines)
-fixed.leg <- ggplot() +
+fixed.leg.npk <- ggplot() +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + 
   theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), 
                                      panel.grid.minor = element_blank(), 
                                      strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  geom_segment(data = cde.s,
+  geom_segment(data = leg.dat ,#%>% filter(Treatment == "NPK") ,
                aes(x = 0,
                    xend = 0,
                    y = 0,
-                   yend = cde.trt_global_slope,colour= Vector ), 
-               size = 1.5,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = cde.s,aes(x=0, #persistent
-                              y=  cde.trt_global_slope),
-             colour="#816687",size=0.1,alpha = 0.4) +
-  geom_segment(data = loss.s,
+                   yend = Estimate, 
+                   color = Treatment,
+                   linetype=Vector
+                   ), 
+               size = 1.5, 
+                 arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+  geom_segment(data = leg.dat %>% filter(Treatment == "Control") ,
                aes(x = 0,
-                   xend = sloss.trt_global_slope,
+                   xend = 0,
                    y = 0,
-                   yend = sl.trt_global_slope, colour= Vector,),
-               size = 1.5,
+                   yend = Estimate,
+                   color = Treatment,
+                   linetype=Vector
+               ),
+               size = 1.5, 
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = loss.s, aes(x= sloss.trt_global_slope, #loss
-                                y=  sl.trt_global_slope ),
-             colour="#B40F20",size=0.2,alpha = 0.4)+
-  geom_segment(data = gains.s,
+ scale_color_manual(name='Control \n NPK',
+                    #breaks=c("Losses","Gains","Persistent Sp." ),
+                    #values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400")
+                    #values=c("#B40F20","#B40F20","#3B9AB2","#3B9AB2","#F98400","#F98400" ) ,
+                    values=c("Losses Control"="#B40F20","Losses NPK"="#B40F20","Gains Control"="#3B9AB2","Gains NPK"="#3B9AB2","Persistent Sp. Control"= "#F98400","Persistent Sp. NPK"="#F98400" )  ) #+
+ # scale_linetype_manual(name='Control \n NPK',
+ #                       values = c("Losses Control"=1, "Losses NPK"=2, "Gains Control"=1,"Gains NPK"= 2, "Persistent Sp. Control"= 1,"Persistent Sp. NPK"=2))
+
+
+fixed.leg.npk
+
+
+fixed.leg.ctl <- ggplot() +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + 
+  theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), 
+                                     panel.grid.minor = element_blank(), 
+                                     strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+  geom_segment(data = leg.dat ,#%>% filter(Treatment == "Control"),
                aes(x = 0,
-                   xend =  sgain.trt_global_slope,
+                   xend = 0,
                    y = 0,
-                   yend =  sg.trt_global_slope, colour= Vector),
-               size = 1.5,
+                   yend = Estimate,colour= Vector , linetype=Vector), 
+               size = 1.5, linetype=2,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = gains.s, aes(x= sgain.trt_global_slope, #losses
-                                 y=  sg.trt_global_slope ) ,
-             colour="#3B9AB2",
-             size=0.2,alpha = 0.4)+
-  scale_color_manual(name='Overall Effects',breaks=c("Losses","Gains","Persistent Sp."),
+  scale_color_manual(name='Overall Effects: Control',
+                     breaks=c("Losses","Gains","Persistent Sp."),
                      values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))
+  
 
-
-fixed.leg
+fixed.leg.ctl
 
 # legend for posterior samples (thin lines)
 post.leg <- ggplot()+
