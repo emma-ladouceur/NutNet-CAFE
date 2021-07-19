@@ -43,7 +43,7 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/ps.Rd
 # Species Loss model
 
 #  model summary
-summary(sloss.3)
+summary(sl.3)
 # caterpillar plots
 plot(sloss.3)
 # predicted values vs. observed

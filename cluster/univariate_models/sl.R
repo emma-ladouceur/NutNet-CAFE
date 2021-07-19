@@ -16,12 +16,11 @@ p.all$plot<-as.factor(p.all$plot)
 p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
-sl.3 <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all, family=student(), cores = 4, iter=35000, warmup = 1000, chains = 4,
-            control = list(adapt_delta = 0.99) )
+sl.3_test <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                 data = p.all, family=student(), cores = 4, chains = 4)
 
 
-save(sl.3,
+save(sl.3_test,
      file=Sys.getenv('OFILE'))
 
 
