@@ -16,11 +16,12 @@ p.all$plot<-as.factor(p.all$plot)
 p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
-sl.3_test <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all, family=student(), cores = 4, chains = 4)
+sl.3_test2 <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+                 data = p.all, family=student(), cores = 4, chains = 4,
+                 control = list(max_treedepth = 12) )
 
 
-save(sl.3_test,
+save(sl.3_test2,
      file=Sys.getenv('OFILE'))
 
 
