@@ -7,7 +7,7 @@ path <- '/gpfs1/data/idiv_chase/emmala/NutNet'
 p.all <- read.csv(paste0(path, '/nutnet_cumulative_time.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 #p.all <- read.csv(paste0(path, '/nutnet_cumulative_time_cover.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
-p.all <- read.csv(paste0('~/Dropbox/NutNet/Data/nutnet_cumulative_time.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+p.all <- read.csv(paste0('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv'), header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 p.all$site_code<-as.factor(p.all$site_code)
 p.all$site.year.id<-as.factor(p.all$site.year.id)
@@ -25,10 +25,11 @@ get_prior(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
 
 sl.3_test2_nu10 <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                  data = p.all, family=student(), cores = 4, chains = 4,
-                 prior = c(prior(normal(-35,10), class = b, coef = trt.yNPK),
+                 prior = c(
+                   prior(normal(-22,30), class = Intercept),
+                   prior(normal(-35,10), class = b, coef = trt.yNPK),
                            prior(normal(0,10), class = b, coef = year.y.m),
                            prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
-                           prior(normal(-22,30), class = Intercept),
                            prior(normal(0,10), class = sd),
                            prior(normal(0,10), class = sigma),
                            prior(constant(10), class = nu)),
