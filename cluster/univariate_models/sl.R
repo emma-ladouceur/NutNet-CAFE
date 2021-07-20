@@ -31,7 +31,8 @@ sl.3_p <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot
                          prior(normal(0,10), class = sd),
                          prior(normal(0,10), class = sigma),
                          prior(constant(10), class = nu)),
-                       control = list(max_treedepth = 12))
+                       control = list(max_treedepth = 12),
+              control = list(adapt_delta = 0.99) )
 
 
 
