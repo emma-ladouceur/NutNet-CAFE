@@ -23,7 +23,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 
 sg.3_p <- brm(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
               data = p.all, family=student(), cores = 4, chains = 4,
-              iter=5000, warmup = 1000,
+              #iter=5000, warmup = 1000,
               prior = c(
                 prior(normal(22,33), class = Intercept),
                 prior(normal(33,10), class = b, coef = trt.yNPK),
