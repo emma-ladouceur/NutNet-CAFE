@@ -12,14 +12,27 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 
- plot <- plot %>% group_by(site_code) %>% filter(year_max >= 10) %>%
+ plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
  ungroup()
 
 
-rich.10 <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
-                    data = plot ,cores = 4,iter=6000, warmup = 1000, chains = 4)
+# rich.3 <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
+#                     data = plot ,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
-save(rich.10,
+rich.3_p <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+               data = plot, cores = 4, chains = 4,
+               #iter=5000, warmup = 1000,
+               prior = c(
+                 prior(normal(8,5), class = Intercept),
+                 prior(normal(5,1), class = b, coef = trt.yNPK),
+                 prior(normal(0,1), class = b, coef = year.y.m),
+                 prior(normal(0,1), class = b, coef = trt.yNPK:year.y.m),
+                 prior(normal(0,1), class = sd),
+                 prior(normal(0,1), class = sigma),
+                 prior(constant(1), class = nu)),
+               control = list(max_treedepth = 12))
+
+save(rich.3_p,
      file=Sys.getenv('OFILE'))
 
 
