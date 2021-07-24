@@ -2,7 +2,7 @@
 library(tidyverse)
 library(brms)
 
-
+# price partitions
 p.all <- read.csv('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv', header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 p.all$site_code<-as.factor(p.all$site_code)
@@ -23,21 +23,21 @@ get_prior(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
 
 
 # same as sl_sb
-sl.3_test2_nu10 <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                 data = p.all, family=student(), cores = 1, chains = 1,
-                 prior = c(
-                   prior(normal(-22,30), class = Intercept),
-                   prior(normal(-30,10), class = b, coef = trt.yNPK),
-                           prior(normal(0,10), class = b, coef = year.y.m),
-                           prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
-                           prior(normal(0,10), class = sd),
-                           prior(normal(0,10), class = sigma),
-                           prior(constant(10), class = nu)),
-                 control = list(max_treedepth = 12),
-                 sample_prior = 'only'
-                 )
+# sl.3_test2_nu10 <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+#                  data = p.all, family=student(), cores = 4, chains = 4,
+#                  prior = c(
+#                    prior(normal(-22,30), class = Intercept),
+#                    prior(normal(-30,10), class = b, coef = trt.yNPK),
+#                            prior(normal(0,10), class = b, coef = year.y.m),
+#                            prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
+#                            prior(normal(0,10), class = sd),
+#                            prior(normal(0,10), class = sigma),
+#                            prior(constant(10), class = nu)),
+#                  control = list(max_treedepth = 12),
+#                  sample_prior = 'only'
+#                  )
 
-pp_check(sl.3_test2_nu10)
+#pp_check(sl.3_test2_nu10)
 
 
 get_prior(SG ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
@@ -61,14 +61,13 @@ get_prior(s.gain ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot
 
 
 
-# biomass richness
+# biomass richness plot level stuff
 plot <- read.csv('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv', header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
 
 get_prior(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
-          data = plot,
-          family = student())
+          data = plot)
 
 
 get_prior(strip.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
