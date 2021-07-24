@@ -22,9 +22,9 @@ bm.3_p <- brm(strip.mass ~ trt * year_trt + (trt * year_trt | site_code/block/pl
                  #iter=5000, warmup = 1000,
                  prior = c(
                    prior(normal(285,287), class = Intercept),
-                   prior(normal(257,10), class = b, coef = trt.NPK),
+                   prior(normal(257,10), class = b, coef = trtNPK),
                    prior(normal(0,10), class = b, coef = year_trt),
-                   prior(normal(0,10), class = b, coef = trt.NPK:year_trt),
+                   prior(normal(0,10), class = b, coef = trtNPK:year_trt),
                    prior(normal(0,10), class = sd),
                    prior(normal(0,10), class = sigma),
                    prior(constant(10), class = nu)),
