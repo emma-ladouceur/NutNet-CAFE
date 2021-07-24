@@ -28,8 +28,9 @@ rich.3_p <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot),
                  prior(normal(0,1), class = b, coef = year_trt),
                  prior(normal(0,1), class = b, coef = trtNPK:year_trt),
                  prior(normal(0,1), class = sd),
-                 prior(normal(0,1), class = sigma),
-                 prior(constant(1), class = nu)),
+                 prior(normal(0,1), class = sigma)
+                 #prior(constant(1), class = nu)
+                 ),
                control = list(max_treedepth = 12))
 
 save(rich.3_p,
