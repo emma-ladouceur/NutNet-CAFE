@@ -20,7 +20,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 #                 control = list(adapt_delta = 0.99) )
 
 
-sgain.3_p <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+sgain.3_p <- brm(s.gain ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                  data = p.all, family=student(), cores = 4, chains = 4,
                  #iter=5000, warmup = 1000,
                  prior = c(
