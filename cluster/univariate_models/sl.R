@@ -21,7 +21,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 #                  control = list(max_treedepth = 12) )
 
 
-sl.3_test2_nu10 <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+sl.3_p <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                        data = p.all, family=student(), cores = 4, chains = 4,
                        prior = c(
                          prior(normal(-22,30), class = Intercept),
