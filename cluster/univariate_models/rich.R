@@ -19,19 +19,36 @@ plot$plot<-as.factor(plot$plot)
 # rich.3 <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
 #                     data = plot ,cores = 4,iter=6000, warmup = 1000, chains = 4)
 
-rich.3_p <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
-               data = plot, cores = 4, chains = 4,
-               #iter=5000, warmup = 1000,
-               prior = c(
-                 prior(normal(8,5), class = Intercept),
-                 prior(normal(5,1), class = b, coef = trtNPK),
-                 prior(normal(0,1), class = b, coef = year_trt),
-                 prior(normal(0,1), class = b, coef = trtNPK:year_trt),
-                 prior(normal(0,1), class = sd),
-                 prior(normal(0,1), class = sigma)
-                 #prior(constant(1), class = nu)
-                 ),
-               control = list(max_treedepth = 12))
+# rich.3_p <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+#                data = plot, cores = 4, chains = 4,
+#                #iter=5000, warmup = 1000,
+#                prior = c(
+#                  prior(normal(8,5), class = Intercept),
+#                  prior(normal(5,1), class = b, coef = trtNPK),
+#                  prior(normal(0,1), class = b, coef = year_trt),
+#                  prior(normal(0,1), class = b, coef = trtNPK:year_trt),
+#                  prior(normal(0,1), class = sd),
+#                  prior(normal(0,1), class = sigma)
+#                  #prior(constant(1), class = nu)
+#                  ),
+#                control = list(max_treedepth = 12))
+ 
+ 
+ rich.3_p <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot),
+                 data = plot, cores = 4, chains = 4,
+                 iter=5000, warmup = 1000,
+                 prior = c(
+                   prior(normal(8,5), class = Intercept),
+                   prior(normal(5,1), class = b, coef = trtNPK),
+                   prior(normal(0,1), class = b, coef = year_trt),
+                   prior(normal(0,1), class = b, coef = trtNPK:year_trt),
+                   prior(normal(0,1), class = sd),
+                   prior(normal(0,1), class = sigma),
+                   prior(constant(1), class = nu)),
+                 control = list(adapt_delta = 0.99)#,
+                 #sample_prior = 'only',
+                 #backend = 'cmdstanr'
+ )
 
 save(rich.3_p,
      file=Sys.getenv('OFILE'))

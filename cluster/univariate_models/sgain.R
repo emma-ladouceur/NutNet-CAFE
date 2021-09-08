@@ -20,9 +20,23 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 #                 control = list(adapt_delta = 0.99) )
 
 
+# sgain.3_p <- brm(s.gain ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+#                  data = p.all, family=student(), cores = 4, chains = 4,
+#                  #iter=5000, warmup = 1000,
+#                  prior = c(
+#                    prior(normal(3,3), class = Intercept),
+#                    prior(normal(3,1), class = b, coef = trt.yNPK),
+#                    prior(normal(0,1), class = b, coef = year.y.m),
+#                    prior(normal(0,1), class = b, coef = trt.yNPK:year.y.m),
+#                    prior(normal(0,1), class = sd),
+#                    prior(normal(0,1), class = sigma),
+#                    prior(constant(1), class = nu)),
+#                  control = list(max_treedepth = 12))
+
+
 sgain.3_p <- brm(s.gain ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                  data = p.all, family=student(), cores = 4, chains = 4,
-                 #iter=5000, warmup = 1000,
+                 iter=5000, warmup = 1000,
                  prior = c(
                    prior(normal(3,3), class = Intercept),
                    prior(normal(3,1), class = b, coef = trt.yNPK),
@@ -31,9 +45,10 @@ sgain.3_p <- brm(s.gain ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/blo
                    prior(normal(0,1), class = sd),
                    prior(normal(0,1), class = sigma),
                    prior(constant(1), class = nu)),
-                 control = list(max_treedepth = 12))
-
-
+                 control = list(adapt_delta = 0.99)#,
+                 #sample_prior = 'only',
+                 #backend = 'cmdstanr'
+)
 
 save(sgain.3_p,
      file=Sys.getenv('OFILE'))
