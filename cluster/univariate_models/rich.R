@@ -43,8 +43,7 @@ plot$plot<-as.factor(plot$plot)
                    prior(normal(0,1), class = b, coef = year_trt),
                    prior(normal(0,1), class = b, coef = trtNPK:year_trt),
                    prior(normal(0,1), class = sd),
-                   prior(normal(0,1), class = sigma),
-                   prior(constant(1), class = nu)),
+                   prior(normal(0,1), class = sigma)),
                  control = list(adapt_delta = 0.99)#,
                  #sample_prior = 'only',
                  #backend = 'cmdstanr'
