@@ -21,18 +21,35 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 #                  control = list(max_treedepth = 12) )
 
 
-sl.3_p <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-                       data = p.all, family=student(), cores = 4, chains = 4,
-                       #iter=5000, warmup = 1000,
-                       prior = c(
-                         prior(normal(-22,30), class = Intercept),
-                         prior(normal(-30,10), class = b, coef = trt.yNPK),
-                         prior(normal(0,10), class = b, coef = year.y.m),
-                         prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
-                         prior(normal(0,10), class = sd),
-                         prior(normal(0,10), class = sigma),
-                         prior(constant(10), class = nu)),
-                       control = list(max_treedepth = 12))
+# sl.3_p <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+#                        data = p.all, family=student(), cores = 4, chains = 4,
+#                        #iter=5000, warmup = 1000,
+#                        prior = c(
+#                          prior(normal(-22,30), class = Intercept),
+#                          prior(normal(-30,10), class = b, coef = trt.yNPK),
+#                          prior(normal(0,10), class = b, coef = year.y.m),
+#                          prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
+#                          prior(normal(0,10), class = sd),
+#                          prior(normal(0,10), class = sigma),
+#                          prior(constant(10), class = nu)),
+#                        control = list(max_treedepth = 12))
+
+
+sl.3_p <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
+                 data = p.all, family=student(), cores = 4, chains = 4,
+                 iter = 5000, warmup = 1000,
+                 prior = c(
+                   prior(normal(-22,30), class = Intercept),
+                   prior(normal(-30,10), class = b, coef = trt.yNPK),
+                   prior(normal(0,10), class = b, coef = year.y.m),
+                   prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
+                   prior(normal(0,10), class = sd),
+                   prior(normal(0,10), class = sigma),
+                   prior(constant(10), class = nu)),
+                 control = list(adapt_delta = 0.99)#,
+                 #sample_prior = 'only',
+                # backend = 'cmdstanr'
+)
 
 
 save(sl.3_p,
