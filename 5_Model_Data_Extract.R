@@ -29,26 +29,26 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 # model objects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3_p
 
 
 
 # species richness model
 
 #  model summary
-summary(rich.3)
+summary(rich.3_p)
 # caterpillar plots
-plot(rich.3)
+plot(rich.3_p_p)
 # predicted values vs. observed
 color_scheme_set("darkgray")
-fig_s5a <- pp_check(rich.3) + theme_classic() + 
+fig_s5a <- pp_check(rich.3_p) + theme_classic() + 
   labs( title = "a)", x= "Species richness", y = "Density") + theme(legend.position="bottom")
 
 fig_s5a
 
 # residuals (this take a minute)
-rich.m <- residuals(rich.3)
+rich.m <- residuals(rich.3_p)
 rich.m <-as.data.frame(rich.m)
 rr.plot <- cbind(plot,rich.m$Estimate)
 head(rr.plot)
@@ -62,19 +62,19 @@ with(rr.plot, plot(plot, rich.m$Estimate))
 
 # each of these steps may take a few minutes because the model objects are large
 # fixed effects
-plot.rich_fitted <- cbind(rich.3$data,
+plot.rich_fitted <- cbind(rich.3_p$data,
                           # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                          fitted(rich.3, re_formula = NA)) %>% 
+                          fitted(rich.3_p, re_formula = NA)) %>% 
   as_tibble() %>% left_join(plot)
 
 head(plot.rich_fitted)
 
 # fixed effect coefficients 
-plot.rich_fixef <- fixef(rich.3)
+plot.rich_fixef <- fixef(rich.3_p)
 
 
 # coefficients for site-level (random) effects
-plot.rich_coef <- coef(rich.3)
+plot.rich_coef <- coef(rich.3_p)
 
 
 plot.rich_coef2 <-  bind_cols(plot.rich_coef$site_code[,,'Intercept'] %>% 
@@ -116,19 +116,19 @@ plot.rich_fitted.ctl <- plot.rich_fitted %>% filter(trt %in% c('Control'))
 
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
 save(plot.rich_fitted,plot.rich_fixef,plot.rich_fitted.npk,plot.rich_fitted.ctl,plot.rich_coef2,file = 'rich.mod.dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/rich.mod.dat.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/rich.mod.dat.Rdata')
 
 
 # biomass model 
 
 
 #  model summary
-summary(bm.3)
+summary(bm.3_p)
 # caterpillar plots
-plot(bm.3)
+plot(bm.3_p)
 # predicted values vs. observed
 #color_scheme_set("darkgray")
-fig_s5b <- pp_check(bm.3) + theme_classic() + 
+fig_s5b <- pp_check(bm.3_p) + theme_classic() + 
   labs(title = "b)", x = expression(paste('Biomass (g/',m^2, ')')) , y = "") + 
   scale_x_continuous(limits = c(-1000, 2000)) + theme(legend.position="none")
 
@@ -137,7 +137,7 @@ fig_s5b
 # residuals (this take a minute)
 colnames(plot)
 plot.bm <- plot %>% filter(!is.na(plot.mass))
-bm.m <- residuals(bm.3)
+bm.m <- residuals(bm.3_p)
 bm.m <- as.data.frame(bm.m)
 br.plot <- cbind(plot.bm, bm.m$Estimate)
 head(br.plot)
@@ -150,17 +150,17 @@ with(br.plot, plot(plot, bm.m$Estimate))
 
 
 # fixed effects
-plot.bm_fitted <- cbind(bm.3$data,
+plot.bm_fitted <- cbind(bm.3_p$data,
                         # get fitted values; setting re_formula=NA means we are getting 'fixed' effects
-                        fitted(bm.3, re_formula = NA)) %>% 
+                        fitted(bm.3_p, re_formula = NA)) %>% 
   as_tibble() %>% left_join(plot)
 
 # fixed effect coefficients (I want these for the coefficient plot)
-plot.bm_fixef <- fixef(bm.3)
+plot.bm_fixef <- fixef(bm.3_p)
 
 
 # coefficients for experiment-level (random) effects
-plot.bm_coef <- coef(bm.3)
+plot.bm_coef <- coef(bm.3_p)
 
 
 plot.bm_coef2 <-  bind_cols(plot.bm_coef$site_code[,,'Intercept'] %>% 
