@@ -46,7 +46,7 @@ cde.3_p <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/pl
                  prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
                  prior(normal(0,10), class = sd),
                  prior(normal(0,10), class = sigma),
-                 prior(constant(10), class = nu)),
+                 prior(gamma(2.5,0.3), class = nu)),
                control = list(adapt_delta = 0.99)#,
                #sample_prior = 'only',
               # backend = 'cmdstanr'
