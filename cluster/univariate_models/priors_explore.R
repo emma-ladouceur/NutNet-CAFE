@@ -98,6 +98,8 @@ plot(density(rgamma(1000, 2, scale = 1/0.1))) # default
 plot(density(rgamma(1000, 2, scale = 0.1))) # 
 plot(density(rgamma(1000, 1, scale = 1/0.1))) # slender
 plot(density(rgamma(1000, 1, scale = 1/0.2))) # slender
+plot(density(rgamma(1000, 2.5, scale = 1/0.3))) # slender
+
 
 sl.3_test <- brm(SL ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
                  data = p.all, family=student(), cores = 4, chains = 4,
@@ -182,7 +184,7 @@ cde.3_p <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/pl
                  prior(normal(0,10), class = b, coef = trt.yNPK:year.y.m),
                  prior(normal(0,10), class = sd),
                  prior(normal(0,10), class = sigma),
-                 prior(constant(10), class = nu)),
+                 prior(gamma(10), class = nu)),
                control = list(adapt_delta = 0.99),
                #sample_prior = 'only',
                backend = 'cmdstanr'
