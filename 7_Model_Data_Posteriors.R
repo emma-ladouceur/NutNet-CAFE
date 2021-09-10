@@ -15,13 +15,13 @@ library(brms)
 
 # load models
 # model object names follow each model
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.3
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.3_p
 
 
 meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -31,7 +31,7 @@ meta <- meta %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
 # STUDY LEVEL POSTERIORS
-study_levels <- rich.3$data %>% 
+study_levels <- rich.3_p$data %>% 
   as_tibble() %>% 
   distinct(site_code) %>% 
   mutate(level =  site_code) %>%
@@ -39,75 +39,75 @@ study_levels <- rich.3$data %>%
 
 # extract 1000 study-level posterior samples for each site, and treatment  (Control, NPK) for each model  
 study_sample_posterior <- study_levels %>%
-  mutate( rich.ctl.study = purrr::map(data, ~posterior_samples(rich.3,
+  mutate( rich.ctl.study = purrr::map(data, ~posterior_samples(rich.3_p,
                                                          pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                          exact = TRUE,
                                                          subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-          bm.ctl.study = purrr::map(data, ~posterior_samples(bm.3,
+          bm.ctl.study = purrr::map(data, ~posterior_samples(bm.3_p,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',year_trt]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-          rich.npk.study = purrr::map(data, ~posterior_samples(rich.3,
+          rich.npk.study = purrr::map(data, ~posterior_samples(rich.3_p,
                                                          pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                          exact = TRUE,
                                                          subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-          bm.npk.study = purrr::map(data, ~posterior_samples(bm.3,
+          bm.npk.study = purrr::map(data, ~posterior_samples(bm.3_p,
                                                        pars = paste('r_site_code[', as.character(.x$level), ',trtNPK:year_trt]', sep=''),
                                                        exact = TRUE,
                                                        subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-          sl.ctl.study = purrr::map(data, ~posterior_samples(sl.3,
+          sl.ctl.study = purrr::map(data, ~posterior_samples(sl.3_p,
                                                              pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                              exact = TRUE,
                                                              subset = floor(runif(n = 1000,
                                                                                   min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          sg.ctl.study = purrr::map(data, ~posterior_samples(sg.3,
+          sg.ctl.study = purrr::map(data, ~posterior_samples(sg.3_p,
                                                              pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                              exact = TRUE,
                                                              subset = floor(runif(n = 1000,
                                                                                   min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          sloss.ctl.study = purrr::map(data, ~posterior_samples(sloss.3,
+          sloss.ctl.study = purrr::map(data, ~posterior_samples(sloss.3_p,
                                                                 pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                                 exact = TRUE,
                                                                 subset = floor(runif(n = 1000,
                                                                                      min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          sgain.ctl.study = purrr::map(data, ~posterior_samples(sgain.3,
+          sgain.ctl.study = purrr::map(data, ~posterior_samples(sgain.3_p,
                                                                 pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                                 exact = TRUE,
                                                                 subset = floor(runif(n = 1000,
                                                                                      min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          # ps.ctl.study = purrr::map(data, ~posterior_samples(ps.3_sigma,
+          # ps.ctl.study = purrr::map(data, ~posterior_samples(ps.3_p_sigma,
           #                                                    pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
           #                                                    exact = TRUE,
           #                                                    subset = floor(runif(n = 1000,
           #                                                                         min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          cde.ctl.study = purrr::map(data, ~posterior_samples(cde.3,
+          cde.ctl.study = purrr::map(data, ~posterior_samples(cde.3_p,
                                                               pars = paste('r_site_code[', as.character(.x$level), ',year.y.m]', sep=''),
                                                               exact = TRUE,
                                                               subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
-          sl.npk.study = purrr::map(data, ~posterior_samples(sl.3, 
+          sl.npk.study = purrr::map(data, ~posterior_samples(sl.3_p, 
                                                              pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                              exact = TRUE,
                                                              subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          sg.npk.study = purrr::map(data, ~posterior_samples(sg.3,
+          sg.npk.study = purrr::map(data, ~posterior_samples(sg.3_p,
                                                              pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                              exact = TRUE,
                                                              subset = floor(runif(n = 1000,
                                                                                   min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          sloss.npk.study = purrr::map(data, ~posterior_samples(sloss.3, 
+          sloss.npk.study = purrr::map(data, ~posterior_samples(sloss.3_p, 
                                                                 pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                                 exact = TRUE,
                                                                 subset = floor(runif(n = 1000,min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          sgain.npk.study = purrr::map(data, ~posterior_samples(sgain.3,
+          sgain.npk.study = purrr::map(data, ~posterior_samples(sgain.3_p,
                                                                 pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                                 exact = TRUE,
                                                                 subset = floor(runif(n = 1000,
                                                                                      min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          # ps.npk.study = purrr::map(data, ~posterior_samples(ps.3,
+          # ps.npk.study = purrr::map(data, ~posterior_samples(ps.3_p,
           #                                                    pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
           #                                                    exact = TRUE,
           #                                                    subset = floor(runif(n = 1000,
           #                                                                         min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          cde.npk.study = purrr::map(data, ~posterior_samples(cde.3,
+          cde.npk.study = purrr::map(data, ~posterior_samples(cde.3_p,
                                                               pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                               exact = TRUE,
                                                               subset = floor(runif(n = 1000, 1, max = 2000))) %>%  unlist() %>%  as.numeric()),
@@ -178,16 +178,16 @@ head(sgain_study_posterior)
 
 # Extract 1000 posterior samples from Fixed Effects (Overall/Population/Global Effects) 
 # richness and biomass
-rich.fixed.p<-posterior_samples(rich.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000)))
-bm.fixed.p<-posterior_samples(bm.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+rich.fixed.p<-posterior_samples(rich.3_p, "^b" , subset = floor(runif(n = 1000, 1, max = 2000)))
+bm.fixed.p<-posterior_samples(bm.3_p, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 # price  reponses
-sl.fixed.p<-posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
-sg.fixed.p<-posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
-cde.fixed.p<-posterior_samples(cde.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
+sl.fixed.p<-posterior_samples(sl.3_p, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sg.fixed.p<-posterior_samples(sg.3_p, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+cde.fixed.p<-posterior_samples(cde.3_p, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
 
-sloss.fixed.p<-posterior_samples(sloss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
-sgain.fixed.p<-posterior_samples(sgain.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
-#ps.fixed.p <- posterior_samples(ps.3_sigma, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
+sloss.fixed.p<-posterior_samples(sloss.3_p, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sgain.fixed.p<-posterior_samples(sgain.3_p, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) )
+#ps.fixed.p <- posterior_samples(ps.3_p_sigma, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 
 
 # select columns of interests and give meaningful names
@@ -470,17 +470,17 @@ sgain.p <- sgain.site.p %>%
 
 head(sgain.p)
 
-ps.site.p <- ps_study_posterior %>% group_by(site_code) %>%
-  nest() 
-
-
-ps.p <- ps.site.p %>% 
-  mutate(data = purrr::map(data, ~ mutate(.x,cbind(ps_global_posterior)))) %>%
-  unnest() %>% mutate(ps.study.trt.effect = (ps.trt.study + ps.trt.global))  %>%
-  mutate(ps.study.ctl.effect = (ps.ctl.study + ps.ctl.global))
-
-
-head(ps.p)
+# ps.site.p <- ps_study_posterior %>% group_by(site_code) %>%
+#   nest() 
+# 
+# 
+# ps.p <- ps.site.p %>% 
+#   mutate(data = purrr::map(data, ~ mutate(.x,cbind(ps_global_posterior)))) %>%
+#   unnest() %>% mutate(ps.study.trt.effect = (ps.trt.study + ps.trt.global))  %>%
+#   mutate(ps.study.ctl.effect = (ps.ctl.study + ps.ctl.global))
+# 
+# 
+# head(ps.p)
 
 cde.site.p <- cde_study_posterior %>% group_by(site_code) %>%
   nest() 
