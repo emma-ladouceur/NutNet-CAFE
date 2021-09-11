@@ -478,6 +478,7 @@ fixed.leg.ctl <- ggplot() +
 
 fixed.leg.ctl
 
+
 # legend for posterior samples (thin lines)
 post.leg <- ggplot()+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
