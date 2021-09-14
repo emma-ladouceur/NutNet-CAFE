@@ -435,8 +435,8 @@ fig_3_legend <- ggplot()  +
   labs(x = 'Years',
        y='',
        title= '', color='',fill='',linetype='') +
-  scale_fill_manual(values = c("black", drop =FALSE))+
-   scale_color_manual(values = c("black",drop =FALSE))+
+  scale_fill_manual(values = c("black"))+
+   scale_color_manual(values = c("black"))+
   theme_bw(base_size=18 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
                      legend.position="left", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
                      legend.spacing.y = unit(0.02, 'cm')

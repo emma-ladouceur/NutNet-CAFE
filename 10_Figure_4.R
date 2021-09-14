@@ -32,12 +32,12 @@ colnames(meta)
 # Similarly  to '7_Model_Data_Posteriors.R' we 
 # Extract 1000 posterior samples from Fixed Effects (Overall/Population/Global Effects) 
 # for the price partitions
-sloss.fixed.p <- posterior_samples(sloss.3, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
-sgain.fixed.p <- posterior_samples(sgain.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
+sloss.fixed.p <- posterior_samples(sloss.3_p, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
+sgain.fixed.p <- posterior_samples(sgain.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 
-cde.fixed.p <- posterior_samples(cde.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) )
-sl.fixed.p <- posterior_samples(sl.3, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
-sg.fixed.p <- posterior_samples(sg.3, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
+cde.fixed.p <- posterior_samples(cde.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) )
+sl.fixed.p <- posterior_samples(sl.3_p, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
+sg.fixed.p <- posterior_samples(sg.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 
 # except here, we take 50 samples of the posterior distribution from overall effects
 # within the range of 95 % probability to represent uncertainty around these effects
@@ -53,20 +53,20 @@ sg.fixed.p2 <-sg.fixed.p %>%
   mutate(sg.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
   mutate(sg.ctl.p=`b_year.y.m`) %>%
   select(sg.ctl.p,
-         sg.trt.p,)
+         sg.trt.p)
 
 cde.fixed.p2 <-cde.fixed.p %>% 
   mutate(cde.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
   mutate(cde.ctl.p=`b_year.y.m`) %>%
   select(cde.ctl.p,
-         cde.trt.p,) 
+         cde.trt.p) 
 
 
 sloss.fixed.p2 <-sloss.fixed.p %>% 
   mutate(sloss.trt.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
   mutate(sloss.ctl.p=`b_year.y.m`) %>%
   select(sloss.ctl.p,
-         sloss.trt.p,) 
+         sloss.trt.p) 
 
 
 sgain.fixed.p2 <-sgain.fixed.p %>% 
@@ -380,7 +380,7 @@ fig_4 <- ggplot() +
                                  y=  sl.sg.cde.trt_global_slope ),
              colour="#F98400",size=0.1,alpha = 0.4) +
   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
-  scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
+  scale_x_continuous(breaks=c(-0.5,-0.4,-0.3_p,-0.2,-0.1,0,0.05,0.1)) +
   # annotate("text", x = -0.015, y = 0.75, label = "t0") +
   # annotate("text", x = -0.415, y = 7.25, label = "tn") +
   # annotate("text", x = 0.03, y = -1.5, label = "tn") +
@@ -419,66 +419,56 @@ leg.dat <- bind_rows(cde.s, loss.s, gains.s) %>%
   unite(vec_trt,  Vector,  Treatment, sep=" " , remove= FALSE) %>%
   mutate(vec_trt = factor(vec_trt, levels = c("Losses Control", "Losses NPK", "Gains Control", "Gains NPK", "Persistent Sp. Control", "Persistent Sp. NPK")))
 
-head(leg.dat)
+
 
 # legend for overall effects (thick lines)
+head(leg.dat)
+
 fixed.leg.npk <- ggplot() +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + 
   theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), 
                                      panel.grid.minor = element_blank(), 
                                      strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  geom_segment(data = leg.dat ,#%>% filter(Treatment == "NPK") ,
+  geom_segment(data = leg.dat %>% filter(Treatment == "NPK"),
                aes(x = 0,
                    xend = 0,
                    y = 0,
-                   yend = Estimate, 
-                   color = Treatment,
-                   linetype=Vector
-                   ), 
-               size = 1.5, 
-                 arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_segment(data = leg.dat %>% filter(Treatment == "Control") ,
-               aes(x = 0,
-                   xend = 0,
-                   y = 0,
-                   yend = Estimate,
-                   color = Treatment,
-                   linetype=Vector
-               ),
-               size = 1.5, 
+                   yend = Estimate,colour= Vector ), 
+               size = 1.5, #linetype=2,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
- scale_color_manual(name='Control \n NPK',
-                    #breaks=c("Losses","Gains","Persistent Sp." ),
-                    #values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400")
-                    #values=c("#B40F20","#B40F20","#3B9AB2","#3B9AB2","#F98400","#F98400" ) ,
-                    values=c("Losses Control"="#B40F20","Losses NPK"="#B40F20","Gains Control"="#3B9AB2","Gains NPK"="#3B9AB2","Persistent Sp. Control"= "#F98400","Persistent Sp. NPK"="#F98400" )  ) #+
- # scale_linetype_manual(name='Control \n NPK',
- #                       values = c("Losses Control"=1, "Losses NPK"=2, "Gains Control"=1,"Gains NPK"= 2, "Persistent Sp. Control"= 1,"Persistent Sp. NPK"=2))
+  scale_color_manual(name='NPK',
+                     breaks=c("Losses","Gains","Persistent Sp."),
+                     values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))+
+  theme(legend.key.width = unit(2,"cm"))
 
 
 fixed.leg.npk
 
 
+
 fixed.leg.ctl <- ggplot() +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + 
-  theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), 
-                                     panel.grid.minor = element_blank(), 
-                                     strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  geom_segment(data = leg.dat ,#%>% filter(Treatment == "Control"),
+  theme_classic(base_size=14 )+
+  geom_segment(data = leg.dat %>% filter(Treatment == "Control"),
                aes(x = 0,
                    xend = 0,
                    y = 0,
-                   yend = Estimate,colour= Vector , linetype=Vector), 
+                   yend = Estimate,colour= Vector ), 
                size = 1.5, linetype=2,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  scale_color_manual(name='Overall Effects: Control',
+  scale_color_manual(name='Control',
                      breaks=c("Losses","Gains","Persistent Sp."),
-                     values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))
+                     values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))+
+  theme(legend.key.width = unit(2,"cm"))+ theme(panel.grid.major = element_blank(), 
+                                               panel.grid.minor = element_blank(), 
+                                               strip.background = element_rect(colour="black", fill="white"),legend.position="bottom"
+                                               #legend.title = element_text(vjust = 6) 
+                                               )
   
 
 fixed.leg.ctl
 
-
+ head(cde.s)
 # legend for posterior samples (thin lines)
 post.leg <- ggplot()+
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
@@ -486,28 +476,29 @@ post.leg <- ggplot()+
                aes(x = 0,
                    xend = 0,
                    y = 0,
-                   yend = cde.trt.p ,colour= Vector),
+                   yend = Estimate ,colour= Vector),
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_segment(data = loss.s,
                aes(x = 0,
-                   xend = sloss.trt.p ,
+                   xend = Estimate ,
                    y = 0,
-                   yend = sl.trt.p ,colour= Vector ),
+                   yend = Estimate ,colour= Vector ),
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   geom_segment(data = gains.s,
                aes(x = 0,
-                   xend = sgain.trt.p ,
+                   xend = Estimate ,
                    y = 0,
-                   yend = sg.trt.p ,
+                   yend = Estimate ,
                    colour= Vector), size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
   scale_color_manual(name='Uncertainty',breaks=c("Losses","Gains","Persistent Sp."),
                      values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))+
   labs(x = 'Effect of NPK on Change in Species / Year',
        y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
-       title= '')
+       title= '')+
+  theme(legend.key.width = unit(2,"cm"))
 
 
 post.leg
@@ -522,13 +513,16 @@ g_legend<-function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
-f.legend<-g_legend(fixed.leg)
+
+
+f.legend.c<-g_legend(fixed.leg.ctl)
+f.legend.n<-g_legend(fixed.leg.npk)
+
 p.legend<-g_legend(post.leg)
 
 
 
-(fig_4 ) / (f.legend) / (p.legend) +
-  plot_layout(heights = c(10,0.5,0.5))
+(fig_4 ) / (f.legend.c)/(f.legend.n) / (p.legend) + plot_layout(heights = c(10,0.5,0.5,0.5))
 
 
 

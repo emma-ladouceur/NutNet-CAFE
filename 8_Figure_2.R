@@ -103,7 +103,7 @@ study_2c_legend <- ggplot()+
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = ' C)',  color='',fill='',linetype='') + 
-  scale_color_manual(values = c("black", drop =FALSE))+
+  scale_color_manual(values = c("black"))+
   theme_classic(base_size=18 ) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
@@ -124,7 +124,7 @@ overall_2c_legend <- ggplot()+
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = ' C)',  color='',fill='',linetype='') + 
-  scale_color_manual(values = c( "#0B775E",drop =FALSE))+
+  scale_color_manual(values = c( "#0B775E"))+
   theme_classic(base_size=18 ) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
@@ -225,8 +225,8 @@ fig_2ab_legend <- ggplot() +
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   labs(x='',
        y = ' Species richness', title= '', color='',fill='',linetype='') +
-  scale_fill_manual(values = c("black", drop =FALSE))+
-  scale_color_manual(values = c("black",drop =FALSE))+
+  scale_fill_manual(values = c("black"))+
+  scale_color_manual(values = c("black"))+
   theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                  strip.background = element_blank(),
                                  legend.position="bottom",
@@ -345,6 +345,10 @@ g_legend<-function(a.gplot){
 
 fig_2ab_leg <- g_legend(fig_2ab_legend)
 
+o_2c_leg <- g_legend(overall_2c_legend)
+
+s_2c_leg <- g_legend(study_2c_legend)
+
 # use grid extra to add inset effect plots to regression
 fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 6.5, xmax = 12.75, 
                                 ymin = 25, ymax = 42)
@@ -355,7 +359,7 @@ fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 6.5, xmax =
 
 # use patchwork to put everything together
 # SAVE AS PORTRAIT 10 X 11
-( fig_2a | fig_2b ) / ( fig_2ab_leg ) / ( fig_2c )/ (fig_2c_legend) + plot_layout(heights = c(10,0.75,13,0.75))
+( fig_2a | fig_2b ) / ( fig_2ab_leg ) / ( fig_2c )/(s_2c_leg)/ (o_2c_leg) + plot_layout(heights = c(10,0.75,13,0.75,0.75))
 
 
 
