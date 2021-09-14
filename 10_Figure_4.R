@@ -380,7 +380,7 @@ fig_4 <- ggplot() +
                                  y=  sl.sg.cde.trt_global_slope ),
              colour="#F98400",size=0.1,alpha = 0.4) +
   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
-  scale_x_continuous(breaks=c(-0.5,-0.4,-0.3_p,-0.2,-0.1,0,0.05,0.1)) +
+  scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
   # annotate("text", x = -0.015, y = 0.75, label = "t0") +
   # annotate("text", x = -0.415, y = 7.25, label = "tn") +
   # annotate("text", x = 0.03, y = -1.5, label = "tn") +

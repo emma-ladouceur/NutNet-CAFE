@@ -29,8 +29,7 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 # model objects
-#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3_p
-load('~/Desktop/bm.Rdata') # plot.bm.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3_p
 
 

@@ -246,6 +246,14 @@ plot$plot<-as.factor(plot$plot)
 plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup()
 
+
+get_prior(strip.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
+          data = plot, family=student())
+
+plot(density(rgamma(1000, 3, scale = 1/0.25))) # slender
+
+
+
 bm.3_p <- brm(strip.mass ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
               data = plot, family=student(), cores = 4, chains = 4,
               iter=5000, warmup = 1000,
@@ -256,7 +264,7 @@ bm.3_p <- brm(strip.mass ~ trt * year_trt + (trt * year_trt | site_code/block/pl
                 prior(normal(0,10), class = b, coef = trtNPK:year_trt),
                 prior(normal(0,10), class = sd),
                 prior(normal(0,10), class = sigma),
-                prior(constant(10), class = nu)),
+                prior(gamma(2,0.1), class = nu)),
               control = list(adapt_delta = 0.99),
               #sample_prior = 'only',
               backend = 'cmdstanr'
