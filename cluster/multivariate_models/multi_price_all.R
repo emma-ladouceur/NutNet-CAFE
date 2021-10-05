@@ -19,7 +19,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup() 
 
 
-pp.multi_all <- brm( mvbind(SL,SG,CDE,s.loss.n,s.gain) ~ trt.y * year.y.m + (trt.y * year.y.m | site_code), 
+pp.multi_all <- brm( mvbind(SL,SG,CDE,s.loss.n,s.gain) ~ trt.y * year.y.m + (trt.y * year.y.m | p | site_code), 
                 data = p.all,
                 family=student(),
                 cores = 4, iter = 6000, warmup = 1000, chains = 4,

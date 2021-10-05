@@ -625,19 +625,24 @@ summary(sp.multi)
 color_scheme_set("darkgray")
 
 
-nnb <- pp_check(sp.multi, resp = 'stripmass')+ theme_classic() + scale_x_continuous(limits = c(-1000, 2000))+ labs(x=expression(paste('Biomass (g/',m^2, ')')),
-                                                                                                                 y = '')  +
+nnb <- pp_check(sp.multi, resp = 'stripmass')+ theme_classic() + scale_x_continuous(limits = c(-1000, 2000))+ 
+  labs(title = "h)",
+       x=expression(paste('Biomass (g/',m^2, ')')),
+                      y = '')  +
   theme(legend.position= "bottom")
-nnr <- pp_check(sp.multi, resp = 'rich')+ theme_classic() + scale_x_continuous(limits = c(-10, 50))+ labs(x='Species Richness',
-                                                                                                           y = 'Density') +
+
+nnr <- pp_check(sp.multi, resp = 'rich')+ theme_classic() + scale_x_continuous(limits = c(-10, 50))+ 
+  labs(title = "i)",
+       x='Species Richness',
+            y = 'Density') +
   theme(legend.position= "none")
 
 fig_5sh_legend <- g_legend(nnb)
 
 # Figure s5h
-fig_s5h <- (nnr  | nnb +  theme(legend.position= "none")) /(fig_5sh_legend) + plot_layout(heights = c(10,0.75))
+fig_s5h_i <- (nnr  | nnb +  theme(legend.position= "none")) /(fig_5sh_legend) + plot_layout(heights = c(10,0.75))
 
-fig_s5h
+fig_s5h_i
 
 
 # multivariate price partitions with all responses possible
@@ -648,28 +653,37 @@ summary(pp.multi_all)
 
 # predicted vs observed values
 color_scheme_set("darkgray")
-sloss <- pp_check(pp.multi_all, resp = 'slossn')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ labs(x=expression(paste('s.loss')),
-                                                                                                             y = 'Density') +
-  theme(legend.position= "none")
-sgain <- pp_check(pp.multi_all, resp = 'sgain')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ labs(x='s.gain',
-                                                                                                            y = '') +
+sloss <- pp_check(pp.multi_all, resp = 'slossn')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ 
+  labs(title = "j)",
+      x=expression(paste('s.loss')),
+         y = 'Density') +
   theme(legend.position= "none")
 
-sl <- pp_check(pp.multi_all, resp = 'SL')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 200))+ labs(x=expression(paste('SL')),
-                                                                                                         y = 'Density') +
+sgain <- pp_check(pp.multi_all, resp = 'sgain')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+
+  labs(title = "j)", x='s.gain',
+        y = '') +
   theme(legend.position= "none")
-sg <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-200, 1000))+ labs(x='SG',
-                                                                                                         y = '') +
+
+sl <- pp_check(pp.multi_all, resp = 'SL')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 200))+ 
+  labs(title = "k)",
+       x=expression(paste('SL')),
+       y = 'Density') +
+  theme(legend.position= "none")
+
+sg <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-200, 1000))+ 
+  labs(title = "l)",x='SG',
+           y = '') +
   theme(legend.position= "bottom")
 
-cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 1000))+ labs(x='PS', y = '') +
+cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 1000))+ 
+  labs(title = "m)", x='PS', y = '') +
   theme(legend.position= "none")
            
                                                                                                                                                                                                                                                                                                                                                                                                                        
 # Figure s5j
-fig_s5i <- (sloss | sgain )/( sl | sg | cde) + plot_layout(heights = c(10,10))
+fig_s5j_m <- (sloss | sgain )/( sl | sg | cde) + plot_layout(heights = c(10,10))
 
-fig_s5i
+fig_s5j_m
 
 # extract all response correlations for  multivariate model,
 # reported in Supplementary Model Information 1.9

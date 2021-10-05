@@ -76,15 +76,16 @@ fig_S3
 
 
 #plot cover
-load('~/Desktop/nn mods/cover_plot.Rdata') # cover.3
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/cover/cover.Rdata') # cover.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # rich.3i
-load('~/Desktop/nn mods/cde_cover.Rdata') # rich.3i
-load('~/Desktop/nn mods/sl_cover.Rdata') # rich.3i
-load('~/Desktop/nn mods/sg_cover.Rdata') # rich.3i
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/cover/cde_cover.Rdata') # rich.3i
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/cover/sl_cover.Rdata') # rich.3i
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/cover/sg_cover.Rdata') # rich.3i
 # produced in '7_Model_Data_Posteriors.R' (biomass models)
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.p.effs.Rdata')
 
 # check cover mods
+summary(cover.3)
 summary(sl.3_cover)
 summary(sg.3_cover)
 summary(cde.3_cover)
@@ -102,11 +103,11 @@ summary(cover.3)
 #plot(cover.3i)
 # predicted values vs. observed
 color_scheme_set("darkgray")
-fig_s3b <- pp_check(cover.3i) + theme_classic() + 
-  labs( x = expression(paste('Biomass (g/',m^2, ')')) , y = "Density") + 
+fig_s_cover <- pp_check(cover.3) + theme_classic() + 
+  labs( x = expression(paste('Cover')) , y = "Density") + 
   scale_x_continuous(limits = c(-1000, 2000))
 
-fig_s3b
+fig_s_cover
 
 
 cover.fixed.p<-posterior_samples(cover.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
@@ -344,7 +345,7 @@ fig_s4d <- ggplot() +
 fig_s4d
 
 
-
+# Landscape 10 x11
 
 (fig_s4a + fig_s4b)/(fig_s4c + fig_s4d)
 

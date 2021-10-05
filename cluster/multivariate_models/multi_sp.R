@@ -16,7 +16,7 @@ p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   ungroup() 
 
 
-sp.multi <- brm(mvbind(rich, strip.mass) ~ trt * year_trt + (trt * year_trt  | site_code),
+sp.multi <- brm(mvbind(rich, strip.mass) ~ trt * year_trt + (trt * year_trt | p  | site_code),
                 data = p.all, family=student(),  cores = 4, iter=6000, warmup = 1000,chains = 4,
                 control = list(adapt_delta = 0.99) )
 

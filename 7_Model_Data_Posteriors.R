@@ -631,6 +631,8 @@ save(study.rich.p, study.bm.p,study.sl.p,study.sg.p,study.cde.p,study.sloss.p,st
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
 
+head(study.bm.p)
+
 # Use these same data to calculate categories for:
 # Figure 2c, Figure 5, Figure S1,  Figure S7, Table S1
 study.rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
@@ -649,7 +651,16 @@ study.effs.p$Quadrant <- ifelse(study.effs.p$r.eff < 0 & study.effs.p$b.eff > 0,
 
 study.effs.p$Quadrant <- factor(study.effs.p$Quadrant, levels= c("+biomass -rich",  "+biomass +rich", "-biomass -rich", "-biomass +rich"))
 
-Quads <- study.effs.p %>% select(site_code, Quadrant)
+
+
+study.effs.p$Biomass_R <- ifelse(study.effs.p$b.eff_lower > 0, 'Biomass Increase','other')
+
+View(study.effs.p)
+
+Quads <- study.effs.p %>% select(site_code, Quadrant,Biomass_R)
+
+
+head(Quads)
 
 write.csv(Quads,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv" )
 
