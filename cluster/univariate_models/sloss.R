@@ -12,29 +12,15 @@ p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 
 
-p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
-  ungroup()
+# p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
+#   ungroup()
 
  # sloss.3<- brm(s.loss.n ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
  #                 data = p.all,family=student(), cores = 4, iter = 15000, warmup = 1000,chains = 4,
  #                 control = list(adapt_delta = 0.99))
 
 
-# sloss.3_p <- brm(s.loss.n ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
-#               data = p.all, family=student(), cores = 4, chains = 4,
-#               #iter=5000, warmup = 1000,
-#               prior = c(
-#                 prior(normal(-4,3), class = Intercept),
-#                 prior(normal(3,1), class = b, coef = trt.yNPK),
-#                 prior(normal(0,1), class = b, coef = year.y.m),
-#                 prior(normal(0,1), class = b, coef = trt.yNPK:year.y.m),
-#                 prior(normal(0,1), class = sd),
-#                 prior(normal(0,1), class = sigma),
-#                 prior(constant(1), class = nu)),
-#               control = list(max_treedepth = 12))
-
-
-sloss.3_p <- brm(s.loss.n ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
+sloss.all <- brm(s.loss.n ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot), 
                  data = p.all, family=student(), cores = 4, chains = 4,
                  iter=5000, warmup = 1000,
                  prior = c(
@@ -51,7 +37,7 @@ sloss.3_p <- brm(s.loss.n ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/b
 )
 
 
-save(sloss.3_p,
+save(sloss.all,
      file=Sys.getenv('OFILE'))
 
 

@@ -12,29 +12,10 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 
- plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
- ungroup()
-
-
-# rich.3 <- brm(rich ~  trt * year_trt + (trt * year_trt | site_code/block/plot), 
-#                     data = plot ,cores = 4,iter=6000, warmup = 1000, chains = 4)
-
-# rich.3_p <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot), 
-#                data = plot, cores = 4, chains = 4,
-#                #iter=5000, warmup = 1000,
-#                prior = c(
-#                  prior(normal(8,5), class = Intercept),
-#                  prior(normal(5,1), class = b, coef = trtNPK),
-#                  prior(normal(0,1), class = b, coef = year_trt),
-#                  prior(normal(0,1), class = b, coef = trtNPK:year_trt),
-#                  prior(normal(0,1), class = sd),
-#                  prior(normal(0,1), class = sigma)
-#                  #prior(constant(1), class = nu)
-#                  ),
-#                control = list(max_treedepth = 12))
+ # plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
+ # ungroup()
  
- 
- rich.3_p <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot),
+ rich.all <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot),
                  data = plot, cores = 4, chains = 4,
                  iter=5000, warmup = 1000,
                  prior = c(
@@ -49,7 +30,7 @@ plot$plot<-as.factor(plot$plot)
                  #backend = 'cmdstanr'
  )
 
-save(rich.3_p,
+save(rich.all,
      file=Sys.getenv('OFILE'))
 
 
