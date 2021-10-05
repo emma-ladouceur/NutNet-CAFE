@@ -14,8 +14,8 @@ p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 
 
-# p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 3) %>%
-#   ungroup()
+p.all <- p.all %>% group_by(site_code) %>% filter(year_max >= 6) %>%
+  ungroup()
 
 # cde.3_cover <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
 #                   data = p.all, family = student(),cores = 4, chains = 4,
@@ -23,7 +23,7 @@ p.all$plot<-as.factor(p.all$plot)
 #                   control = list(adapt_delta = 0.99))
 
 
-cde.all <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
+cde.6 <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/plot),
                data = p.all, family=student(), cores = 4, chains = 4,
                iter = 5000, warmup = 1000,
                prior = c(
@@ -40,7 +40,7 @@ cde.all <- brm(CDE ~  trt.y * year.y.m + (trt.y * year.y.m |  site_code/block/pl
 )
 
 
-save(cde.all,
+save(cde.6,
      file=Sys.getenv('OFILE'))
 
 
