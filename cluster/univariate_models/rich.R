@@ -12,10 +12,10 @@ plot$block<-as.factor(plot$block)
 plot$plot<-as.factor(plot$plot)
 
 
- plot <- plot %>% group_by(site_code) %>% filter(year_max >= 6) %>%
+ plot <- plot %>% group_by(site_code) %>% filter(year_max >= 10) %>%
  ungroup()
  
- rich.6 <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot),
+ rich.10 <- brm(rich ~ trt * year_trt + (trt * year_trt | site_code/block/plot),
                  data = plot, cores = 4, chains = 4,
                  iter=5000, warmup = 1000,
                  prior = c(
@@ -30,7 +30,7 @@ plot$plot<-as.factor(plot$plot)
                  #backend = 'cmdstanr'
  )
 
-save(rich.6,
+save(rich.10,
      file=Sys.getenv('OFILE'))
 
 
