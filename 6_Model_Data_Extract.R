@@ -37,7 +37,7 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.3_p
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/ps.Rdata') # CDE.3_p
+#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/ps.Rdata') # CDE.3_p
 
 
 # Species Loss model
@@ -660,30 +660,30 @@ sloss <- pp_check(pp.multi_all, resp = 'slossn')+ theme_classic()+ scale_x_conti
   theme(legend.position= "none")
 
 sgain <- pp_check(pp.multi_all, resp = 'sgain')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+
-  labs(title = "j)", x='s.gain',
+  labs(title = "k)", x='s.gain',
         y = '') +
   theme(legend.position= "none")
 
 sl <- pp_check(pp.multi_all, resp = 'SL')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 200))+ 
-  labs(title = "k)",
+  labs(title = "l)",
        x=expression(paste('SL')),
        y = 'Density') +
   theme(legend.position= "none")
 
 sg <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-200, 1000))+ 
-  labs(title = "l)",x='SG',
+  labs(title = "m)",x='SG',
            y = '') +
   theme(legend.position= "bottom")
 
 cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 1000))+ 
-  labs(title = "m)", x='PS', y = '') +
+  labs(title = "n)", x='PS', y = '') +
   theme(legend.position= "none")
            
                                                                                                                                                                                                                                                                                                                                                                                                                        
 # Figure s5j
-fig_s5j_m <- (sloss | sgain )/( sl | sg | cde) + plot_layout(heights = c(10,10))
+fig_s5j_n <- (sloss | sgain )/( sl | sg | cde) + plot_layout(heights = c(10,10))
 
-fig_s5j_m
+fig_s5j_n
 
 # extract all response correlations for  multivariate model,
 # reported in Supplementary Model Information 1.9

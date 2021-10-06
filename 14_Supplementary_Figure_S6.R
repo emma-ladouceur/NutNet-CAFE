@@ -35,19 +35,11 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/10/rich
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/bm.Rdata') # plot.bm.6
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/6/rich.Rdata') # plot.rich.6
 
-
-load('~/Desktop/nn mods/bm.6.Rdata') # rich.3i
-load('~/Desktop/nn mods/rich.6.Rdata') # rich.3i
-load('~/Desktop/nn mods/bm.10.Rdata') # rich.3i
-load('~/Desktop/nn mods/rich.10.Rdata') # rich.3i
-load('~/Desktop/nn mods/bm.all.Rdata') # rich.3i
-load('~/Desktop/nn mods/rich.all.Rdata') # rich.3i
-
 rich.im_fixef <- as.data.frame(fixef(rich.all))
 bm.im_fixef <- as.data.frame(fixef(bm.all))
 
-rich.im_fixef.3 <- as.data.frame(fixef(rich.3))
-bm.im_fixef.3 <- as.data.frame(fixef(bm.3))
+rich.im_fixef.3 <- as.data.frame(fixef(rich.3_p))
+bm.im_fixef.3 <- as.data.frame(fixef(bm.3_p))
 
 rich.im_fixef.10 <- as.data.frame(fixef(rich.10))
 bm.im_fixef.10 <- as.data.frame(fixef(bm.10))
@@ -285,20 +277,9 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sl.Rd
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sg.Rdata') # sg.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/cde.Rdata') # CDE.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sloss.Rdata') # s.loss.s
-#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain.Rdata') # s.gain.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/6/sgain.Rdata') # s.gain.s
 
 
-load('~/Desktop/nn mods/cde.6.Rdata') # rich.3i
-load('~/Desktop/nn mods/sloss.6.Rdata') # rich.3i
-load('~/Desktop/nn mods/sgain.6.Rdata') # rich.3i
-
-load('~/Desktop/nn mods/cde.10.Rdata') # rich.3i
-load('~/Desktop/nn mods/sloss.10.Rdata') # rich.3i
-load('~/Desktop/nn mods/sgain.10.Rdata') # rich.3i
-
-load('~/Desktop/nn mods/cde.all.Rdata') # rich.3i
-load('~/Desktop/nn mods/sloss.all.Rdata') # rich.3i
-load('~/Desktop/nn mods/sgain.all.Rdata') # rich.3i
 
 
 
@@ -309,11 +290,11 @@ sloss.trt.i_fixef <- as.data.frame(fixef(sloss.all))
 sgain.trt.i_fixef <- as.data.frame(fixef(sgain.all))
 
 
-sl.trt.i_fixef.3 <- as.data.frame(fixef(sl.3))
-sg.trt.i_fixef.3 <- as.data.frame(fixef(sg.3))
-cde.trt.i_fixef.3 <- as.data.frame(fixef(cde.3))
-sloss.trt.i_fixef.3 <- as.data.frame(fixef(sloss.3))
-sgain.trt.i_fixef.3 <- as.data.frame(fixef(sgain.3))
+sl.trt.i_fixef.3 <- as.data.frame(fixef(sl.3_p))
+sg.trt.i_fixef.3 <- as.data.frame(fixef(sg.3_p))
+cde.trt.i_fixef.3 <- as.data.frame(fixef(cde.3_p))
+sloss.trt.i_fixef.3 <- as.data.frame(fixef(sloss.3_p))
+sgain.trt.i_fixef.3 <- as.data.frame(fixef(sgain.3_p))
 
 sl.trt.i_fixef.10 <- as.data.frame(fixef(sl.10))
 sg.trt.i_fixef.10 <- as.data.frame(fixef(sg.10))
