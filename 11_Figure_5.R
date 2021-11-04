@@ -265,16 +265,16 @@ sloss.ps$Quadrant<-factor(sloss.ps$Quadrant,  levels=c("-biomass +rich", "+bioma
 sloss.ps
 
 fig_5a <- ggplot() +
-  geom_density_ridges(data = sloss.ps,
+  geom_density_ridges(data = sloss.ps, #density ridges
                       aes(x = sloss.trt.study + sloss.trt.global, 
                           y = Quadrant,
                       ), fill="#B40F20",
                       scale = 1, alpha = 0.3,
                       linetype = 0) +
-  geom_point(data =npk.effs, aes(y = Quadrant, x = sloss.trt.rate.p),
+  geom_point(data =npk.effs, aes(y = Quadrant, x = sloss.trt.rate.p), #study-level effects
              colour= "#B40F20", shape=1, size = 2,  position = position_jitter(height = 0.02 )) +
-  geom_point(data= sloss.ps %>% group_by(Quadrant) %>%
-               summarise(mean.s.eff = median(sloss.trt.study + sloss.trt.global)), 
+  geom_point(data= sloss.ps %>% group_by(Quadrant) %>% # median of study-level effects for each group
+               summarise(mean.s.eff = median(sloss.trt.study + sloss.trt.global)),
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
@@ -419,7 +419,9 @@ cde.ps$Quadrant<-factor(cde.ps$Quadrant,  levels=c("-biomass +rich","+biomass +r
 cde.ps
 
 
-View(npk.effs)
+head(npk.effs)
+
+
 fig_5e <- ggplot() +
   geom_density_ridges(data = cde.ps,
                       aes(x = cde.trt.study + cde.trt.global, 

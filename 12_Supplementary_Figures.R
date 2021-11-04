@@ -169,7 +169,9 @@ fig_s2
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
 
-head(study.rich.p)
+
+
+View(study.rich.p)
 
 rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) %>%
   filter(response == "NPK")

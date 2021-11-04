@@ -74,7 +74,10 @@ p.all <- global.rich.p %>% bind_rows(global.bm.p) %>% bind_rows(global.sloss.p) 
          Upper_Estimate = eff_upper,
          Lower_Estimate = eff_lower) %>%
   select(-response,-eff,-eff_upper,-eff_lower,
-         Model, Treatment, Estimate, Upper_Estimate, Lower_Estimate)
+         Model, Treatment, Estimate, Upper_Estimate, Lower_Estimate) %>% 
+  mutate(Estimate = round(Estimate, 2),
+         Upper_Estimate = round(Upper_Estimate, 2),
+         Lower_Estimate = round(Lower_Estimate, 2),)
 
 head(p.all)
 

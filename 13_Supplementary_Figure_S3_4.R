@@ -60,7 +60,7 @@ fig_S3c <- ggplot() +
  scale_color_manual(values = c("#00AFBB", "#E7B800", "#FC4E07")) +
   ylim(-50,50) +
   theme_classic() +
-  labs( x= "Functional Group" , y= "Difference in per species biomass estimates",
+  labs( x= "Functional Group" ,  y = expression(paste('Difference in per species biomass (g/' ,m^2, '/year) estimates')),
         title= "c)" ) + theme(legend.position="none")
 
 fig_S3c

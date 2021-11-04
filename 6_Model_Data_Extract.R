@@ -719,7 +719,7 @@ cor_samp <- cor %>%
              corr_CDE_sgain = `cor_site_code__CDE_trt.yNPK__sgain_trt.yNPK:year.y.m`,
              corr_sloss_sgain = `cor_site_code__slossn_trt.yNPK__sgain_trt.yNPK:year.y.m`,
              ) %>% 
-  # select cols
+  # select  renamedcols
   select(corr_SL_SG, corr_SL_CDE, corr_SG_CDE, corr_SL_sloss, corr_SL_sgain, corr_SG_sloss,
          corr_SG_sgain, corr_CDE_sloss, corr_CDE_sgain, corr_sloss_sgain) %>%
   gather(metric, correlation, corr_SL_SG:corr_sloss_sgain ) %>%
@@ -727,8 +727,15 @@ cor_samp <- cor %>%
   # calculate mean and uncertainty
   summarise(corr_coef = mean(correlation),
             lower_ci = quantile(correlation, probs=0.025),
-            upper_ci = quantile(correlation, probs=0.975)) 
+            upper_ci = quantile(correlation, probs=0.975)) %>% 
+  # round to two decimal places
+  mutate(corr_coef = round(corr_coef, 2),
+         lower_ci = round(lower_ci, 2),
+         upper_ci = round(upper_ci, 2),)
             
 
 View(cor_samp)
+
+
+write.csv(cor_samp, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S3.csv')
 
