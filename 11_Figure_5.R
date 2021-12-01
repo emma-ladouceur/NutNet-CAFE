@@ -278,7 +278,7 @@ fig_5a <- ggplot() +
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species loss / year')),
+  labs( x = expression(paste('Species loss / year in NPK plots')),
         title= 'A) Species loss (s.loss)',
         y= ' Slope'
   )+
@@ -315,7 +315,7 @@ fig_5b <- ggplot() +
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species gain / year')),
+  labs( x = expression(paste('Species gain / year in NPK plots')),
         title= 'B) Species gain (s.gain)',
         y= ' '
   )+
@@ -354,7 +354,7 @@ fig_5c <- ggplot() +
   theme_bw(base_size=14) +
   scale_x_continuous(breaks=c(-40,-20,-10,-5,0,10), limits=c(-40,15))+
   labs( 
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
+    x = expression(paste(atop( paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
         title= 'C) Biomass change associated \n with species loss (SL)',
         y= ''
   ) +
@@ -393,7 +393,7 @@ fig_5d <- ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs( #x = '',
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
+    x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
     title= 'D) Biomass change associated \n with species gain (SG)',
     y= ' '
   )+
@@ -437,7 +437,7 @@ fig_5e <- ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs(#x='', 
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
+    x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
         title= 'E) Biomass change associated \n with persistent species (PS)',
         y= ''
   )+
