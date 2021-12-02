@@ -111,8 +111,8 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.
 
 sloss.trt_coef2$xs<-1
 
-sloss.trt_fitted.npk$Model<-"A) Species loss (s.loss)"
-sloss.trt_fitted.ctl$Model<-"A) Species loss (s.loss)"
+sloss.trt_fitted.npk$Model<-"a) Species loss (s.loss)"
+sloss.trt_fitted.ctl$Model<-"a) Species loss (s.loss)"
 sloss.trt_fitted.npk <- sloss.trt_fitted.npk  %>%  rename(Treatment = trt.y) 
 sloss.trt_fitted.ctl <- sloss.trt_fitted.ctl  %>% rename(Treatment = trt.y) 
 fitted.sloss <- bind_rows(sloss.trt_fitted.npk,sloss.trt_fitted.ctl)
@@ -167,8 +167,8 @@ fig_3a_r
 
 sgain.trt_coef2$xs<-1
 
-sgain.trt_fitted.npk$Model<-"B) Species gain (s.gain)"
-sgain.trt_fitted.ctl$Model<-"B) Species gain (s.gain)"
+sgain.trt_fitted.npk$Model<-"b) Species gain (s.gain)"
+sgain.trt_fitted.ctl$Model<-"b) Species gain (s.gain)"
 sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% rename(Treatment = trt.y) 
 fitted.sgain<-bind_rows(sgain.trt_fitted.npk,sgain.trt_fitted.ctl)
@@ -298,7 +298,7 @@ fig_3e_r <- ggplot() +
   ylim(-500,1000)+
   labs(x='Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-       title= 'E) Biomass change associated \n with persistent species (PS)') +
+       title= 'e) Biomass change associated \n with persistent species (PS)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#F98400",drop =FALSE))+
   theme_bw(base_size=16 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
@@ -345,7 +345,7 @@ fig_3c_r <- ggplot() +
   labs(x='Year',
        #x = 'Years',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
-       title= 'C) Biomass change associated \n with species loss (SL)') +
+       title= 'c) Biomass change associated \n with species loss (SL)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
   theme_bw(base_size=16 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
@@ -394,7 +394,7 @@ fig_3d_r <- ggplot()  +
   ylim(0,400) +
   labs(x = 'Year',
        y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-       title= 'D) Biomass change associated \n with species gain (SG)',
+       title= 'd) Biomass change associated \n with species gain (SG)',
        color='Treatment') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A", drop =FALSE))+

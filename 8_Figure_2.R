@@ -80,7 +80,7 @@ fig_2c <- ggplot()+
   annotate("text", x = 1.5, y = -200, label = "-biomass +rich", size=5) +
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
-       title = ' C)') + theme_classic(base_size=16) +
+       title = ' c)') + theme_classic(base_size=16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
@@ -148,8 +148,8 @@ fig_2c_legend <- grid.arrange(oc.leg,sc.leg,ncol=2,nrow=1)
 
 
 # Richness & Biomass Regressions
-plot.rich_fitted.npk$Model <- "A) Species Richness"
-plot.rich_fitted.ctl$Model <- "A) Species Richness"
+plot.rich_fitted.npk$Model <- "a) Species richness"
+plot.rich_fitted.ctl$Model <- "a) Species richness"
 plot.rich_fitted.npk <- plot.rich_fitted.npk %>% rename(Treatment = trt) 
 plot.rich_fitted.ctl <- plot.rich_fitted.ctl %>% rename(Treatment = trt) 
 fitted.rich <- bind_rows(plot.rich_fitted.npk,plot.rich_fitted.ctl)
@@ -159,7 +159,6 @@ fitted.rich$Treatment <- factor(fitted.rich$Treatment , levels=c("NPK","Control"
 plot.rich_coef2 <- plot.rich_coef2 %>% filter(!is.na(TESlope))
 
 
-# note to self: try predicted effects instead of coefficients
 fig_2a_r <- ggplot() +
   facet_wrap(~Model) +
   geom_hline(yintercept = 0,linetype="longdash") +
@@ -238,8 +237,8 @@ fig_2ab_legend
 
 
 # Biomass Regression
-plot.bm_fitted.npk$Model<-"B) Biomass"
-plot.bm_fitted.ctl$Model<-"B) Biomass"
+plot.bm_fitted.npk$Model<-"b) Biomass"
+plot.bm_fitted.ctl$Model<-"b) Biomass"
 plot.bm_fitted.npk <- plot.bm_fitted.npk %>% rename(Treatment = trt) 
 plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% rename(Treatment = trt) 
 fitted.bm<-bind_rows(plot.bm_fitted.npk,plot.bm_fitted.ctl)
@@ -350,14 +349,13 @@ o_2c_leg <- g_legend(overall_2c_legend)
 s_2c_leg <- g_legend(study_2c_legend)
 
 # use grid extra to add inset effect plots to regression
-fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 6.5, xmax = 12.75, 
-                                ymin = 25, ymax = 42)
+fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 7, xmax = 13.5, 
+                                ymin = 20, ymax = 42)
 
-fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 6.5, xmax = 12.75, 
-                             ymin = 1200 ,ymax = 2075)
+fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 7, xmax = 13.5, 
+                             ymin = 1100 ,ymax = 2075)
 
 
-# use patchwork to put everything together
 # SAVE AS PORTRAIT 10 X 11
 ( fig_2a | fig_2b ) / ( fig_2ab_leg ) / ( fig_2c )/(s_2c_leg)/ (o_2c_leg) + plot_layout(heights = c(10,0.75,13,0.75,0.75))
 

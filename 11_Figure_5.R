@@ -279,7 +279,7 @@ fig_5a <- ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Species loss / year in NPK plots')),
-        title= 'A) Species loss (s.loss)',
+        title= 'a) Species loss (s.loss)',
         y= ' Slope'
   )+
   scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
@@ -316,7 +316,7 @@ fig_5b <- ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Species gain / year in NPK plots')),
-        title= 'B) Species gain (s.gain)',
+        title= 'b) Species gain (s.gain)',
         y= ' '
   )+
   scale_x_continuous(breaks=c(-1,0,1), limits=c(-1.5,1.5))+
@@ -355,7 +355,7 @@ fig_5c <- ggplot() +
   scale_x_continuous(breaks=c(-40,-20,-10,-5,0,10), limits=c(-40,15))+
   labs( 
     x = expression(paste(atop( paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
-        title= 'C) Biomass change associated \n with species loss (SL)',
+        title= 'c) Biomass change associated \n with species loss (SL)',
         y= ''
   ) +
   theme(panel.grid = element_blank(),
@@ -394,7 +394,7 @@ fig_5d <- ggplot() +
   theme_bw(base_size=14) +
   labs( #x = '',
     x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
-    title= 'D) Biomass change associated \n with species gain (SG)',
+    title= 'd) Biomass change associated \n with species gain (SG)',
     y= ' '
   )+
   scale_x_continuous(breaks=c(-10,0,5,10,20,40,60,80), limits=c(-20,80))+
@@ -438,7 +438,7 @@ fig_5e <- ggplot() +
   theme_bw(base_size=14) +
   labs(#x='', 
     x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
-        title= 'E) Biomass change associated \n with persistent species (PS)',
+        title= 'e) Biomass change associated \n with persistent species (PS)',
         y= ''
   )+
   scale_x_continuous(breaks=c(-150,-100,-50,-25,0,25,50,100), limits=c(-175,100))+

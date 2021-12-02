@@ -655,28 +655,31 @@ summary(pp.multi_all)
 color_scheme_set("darkgray")
 sloss <- pp_check(pp.multi_all, resp = 'slossn')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+ 
   labs(title = "j)",
-      x=expression(paste('s.loss')),
+      x=expression(paste('Species loss (s.loss)')),
          y = 'Density') +
   theme(legend.position= "none")
 
 sgain <- pp_check(pp.multi_all, resp = 'sgain')+ theme_classic()+ scale_x_continuous(limits = c(-50, 50))+
-  labs(title = "k)", x='s.gain',
+  labs(title = "k)", x= "Species gain (s.gain)",
         y = '') +
   theme(legend.position= "none")
 
 sl <- pp_check(pp.multi_all, resp = 'SL')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 200))+ 
   labs(title = "l)",
-       x=expression(paste('SL')),
+       x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with species sloss (SL)'))),
        y = 'Density') +
   theme(legend.position= "none")
 
 sg <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-200, 1000))+ 
-  labs(title = "m)",x='SG',
+  labs(title = "m)",
+       x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with species gain (SG)'))),
            y = '') +
   theme(legend.position= "bottom")
 
 cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(limits = c(-1000, 1000))+ 
-  labs(title = "n)", x='PS', y = '') +
+  labs(title = "n)", 
+       x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with persistent species (PS)'))),
+       y = '') +
   theme(legend.position= "none")
            
                                                                                                                                                                                                                                                                                                                                                                                                                        

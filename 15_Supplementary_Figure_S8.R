@@ -64,7 +64,7 @@ rich.ps <- rich.ps %>% left_join(enviro_dat)
 head(rich.ps)
 summary(rich.ps)
 
-fig_s6a <- ggplot() +
+fig_s8a <- ggplot() +
   geom_density_ridges(data = rich.ps, #%>% arrange(desc(MAP_v2)) %>%
                       #                       mutate(site_code= fct_reorder(site_code, MAP_v2)),
                       aes(x = rich.trt.study + rich.trt.global, 
@@ -80,8 +80,8 @@ fig_s6a <- ggplot() +
   #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species loss / year')),
-        title= 'A) Species Richness',
+  labs( x = expression(paste('Species richness change / year in NPK plots')),
+        title= 'a) Species richness',
         y= 'Annual precipitation (mm)'
   )+
  # scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
@@ -93,7 +93,7 @@ fig_s6a <- ggplot() +
         legend.key = element_blank(),
         legend.position="none")
 
-fig_s6a
+fig_s8a
 
 
 bm.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/bm_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -102,7 +102,7 @@ bm.ps <- bm.ps %>% left_join(enviro_dat)
 head(bm.ps)
 summary(bm.ps)
 
-fig_s6b <- ggplot() +
+fig_s8b <- ggplot() +
   geom_density_ridges(data = bm.ps, #%>% arrange(desc(MAP_v2)) %>%
                       #                       mutate(site_code= fct_reorder(site_code, MAP_v2)),
                       aes(x = bm.trt.study + bm.trt.global, 
@@ -118,8 +118,8 @@ fig_s6b <- ggplot() +
   #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species loss / year')),
-        title= 'B) Biomass',
+  labs(   x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
+        title= 'b) Biomass',
         y= ''
   )+
   #scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
@@ -132,7 +132,7 @@ fig_s6b <- ggplot() +
         axis.text.y = element_blank(),
         legend.position="none")
 
-fig_s6b
+fig_s8b
 
 
 
@@ -142,7 +142,7 @@ sloss.ps <- sloss.ps %>% left_join(enviro_dat)
 head(sloss.ps)
 summary(sloss.ps)
 
-fig_s6c <- ggplot() +
+fig_s8c <- ggplot() +
    geom_density_ridges(data = sloss.ps, #%>% arrange(desc(MAP_v2)) %>%
   #                       mutate(site_code= fct_reorder(site_code, MAP_v2)),
                       aes(x = sloss.trt.study + sloss.trt.global, 
@@ -158,8 +158,8 @@ fig_s6c <- ggplot() +
   #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species loss / year')),
-        title= 'C) Species loss (s.loss)',
+  labs( x = expression(paste('Species loss / year in NPK plots')),
+        title= 'c) Species loss (s.loss)',
         y= 'Annual precipitation (mm)'
   )+
   scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
@@ -171,14 +171,14 @@ fig_s6c <- ggplot() +
         legend.key = element_blank(),
         legend.position="none")
 
-fig_s6c
+fig_s8c
 
 
 sgain.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sgain.ps <- sgain.ps %>% left_join(enviro_dat)
 
-fig_s6d <- ggplot() +
+fig_s8d <- ggplot() +
   geom_density_ridges(data = sgain.ps,
                       aes(x = sgain.trt.study + sgain.trt.global, 
                           y = MAP_v2, group = MAP_v2
@@ -193,8 +193,8 @@ fig_s6d <- ggplot() +
   #            aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
-  labs( x = expression(paste('Effect of NPK on species gain / year')),
-        title= 'D) Species gain (s.gain)',
+  labs( x = expression(paste('Species gain / year in NPK plots')),
+        title= 'd) Species gain (s.gain)',
         y= ' '
   )+
   scale_x_continuous(breaks=c(-1,0,1), limits=c(-1.5,1.5))+
@@ -208,14 +208,14 @@ fig_s6d <- ggplot() +
         axis.text.y = element_blank(),
         legend.position="none") 
 
-fig_s6d
+fig_s8d
 
 # species loss (s.loss)
 sl.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sl.ps <- sl.ps %>% left_join(enviro_dat)
 
-fig_s6e <- ggplot() +
+fig_s8e <- ggplot() +
   geom_density_ridges(data = sl.ps,
                       aes(x = sl.trt.study + sl.trt.global, 
                           y = MAP_v2, group = MAP_v2
@@ -236,8 +236,8 @@ fig_s6e <- ggplot() +
     expand = c(0, 0)
   ) +
   labs( 
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
-    title= 'E) Biomass change associated \n with species loss (SL)',
+    x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
+    title= 'e) Biomass change associated \n with species loss (SL)',
     y= 'Annual precipitation (mm)'
   ) +
   theme(panel.grid = element_blank(),
@@ -247,14 +247,14 @@ fig_s6e <- ggplot() +
         legend.position="none") 
 
 
-fig_s6e
+fig_s8e
 
 
 sg.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 sg.ps <- sg.ps %>% left_join(enviro_dat)
 
-fig_s6f <- ggplot() +
+fig_s8f <- ggplot() +
   geom_density_ridges(data = sg.ps,
                       aes(x = sg.trt.study + sg.trt.global, 
                           y = MAP_v2, group = MAP_v2
@@ -270,8 +270,8 @@ fig_s6f <- ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs( #x = '',
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
-    title= 'F) Biomass change associated \n with species gain (SG)',
+    x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
+    title= 'f) Biomass change associated \n with species gain (SG)',
     y= ' '
   )+
   scale_x_continuous(breaks=c(-10,0,5,10,20,40,60,80), limits=c(-20,80))+
@@ -286,7 +286,7 @@ fig_s6f <- ggplot() +
                                    margin = margin(t = 16, r = 0, b = 0, l = 0)), 
         legend.position="none")
 
-fig_s6f
+fig_s8f
 
 
 
@@ -294,7 +294,7 @@ cde.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Post
 
 cde.ps <- cde.ps %>% left_join(enviro_dat)
 
-fig_s6g <- ggplot() +
+fig_s8g <- ggplot() +
   geom_density_ridges(data = cde.ps,
                       aes(x = cde.trt.study + cde.trt.global, 
                           y = MAP_v2, group = MAP_v2
@@ -310,8 +310,8 @@ fig_s6g <- ggplot() +
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs(#x='', 
-    x = expression(paste(atop('Effect of NPK on', paste('biomass change (g/' ,m^2, ') / year')))),
-    title= 'G) Biomass change associated \n with persistent species (PS)',
+    x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
+    title= 'g) Biomass change associated \n with persistent species (PS)',
     y= ''
   )+
   scale_x_continuous(breaks=c(-150,-100,-50,-25,0,25,50,100), limits=c(-175,100))+
@@ -335,11 +335,11 @@ fig_s6g <- ggplot() +
                                     margin = margin(t = 16, r = 0, b = 0, l = 0)), 
         legend.position="none")
 
-fig_s6g
+fig_s8g
 
 
 # PORTRAIT 12 x 15
-( fig_s6a |  fig_s6b)/( fig_s6c | fig_s6d)/(  fig_s6e | fig_s6f | fig_s6g)
+( fig_s8a |  fig_s8b)/( fig_s8c | fig_s8d)/(  fig_s8e | fig_s8f | fig_s8g)
 
 
 

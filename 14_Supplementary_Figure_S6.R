@@ -139,7 +139,7 @@ sp.slope <- ggplot() +
                 width = 0, size = 0.7) +
   labs(x = '',
        y= expression(paste('Change in species richness / year ')),
-       title='a) NPK effect on change in species richness / year') +
+       title='a) Species richness') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
   theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -235,8 +235,8 @@ bm.slope<-ggplot() +
                                     ymax = trt_upper_slope,color=response),
                 width = 0, size = 0.7) +
   labs(x = '',
-       y= expression(paste('Change in biomass (g/' ,m^2, ') / year ')),
-       title='b) NPK effect on change in biomass / year') +
+       y= expression(paste('Biomass change (g/' ,m^2, ') / year ')),
+       title='b) Biomass') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
   theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -391,7 +391,7 @@ sl.slope<-ggplot() +
                 width = 0, size = 0.7) +
   labs(x = '',
        y= expression(paste('Biomass change (g/' ,m^2, ') / year ')),
-       title='e) NPK effect on biomass change / year \n associated with species loss (SL)') +
+       title='e) Biomass change associated \n with species loss (SL)') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
   theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -482,8 +482,8 @@ sg.slope<-ggplot() +
   labs(x = 'Site',
        y = 'Slope') +
   labs(x = '',
-       y= expression(paste('Biomass change (g/' ,m^2, ') / Year ')),
-       title='f) NPK effect on biomass change / year \n associated with species gain (SG)') +
+       y= expression(paste('Biomass change (g/' ,m^2, ') / year ')),
+       title='f) Biomass change associated \n with species gain (SG)') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
   theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -574,8 +574,8 @@ cde.slope<-ggplot() +
   labs(x = 'Site',
        y = 'Slope') +
   labs(x = '',
-       y= expression(paste('Biomass change (g/' ,m^2, ') / Year ')),
-       title='g) NPK effect on biomass change / year \n associated with persistent species (PS)') +
+       y= expression(paste('Biomass change (g/' ,m^2, ') / year ')),
+       title='g) Biomass change associated \n with persistent species (PS)') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
   theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -668,7 +668,7 @@ sloss.slope<-ggplot() +
        y = 'Slope') +
   labs(x = '',
        y= expression(paste('Species loss / year ')),
-       title='c) NPK effect on species loss  / year') +
+       title='c) Species loss (s.loss)') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
   theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -760,8 +760,8 @@ sgain.slope<-ggplot() +
   labs(x = 'Site',
        y = 'Slope') +
   labs(x = '',
-       y= expression(paste('Species gain / year ')),
-       title='d) NPK effect on species gain  / year') +
+       y= expression(paste('Species gain / year')),
+       title='d) Species gain (s.gain)') +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = wes_palette("Darjeeling1")) +
   theme_bw(base_size=14) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
