@@ -113,7 +113,7 @@ price.pairs.calc <-  price.pairs %>% group_by(site_code) %>%
          year.y.m = (year.y - mean(year.y) ) ) # center year
 
 
-head(price.pairs.calc)
+View(price.pairs.calc)
 nrow(price.pairs.calc)
 # 2,966
 
