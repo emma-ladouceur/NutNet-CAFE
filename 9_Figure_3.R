@@ -126,7 +126,7 @@ fig_3a_r <- ggplot() +
   facet_grid(~Model)+
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = sloss.trt_fitted.npk,
-             aes(x = year.y, y = s.loss.n),color="black", alpha=0.2,
+             aes(x = year.y, y = s.loss.n),color="#B40F20", alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sloss.trt_coef2,
                aes(x = xs, 
@@ -134,14 +134,14 @@ fig_3a_r <- ggplot() +
                    y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
                    yend = (Intercept + TE + (ISlope+TESlope) * cxmax)
                ),
-               color="black",alpha=0.2,size = .7) +
+               color="#B40F20",alpha=0.2,size = .7) +
   # uncertainy in fixed effect
   geom_ribbon(data = sloss.trt_fitted.npk,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="#B40F20",alpha = 0.5) +
   # fixed effect
   geom_line(data = fitted.sloss,
-            aes(x = year.y, y = Estimate,linetype=Treatment,color=Treatment),
+            aes(x = year.y, y = Estimate, color=Treatment),
             size = 1.5) +
   geom_ribbon(data = sloss.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
@@ -178,20 +178,20 @@ fig_3b_r <- ggplot()  +
   geom_hline(yintercept = 0,linetype="longdash") +
   facet_grid(~Model)+
   geom_point(data = sgain.trt_fitted.npk,
-             aes(x = year.y, y = s.gain), colour = "black", alpha=0.2,
+             aes(x = year.y, y = s.gain), colour = "#046C9A", alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sgain.trt_coef2,
                aes(x = xs,
                    xend = xmax,
                    y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
                    yend = (Intercept + TE + (ISlope+TESlope)  * cxmax)),
-               colour = "black", alpha=0.2,size = .7) +
+               colour = "#046C9A", alpha=0.2,size = .7) +
   geom_ribbon(data = sgain.trt_fitted.npk,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="#046C9A",alpha = 0.5) +
   # fixed effect
   geom_line(data = fitted.sgain,
-            aes(x = year.y, y = Estimate, linetype=Treatment, color=Treatment),
+            aes(x = year.y, y = Estimate,  color=Treatment),
             size = 1.5) +
   geom_ribbon(data = sgain.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
@@ -277,19 +277,19 @@ fitted.cde$Treatment <- factor(fitted.cde$Treatment , levels=c("NPK","Control"))
 fig_3e_r <- ggplot() +
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = cde_fitted.npk,
-             aes(x = year.y, y = CDE),color="black", alpha=0.2,
+             aes(x = year.y, y = CDE),color="#F98400", alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = cde_coef2,
                aes(x = xs, 
                    xend = xmax,
                    y = (Intercept + TE + (ISlope+TESlope)  * cxmin),
                    yend = (Intercept + TE + (ISlope+TESlope)  * cxmax)),
-               color="black",alpha=0.2,size = .7) +
+               color="#F98400",alpha=0.2,size = .7) +
   geom_ribbon(data = cde_fitted.npk,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="#F98400",alpha = 0.5) +
   geom_line(data = fitted.cde,
-            aes(x = year.y, y = Estimate,linetype=Treatment,color=Treatment),
+            aes(x = year.y, y = Estimate, color=Treatment),
             size = 1.5) +
   geom_ribbon(data = cde_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
@@ -320,7 +320,7 @@ fitted.sl$Treatment <- factor(fitted.sl$Treatment , levels=c("NPK","Control"))
 fig_3c_r <- ggplot() +
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = sl.trt_fitted.npk,
-             aes(x = year.y, y = SL),color="black",alpha=0.2,
+             aes(x = year.y, y = SL),color="#B40F20",alpha=0.2,
              size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sl.trt_coef2,
                aes(x = xs, 
@@ -328,14 +328,14 @@ fig_3c_r <- ggplot() +
                    y = (Intercept + TE  + (ISlope+TESlope) * cxmin),
                    yend = (Intercept + TE + (ISlope+TESlope) * cxmax)
                ),
-               color="black", alpha=0.2,size = .7) +
+               color="#B40F20", alpha=0.2,size = .7) +
   # uncertainty in fixed effect
   geom_ribbon(data = sl.trt_fitted.npk,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="#B40F20",alpha = 0.5) +
   # fixed effect
   geom_line(data = fitted.sl,
-            aes(x = year.y, y = Estimate,linetype=Treatment,color=Treatment),
+            aes(x = year.y, y = Estimate, color=Treatment),
             size = 1.5) +
   geom_ribbon(data = sl.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
@@ -372,20 +372,20 @@ fig_3d_r <- ggplot()  +
   geom_hline(yintercept = 0,linetype="longdash") +
   # data
   geom_point(data = sg.trt_fitted.npk,
-             aes(x = year.y, y = SG), color="black",alpha =0.2,
+             aes(x = year.y, y = SG), color="#046C9A",alpha =0.2,
              size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sg.trt_coef2,
                aes(x = xs,
                    xend = xmax,
                    y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
                    yend = (Intercept + TE + (ISlope+TESlope)  * cxmax)),
-               color="black",alpha=0.2,size = .7) +
+               color="#046C9A",alpha=0.2,size = .7) +
   geom_ribbon(data = sg.trt_fitted.npk,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
               fill="#046C9A",alpha = 0.5) +
   # fixed effect
   geom_line(data = fitted.sg,
-            aes(x = year.y, y = Estimate,linetype=Treatment,color=Treatment),
+            aes(x = year.y, y = Estimate, color=Treatment),
             size = 1.5) +
   geom_ribbon(data = sg.trt_fitted.ctl,
               aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
@@ -408,42 +408,57 @@ fig_3d_r
 
 # Figure 3 Legend
 
-sg.trt_fitted.npk$Plot <- "Temporal comparison cetween plot t0 and plot tn"
-sg.trt_coef2$Site <- "Site"
+sg.trt_fitted.npk$Plot <- "Temporal comparison cetween plot t0 and plot tn: NPK"
+sg.trt_coef2$Site <- "Site: NPK"
 
-fig_3_legend <- ggplot()  +
+
+fig_3_legend_o <- ggplot() +
+  geom_ribbon(data = sg.trt_fitted.npk,
+                  aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
+                  alpha = 0.5) +
+  geom_line(data = fitted.sg,
+            aes(x = year.y, y = Estimate, color= Treatment),
+            size = 1.5) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+  labs(x='',
+       y = ' SL', title= '', color='',fill='') +
+  scale_fill_manual(values = c(  "#046C9A"))+
+  scale_color_manual(values = c( "#046C9A" , "black"))+
+  scale_linetype_manual("",values=c("Site" = 1))+
+  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                 strip.background = element_blank(),
+                                 legend.position="bottom",
+                                 plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                                 legend.spacing.x = unit(0.25, 'cm'))
+
+fig_3_legend_o
+
+fig_3_legend_s <- ggplot() +
+  #facet_wrap(~Model) +
   geom_point(data = sg.trt_fitted.npk,
-             aes(x = year.y, y = SG, fill="Temporal comparison between \n plot t0 and plot tn"), alpha =0.2,
+             aes(x = year.y, y = SG, fill="Temporal comparison between \n plot t0 and plot tn: NPK"),
+             col= "#046C9A",  alpha =0.2,
              size = .7, position = position_jitter(width = 0.45)) +
   geom_segment(data = sg.trt_coef2,
                aes(x = xs,
                    xend = xmax,
                    y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
-                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax), color=Site),
+                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax), color=Site, linetype=Site),
                alpha=0.2,size = .7) +
-  geom_ribbon(data = sg.trt_fitted.npk,
-              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-              fill="#046C9A",alpha = 0.5) +
-  geom_line(data = fitted.sg,
-            aes(x = year.y, y = Estimate, linetype=Treatment),
-            size = 1.5) +
-  geom_ribbon(data = sg.trt_fitted.ctl,
-              aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-              fill="black",alpha = 0.5) +
-  scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
-  ylim(0,400) +
-  labs(x = 'Years',
-       y='',
-       title= '', color='',fill='',linetype='') +
-  scale_fill_manual(values = c("black"))+
-   scale_color_manual(values = c("black"))+
-  theme_bw(base_size=18 ) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                     legend.position="left", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
-                     legend.spacing.y = unit(0.02, 'cm')
-                     )
+  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+  labs(x='',
+       y = ' ', title= '', color='',fill='') +
+  scale_fill_manual(values = c( "#046C9A"))+
+  scale_color_manual(values = c("#046C9A"))+
+  scale_linetype_manual("",values=c("Site: NPK" = 1))+
+  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                 strip.background = element_blank(),
+                                 legend.position="bottom",
+                                 plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                                 legend.spacing.x = unit(0.25, 'cm'))
 
+fig_3_legend_s
 
-fig_3_legend
 
  # extract legend
 # Source: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
@@ -453,8 +468,9 @@ g_legend<-function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
-fig_3_legend <- g_legend(fig_3_legend)
+fig_3_leg_o <- g_legend(fig_3_legend_o)
 
+fig_3_leg_s <- g_legend(fig_3_legend_s)
 
 # produce inset effect plots in upper corners of Fig 3 b) - f)
 
@@ -591,7 +607,10 @@ fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 7.5, xmax =
 # put everything together with grid arrange and grob
 # Save As LANDSCAPE 12 X 14
 
-fig_3 <- grid.arrange(arrangeGrob(fig_3a, fig_3b, fig_3_legend, 
+fig_3_legend <- grid.arrange(arrangeGrob(fig_3_leg_o, fig_3_leg_s,
+                                   ncol = 1, nrow=2))
+
+fig_3 <- grid.arrange(arrangeGrob(fig_3a, fig_3b, fig_3_legend,
                                   fig_3c , fig_3d , fig_3e, ncol = 3, nrow=2))
 
 
