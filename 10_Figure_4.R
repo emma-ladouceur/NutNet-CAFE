@@ -966,6 +966,8 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rd
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3_p
 
 
+
+
 rich.fixed.p <- posterior_samples(rich.3_p, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
 bm.fixed.p <- posterior_samples(bm.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 

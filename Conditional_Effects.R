@@ -49,7 +49,7 @@ fig_2a <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  #ylim(-250, 0)+
+  ylim(-10, 0)+
   labs(x='',
        y = 'Species Loss',
        title= 'a) Species loss (s.loss)') 
@@ -75,7 +75,7 @@ fig_2b <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  #ylim( 0, 250)+
+  ylim( 0, 10)+
   labs(x='',
        y = 'Species gain',
        title= 'a) Species gain (s.gain)') 
@@ -102,7 +102,7 @@ fig_2c <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  ylim(-250, 0)+
+  ylim(-200, 0)+
         labs(x='',
           y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
           title= 'c) Biomass change associated \n with species loss (SL)') 
@@ -128,7 +128,7 @@ fig_2d <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  ylim( 0, 250)+
+  ylim( 0, 200)+
   labs(x='',
        y = '',
       # y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
@@ -159,7 +159,7 @@ fig_2e <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  ylim(-250, 250)+
+  ylim(-100, 200)+
   labs(x='',
        y = '',
       # y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
