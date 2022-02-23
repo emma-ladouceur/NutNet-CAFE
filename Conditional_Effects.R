@@ -51,7 +51,7 @@ fig_2a <- ggplot() +
                                strip.background = element_blank(),legend.position="none") +
   ylim(-10, 0)+
   labs(x='',
-       y = 'Species Loss',
+       y = 'Average species loss',
        title= 'a) Species loss (s.loss)') 
 
 
@@ -77,8 +77,8 @@ fig_2b <- ggplot() +
                                strip.background = element_blank(),legend.position="none") +
   ylim( 0, 10)+
   labs(x='',
-       y = 'Species gain',
-       title= 'a) Species gain (s.gain)') 
+       y = 'Average species gain',
+       title= 'b) Species gain (s.gain)') 
 
 
 fig_2b
@@ -104,7 +104,7 @@ fig_2c <- ggplot() +
                                strip.background = element_blank(),legend.position="none") +
   ylim(-200, 0)+
         labs(x='',
-          y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
+          y = expression(paste('Average change in biomass (g/' ,m^2, ')')),
           title= 'c) Biomass change associated \n with species loss (SL)') 
 
 
@@ -163,12 +163,12 @@ fig_2e <- ggplot() +
   labs(x='',
        y = '',
       # y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
-       title= 'c) Biomass change associated \n with persistent species (PS)') 
+       title= 'e) Biomass change associated \n with persistent species (PS)') 
 
 
 fig_2e
 
-
+# 9X14 LANDSCAPE
 (fig_2a | fig_2b)/ (fig_2c | fig_2d | fig_2e)
 
 

@@ -405,111 +405,113 @@ fig_4a_trt <- ggplot() +
   # annotate("text", x = -0.015, y = 0.75, label = "t0") +
   # annotate("text", x = -0.415, y = 7.25, label = "tn") +
   # annotate("text", x = 0.03, y = -1.5, label = "tn") +
-  labs(x = 'Change in species',
-       y = expression(paste('Change in biomass (g/' ,m^2, ')')),
-       title = '')
+  labs(x = 'Average change in species',
+       y = expression(paste('Average change in biomass (g/' ,m^2, ')')),
+       subtitle = 'a) Average change in species and biomass')
 
 
 fig_4a_trt
 
 
-fig_4a_ctl <- ggplot() +
-  geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
-  theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                     strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  # posterior uncertainty samples for Controls (small dashed lines)
-  # species loss (x-axis) & SL (y-axis)
-  geom_segment(data = added.p.effs,  # segments
-               aes(x = 0,
-                   xend = sloss.ctl.p,
-                   y = 0,
-                   yend = sl.ctl.p  ),
-               colour= "#B40F20", linetype=2,
-               size = 0.2,  alpha = 0.2,
-               arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.ctl.p, # points
-                                      y=  sl.ctl.p  ),
-             colour="black",size=0.2,alpha = 0.2) +
-  # species gain (x-axis) & SG (y-axis)
-  geom_segment(data = added.p.effs, # segment
-               aes(x = sloss.ctl.p,
-                   xend =  sloss.sgain.ctl.p ,
-                   y = sl.ctl.p,
-                   yend = sl.sg.ctl.p ),
-               colour= "#046C9A",linetype=2,
-               size = 0.2,  alpha = 0.2,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl.p, # points
-                                      y=  sl.sg.ctl.p ) ,
-             colour="black",
-             size=0.2,alpha = 0.2) +
-  # persistent species (cde/ps) (y axis only)
-  geom_segment(data = added.p.effs, # segment
-               aes(x =  sloss.sgain.ctl.p,
-                   xend =  sloss.sgain.ctl.p,
-                   y =  sl.sg.ctl.p,
-                   yend = sl.sg.cde.ctl.p ), 
-               colour=  "#F98400",linetype=2,
-               size = 0.2,  alpha = 0.2,
-               arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs,aes(x=0, # points
-                                     y= sl.sg.cde.ctl.p),
-             colour="#F98400",size=0.1,alpha = 0.2) +
-  # Overall effects in Controls (thick dashed lines) 
-  # species loss (x-axis) & SL (y-axis)
-  geom_segment(data = added.p.effs %>% distinct(sloss.ctl_global,
-                                                sl.ctl_global), # segments
-               aes(x = 0,
-                   xend = sloss.ctl_global,
-                   y = 0,
-                   yend = sl.ctl_global  ),
-               colour= "#B40F20", linetype=2,
-               size = 1.5, alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.ctl_global, # points
-                                      y=  sl.ctl_global ),
-             colour="#B40F20",size=0.2,alpha = 0.4) +
-  # species gain (x-axis) & SG (y-axis)
-  geom_segment(data = added.p.effs %>% 
-                 distinct(sloss.ctl_global,sloss.sgain.ctl_global,
-                          sl.ctl_global,sl.sg.ctl_global),
-               aes(x = sloss.ctl_global,
-                   xend = sloss.sgain.ctl_global,
-                   y = sl.ctl_global,
-                   yend =  sl.sg.ctl_global),
-               colour= "#046C9A",linetype=2,
-               size = 1.5,alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl_global, # point
-                                      y= sl.sg.ctl_global ) ,
-             colour="#046C9A",
-             size=0.2,alpha = 0.4) +
-  # persistent species (cde/ps) (y axis only)
-  geom_segment(data = added.p.effs %>% #segment
-                 distinct( sloss.sgain.ctl_global,sl.sg.ctl_global,
-                           sl.sg.cde.ctl_global),
-               aes(x = sloss.sgain.ctl_global,
-                   xend = sloss.sgain.ctl_global,
-                   y = sl.sg.ctl_global,
-                   yend = sl.sg.cde.ctl_global), 
-               colour=  "#F98400",linetype=2,
-               size = 1.5,alpha=0.7,
-               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs,aes(x=0, # points
-                                     y=  sl.sg.cde.ctl_global),
-             colour="#F98400",size=0.1,alpha = 0.4) +
-  labs(x = 'Change in species',
-       y = expression(paste('Change in biomass (g/' ,m^2, ')')),
-       title = '')
-
-
-fig_4a_ctl
-
-
-fig_4a <- fig_4a_trt +  annotation_custom(ggplotGrob(fig_4a_ctl), xmin = -6.25, xmax = -3.5, 
-                                        ymin = 60, ymax = 180)
-
-fig_4a
+# fig_4a_ctl <- ggplot() +
+#   geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+#  # posterior uncertainty samples for Controls (small dashed lines)
+#   # species loss (x-axis) & SL (y-axis)
+#   geom_segment(data = added.p.effs,  # segments
+#                aes(x = 0,
+#                    xend = sloss.ctl.p,
+#                    y = 0,
+#                    yend = sl.ctl.p  ),
+#                colour= "#B40F20", linetype=2,
+#                size = 0.2,  alpha = 0.2,
+#                arrow= arrow(type="closed",length=unit(0.1,"cm"))) +
+#   geom_point(data = added.p.effs, aes(x= sloss.ctl.p, # points
+#                                       y=  sl.ctl.p  ),
+#              colour="black",size=0.2,alpha = 0.2) +
+#   # species gain (x-axis) & SG (y-axis)
+#   geom_segment(data = added.p.effs, # segment
+#                aes(x = sloss.ctl.p,
+#                    xend =  sloss.sgain.ctl.p ,
+#                    y = sl.ctl.p,
+#                    yend = sl.sg.ctl.p ),
+#                colour= "#046C9A",linetype=2,
+#                size = 0.2,  alpha = 0.2,
+#                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+#   geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl.p, # points
+#                                       y=  sl.sg.ctl.p ) ,
+#              colour="black",
+#              size=0.2,alpha = 0.2) +
+#   # persistent species (cde/ps) (y axis only)
+#   geom_segment(data = added.p.effs, # segment
+#                aes(x =  sloss.sgain.ctl.p,
+#                    xend =  sloss.sgain.ctl.p,
+#                    y =  sl.sg.ctl.p,
+#                    yend = sl.sg.cde.ctl.p ), 
+#                colour=  "#F98400",linetype=2,
+#                size = 0.2,  alpha = 0.2,
+#                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+#   geom_point(data = added.p.effs,aes(x=0, # points
+#                                      y= sl.sg.cde.ctl.p),
+#              colour="#F98400",size=0.1,alpha = 0.2) +
+#   # Overall effects in Controls (thick dashed lines) 
+#   # species loss (x-axis) & SL (y-axis)
+#   geom_segment(data = added.p.effs %>% distinct(sloss.ctl_global,
+#                                                 sl.ctl_global), # segments
+#                aes(x = 0,
+#                    xend = sloss.ctl_global,
+#                    y = 0,
+#                    yend = sl.ctl_global  ),
+#                colour= "#B40F20", linetype=2,
+#                size = 1.5, alpha=0.7,
+#                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+#   geom_point(data = added.p.effs, aes(x= sloss.ctl_global, # points
+#                                       y=  sl.ctl_global ),
+#              colour="#B40F20",size=0.2,alpha = 0.4) +
+#   # species gain (x-axis) & SG (y-axis)
+#   geom_segment(data = added.p.effs %>% 
+#                  distinct(sloss.ctl_global,sloss.sgain.ctl_global,
+#                           sl.ctl_global,sl.sg.ctl_global),
+#                aes(x = sloss.ctl_global,
+#                    xend = sloss.sgain.ctl_global,
+#                    y = sl.ctl_global,
+#                    yend =  sl.sg.ctl_global),
+#                colour= "#046C9A",linetype=2,
+#                size = 1.5,alpha=0.7,
+#                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+#   geom_point(data = added.p.effs, aes(x= sloss.sgain.ctl_global, # point
+#                                       y= sl.sg.ctl_global ) ,
+#              colour="#046C9A",
+#              size=0.2,alpha = 0.4) +
+#   # persistent species (cde/ps) (y axis only)
+#   geom_segment(data = added.p.effs %>% #segment
+#                  distinct( sloss.sgain.ctl_global,sl.sg.ctl_global,
+#                            sl.sg.cde.ctl_global),
+#                aes(x = sloss.sgain.ctl_global,
+#                    xend = sloss.sgain.ctl_global,
+#                    y = sl.sg.ctl_global,
+#                    yend = sl.sg.cde.ctl_global), 
+#                colour=  "#F98400",linetype=2,
+#                size = 1.5,alpha=0.7,
+#                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+#   geom_point(data = added.p.effs,aes(x=0, # points
+#                                      y=  sl.sg.cde.ctl_global),
+#              colour="#F98400",size=0.1,alpha = 0.4) +
+#   labs(#x = 'Change in species',
+#     x='', y= ''
+#        #y = expression(paste('Change in biomass (g/' ,m^2, ')')),
+#        #subtitle = ''
+#        ) +   theme_classic(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+#                                           plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
+#                                           strip.background = element_blank(),legend.position="none")
+# 
+# 
+# fig_4a_ctl
+# 
+# 
+# fig_4a <- fig_4a_trt +  annotation_custom(ggplotGrob(fig_4a_ctl), xmin = -6.5, xmax = -3.5, 
+#                                         ymin = 40, ymax = 160)
+# 
+# fig_4a
 
 # GET LEGENDS
 cde.s <- cde.fixed.p2  %>%
@@ -949,14 +951,14 @@ fig_4b <- ggplot() +
   # annotate("text", x = 0.03, y = -1.5, label = "tn") +
   labs(x = 'Rate of change in species (species/year)',
        y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
-       title = '')
+       subtitle = 'b) Rate of change in species and biomass/year (slopes)')
 
 
 fig_4b
 
 
-
-fig_4 <- ( (fig_4a ) | (fig_4b) ) / (f.legend.c) / (f.legend.n) / (p.legend) + plot_layout(heights = c(10,0.5,0.5,0.5))
+# LANDSCAPE 9X13
+fig_4 <- ( (fig_4a_trt ) | (fig_4b) ) / (f.legend.c) / (f.legend.n) / (p.legend) + plot_layout(heights = c(10,0.5,0.5,0.5))
 
 fig_4
 
@@ -996,71 +998,126 @@ bm.fixed.p2 <- bm.fixed.p %>%
 
 bef.effs <- rich.fixed.p2 %>% bind_cols(bm.fixed.p2) 
 
-bef.effs
+head(bef.effs)
 
 rich.ctl.effs <- bef.effs %>%
-  select(rich.ctl.slope.p) %>%
+  select(rich.ctl.slope.p, rich.ctl.p) %>%
   # rich control
-  mutate( rich.ctl_global = mean(rich.ctl.slope.p),
-          rich.ctl_lower = quantile(rich.ctl.slope.p, probs=0.025),
-          rich.ctl_upper = quantile(rich.ctl.slope.p, probs=0.975) )  %>%
-  select(-rich.ctl.slope.p) %>% distinct()
+  mutate( rich.ctl_global_slope = mean(rich.ctl.slope.p),
+          rich.ctl_lower_slope = quantile(rich.ctl.slope.p, probs=0.025),
+          rich.ctl_upper_slope = quantile(rich.ctl.slope.p, probs=0.975) ,
+          #trt
+          rich.ctl_global = mean(rich.ctl.p),
+          rich.ctl_lower = quantile(rich.ctl.p, probs=0.025),
+          rich.ctl_upper = quantile(rich.ctl.p, probs=0.975) ,)  %>%
+  select(-rich.ctl.slope.p, -rich.ctl.p) %>% distinct()
 
 rich.ctl.effs
 
 rich.trt.effs <- bef.effs %>%
-  select(rich.trt.slope.p) %>%
+  select(rich.trt.slope.p, rich.trt.p) %>%
   # rich control
-  mutate( rich.trt_global = mean(rich.trt.slope.p),
-          rich.trt_lower = quantile(rich.trt.slope.p, probs=0.025),
-          rich.trt_upper = quantile(rich.trt.slope.p, probs=0.975) )  %>%
-  select(-rich.trt.slope.p) %>% distinct()
+  mutate(  rich.trt_global_slope = mean(rich.trt.slope.p),
+           rich.trt_lower_slope = quantile(rich.trt.slope.p, probs=0.025),
+           rich.trt_upper_slope = quantile(rich.trt.slope.p, probs=0.975),
+    #trt
+    rich.trt_global = mean(rich.trt.p),
+          rich.trt_lower = quantile(rich.trt.p, probs=0.025),
+          rich.trt_upper = quantile(rich.trt.p, probs=0.975) )  %>%
+  select(-rich.trt.slope.p, -rich.trt.p) %>% distinct()
 
 rich.trt.effs
 
 bm.ctl.effs <- bef.effs %>%
-  select(bm.ctl.slope.p) %>%
+  select(bm.ctl.slope.p, bm.ctl.p) %>%
   # bm control
-  mutate( bm.ctl_global = mean(bm.ctl.slope.p),
-          bm.ctl_lower = quantile(bm.ctl.slope.p, probs=0.025),
-          bm.ctl_upper = quantile(bm.ctl.slope.p, probs=0.975) )  %>%
-  select(-bm.ctl.slope.p) %>% distinct()
+  mutate( bm.ctl_global_slope = mean(bm.ctl.slope.p),
+          bm.ctl_lower_slope = quantile(bm.ctl.slope.p, probs=0.025),
+          bm.ctl_upper_slope = quantile(bm.ctl.slope.p, probs=0.975) ,
+          bm.ctl_global = mean(bm.ctl.p),
+          bm.ctl_lower = quantile(bm.ctl.p, probs=0.025),
+          bm.ctl_upper = quantile(bm.ctl.p, probs=0.975) )  %>%
+  select(-bm.ctl.slope.p, -bm.ctl.p) %>% distinct()
+
+bm.ctl.effs
 
 bm.trt.effs <- bef.effs %>%
-  select(bm.trt.slope.p) %>%
+  select(bm.trt.slope.p, bm.trt.p) %>%
   # bm control
-  mutate( bm.trt_global = mean(bm.trt.slope.p),
-          bm.trt_lower = quantile(bm.trt.slope.p, probs=0.025),
-          bm.trt_upper = quantile(bm.trt.slope.p, probs=0.975) )  %>%
-  select(-bm.trt.slope.p) %>% distinct()
+  mutate( bm.trt_global_slope = mean(bm.trt.slope.p),
+          bm.trt_lower_slope = quantile(bm.trt.slope.p, probs=0.025),
+          bm.trt_upper_slope = quantile(bm.trt.slope.p, probs=0.975),
+          bm.trt_global = mean(bm.trt.p),
+          bm.trt_lower = quantile(bm.trt.p, probs=0.025),
+          bm.trt_upper = quantile(bm.trt.p, probs=0.975),)  %>%
+  select(-bm.trt.slope.p, -bm.trt.p) %>% distinct()
 
 
 trt.effs <- rich.trt.effs %>% bind_cols(bm.trt.effs)
 
 ctl.effs <- rich.ctl.effs %>% bind_cols(bm.ctl.effs)
 
+head(effs_calc)
 
-bm_trt_effs <- effs_calc_slope %>% 
-  select(sl.sg.cde.trt.slope.p) %>%
+bm_trt_effs <- effs_calc_slope %>% cbind(effs_calc) %>%
+  select(sl.sg.cde.trt.slope.p, sl.sg.cde.trt.p) %>%
   # sl + sg + cde treatment
   mutate( sl.sg.cde.trt_global_slope = mean(sl.sg.cde.trt.slope.p),
           sl.sg.cde.trt_lower_slope = quantile(sl.sg.cde.trt.slope.p, probs=0.025),
-          sl.sg.cde.trt_upper_slope = quantile(sl.sg.cde.trt.slope.p, probs=0.975) ) %>%
-  select(-sl.sg.cde.trt.slope.p) %>% distinct()
+          sl.sg.cde.trt_upper_slope = quantile(sl.sg.cde.trt.slope.p, probs=0.975),
+          sl.sg.cde.trt_global = mean(sl.sg.cde.trt.p),
+          sl.sg.cde.trt_lower = quantile(sl.sg.cde.trt.p, probs=0.025),
+          sl.sg.cde.trt_upper = quantile(sl.sg.cde.trt.p, probs=0.975) ) %>%
+  select(-sl.sg.cde.trt.slope.p, -sl.sg.cde.trt.p) %>% distinct()
 
-sp_trt_effs <- effs_calc_slope %>% 
-  select(sloss.sgain.trt.slope.p) %>%
+
+sp_trt_effs <- effs_calc_slope %>% cbind(effs_calc) %>%
+  select(sloss.sgain.trt.slope.p, sloss.sgain.trt.p) %>%
   # sloss + sgain treatment
   mutate( sloss.sgain.trt_global_slope = mean(sloss.sgain.trt.slope.p),
           sloss.sgain.trt_lower_slope = quantile(sloss.sgain.trt.slope.p, probs=0.025),
-          sloss.sgain.trt_upper_slope = quantile(sloss.sgain.trt.slope.p, probs=0.975) ) %>%
-  select(-sloss.sgain.trt.slope.p) %>% distinct()
+          sloss.sgain.trt_upper_slope = quantile(sloss.sgain.trt.slope.p, probs=0.975),
+          sloss.sgain.trt_global = mean(sloss.sgain.trt.p),
+          sloss.sgain.trt_lower = quantile(sloss.sgain.trt.p, probs=0.025),
+          sloss.sgain.trt_upper = quantile(sloss.sgain.trt.p, probs=0.975),) %>%
+  select(-sloss.sgain.trt.slope.p, -sloss.sgain.trt.p) %>% distinct()
 
-price_trt_effs <- bm_effs %>% bind_cols(sp_effs)
+price_trt_effs <- bm_trt_effs %>% bind_cols(sp_trt_effs)
 
 price_trt_effs
 
-fig_ssb <- ggplot()+
+bm_ctl_effs<- effs_calc_slope %>% cbind(effs_calc) %>%
+  select(sl.sg.cde.ctl.slope.p, sl.sg.cde.ctl.p) %>%
+  # sl + sg + cde treatment
+  mutate( sl.sg.cde.ctl_global_slope = mean(sl.sg.cde.ctl.slope.p),
+          sl.sg.cde.ctl_lower_slope = quantile(sl.sg.cde.ctl.slope.p, probs=0.025),
+          sl.sg.cde.ctl_upper_slope = quantile(sl.sg.cde.ctl.slope.p, probs=0.975),
+          sl.sg.cde.ctl_global = mean(sl.sg.cde.ctl.p),
+          sl.sg.cde.ctl_lower = quantile(sl.sg.cde.ctl.p, probs=0.025),
+          sl.sg.cde.ctl_upper = quantile(sl.sg.cde.ctl.p, probs=0.975) ) %>%
+  select(-sl.sg.cde.ctl.slope.p, -sl.sg.cde.ctl.p) %>% distinct()
+
+
+sp_ctl_effs <- effs_calc_slope %>% cbind(effs_calc) %>%
+  select(sloss.sgain.ctl.slope.p, sloss.sgain.ctl.p) %>%
+  # sloss + sgain treatment
+  mutate( sloss.sgain.ctl_global_slope = mean(sloss.sgain.ctl.slope.p),
+          sloss.sgain.ctl_lower_slope = quantile(sloss.sgain.ctl.slope.p, probs=0.025),
+          sloss.sgain.ctl_upper_slope = quantile(sloss.sgain.ctl.slope.p, probs=0.975) ,
+          sloss.sgain.ctl_global = mean(sloss.sgain.ctl.p),
+          sloss.sgain.ctl_lower = quantile(sloss.sgain.ctl.p, probs=0.025),
+          sloss.sgain.ctl_upper = quantile(sloss.sgain.ctl.p, probs=0.975) ) %>%
+  select(-sloss.sgain.ctl.slope.p, -sloss.sgain.ctl.p) %>% distinct()
+
+price_ctl_effs <- bm_ctl_effs %>% bind_cols(sp_ctl_effs)
+
+price_ctl_effs
+
+price_effs<- price_trt_effs %>% bind_cols(price_ctl_effs)
+
+head(added.p.effs)
+
+fig_ssa <- ggplot()+
   geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
  # overall effects
   geom_point(data = trt.effs, aes(x= rich.trt_global,
@@ -1070,17 +1127,130 @@ fig_ssb <- ggplot()+
                                          ymin = bm.trt_lower, ymax = bm.trt_upper),width=0,colour = "#0B775E", size = 2,alpha=0.7) +
   geom_errorbarh(data = trt.effs, aes(y= bm.trt_global,
                                           xmin = rich.trt_lower, xmax = rich.trt_upper),height=0,colour = "#0B775E", size = 2, alpha=0.7) +
-  #ctl
-  # geom_point(data = ctl.effs, aes(x= rich.ctl_global,
-  #                                 y=  bm.ctl_global ),
-  #            fill="black",color="black",size=8, alpha=0.5)+
-  # geom_errorbar(data = ctl.effs, aes(x=rich.ctl_global,
-  #                                    ymin = bm.ctl_lower, ymax = bm.ctl_upper),width=0,colour = "black", size = 2,alpha=0.9) +
-  # geom_errorbarh(data = ctl.effs, aes(y= bm.ctl_global,
-  #                                            xmin = rich.ctl_lower, xmax = rich.ctl_upper),height=0,colour = "black", size = 2, alpha=0.9) +
+   # price
+  geom_point(data = price_effs, aes(x= sloss.sgain.trt_global,
+                                  y=  sl.sg.cde.trt_global ),
+             fill="#F98400",color="#F98400",size=4, alpha=0.5)+
+  geom_errorbar(data = price_effs, aes(x= sloss.sgain.trt_global,
+                                       ymin = sl.sg.cde.trt_lower, ymax = sl.sg.cde.trt_upper),width=0,colour = "#F98400", size = 2,alpha=0.7) +
+  geom_errorbarh(data = price_effs, aes(y= sl.sg.cde.trt_global,
+                                        xmin = sloss.sgain.trt_lower, xmax = sloss.sgain.trt_upper),height=0,colour = "#F98400", size = 2, alpha=0.7) +
+  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global , sloss.ctl_global,
+                                                      sl.trt_global, sl.ctl_global),
+               aes(x = 0,
+                   xend = sloss.trt_global ,
+                   y = 0,
+                   yend = sl.trt_global ),
+               colour= "#B40F20",
+               size = 1.5, #alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  # species gain (x-axis) & SG (y-axis)
+  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global , sloss.sgain.trt_global,
+                                                      sl.trt_global, sl.sg.trt_global ),
+               aes(x = sloss.trt_global,
+                   xend = sloss.sgain.trt_global,
+                   y = sl.trt_global ,
+                   yend = sl.sg.trt_global ),
+               colour= "#046C9A",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  # persistent species (cde/ps) (y axis only)
+  geom_segment(data = added.p.effs %>% distinct(sloss.trt_global ,sloss.sgain.trt_global,
+                                                      sl.trt_global, sl.sg.trt_global,sl.sg.cde.trt_global ),
+               aes(x = sloss.sgain.trt_global,
+                   xend = sloss.sgain.trt_global,
+                   y = sl.sg.trt_global,
+                   yend = sl.sg.cde.trt_global ),
+               colour= "#F98400",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+   #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
+  # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
+  ylim(-100,400) + xlim(-6,15)+
+  labs(x = 'Species',
+       y = expression(paste('Plot biomass (g/' ,m^2, ')')),
+       title = '') + theme_classic(base_size=16) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+fig_ssa
+
+
+fig_ssb <- ggplot()+
+  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+   #ctl
+  geom_point(data = ctl.effs, aes(x= rich.ctl_global,
+                                  y=  bm.ctl_global ),
+             fill="black",color="black",size=8, alpha=0.5)+
+  geom_errorbar(data = ctl.effs, aes(x=rich.ctl_global,
+                                     ymin = bm.ctl_lower, ymax = bm.ctl_upper),width=0,colour = "black", size = 2,alpha=0.9) +
+  geom_errorbarh(data = ctl.effs, aes(y= bm.ctl_global,
+                                      xmin = rich.ctl_lower, xmax = rich.ctl_upper),height=0,colour = "black", size = 2, alpha=0.9) +
+ #price ctl
+  geom_point(data = price_effs, aes(x= sloss.sgain.ctl_global,
+                                    y=  sl.sg.cde.ctl_global ),
+             fill="#F98400",color="#F98400",size=4, alpha=0.5)+
+  geom_errorbar(data = price_effs, aes(x= sloss.sgain.ctl_global,
+                                       ymin = sl.sg.cde.ctl_lower, ymax = sl.sg.cde.ctl_upper),width=0,colour = "#F98400", size = 2,alpha=0.7) +
+  geom_errorbarh(data = price_effs, aes(y= sl.sg.cde.ctl_global,
+                                        xmin = sloss.sgain.ctl_lower, xmax = sloss.sgain.ctl_upper),height=0,colour = "#F98400", size = 2, alpha=0.7) +
+  geom_segment(data = added.p.effs %>% distinct(sloss.ctl_global , sloss.ctl_global,
+                                                      sl.ctl_global, sl.ctl_global),
+               aes(x = 0,
+                   xend = sloss.ctl_global ,
+                   y = 0,
+                   yend = sl.ctl_global ),
+               colour= "#B40F20",
+               size = 1.5, #alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  # species gain (x-axis) & SG (y-axis)
+  geom_segment(data = added.p.effs %>% distinct(sloss.ctl_global ,sloss.sgain.ctl_global, 
+                                                      sl.ctl_global, sl.sg.ctl_global ),
+               aes(x = sloss.ctl_global,
+                   xend = sloss.sgain.ctl_global,
+                   y = sl.ctl_global ,
+                   yend = sl.sg.ctl_global ),
+               colour= "#046C9A",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  # persistent species (cde/ps) (y axis only)
+  geom_segment(data = added.p.effs %>% distinct(sloss.ctl_global ,sloss.sgain.ctl_global, 
+                                                      sl.ctl_global, sl.sg.ctl_global,sl.sg.cde.ctl_global ),
+               aes(x = sloss.sgain.ctl_global,
+                   xend = sloss.sgain.ctl_global,
+                   y = sl.sg.ctl_global,
+                   yend = sl.sg.cde.ctl_global ), 
+               colour= "#F98400",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
+  # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
+ ylim(-100,400) + xlim(-6,15)+
+  labs(x = 'Species',
+       y = expression(paste('Plot biomass (g/' ,m^2, ')')),
+       title = '') + theme_classic(base_size=16) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+fig_ssb
+
+(fig_ssa | fig_ssb)
+
+#c d
+
+fig_ssc <- ggplot()+
+  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+  # overall effects
+  geom_point(data = trt.effs, aes(x= rich.trt_global_slope,
+                                  y=  bm.trt_global_slope ),
+             fill="#0B775E",color="#0B775E",size=4, alpha=0.5)+
+  geom_errorbar(data = trt.effs, aes(x=rich.trt_global_slope,
+                                     ymin = bm.trt_lower_slope, ymax = bm.trt_upper_slope),width=0,colour = "#0B775E", size = 2,alpha=0.7) +
+  geom_errorbarh(data = trt.effs, aes(y= bm.trt_global_slope,
+                                      xmin = rich.trt_lower_slope, xmax = rich.trt_upper_slope),height=0,colour = "#0B775E", size = 2, alpha=0.7) +
   # price
   geom_point(data = price_effs, aes(x= sloss.sgain.trt_global_slope,
-                                  y=  sl.sg.cde.trt_global_slope ),
+                                    y=  sl.sg.cde.trt_global_slope ),
              fill="#F98400",color="#F98400",size=4, alpha=0.5)+
   geom_errorbar(data = price_effs, aes(x= sloss.sgain.trt_global_slope,
                                        ymin = sl.sg.cde.trt_lower_slope, ymax = sl.sg.cde.trt_upper_slope),width=0,colour = "#F98400", size = 2,alpha=0.7) +
@@ -1115,12 +1285,75 @@ fig_ssb <- ggplot()+
                colour= "#F98400",
                size = 1.5,#alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-   #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
+  #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
+  ylim(-8,35) + xlim(-0.8,0.1)+
   labs(x = 'Rate of change in species richness (species/year)',
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = '') + theme_classic(base_size=16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
-fig_ssb
+fig_ssc
+
+
+fig_ssd <- ggplot()+
+  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
+  #ctl
+  geom_point(data = ctl.effs, aes(x= rich.ctl_global_slope,
+                                  y=  bm.ctl_global_slope ),
+             fill="black",color="black",size=8, alpha=0.5)+
+  geom_errorbar(data = ctl.effs, aes(x=rich.ctl_global_slope,
+                                     ymin = bm.ctl_lower_slope, ymax = bm.ctl_upper_slope),width=0,colour = "black", size = 2,alpha=0.9) +
+  geom_errorbarh(data = ctl.effs, aes(y= bm.ctl_global_slope,
+                                      xmin = rich.ctl_lower_slope, xmax = rich.ctl_upper_slope),height=0,colour = "black", size = 2, alpha=0.9) +
+  #price ctl
+  geom_point(data = price_effs, aes(x= sloss.sgain.ctl_global_slope,
+                                    y=  sl.sg.cde.ctl_global_slope ),
+             fill="#F98400",color="#F98400",size=4, alpha=0.5)+
+  geom_errorbar(data = price_effs, aes(x= sloss.sgain.ctl_global_slope,
+                                       ymin = sl.sg.cde.ctl_lower_slope, ymax = sl.sg.cde.ctl_upper_slope),width=0,colour = "#F98400", size = 2,alpha=0.7) +
+  geom_errorbarh(data = price_effs, aes(y= sl.sg.cde.ctl_global_slope,
+                                        xmin = sloss.sgain.ctl_lower_slope, xmax = sloss.sgain.ctl_upper_slope),height=0,colour = "#F98400", size = 2, alpha=0.7) +
+  geom_segment(data = added.p.effs.slope %>% distinct(sloss.ctl_global_slope , sloss.ctl_global_slope,
+                                                      sl.ctl_global_slope, sl.ctl_global_slope),
+               aes(x = 0,
+                   xend = sloss.ctl_global_slope ,
+                   y = 0,
+                   yend = sl.ctl_global_slope ),
+               colour= "#B40F20",
+               size = 1.5, #alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  # species gain (x-axis) & SG (y-axis)
+  geom_segment(data = added.p.effs.slope %>% distinct(sloss.ctl_global_slope ,sloss.sgain.ctl_global_slope, 
+                                                      sl.ctl_global_slope, sl.sg.ctl_global_slope ),
+               aes(x = sloss.ctl_global_slope,
+                   xend = sloss.sgain.ctl_global_slope,
+                   y = sl.ctl_global_slope ,
+                   yend = sl.sg.ctl_global_slope ),
+               colour= "#046C9A",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  # persistent species (cde/ps) (y axis only)
+  geom_segment(data = added.p.effs.slope %>% distinct(sloss.ctl_global_slope ,sloss.sgain.ctl_global_slope, 
+                                                      sl.ctl_global_slope, sl.sg.ctl_global_slope,sl.sg.cde.ctl_global_slope ),
+               aes(x = sloss.sgain.ctl_global_slope,
+                   xend = sloss.sgain.ctl_global_slope,
+                   y = sl.sg.ctl_global_slope,
+                   yend = sl.sg.cde.ctl_global_slope ), 
+               colour= "#F98400",
+               size = 1.5,#alpha=0.7,
+               arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
+  #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
+  # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
+  ylim(-8,35) + xlim(-0.8,0.1)+
+  labs(x = 'Change in species richness (species/year)',
+       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
+       title = '') + theme_classic(base_size=16) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+
+fig_ssd
+
+(fig_ssa | fig_ssb)/(fig_ssc | fig_ssd)
+
