@@ -31,7 +31,39 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain
 
 colnames(p.all)
 
-sloss_c <- conditional_effects(sloss.3_p, effects = 'trt.y', re_formula = NA, method = 'fitted')  # conditional effects
+head(p.all)
+
+pp.deets <- p.all %>% ungroup() %>% select(year.y.m) %>% 
+  mutate(year.y.m = max(year.y.m) ) %>% 
+  distinct()
+
+head(pp.deets)
+
+conditions <- make_conditions(pp.deets, vars = c("year.y.m"))
+
+conditions <- make_conditions(sloss.3_p, "year.y.m")
+
+sloss_c <- conditional_effects(sloss.3_p, effects = 'trt.y:year.y.m',
+                               conditions = conditions, re_formula = NA, method = 'fitted')  # conditional effects
+
+View(sloss_c)
+
+
+plot(conditional_effects(sloss.3_p, effects = "trt.y:year.y.m",
+                         condition = conditions, 
+                         re_formula = NULL, method = 'predict'),
+     points = TRUE, rug = TRUE)
+
+
+sloss_c.df <- sloss_c %>% 
+  purrr::pluck("trt.y:year.y.m")
+
+View(sloss_c.df)
+
+sloss_ci <- sloss_c.df %>% left_join(pp.deets)
+
+head(sloss_ci)
+
 
 fig_2a <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +

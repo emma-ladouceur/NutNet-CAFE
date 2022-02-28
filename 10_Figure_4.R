@@ -1167,9 +1167,10 @@ fig_ssa <- ggplot()+
    #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
   ylim(-100,400) + xlim(-6,15)+
-  labs(x = 'Species',
-       y = expression(paste('Plot biomass (g/' ,m^2, ')')),
-       title = '') + theme_classic(base_size=16) +
+  labs(x = 'Average species change',
+       y = expression(paste('Average plot biomass (g/' ,m^2, ')')),
+       title = 'Average change in species and biomass',
+       subtitle= 'a) NPK') + theme_classic(base_size=16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
@@ -1226,9 +1227,9 @@ fig_ssb <- ggplot()+
   #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
  ylim(-100,400) + xlim(-6,15)+
-  labs(x = 'Species',
-       y = expression(paste('Plot biomass (g/' ,m^2, ')')),
-       title = '') + theme_classic(base_size=16) +
+  labs(x = 'Average species change',
+       y = expression(paste('Average plot biomass (g/' ,m^2, ')')),
+       subtitle = 'b) Control') + theme_classic(base_size=16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
@@ -1288,9 +1289,10 @@ fig_ssc <- ggplot()+
   #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
   ylim(-8,35) + xlim(-0.8,0.1)+
-  labs(x = 'Rate of change in species richness (species/year)',
-       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
-       title = '') + theme_classic(base_size=16) +
+  labs(x = 'Rate of change in species (species/year)',
+       y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
+       title = 'Rate of change in species and biomass/year (slopes)',
+       subtitle = 'c) NPK') + theme_classic(base_size=16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
@@ -1347,9 +1349,9 @@ fig_ssd <- ggplot()+
   #   scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
   # scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
   ylim(-8,35) + xlim(-0.8,0.1)+
-  labs(x = 'Change in species richness (species/year)',
-       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
-       title = '') + theme_classic(base_size=16) +
+  labs(x = 'Rate of change in species  (species/year)',
+       y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
+       subtitle = 'd)  Control') + theme_classic(base_size=16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 

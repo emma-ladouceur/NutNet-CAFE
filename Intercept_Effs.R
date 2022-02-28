@@ -35,7 +35,7 @@ sl.fixed.p <- posterior_samples(sl.3_p, "^b" , subset = floor(runif(n = 2000, 1,
 sg.fixed.p <- posterior_samples(sg.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 
 
-head(sl.fixed.p)
+nrow(sl.fixed.p)
 
 
 sl.fixed.p2 <- sl.fixed.p %>% 
