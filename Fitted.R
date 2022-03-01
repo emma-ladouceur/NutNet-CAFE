@@ -12,8 +12,12 @@ library(grid)
 p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
+colnames(p.all)
+
 p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
-  filter(year_max >= 3) 
+  filter(year_max >= 3) %>% mutate(year.y == max(year.y))
+
+View(p.all)
 
 p.all$site_code <- as.factor(p.all$site_code)
 p.all$block<-as.factor(p.all$block)
@@ -76,7 +80,7 @@ fig_2a <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  #ylim(-10, 0)+
+  ylim(-20, 0)+
   labs(x='',
        y = 'Average species loss',
        title= 'a) Species loss (s.loss)') 
@@ -136,7 +140,7 @@ fig_2b <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  #ylim(-10, 0)+
+  ylim(0, 20)+
   labs(x='',
        y = 'Average species gain',
        title= 'a) Species gain (s.gain)') 
@@ -194,7 +198,7 @@ fig_2c <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  ylim(-200, 300)+
+  ylim(-250, 250)+
   labs(x='',
        y = expression(paste('Average change in biomass (g/' ,m^2, ')')),
        title= 'a) Biomass change associated \n with species loss (SL)') 
@@ -254,7 +258,7 @@ fig_2d <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  ylim(-200, 300)+
+  ylim(-250, 250)+
   labs(x='',
        y = '',
        title= 'd) Biomass change associated \n with species gain (SG)') 
@@ -317,7 +321,7 @@ fig_2e <- ggplot() +
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
                                strip.background = element_blank(),legend.position="none") +
-  ylim(-400, 450)+
+  ylim(-250, 250)+
   labs(x='',
        y = '',
        title= 'e) Biomass change associated \n with persistent species (PS)') 
