@@ -78,6 +78,8 @@ sloss.trt_fitted <- cbind(sloss.3_p$data,
                           fitted(sloss.3_p, re_formula = NA)) %>% 
   as_tibble() %>% left_join(p.all)
 
+View(sloss.trt_fitted)
+
 
 sloss.trt_fitted.npk <- sloss.trt_fitted %>% filter(trt.y %in% c('NPK'))
 sloss.trt_fitted.ctl <- sloss.trt_fitted  %>% filter(trt.y %in% c('Control'))

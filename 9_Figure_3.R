@@ -120,7 +120,7 @@ fitted.sloss <- bind_rows(sloss.trt_fitted.npk,sloss.trt_fitted.ctl)
 
 fitted.sloss$Treatment <- factor(fitted.sloss$Treatment , levels=c("NPK","Control"))
 
-
+View(fitted.sloss)
 
 fig_3a_r <- ggplot() +
   facet_grid(~Model)+
