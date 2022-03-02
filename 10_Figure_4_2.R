@@ -562,6 +562,7 @@ head(effs_calc_slope)
 # take mean and quantiles and take 50 samps within probs
 
 added.p.effs.slope <- effs_calc_slope %>%
+  group_by(Treatment) %>%
   mutate( # sloss
           sloss_global_slope = mean(sloss),
           sloss_lower_slope = quantile(sloss, probs=0.025),
@@ -599,10 +600,11 @@ added.p.effs.slope <- effs_calc_slope %>%
     sl.sg.cde > quantile(sl.sg.cde, probs=0.025),
     sl.sg.cde < quantile(sl.sg.cde, probs=0.975)
          ) %>% sample_n(50) %>% 
+  ungroup() %>%
   select(-c(sg, cde, sgain))
 
 
-nrow(added.p.effs.slope)
+View(added.p.effs.slope)
 head(added.p.effs.slope)
 
 
@@ -654,8 +656,7 @@ fig_4b <- ggplot() +
   # Overall effects in Controls (thick dashed lines) 
   # species loss (x-axis) & SL (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "Control") %>% 
-                 distinct(sloss_global_slope,
-                                                      sl_global_slope), # segments
+                 distinct(sloss_global_slope,sl_global_slope), # segments
                aes(x = 0,
                    xend = sloss_global_slope,
                    y = 0,
@@ -669,7 +670,7 @@ fig_4b <- ggplot() +
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "Control") %>% 
-                 distinct(sloss_global_slope,sloss.sgain_global_slope,
+                 distinct(sloss_global_slope, sloss.sgain_global_slope,
                           sl_global_slope, sl.sg_global_slope),
                aes(x = sloss_global_slope,
                    xend = sloss.sgain_global_slope,
@@ -707,7 +708,8 @@ fig_4b <- ggplot() +
                colour= "#B40F20",
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs.slope, aes(x= sloss , # points
+  geom_point(data = added.p.effs.slope %>% filter( Treatment == "NPK"),
+             aes(x= sloss , # points
                                             y=  sl  ),
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
@@ -719,8 +721,8 @@ fig_4b <- ggplot() +
                colour= "#046C9A",
                size = 0.2,  alpha = 0.4,
                arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
-  geom_point(data = added.p.effs.slope %>% filter( Treatment == "NPK"), aes(x= sloss.sgain , #points
-                                            y= sl.sg),
+  geom_point(data = added.p.effs.slope %>% filter( Treatment == "NPK"),
+             aes(x= sloss.sgain , y= sl.sg),
              colour="#046C9A",
              size=0.2,alpha = 0.4) +
   # persistent species (cde/ps) (y axis only)
@@ -738,8 +740,9 @@ fig_4b <- ggplot() +
              colour="#F98400",size=0.1,alpha = 0.4) +
   #   # Overall effects in Treatments (NPK) (thick solid lines) 
   # species loss (x-axis) and SL (y-axis)
-  geom_segment(data = added.p.effs.slope %>% filter( Treatment == "NPK") %>% distinct(sloss_global_slope , sloss_global_slope,
-                                                      sl_global_slope, sl_global_slope),
+  geom_segment(data = added.p.effs.slope %>% filter( Treatment == "NPK") %>% 
+                 distinct(sloss_global_slope , sloss_global_slope,
+                           sl_global_slope, sl_global_slope),
                aes(x = 0,
                    xend = sloss_global_slope ,
                    y = 0,
@@ -747,13 +750,13 @@ fig_4b <- ggplot() +
                colour= "#B40F20",
                size = 1.5, #alpha=0.7,
                arrow=arrow(type="closed",length=unit(0.4,"cm"))) +
-  geom_point(data = added.p.effs.slope %>% filter( Treatment == "NPK"), aes(x= sloss_global_slope , #loss
-                                            y=  sl_global_slope ),
+  geom_point(data = added.p.effs.slope %>% filter( Treatment == "NPK"), 
+             aes(x= sloss_global_slope ,  y=  sl_global_slope ),
              colour="#B40F20",size=0.2,alpha = 0.4) +
   # species gain (x-axis) & SG (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "NPK") %>% 
                  distinct(sloss_global_slope ,sloss.sgain_global_slope, 
-                                                      sl_global_slope, sl.sg_global_slope ),
+                           sl_global_slope, sl.sg_global_slope ),
                aes(x = sloss_global_slope,
                    xend = sloss.sgain_global_slope,
                    y = sl_global_slope ,
@@ -766,8 +769,8 @@ fig_4b <- ggplot() +
   ), colour="#046C9A", size=0.2,alpha = 0.4) +
   # persistent species (cde/ps) (y axis only)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "NPK") %>% 
-                 distinct(sloss_global_slope , sloss.sgain_global_slope, 
-                                                      sl_global_slope, sl.sg_global_slope,sl.sg.cde_global_slope ),
+                 distinct(sloss.sgain_global_slope, 
+                          sl.sg_global_slope, sl.sg.cde_global_slope ),
                aes(x = sloss.sgain_global_slope,
                    xend = sloss.sgain_global_slope,
                    y = sl.sg_global_slope,
@@ -779,8 +782,8 @@ fig_4b <- ggplot() +
              aes(x=0, #persistent
                                            y=  sl.sg.cde_global_slope ),
              colour="#F98400",size=0.1,alpha = 0.4) +
-  scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
-  scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
+   scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
+   scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
   # annotate("text", x = -0.015, y = 0.75, label = "t0") +
   # annotate("text", x = -0.415, y = 7.25, label = "tn") +
   # annotate("text", x = 0.03, y = -1.5, label = "tn") +
@@ -793,7 +796,7 @@ fig_4b
 
 
 # LANDSCAPE 9X13
-fig_4 <- ( (fig_4a_trt ) | (fig_4b) ) / (f.legend.c) / (f.legend.n) / (p.legend) + plot_layout(heights = c(10,0.5,0.5,0.5))
+fig_4 <- ( (fig_4a ) | (fig_4b) ) / (f.legend.c) / (f.legend.n) / (p.legend) + plot_layout(heights = c(10,0.5,0.5,0.5))
 
 fig_4
 
