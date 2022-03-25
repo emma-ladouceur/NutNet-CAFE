@@ -583,24 +583,24 @@ fig_3e_e
 
 # Inset effect plots within regression plots
 
-fig_3a <- fig_3a_r +  annotation_custom(ggplotGrob(fig_3a_e), xmin = 7.5, xmax = 13.75, 
-                                         ymin = -22.5, ymax = -15.5)
+fig_3a <- fig_3a_r +  annotation_custom(ggplotGrob(fig_3a_e), xmin = 7, xmax = 13.75, 
+                                         ymin = -22.25, ymax = -15)
 
 
-fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 7.5, xmax = 13.75, 
+fig_3b <- fig_3b_r +  annotation_custom(ggplotGrob(fig_3b_e), xmin = 7, xmax = 13.75, 
                                          ymin = 14, ymax = 21)
 
 
 # fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 6.5, xmax = 12.75, 
 #                                         ymin = 21, ymax = 30)
 
-fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 7.5, xmax = 13.75, 
-                                   ymin = -420, ymax = -295)
+fig_3c <- fig_3c_r +  annotation_custom(ggplotGrob(fig_3c_e), xmin = 7, xmax = 13.75, 
+                                   ymin = -425, ymax = -290)
 
-fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 7.5, xmax = 13.75, 
-                                   ymin = 295, ymax = 420)
+fig_3d <- fig_3d_r +  annotation_custom(ggplotGrob(fig_3d_e), xmin = 7, xmax = 13.75, 
+                                   ymin = 290, ymax = 420)
 
-fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 7.5, xmax = 13.75, 
+fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 7, xmax = 13.75, 
                                         ymin = 570, ymax = 1070)
 
 

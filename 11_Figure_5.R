@@ -36,12 +36,14 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p
 
 
 #  mods study level dat
-study_levels <- rich.3$data %>% 
+study_levels <- sl.3_p$data %>% 
   as_tibble() %>% 
   distinct(site_code) %>% 
   mutate(level =  site_code) %>%
   nest_legacy(level)
 
+
+head(study_levels)
 
 study_sample_posterior <- study_levels %>%
   mutate(sl.ctl.study = purrr::map(data, ~posterior_samples(sl.3,

@@ -17,7 +17,11 @@ colnames(p.all)
 p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
   filter(year_max >= 3) %>% mutate(year.y == max(year.y))
 
-View(p.all)
+head(p.all)
+
+p.all %>% ungroup() %>% select(year_max) %>% distinct() %>% mutate(mean(year_max))
+
+
 
 p.all$site_code <- as.factor(p.all$site_code)
 p.all$block<-as.factor(p.all$block)
@@ -52,6 +56,8 @@ head(s.loss.fitted.df)
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
 save(s.loss.fitted.df, file = 'fitted_s.loss.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.loss.Rdata')
+
+View(s.loss.fitted.df)
 
 s.loss.fitted <- s.loss.fitted.df %>%
   select(-.draw) %>%
