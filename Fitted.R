@@ -149,7 +149,7 @@ fig_2b <- ggplot() +
   ylim(0, 20)+
   labs(x='',
        y = 'Average species gain',
-       title= 'a) Species gain (s.gain)') 
+       title= 'b) Species gain (s.gain)') 
 
 
 fig_2b
@@ -207,7 +207,7 @@ fig_2c <- ggplot() +
   ylim(-250, 250)+
   labs(x='',
        y = expression(paste('Average change in biomass (g/' ,m^2, ')')),
-       title= 'a) Biomass change associated \n with species loss (SL)') 
+       title= 'c) Biomass change associated \n with species loss (SL)') 
 
 
 fig_2c
