@@ -113,13 +113,13 @@ study_sample_posterior <- study_levels %>%
 # fixed posteriors
 sl.fixed.p <- posterior_samples(sl.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sg.fixed.p<-posterior_samples(sg.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
-sloss.fixed.p <- posterior_samples(sloss.3, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
+sloss.fixed.p <- posterior_samples(sloss.3_p, "^b" , subset = floor(runif(n = 1000, 1, max = 2000))) 
 sgain.fixed.p<-posterior_samples(sgain.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 cde.fixed.p<-posterior_samples(cde.3, "^b",subset = floor(runif(n = 1000, 1, max = 2000)) ) 
 rich.fixed.p<-posterior_samples(rich.3, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
 bm.fixed.p<-posterior_samples(bm.3, "^b" ,subset = floor(runif(n = 1000, 1, max = 2000))) 
 
-head(rich.fixed.p)
+head(sloss.fixed.p)
 
 
 rich_posterior <- study_sample_posterior  %>% 
