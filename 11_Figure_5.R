@@ -266,7 +266,7 @@ sloss.ps$Quadrant<-factor(sloss.ps$Quadrant,  levels=c("-biomass +rich", "+bioma
 
 sloss.ps
 
-fig_5a <- ggplot() +
+fig_5f <- ggplot() +
   geom_density_ridges(data = sloss.ps, #density ridges
                       aes(x = sloss.trt.study + sloss.trt.global, 
                           y = Quadrant,
@@ -275,21 +275,22 @@ fig_5a <- ggplot() +
                       linetype = 0) +
   geom_point(data =npk.effs, aes(y = Quadrant, x = sloss.trt.rate.p), #study-level effects
              colour= "#B40F20", shape=1, size = 2,  position = position_jitter(height = 0.02 )) +
-  geom_point(data= sloss.ps %>% group_by(Quadrant) %>% # median of study-level effects for each group
-               summarise(mean.s.eff = median(sloss.trt.study + sloss.trt.global)),
+  geom_point(data= sloss.ps %>% group_by(Quadrant) %>% # mean of study-level effects for each group
+               summarise(mean.s.eff = mean(sloss.trt.study + sloss.trt.global)),
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Species loss / year in NPK plots')),
-        title= 'a) Species loss (s.loss)',
-        y= ' Slope'
+        #title= 'a) Species loss (s.loss)',
+        subtitle = "f)",
+        y= ''
   )+
   scale_x_continuous(breaks=c(-2,-1,0,1,2), limits=c(-2,2))+
   theme(panel.grid = element_blank(),
         legend.key = element_blank(),
         legend.position="none")+  scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
-fig_5a
+fig_5f
 
 
 sgain.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sgain_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -303,7 +304,7 @@ colnames(sgain.ps)
 sgain.p
 
 
-fig_5b <- ggplot() +
+fig_5g <- ggplot() +
   geom_density_ridges(data = sgain.ps,
                       aes(x = sgain.trt.study + sgain.trt.global, 
                           y = Quadrant,
@@ -313,13 +314,14 @@ fig_5b <- ggplot() +
   geom_point(data =npk.effs, aes(y = Quadrant, x = sgain.trt.rate.p),
              colour= "#3B9AB2",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
   geom_point(data= sgain.ps %>% group_by(Quadrant) %>%
-               summarise(mean.s.eff = median(sgain.trt.study + sgain.trt.global)), 
+               summarise(mean.s.eff = mean(sgain.trt.study + sgain.trt.global)), 
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs( x = expression(paste('Species gain / year in NPK plots')),
-        title= 'b) Species gain (s.gain)',
-        y= ' '
+       # title= 'b) Species gain (s.gain)',
+       subtitle = "g)", 
+       y= ' '
   )+
   scale_x_continuous(breaks=c(-1,0,1), limits=c(-1.5,1.5))+
   theme(panel.grid = element_blank(),
@@ -328,7 +330,7 @@ fig_5b <- ggplot() +
         axis.text.y = element_blank(),
         legend.position="none") 
 
-fig_5b
+fig_5g
 
 # species loss (s.loss)
 sl.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sl_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -340,7 +342,7 @@ sl.ps$Quadrant<-factor(sl.ps$Quadrant,  levels=c("-biomass +rich","+biomass +ric
 
 head(sl.ps)
 
-fig_5c <- ggplot() +
+fig_5h <- ggplot() +
   geom_density_ridges(data = sl.ps,
                       aes(x = sl.trt.study + sl.trt.global, 
                           y = Quadrant,
@@ -350,15 +352,16 @@ fig_5c <- ggplot() +
   geom_point(data =npk.effs, aes(y = Quadrant, x = sl.trt.rate.p),
              colour= "#B40F20",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
   geom_point(data= sl.ps %>% group_by(Quadrant) %>%
-               summarise(mean.s.eff = median(sl.trt.study + sl.trt.global)), 
+               summarise(mean.s.eff = mean(sl.trt.study + sl.trt.global)), 
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   scale_x_continuous(breaks=c(-40,-20,-10,-5,0,10), limits=c(-40,15))+
   labs( 
     x = expression(paste(atop( paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
-        title= 'c) Biomass change associated \n with species loss (SL)',
-        y= ''
+        #title= 'c) Biomass change associated \n with species loss (SL)',
+    subtitle = "i)",    
+    y= ''
   ) +
   theme(panel.grid = element_blank(),
         legend.key = element_blank(),
@@ -368,7 +371,7 @@ fig_5c <- ggplot() +
         legend.position="none") 
 
 
-fig_5c
+fig_5f
 
 
 sg.ps <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/sg_posteriors.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
@@ -380,7 +383,7 @@ sg.ps$Quadrant<-factor(sg.ps$Quadrant,  levels=c("-biomass +rich","+biomass +ric
 
 sg.ps
 
-fig_5d <- ggplot() +
+fig_5i <- ggplot() +
   geom_density_ridges(data = sg.ps,
                       aes(x = sg.trt.study + sg.trt.global, 
                           y = Quadrant,
@@ -390,13 +393,14 @@ fig_5d <- ggplot() +
   geom_point(data =npk.effs, aes(y = Quadrant, x = sg.trt.rate.p),
              colour= "#3B9AB2",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
   geom_point(data= sg.ps %>% group_by(Quadrant) %>%
-               summarise(mean.s.eff = median(sg.trt.study + sg.trt.global)), 
+               summarise(mean.s.eff = mean(sg.trt.study + sg.trt.global)), 
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs( #x = '',
     x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
-    title= 'd) Biomass change associated \n with species gain (SG)',
+    #title= 'd) Biomass change associated \n with species gain (SG)',
+    subtitle = "i)",
     y= ' '
   )+
   scale_x_continuous(breaks=c(-10,0,5,10,20,40,60,80), limits=c(-20,80))+
@@ -407,7 +411,7 @@ fig_5d <- ggplot() +
                                    margin = margin(t = 16, r = 0, b = 0, l = 0)), 
         legend.position="none")
 
-fig_5d
+fig_5i
 
 
 
@@ -424,7 +428,7 @@ cde.ps
 head(npk.effs)
 
 
-fig_5e <- ggplot() +
+fig_5j <- ggplot() +
   geom_density_ridges(data = cde.ps,
                       aes(x = cde.trt.study + cde.trt.global, 
                           y = Quadrant,
@@ -434,22 +438,23 @@ fig_5e <- ggplot() +
   geom_point(data =npk.effs, aes(y = Quadrant, x = cde.trt.rate.p),
              colour= "#F98400",shape=1,size = 2,  position = position_jitter(height = 0.02 )) +
   geom_point(data= cde.ps %>% group_by(Quadrant) %>%
-               summarise(mean.s.eff = median(cde.trt.study + cde.trt.global)), 
+               summarise(mean.s.eff = mean(cde.trt.study + cde.trt.global)), 
              aes(x= mean.s.eff, y= Quadrant),  size=4, shape=5)+
   geom_vline(xintercept = 0, lty = 2) +
   theme_bw(base_size=14) +
   labs(#x='', 
     x = expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'in NPK plots'))),
-        title= 'e) Biomass change associated \n with persistent species (PS)',
-        y= ''
+       # title= 'e) Biomass change associated \n with persistent species (PS)',
+    subtitle = "j)",
+     y= ''
   )+
   scale_x_continuous(breaks=c(-150,-100,-50,-25,0,25,50,100), limits=c(-175,100))+
-  geom_text(data = cde.ps %>%
+  geom_text(data = cde %>%
               group_by(Quadrant) %>%
               mutate(n_sites = n_distinct(site_code)) %>%
               ungroup() %>%
               distinct(Quadrant, n_sites, .keep_all = T),
-            aes(x=-100, y=Quadrant,
+            aes(x=-120, y=Quadrant,
                 label=paste('n[sites] == ', n_sites)),
             size=6,
             nudge_y = 0.5, parse = T) +
@@ -460,12 +465,12 @@ fig_5e <- ggplot() +
                                    margin = margin(t = 16, r = 0, b = 0, l = 0)), 
         legend.position="none")
 
-fig_5e
+fig_5j
 
 
 # LANDSCAPE 7 X 19
 # Figure 5
-( fig_5a |  fig_5b | fig_5c | fig_5d |  fig_5e  )
+( fig_5b |  fig_5d | fig_5f | fig_5h |  fig_5j  )
 
 
 
