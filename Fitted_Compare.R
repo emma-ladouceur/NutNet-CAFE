@@ -404,7 +404,7 @@ fig_2d <- ggplot() +
   theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
-                               strip.background = element_blank(),legend.position="bottom") +
+                               strip.background = element_blank(),legend.position="none") +
   ylim(-250, 250)+
   labs(x='',
        y = '',
@@ -502,9 +502,45 @@ fig_2e <- ggplot() +
 fig_2e
 
 
+fig_2_leg <- ggplot() + 
+  geom_hline(yintercept = 0,linetype="longdash") +
+  geom_point(data = s.cde.mm,
+             aes(x = trt.y , y = P_Estimate, shape = value, group = value), 
+             position = position_dodge(width = 0.75), size = 3) +
+  geom_errorbar(data = s.cde.mm,
+                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper,   group = value),
+                position = position_dodge(width = 0.75),
+                size = 1, width = 0) +
+  scale_shape_manual(name = "Average change \n between t0 & tn",
+                     values = c(16, 17), labels = c("Year 1", "Max Year") )+ 
+  ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
+  theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
+                               plot.title=element_text(size=18, hjust=0.5),
+                               strip.background = element_blank(),legend.position="bottom") +
+  ylim(-250, 250)+
+  labs(x='',
+       y = '',
+       title= 'e) Biomass change associated \n with persistent species (PS)') 
+
+
+fig_2_leg
+
+
+# extract legend
+# Source: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+g_legend <- function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+# overall legend
+fig_2_legend <- g_legend(fig_2_leg)
+
 
 # 10X14 LANDSCAPE
-(fig_2a | fig_2b)/ (fig_2c | fig_2d | fig_2e)
+(fig_2a | fig_2b)/ (fig_2c | fig_2d | fig_2e) / (fig_2_legend) + plot_layout(heights = c(10, 10, 1))
 
 
 
