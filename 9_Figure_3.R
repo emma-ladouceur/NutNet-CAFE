@@ -36,10 +36,6 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/slos
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/sl.n.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/sg.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.mod.dat.Rdata')
-#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/ps.mod.dat.Rdata') # ps.3_sigma
-
-
-
 
 # saved posterior data from 7_ Model_Data_Posteriors
 # Global/ Overall/ Population Effects for inset plots
@@ -107,9 +103,9 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.
 # fig_3a
 
 
-#  Fig 3b) species loss regression (s.loss)
+#  Fig 3a) species loss regression (s.loss)
 
-sloss.trt_coef2$xs<-1
+sloss.trt_coef2$xs <- 1
 
 sloss.trt_fitted.npk$Model<-"a) Species loss (s.loss)"
 sloss.trt_fitted.ctl$Model<-"a) Species loss (s.loss)"
@@ -120,7 +116,7 @@ fitted.sloss <- bind_rows(sloss.trt_fitted.npk,sloss.trt_fitted.ctl)
 
 fitted.sloss$Treatment <- factor(fitted.sloss$Treatment , levels=c("NPK","Control"))
 
-View(fitted.sloss)
+head(fitted.sloss)
 
 fig_3a_r <- ggplot() +
   facet_grid(~Model)+
@@ -163,9 +159,9 @@ fig_3a_r <- ggplot() +
 fig_3a_r
 
 
-# fig 3c species gain regression (s.gain)
+# fig 3b) species gain regression (s.gain)
 
-sgain.trt_coef2$xs<-1
+sgain.trt_coef2$xs <- 1
 
 sgain.trt_fitted.npk$Model<-"b) Species gain (s.gain)"
 sgain.trt_fitted.ctl$Model<-"b) Species gain (s.gain)"
@@ -265,9 +261,9 @@ fig_3b_r
 
 # BIOMASS PARTITIONS
 
-# Figure 3 d) -CDE or biomass change associated with persistant species (CDE)
+# Figure 3 e) - CDE or biomass change associated with persistant species (PS)
 
-cde_coef2$xs<-1
+cde_coef2$xs <- 1
 
 cde_fitted.npk <- cde_fitted.npk   %>% rename(Treatment = trt.y) 
 cde_fitted.ctl <- cde_fitted.ctl  %>% rename(Treatment = trt.y) 
@@ -308,9 +304,9 @@ fig_3e_r <- ggplot() +
 
 fig_3e_r
 
-# Figure 3e Biomass changes associated with species loss (SL)
+# Figure 3c) Biomass changes associated with species loss (SL)
 
-sl.trt_coef2$xs<-1
+sl.trt_coef2$xs <- 1
 
 sl.trt_fitted.npk <- sl.trt_fitted.npk  %>% rename(Treatment = trt.y) 
 sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% rename(Treatment = trt.y) 
@@ -358,9 +354,9 @@ fig_3c_r <- ggplot() +
 fig_3c_r
 
 
-# Figure 3f Biomass changes associated with species gain (SG)
+# Figure 3d) Biomass changes associated with species gain (SG)
 
-sg.trt_coef2$xs<-1
+sg.trt_coef2$xs <- 1
 
 sg.trt_fitted.npk <- sg.trt_fitted.npk %>% rename(Treatment = trt.y) 
 sg.trt_fitted.ctl <- sg.trt_fitted.ctl  %>% rename(Treatment = trt.y) 
@@ -406,12 +402,13 @@ fig_3d_r <- ggplot()  +
 fig_3d_r
 
 
-# Figure 3 Legend
+# Create Custom Figure 3 Legend
 
-sg.trt_fitted.npk$Plot <- "Temporal comparison cetween plot t0 and plot tn: NPK"
+# legend labels
+sg.trt_fitted.npk$Plot <- "Temporal comparison between plot t0 and plot tn: NPK"
 sg.trt_coef2$Site <- "Site: NPK"
 
-
+# overall effects legend
 fig_3_legend_o <- ggplot() +
   geom_ribbon(data = sg.trt_fitted.npk,
                   aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
@@ -433,6 +430,7 @@ fig_3_legend_o <- ggplot() +
 
 fig_3_legend_o
 
+# site level slope and points legend
 fig_3_legend_s <- ggplot() +
   #facet_wrap(~Model) +
   geom_point(data = sg.trt_fitted.npk,
@@ -462,17 +460,19 @@ fig_3_legend_s
 
  # extract legend
 # Source: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
-g_legend<-function(a.gplot){
+g_legend <- function(a.gplot){
   tmp <- ggplot_gtable(ggplot_build(a.gplot))
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
+# overall legend
 fig_3_leg_o <- g_legend(fig_3_legend_o)
-
+# site-level legend
 fig_3_leg_s <- g_legend(fig_3_legend_s)
 
-# produce inset effect plots in upper corners of Fig 3 b) - f)
+
+# Produce inset effect plots in upper corners of Fig 3 b) - f)
 
 # again using posterior data from '7_Model_Data_Posteriors.R' (loaded at beginning)
 # Global/ Overall/ Population Effects
@@ -581,7 +581,7 @@ fig_3e_e <- ggplot() +
 fig_3e_e
 
 
-# Inset effect plots within regression plots
+# Inset effect plots within regression plots using grid arrange
 
 fig_3a <- fig_3a_r +  annotation_custom(ggplotGrob(fig_3a_e), xmin = 7, xmax = 13.75, 
                                          ymin = -22.25, ymax = -15)
@@ -605,15 +605,16 @@ fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 7, xmax = 1
 
 
 # put everything together with grid arrange and grob
-# Save As LANDSCAPE 12 X 14
 
+# combine legends first
 fig_3_legend <- grid.arrange(arrangeGrob(fig_3_leg_o, fig_3_leg_s,
                                    ncol = 1, nrow=2))
-
+# add legends as a panel
 fig_3 <- grid.arrange(arrangeGrob(fig_3a, fig_3b, fig_3_legend,
                                   fig_3c , fig_3d , fig_3e, ncol = 3, nrow=2))
 
 
+# Save As LANDSCAPE 12 X 14
 fig_3
 
 
