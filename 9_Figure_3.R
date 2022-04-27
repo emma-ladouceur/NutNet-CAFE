@@ -144,7 +144,7 @@ fig_3a_r <- ggplot() +
               fill="black",alpha = 0.5) +
   scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   labs(x = 'Year',
-       y = expression(paste('Species Loss')), 
+       y = expression(paste('Number of species lost')), 
        #title= 'B) Species loss (s.loss)'
        title='') +
   scale_colour_manual(values = c("Control" = "black",
@@ -195,7 +195,7 @@ fig_3b_r <- ggplot()  +
   scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(0,20) +
   labs(x = 'Year',
-       y = expression(paste('Species Gain')), 
+       y = expression(paste('Number of species gained')), 
   title= '') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#046C9A",
