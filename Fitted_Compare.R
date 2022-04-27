@@ -43,8 +43,7 @@ p.all.min <- p.all %>%
 
   
 p.all.mm <- p.all.max %>% rbind(p.all.min) %>%
-  unite(mm,  trt.y, value, remove=F) %>%
-  mutate(mm = fct_relevel(mm, c("Control_min","Control_max", "NPK_min","NPK_max")))  
+  mutate(value = fct_relevel(value, c("min","max")))  
 
   
 p.all$site_code <- as.factor(p.all$site_code)
@@ -81,9 +80,6 @@ s.loss.fitted.df  <- s.loss.fitted %>%
 
 View(s.loss.fitted.df)
 
-# setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
-# save(s.loss.fitted.df, file = 'fitted_s.loss.Rdata')
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.loss.Rdata')
 
 View(s.loss.fitted.df)
 
@@ -108,39 +104,43 @@ s.loss.fitted.max <- s.loss.fitted %>%
 View(s.loss.fitted.max)
 
 s.loss.mm <- s.loss.fitted.max %>% rbind(s.loss.fitted.min) %>%
-  unite(mm, trt.y, value,  remove =F) %>%
-  mutate(mm = fct_relevel(mm, c("Control_min","Control_max", "Control_min","Control_max")))  
+  mutate(value = fct_relevel(value, c("min","max")))  
 
 head(s.loss.mm)
-#
-# colour = 	"#C0C0C0",
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.loss.mm, file = 'fitted_s.loss_compare.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.loss_compare.Rdata')
+
 
 fig_2a <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   # raw points
   geom_point(data = p.all.mm,
-             aes(y = s.loss.n , x = trt.y,  colour = mm,  group = mm),
+             aes(y = s.loss.n , x = trt.y, colour = trt.y,  shape= value, group = value),
              position = position_jitterdodge(
-               jitter.width = 0.45,
+               jitter.width = 0.15,
                jitter.height = 1,
                dodge.width = 0.75,
                seed = NA
              ),
              size = 1, alpha = 0.2) +
   geom_point(data = s.loss.mm,
-             aes(x = trt.y , y = P_Estimate,  colour = mm, group = mm), 
+             aes(x = trt.y , y = P_Estimate, colour = trt.y, shape = value, group = value), 
              position = position_dodge(width = 0.75), size = 3) +
   geom_errorbar(data = s.loss.mm,
-                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = mm, group = mm),
+                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper,  colour = trt.y, group = value),
                   position = position_dodge(width = 0.75),
                  size = 1, width = 0) +
-  # scale_color_manual(name = "Treatment",
-  #   values =  c(	"black", "#B40F20"), labels = c("Minimum","Maximum"))  +
+  scale_color_manual(name = "Treatment",
+    values =  c(	"black",  "#B40F20"), labels = c("Control","NPK"))  +
+  scale_shape_manual(name = "Average change between t0 & tn",
+    values = c(16, 17), labels = c("Year 1", "Max Year") )+ 
   ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
   theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
-                               strip.background = element_blank(),legend.position="bottom") +
+                               strip.background = element_blank(),legend.position="none") +
   ylim(-20, 0)+
   labs(x='',
        y = 'Average total number of species lost',
@@ -157,8 +157,8 @@ summary(sgain.3_p)
 s.gain.fitted <- p.all %>% 
   mutate(Trt_group = trt.y) %>%
   group_by(Trt_group, trt.y) %>% 
-  summarise(year.y.m =  max(year.y.m),
-            year.y =  max(year.y)) %>%
+  summarise(year.y.m,
+            year.y ) %>%
   nest(data = c(trt.y, year.y.m, year.y)) %>%
   mutate(fitted = map(data, ~epred_draws(sgain.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
 
@@ -170,9 +170,6 @@ s.gain.fitted.df  <- s.gain.fitted %>%
 
 head(s.gain.fitted.df)
 
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
-save(s.gain.fitted.df, file = 'fitted_s.gain.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.gain.Rdata')
 
 s.gain.fitted <- s.gain.fitted.df %>%
   select(-.draw) %>%
@@ -185,17 +182,49 @@ s.gain.fitted <- s.gain.fitted.df %>%
 head(s.gain.fitted)
 
 
+
+s.gain.fitted.min <- s.gain.fitted %>%  filter(year.y %in% c(1)) %>% 
+  mutate(value = "min")
+
+s.gain.fitted.max <- s.gain.fitted %>% 
+  filter(year.y %in% c(13)) %>% 
+  mutate(value = "max")
+
+View(s.gain.fitted.max)
+
+s.gain.mm <- s.gain.fitted.max %>% rbind(s.gain.fitted.min) %>%
+  mutate(value = fct_relevel(value, c("min","max")))  
+
+head(s.gain.mm)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.gain.mm, file = 'fitted_s.gain_compare.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.gain_compare.Rdata')
+
+
 fig_2b <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
-  geom_point(data = p.all,
-             aes(y = s.gain , x = trt.y, colour = 	"#C0C0C0"), 
-             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
-  geom_point(data = s.gain.fitted,
-             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
-  geom_errorbar(data = s.gain.fitted,
-                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+  # raw points
+  geom_point(data = p.all.mm,
+             aes(y = s.gain , x = trt.y, colour = trt.y,  shape= value, group = value),
+             position = position_jitterdodge(
+               jitter.width = 0.15,
+               jitter.height = 1,
+               dodge.width = 0.75,
+               seed = NA
+             ),
+             size = 1, alpha = 0.2) +
+  geom_point(data = s.gain.mm,
+             aes(x = trt.y , y = P_Estimate, colour = trt.y, shape = value, group = value), 
+             position = position_dodge(width = 0.75), size = 3) +
+  geom_errorbar(data = s.gain.mm,
+                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper,  colour = trt.y, group = value),
+                position = position_dodge(width = 0.75),
                 size = 1, width = 0) +
-  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#046C9A"))  + 
+  scale_color_manual(name = "Treatment",
+                     values =  c(	"black",  "#046C9A"), labels = c("Control","NPK"))  +
+  scale_shape_manual(name = "Average change between t0 & tn",
+                     values = c(16, 17), labels = c("Year 1", "Max Year") )+ 
   ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
   theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
@@ -210,13 +239,15 @@ fig_2b <- ggplot() +
 fig_2b
 
 
+
+
 # SL
 
 s.sl.fitted <- p.all %>% 
   mutate(Trt_group = trt.y) %>%
   group_by(Trt_group, trt.y) %>% 
-  summarise(year.y.m =  max(year.y.m),
-            year.y =  max(year.y)) %>%
+  summarise(year.y.m ,
+            year.y ) %>%
   nest(data = c(trt.y, year.y.m, year.y)) %>%
   mutate(fitted = map(data, ~epred_draws(sl.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
 
@@ -227,10 +258,6 @@ s.sl.fitted.df  <- s.sl.fitted %>%
   select(-c(.row, .chain, .iteration))
 
 head(s.sl.fitted.df)
-
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
-save(s.sl.fitted.df, file = 'fitted_s.sl.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.sl.Rdata')
 
 s.sl.fitted <- s.sl.fitted.df %>%
   select(-.draw) %>%
@@ -243,17 +270,48 @@ s.sl.fitted <- s.sl.fitted.df %>%
 head(s.sl.fitted)
 
 
+s.sl.fitted.min <- s.sl.fitted %>%  filter(year.y %in% c(1)) %>% 
+  mutate(value = "min")
+
+s.sl.fitted.max <- s.sl.fitted %>% 
+  filter(year.y %in% c(13)) %>% 
+  mutate(value = "max")
+
+head(s.sl.fitted.max)
+
+s.sl.mm <- s.sl.fitted.max %>% rbind(s.sl.fitted.min) %>%
+  mutate(value = fct_relevel(value, c("min","max")))  
+
+head(s.loss.mm)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.sl.mm, file = 'fitted_sl_compare.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_sl_compare.Rdata')
+
+
 fig_2c <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
-  geom_point(data = p.all,
-             aes(y = SL, x = trt.y, colour = 	"#C0C0C0"), 
-             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
-  geom_point(data = s.sl.fitted,
-             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
-  geom_errorbar(data = s.sl.fitted,
-                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+  # raw points
+  geom_point(data = p.all.mm,
+             aes(y = SL, x = trt.y, colour = trt.y,  shape= value, group = value),
+             position = position_jitterdodge(
+               jitter.width = 0.15,
+               jitter.height = 1,
+               dodge.width = 0.75,
+               seed = NA
+             ),
+             size = 1, alpha = 0.2) +
+  geom_point(data = s.sl.mm,
+             aes(x = trt.y , y = P_Estimate, colour = trt.y, shape = value, group = value), 
+             position = position_dodge(width = 0.75), size = 3) +
+  geom_errorbar(data = s.sl.mm,
+                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper,  colour = trt.y, group = value),
+                position = position_dodge(width = 0.75),
                 size = 1, width = 0) +
-  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#B40F20"))  + 
+  scale_color_manual(name = "Treatment",
+                     values =  c(	"black",  "#B40F20"), labels = c("Control","NPK"))  +
+  scale_shape_manual(name = "Average change between t0 & tn",
+                     values = c(16, 17), labels = c("Year 1", "Max Year") )+ 
   ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
   theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
@@ -268,6 +326,7 @@ fig_2c <- ggplot() +
 fig_2c
 
 
+
 #SG
 
 summary(sg.3_p)
@@ -275,8 +334,8 @@ summary(sg.3_p)
 s.sg.fitted <- p.all %>% 
   mutate(Trt_group = trt.y) %>%
   group_by(Trt_group, trt.y) %>% 
-  summarise(year.y.m =  max(year.y.m),
-            year.y =  max(year.y)) %>%
+  summarise(year.y.m ,
+            year.y ) %>%
   nest(data = c(trt.y, year.y.m, year.y)) %>%
   mutate(fitted = map(data, ~epred_draws(sg.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
 
@@ -287,10 +346,6 @@ s.sg.fitted.df  <- s.sg.fitted %>%
   select(-c(.row, .chain, .iteration))
 
 head(s.sg.fitted.df)
-
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
-save(s.sg.fitted.df, file = 'fitted_s.sg.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.sg.Rdata')
 
 s.sg.fitted <- s.sg.fitted.df %>%
   select(-.draw) %>%
@@ -303,22 +358,53 @@ s.sg.fitted <- s.sg.fitted.df %>%
 head(s.sg.fitted)
 
 
+s.sg.fitted.min <- s.sg.fitted %>%  filter(year.y %in% c(1)) %>% 
+  mutate(value = "min")
+
+s.sg.fitted.max <- s.sg.fitted %>% 
+  filter(year.y %in% c(13)) %>% 
+  mutate(value = "max")
+
+head(s.sg.fitted.max)
+
+s.sg.mm <- s.sg.fitted.max %>% rbind(s.sg.fitted.min) %>%
+  mutate(value = fct_relevel(value, c("min","max")))  
+
+head(s.sg.mm)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.sg.mm, file = 'fitted_sg_compare.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_sg_compare.Rdata')
+
+
 fig_2d <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
-  geom_point(data = p.all,
-             aes(y = SG , x = trt.y, colour = 	"#C0C0C0"), 
-             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
-  geom_point(data = s.sg.fitted,
-             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
-  geom_errorbar(data = s.sg.fitted,
-                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+  # raw points
+  geom_point(data = p.all.mm,
+             aes(y = SG, x = trt.y, colour = trt.y,  shape= value, group = value),
+             position = position_jitterdodge(
+               jitter.width = 0.15,
+               jitter.height = 1,
+               dodge.width = 0.75,
+               seed = NA
+             ),
+             size = 1, alpha = 0.2) +
+  geom_point(data = s.sg.mm,
+             aes(x = trt.y , y = P_Estimate, colour = trt.y, shape = value, group = value), 
+             position = position_dodge(width = 0.75), size = 3) +
+  geom_errorbar(data = s.sg.mm,
+                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper,  colour = trt.y, group = value),
+                position = position_dodge(width = 0.75),
                 size = 1, width = 0) +
-  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#046C9A"))  + 
+  scale_color_manual(name = "Treatment",
+                     values =  c(	"black",   "#046C9A"), labels = c("Control","NPK"))  +
+  scale_shape_manual(name = "Average change between t0 & tn",
+                     values = c(16, 17), labels = c("Year 1", "Max Year") )+ 
   ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
   theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
                                plot.title=element_text(size=18, hjust=0.5),
-                               strip.background = element_blank(),legend.position="none") +
+                               strip.background = element_blank(),legend.position="bottom") +
   ylim(-250, 250)+
   labs(x='',
        y = '',
@@ -327,17 +413,14 @@ fig_2d <- ggplot() +
 
 fig_2d
 
-
-
-
-
+# cde
 summary(cde.3_p)
 
 s.cde.fitted <- p.all %>% 
   mutate(Trt_group = trt.y) %>%
   group_by(Trt_group, trt.y) %>% 
-  summarise(year.y.m =  max(year.y.m),
-            year.y =  max(year.y)) %>%
+  summarise(year.y.m ,
+            year.y ) %>%
   nest(data = c(trt.y, year.y.m, year.y)) %>%
   mutate(fitted = map(data, ~epred_draws(cde.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
 
@@ -348,10 +431,6 @@ s.cde.fitted.df  <- s.cde.fitted %>%
   select(-c(.row, .chain, .iteration))
 
 head(s.cde.fitted.df)
-
-setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
-save(s.cde.fitted.df, file = 'fitted_s.cde.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.cde.Rdata')
 
 s.cde.fitted <- s.cde.fitted.df %>%
   select(-.draw) %>%
@@ -366,17 +445,49 @@ s.cde.fitted <- s.cde.fitted.df %>%
 head(s.cde.fitted)
 
 
+
+s.cde.fitted.min <- s.cde.fitted %>%  filter(year.y %in% c(1)) %>% 
+  mutate(value = "min")
+
+s.cde.fitted.max <- s.cde.fitted %>% 
+  filter(year.y %in% c(13)) %>% 
+  mutate(value = "max")
+
+head(s.cde.fitted.max)
+
+s.cde.mm <- s.cde.fitted.max %>% rbind(s.cde.fitted.min) %>%
+  mutate(value = fct_relevel(value, c("min","max")))  
+
+head(s.sg.mm)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.cde.mm, file = 'fitted_cde_compare.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_sg_compare.Rdata')
+
+
 fig_2e <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
-  geom_point(data = p.all,
-             aes(y = CDE , x = trt.y, colour = 	"#C0C0C0"), 
-             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
-  geom_point(data = s.cde.fitted,
-             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
-  geom_errorbar(data = s.cde.fitted,
-                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+  # raw points
+  geom_point(data = p.all.mm,
+             aes(y = CDE, x = trt.y, colour = trt.y,  shape= value, group = value),
+             position = position_jitterdodge(
+               jitter.width = 0.15,
+               jitter.height = 1,
+               dodge.width = 0.75,
+               seed = NA
+             ),
+             size = 1, alpha = 0.2) +
+  geom_point(data = s.cde.mm,
+             aes(x = trt.y , y = P_Estimate, colour = trt.y, shape = value, group = value), 
+             position = position_dodge(width = 0.75), size = 3) +
+  geom_errorbar(data = s.cde.mm,
+                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper,  colour = trt.y, group = value),
+                position = position_dodge(width = 0.75),
                 size = 1, width = 0) +
-  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#F98400"))  + 
+  scale_color_manual(name = "Treatment",
+                     values =  c(	"black",   "#F98400"), labels = c("Control","NPK"))  +
+  scale_shape_manual(name = "Average change between t0 & tn",
+                     values = c(16, 17), labels = c("Year 1", "Max Year") )+ 
   ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
   theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
@@ -389,6 +500,7 @@ fig_2e <- ggplot() +
 
 
 fig_2e
+
 
 
 # 10X14 LANDSCAPE
