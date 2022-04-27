@@ -1,7 +1,7 @@
 
 # Authors: Emma Ladouceur & Shane A. Blowes
 # Title:
-# Last Updated April 17, 2021
+# Last Updated April 27, 2022
 
 # 9_Figure 3.R
 # This workflow uses data pulled out of models from previous steps and plots Figure 3
@@ -408,54 +408,83 @@ fig_3d_r
 sg.trt_fitted.npk$Plot <- "Temporal comparison between plot t0 and plot tn: NPK"
 sg.trt_coef2$Site <- "Site: NPK"
 
-# overall effects legend
+# overall effects legend for treatments
+
+
 fig_3_legend_o <- ggplot() +
-  geom_ribbon(data = sg.trt_fitted.npk,
-                  aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-                  alpha = 0.5) +
-  geom_line(data = fitted.sg,
+  geom_line(data = fitted.sg %>% filter(Treatment %in% "NPK"),
             aes(x = year.y, y = Estimate, color= Treatment),
             size = 1.5) +
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   labs(x='',
-       y = ' SL', title= '', color='',fill='') +
-  scale_fill_manual(values = c(  "#046C9A"))+
-  scale_color_manual(values = c( "#046C9A" , "black"))+
+       y = ' ', title= '', color='Overall',fill='') +
+  scale_colour_manual(name = 'Overall', 
+                      values =c("#B40F20"="#B40F20",
+                                "#046C9A" ="#046C9A",
+                                "#F98400" = "#F98400",
+                                'black' = 'black' ), labels = c('','', 'NPK', 'Control')
+  )+
   scale_linetype_manual("",values=c("Site" = 1))+
   theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                  strip.background = element_blank(),
-                                 legend.position="bottom",
+                                 legend.position= "right",
+                                 legend.direction = "horizontal",
                                  plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                                 legend.spacing.x = unit(0.25, 'cm'))
+                                 legend.spacing.x = unit(0.15, 'cm'),
+                                 legend.box.margin = margin(0.5, 0.5, 0.5, 0.5)  ) 
 
 fig_3_legend_o
 
-# site level slope and points legend
-fig_3_legend_s <- ggplot() +
-  #facet_wrap(~Model) +
-  geom_point(data = sg.trt_fitted.npk,
-             aes(x = year.y, y = SG, fill="Temporal comparison between \n plot t0 and plot tn: NPK"),
-             col= "#046C9A",  alpha =0.2,
-             size = .7, position = position_jitter(width = 0.45)) +
+
+
+# site level slope 
+fig_3_legend_seg_s <- ggplot() +
   geom_segment(data = sg.trt_coef2,
                aes(x = xs,
                    xend = xmax,
                    y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
-                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax), color=Site, linetype=Site),
-               alpha=0.2,size = .7) +
+                   yend = (Intercept + TE + (ISlope+TESlope)  * cxmax), color=Site, #linetype=Site
+                   ),
+               alpha = 0.4,size = .7) +
   scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
   labs(x='',
        y = ' ', title= '', color='',fill='') +
-  scale_fill_manual(values = c( "#046C9A"))+
-  scale_color_manual(values = c("#046C9A"))+
-  scale_linetype_manual("",values=c("Site: NPK" = 1))+
+  scale_colour_manual(name = 'Site', 
+                      values =c("#B40F20"="#B40F20",
+                                "#046C9A" ="#046C9A",
+                                "#F98400" = "#F98400"), labels = c('','', 'NPK'))+
   theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                  strip.background = element_blank(),
-                                 legend.position="bottom",
+                                 legend.position="right",
+                                 legend.direction = "horizontal",
                                  plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                                 legend.spacing.x = unit(0.25, 'cm'))
+                                 legend.spacing.x = unit(0.15, 'cm'),
+                                 legend.box.margin = margin(0.5, 0.5, 0.5, 0.5)  )
 
-fig_3_legend_s
+fig_3_legend_seg_s
+
+# site level points
+fig_3_legend_points_s <- ggplot() +
+  geom_point(data = sg.trt_fitted.npk,
+             aes(x = year.y, y = SG, color=Treatment  ),
+             alpha = 0.4,
+             size = .8, position = position_jitter(width = 0.45)) +
+  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+  labs(x='',
+       y = ' ', title= '', color='',fill='') +
+  scale_colour_manual(name = "Pairwise comparison \nbetween \nplot t0 & tn", 
+                      values =c("#B40F20"="#B40F20",
+                                "#046C9A" ="#046C9A",
+                                "#F98400" = "#F98400"), labels = c('','', 'NPK'))+
+  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                 strip.background = element_blank(),
+                                 legend.position="right",
+                                 legend.direction = "horizontal",
+                                 plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                                 legend.spacing.x = unit(0.05, 'cm'),
+                                 legend.box.margin = margin(0.5, 0.5, 0.5, 0.5)  )
+
+fig_3_legend_points_s
 
 
  # extract legend
@@ -467,10 +496,12 @@ g_legend <- function(a.gplot){
   return(legend)}
 
 # overall legend
-fig_3_leg_o <- g_legend(fig_3_legend_o)
+fig_3_leg_trt_o <- g_legend(fig_3_legend_o)
 # site-level legend
-fig_3_leg_s <- g_legend(fig_3_legend_s)
-
+#  slopes
+fig_3_leg_seg_s <- g_legend(fig_3_legend_seg_s)
+# data points models were fit to
+fig_3_leg_points_s <- g_legend(fig_3_legend_points_s)
 
 # Produce inset effect plots in upper corners of Fig 3 b) - f)
 
@@ -607,8 +638,24 @@ fig_3e <- fig_3e_r +  annotation_custom(ggplotGrob(fig_3e_e), xmin = 7, xmax = 1
 # put everything together with grid arrange and grob
 
 # combine legends first
-fig_3_legend <- grid.arrange(arrangeGrob(fig_3_leg_o, fig_3_leg_s,
-                                   ncol = 1, nrow=2))
+
+
+fig_3_legend <- grid.arrange( arrangeGrob(
+                                      # overall
+                                      fig_3_leg_trt_o, 
+                                      # site
+                                      fig_3_leg_seg_s,  
+                                      # plot
+                                      fig_3_leg_points_s,
+                                   ncol = 1, nrow = 8,
+                                   heights = c(0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10),
+                                   layout_matrix = rbind(c(NA), c(NA), c(NA), c(1), c(2), c(3), c(NA), c(NA))
+                                   ) )
+
+fig_3_legend
+
+
+
 # add legends as a panel
 fig_3 <- grid.arrange(arrangeGrob(fig_3a, fig_3b, fig_3_legend,
                                   fig_3c , fig_3d , fig_3e, ncol = 3, nrow=2))

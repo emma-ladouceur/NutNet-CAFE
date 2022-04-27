@@ -4,8 +4,6 @@
 
 # 10_Figure 4.R
 
-
-
 # packages
 library(tidyverse)
 library(brms)
