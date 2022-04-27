@@ -1,4 +1,11 @@
 
+# Authors: Emma Ladouceur & Shane A. Blowes
+# Last Updated April 27, 2022
+
+# 10_Figure 4.R
+
+
+
 # packages
 library(tidyverse)
 library(brms)
