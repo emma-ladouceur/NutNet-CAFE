@@ -26,12 +26,34 @@ head(p.all)
 
 p.all %>% ungroup() %>% select(year_max) %>% distinct() %>% mutate(mean(year_max))
 
+head(p.all)
+
+p.all.max <- p.all %>% 
+  mutate( year.y == as.numeric(year.y)) %>%
+  #group_by(site_code) %>%
+  filter(year.y ==  max(year.y)) %>%
+  mutate(value = "max")
 
 
+p.all.min <- p.all %>% 
+  mutate( year.y == as.numeric(year.y)) %>%
+  #group_by(site_code) %>%
+  filter(year.y ==  min(year.y)) %>%
+  mutate(value = "min")
+
+  
+p.all.mm <- p.all.max %>% rbind(p.all.min) %>%
+  unite(mm,  trt.y, value, remove=F) %>%
+  mutate(mm = fct_relevel(mm, c("Control_min","Control_max", "NPK_min","NPK_max")))  
+
+  
 p.all$site_code <- as.factor(p.all$site_code)
 p.all$block<-as.factor(p.all$block)
 p.all$plot<-as.factor(p.all$plot)
 p.all$year.y<-as.numeric(p.all$year.y)
+
+View(p.all.mm)
+
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
@@ -86,24 +108,34 @@ s.loss.fitted.max <- s.loss.fitted %>%
 View(s.loss.fitted.max)
 
 s.loss.mm <- s.loss.fitted.max %>% rbind(s.loss.fitted.min) %>%
-  mutate(value = fct_relevel(value, c("min","max"))) 
+  unite(mm, trt.y, value,  remove =F) %>%
+  mutate(mm = fct_relevel(mm, c("Control_min","Control_max", "Control_min","Control_max")))  
 
-View(s.loss.mm)
+head(s.loss.mm)
+#
+# colour = 	"#C0C0C0",
 
 fig_2a <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
-  # geom_point(data = p.all,
-  #            aes(y = s.loss.n , x = trt.y, colour = 	"#C0C0C0"),
-  #            size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
+  # raw points
+  geom_point(data = p.all.mm,
+             aes(y = s.loss.n , x = trt.y,  colour = mm,  group = mm),
+             position = position_jitterdodge(
+               jitter.width = 0.45,
+               jitter.height = 1,
+               dodge.width = 0.75,
+               seed = NA
+             ),
+             size = 1, alpha = 0.2) +
   geom_point(data = s.loss.mm,
-             aes(x = trt.y , y = P_Estimate,  colour = value, group = value), 
+             aes(x = trt.y , y = P_Estimate,  colour = mm, group = mm), 
              position = position_dodge(width = 0.75), size = 3) +
   geom_errorbar(data = s.loss.mm,
-                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = value, group = value),
+                aes(x = trt.y , ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = mm, group = mm),
                   position = position_dodge(width = 0.75),
                  size = 1, width = 0) +
-  scale_color_manual(name = "Treatment",
-    values =  c(	"black", "#B40F20"), labels = c("Minimum","Maximum"))  + 
+  # scale_color_manual(name = "Treatment",
+  #   values =  c(	"black", "#B40F20"), labels = c("Minimum","Maximum"))  +
   ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
   theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
