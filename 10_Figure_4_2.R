@@ -8,7 +8,7 @@ library(grid)
 library(patchwork)
 
 
-# load modelobjects
+# load model objects
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
@@ -147,7 +147,7 @@ fig_4a <- ggplot() +
              aes(x=0, # point
                                      y= sl.sg.cde),
              colour="#F98400",size=0.1,alpha = 0.4) +
-  #   # Overall effects in Treatments (NPK) (thick solid lines)
+  #  Overall effects in Treatments (NPK) (thick solid lines)
   # species loss (x-axis) and SL (y-axis)
   geom_segment(data = added.p.effs %>% filter(trt.y == "NPK") %>%
                  distinct(sloss_global , sl_global),
@@ -193,7 +193,7 @@ fig_4a <- ggplot() +
                                      y=  sl.sg.cde_global ),
              colour="#F98400",size=0.1,alpha = 0.4) +
   ##############################################
-#posterior uncertainty samples for Controls (small dashed lines)
+# posterior uncertainty samples for Controls (small dashed lines)
 # species loss (x-axis) & SL (y-axis)
 geom_segment(data = added.p.effs  %>% filter(trt.y == "Control"),  # segments
              aes(x = 0,
@@ -281,20 +281,15 @@ geom_segment(data = added.p.effs  %>% filter(trt.y == "Control"),  # segments
              aes(x=0, # points
                                      y =  sl.sg.cde_global),
              colour="#F98400",size=0.1,alpha = 0.4) +
-  #scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
-  #scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
-  # annotate("text", x = -0.015, y = 0.75, label = "t0") +
-  # annotate("text", x = -0.415, y = 7.25, label = "tn") +
-  # annotate("text", x = 0.03, y = -1.5, label = "tn") +
-  labs(x = 'Average change in species',
-       y = expression(paste('Average change in biomass (g/' ,m^2, ')')),
-       subtitle = 'a) Average change in species and biomass')
+  labs(x = 'Average total change in species',
+       y = expression(paste('Average total change in biomass (g/' ,m^2, ')')),
+       subtitle = 'a) Average total change in species and biomass')
 
 
 fig_4a
 
 
-# GET LEGENDS
+# CREATE CUSTOM LEGENDS
 
 colnames(added.p.effs)
 
@@ -397,15 +392,14 @@ g_legend<-function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
+# fixed effect for controls
+f.legend.c <- g_legend(fixed.leg.ctl)
+# fixed effect for NPK
+f.legend.n <- g_legend(fixed.leg.npk)
+# posterior samples of uncertainty
+p.legend < g_legend(post.leg)
 
-
-f.legend.c<-g_legend(fixed.leg.ctl)
-f.legend.n<-g_legend(fixed.leg.npk)
-
-p.legend<-g_legend(post.leg)
-
-
-
+# see how it looks
 (fig_4a ) / (f.legend.c)/(f.legend.n) / (p.legend) + plot_layout(heights = c(10,0.5,0.5,0.5))
 
 
@@ -413,15 +407,15 @@ p.legend<-g_legend(post.leg)
 # Fig 4b: The Slopes
 #______________________________________________________
 
-
+# species loss & gained
 sloss.fixed.p <- posterior_samples(sloss.3_p, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
 sgain.fixed.p <- posterior_samples(sgain.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
-
+# price components
 cde.fixed.p <- posterior_samples(cde.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) )
 sl.fixed.p <- posterior_samples(sl.3_p, "^b" , subset = floor(runif(n = 2000, 1, max = 3000))) 
 sg.fixed.p <- posterior_samples(sg.3_p, "^b",subset = floor(runif(n = 2000, 1, max = 3000)) ) 
 
-# except here, we take 50 samples of the posterior distribution from overall effects
+# we take 50 samples of the posterior distribution from overall effects
 # within the range of 95 % probability to represent uncertainty around these effects
 
 head(sl.fixed.p)
@@ -453,6 +447,7 @@ head(sl.fixed)
 
 
 sg.fixed <- sg.fixed.p %>% 
+  # slope
   mutate(sg.trt.slope.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
   mutate(sg.ctl.slope.p=`b_year.y.m`) %>%
   #  trt
@@ -475,6 +470,7 @@ sg.fixed <- sg.fixed.p %>%
 head(sg.fixed)
 
 cde.fixed <- cde.fixed.p %>% 
+  # slope
   mutate(cde.trt.slope.p=`b_year.y.m` + `b_trt.yNPK:year.y.m`) %>%
   mutate(cde.ctl.slope.p=`b_year.y.m`) %>%
   #  trt
@@ -550,8 +546,8 @@ nrow(all.effs)
 
 
 effs_calc_slope <- all.effs %>%
-  # add posterior samples together
-  mutate( # controls
+  # add posterior samples together for plotting together
+  mutate( 
     sloss.sgain = (sloss + sgain),
     sl.sg = (sl + sg),
     sl.sg.cde = (sl + sg + cde),
@@ -560,7 +556,6 @@ effs_calc_slope <- all.effs %>%
 head(effs_calc_slope)
 
 # take mean and quantiles and take 50 samps within probs
-
 added.p.effs.slope <- effs_calc_slope %>%
   group_by(Treatment) %>%
   mutate( # sloss
@@ -584,7 +579,7 @@ added.p.effs.slope <- effs_calc_slope %>%
           sl.sg.cde_lower_slope = quantile(sl.sg.cde, probs=0.025),
           sl.sg.cde_upper_slope = quantile(sl.sg.cde, probs=0.975)
           )  %>%
-  filter( # ctl sloss
+  filter( # sloss
         sloss > quantile(sloss, probs=0.025),
          sloss < quantile(sloss, probs=0.975),
     # sloss + sgain
@@ -596,7 +591,7 @@ added.p.effs.slope <- effs_calc_slope %>%
     # sl + sg
     sl.sg > quantile(sl.sg, probs=0.025),
     sl.sg < quantile(sl.sg, probs=0.975),
-    #sl sg cde
+    # sl + sg + cde
     sl.sg.cde > quantile(sl.sg.cde, probs=0.025),
     sl.sg.cde < quantile(sl.sg.cde, probs=0.975)
          ) %>% sample_n(50) %>% 
@@ -738,7 +733,7 @@ fig_4b <- ggplot() +
              aes(x=0, # point
                                            y= sl.sg.cde ),
              colour="#F98400",size=0.1,alpha = 0.4) +
-  #   # Overall effects in Treatments (NPK) (thick solid lines) 
+  #  Overall effects in Treatments (NPK) (thick solid lines) 
   # species loss (x-axis) and SL (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "NPK") %>% 
                  distinct(sloss_global_slope , sloss_global_slope,
@@ -784,9 +779,6 @@ fig_4b <- ggplot() +
              colour="#F98400",size=0.1,alpha = 0.4) +
    scale_y_continuous(breaks=c(-10,-5,0,5,10,15)) +
    scale_x_continuous(breaks=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.05,0.1)) +
-  # annotate("text", x = -0.015, y = 0.75, label = "t0") +
-  # annotate("text", x = -0.415, y = 7.25, label = "tn") +
-  # annotate("text", x = 0.03, y = -1.5, label = "tn") +
   labs(x = 'Rate of change in species (species/year)',
        y = expression(paste('Rate of change in biomass (g/' ,m^2, '/year)')),
        subtitle = 'b) Rate of change in species and biomass/year (slopes)')
