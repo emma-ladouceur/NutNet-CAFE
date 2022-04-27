@@ -51,7 +51,7 @@ s.loss.fitted.df  <- s.loss.fitted %>%
   unnest(cols = c(fitted)) %>% select(-data) %>%
   select(-c(.row, .chain, .iteration))
 
-head(s.loss.fitted.df)
+View(s.loss.fitted.df)
 
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
 save(s.loss.fitted.df, file = 'fitted_s.loss.Rdata')
@@ -73,7 +73,7 @@ head(s.loss.fitted)
 fig_2a <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = p.all,
-             aes(y = s.loss.n , x = trt.y, colour = 	"#C0C0C0"), 
+             aes(y = s.loss.n , x = trt.y, colour = 	"#C0C0C0"),
              size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
   geom_point(data = s.loss.fitted,
              aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
@@ -88,8 +88,8 @@ fig_2a <- ggplot() +
                                strip.background = element_blank(),legend.position="none") +
   ylim(-20, 0)+
   labs(x='',
-       y = 'Average total species loss',
-       title= 'a) Species loss (s.loss)') 
+       y = 'Average total number of species lost',
+       title= 'a) Number of species lost (s.loss)') 
 
 
 fig_2a
@@ -148,8 +148,8 @@ fig_2b <- ggplot() +
                                strip.background = element_blank(),legend.position="none") +
   ylim(0, 20)+
   labs(x='',
-       y = 'Average total species gain',
-       title= 'b) Species gain (s.gain)') 
+       y = 'Average total number of species gained',
+       title= 'b) Number of species gained (s.gain)') 
 
 
 fig_2b
@@ -336,7 +336,7 @@ fig_2e <- ggplot() +
 fig_2e
 
 
-# 9X14 LANDSCAPE
+# 10X14 LANDSCAPE
 (fig_2a | fig_2b)/ (fig_2c | fig_2d | fig_2e)
 
 
