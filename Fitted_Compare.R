@@ -539,7 +539,7 @@ g_legend <- function(a.gplot){
 fig_2_legend <- g_legend(fig_2_leg)
 
 
-# 10X14 LANDSCAPE
+# 11X14 LANDSCAPE
 (fig_2a | fig_2b)/ (fig_2c | fig_2d | fig_2e) / (fig_2_legend) + plot_layout(heights = c(10, 10, 1))
 
 
