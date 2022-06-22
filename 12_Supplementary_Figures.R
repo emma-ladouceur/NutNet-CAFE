@@ -45,7 +45,9 @@ fig_s1 <- n_map_dat %>%
   group_by(latitude, longitude, site_code, `Length of study`, continent, `Overall Site Response to NPK`) %>%
   ggplot() +
   geom_polygon(data = world, aes(x=long, y = lat, group = group), fill="grey", alpha=0.7) +
-  geom_point(aes(x=longitude, y=latitude, color=`Length of study`, shape= `Overall Site Response to NPK`),size = 2, alpha=0.8) +
+  geom_point(aes(x=longitude, y=latitude, color=`Length of study`, #shape= `Overall Site Response to NPK`
+                 size= `Length of study`),#size = 5, 
+             alpha=0.8) +
   geom_label_repel(
     aes(x=longitude, y=latitude, label = site_code),family = 'Times',
     segment.size = 0.5, segment.alpha = 0.5,
@@ -62,10 +64,10 @@ fig_s1 <- n_map_dat %>%
     legend.position=c(0.25,0.001),
     legend.direction="horizontal"
   ) +
-  ggplot2::annotate("text", x = -185, y = -34, hjust = 0, size = 7, label = paste("The Nutrient Network"), color = "Black") +
-  ggplot2::annotate("text", x = -181, y = -44, hjust = 0, size = 4, label = paste("Experimental Locations"), color = "black", alpha = 0.5) +
-  xlim(-180,180) +
-  ylim(-60,80) +
+ # ggplot2::annotate("text", x = -185, y = -34, hjust = 0, size = 7, label = paste("The Nutrient Network"), color = "Black") +
+ # ggplot2::annotate("text", x = -181, y = -44, hjust = 0, size = 4, label = paste("Experimental Locations"), color = "black", alpha = 0.5) +
+  #xlim(-180,180) +
+  #ylim(-60,80) +
   scale_x_continuous(expand = c(0.006, 0.006)) +
   coord_equal() 
 
@@ -141,10 +143,10 @@ figs2_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Fi
 head(figs2_dat)
 
 fig_s2<-ggplot() +
-  facet_wrap(~year.max)+
+  #facet_wrap(~year.max)+
   geom_point(data = figs2_dat, aes(x = rich.start, y = mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data = figs2_dat, aes(x = rich.end, y = mass.end),size=1.5, colour="white", shape=2) +
-  geom_text_repel(data = figs2_dat, aes(x = rich.start, y = mass.start, label = rownames(figs2_dat) ) ) +
+  #geom_text_repel(data = figs2_dat, aes(x = rich.start, y = mass.start, label = rownames(figs2_dat) ) ) +
   geom_segment(data = figs2_dat,aes(x = rich.start,
                                  xend = rich.end,
                                  y = mass.start,
@@ -158,9 +160,11 @@ fig_s2<-ggplot() +
        title= '') +
   scale_y_continuous(limits=c(0,1500)) +
   scale_x_continuous(limits=c(0,35)) +
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                     strip.background = element_blank(),plot.title = element_text(size=12),
-                     legend.position="bottom")
+  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                     strip.background = element_blank(), plot.title = element_text(size=16),
+                     legend.position="bottom") + 
+  theme(legend.key.height= unit(1, 'cm'),
+        legend.key.width= unit(1, 'cm'))
 
 fig_s2
 
