@@ -1,410 +1,344 @@
 
 
-# Authors: Emma Ladouceur & Shane A. Blowes
-# Title:
-# Last Updated April 17, 2021
-
-# 8_ Figure 2
-# This workflow uses data pulled out of models from previous steps and plots Figure 2
-
 # packages
 library(tidyverse)
 library(brms)
+library(tidybayes)
 library(ggplot2)
 library(patchwork)
 library(gridExtra)
 library(grid)
 
-# data
-plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
-
-plot$site_code <- as.factor(plot$site_code)
-plot$block <- as.factor(plot$block)
-plot$plot <- as.factor(plot$plot)
-
-colnames(plot)
-plot <- plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
-  ungroup()
+p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 
-View(plot %>% distinct(site_code, year_max))
+colnames(p.all)
 
-# saved model data objects  from '5_Model_Extract.R'
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/rich.mod.dat.Rdata')
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/bm.mod.dat.Rdata')
+p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
+  filter(year_max >= 3) %>% mutate(year.y == max(year.y))
 
-# saved posterior data from 7_ Model_Data_Posteriors
-# Global/ Overall/ Population Effects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/global.p.effs.Rdata')
-# Study-level effects
-load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
+head(p.all)
+
+p.all %>% ungroup() %>% select(year_max) %>% distinct() %>% mutate(mean(year_max))
 
 
-rich.p2 <- global.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) %>%
-  filter(response=="NPK")
 
-bm.p2 <- global.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) %>%
-  filter(response=="NPK")
+p.all$site_code <- as.factor(p.all$site_code)
+p.all$block<-as.factor(p.all$block)
+p.all$plot<-as.factor(p.all$plot)
+p.all$year.y<-as.numeric(p.all$year.y)
 
-global.effs.p <- rich.p2 %>% left_join(bm.p2)
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
 
-global.effs.p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sloss.Rdata') # s.loss.s
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain.Rdata') # s.gain.s
 
-rich.p2.ctl <- global.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) %>%
-  filter(response=="Control")
-
-bm.p2.ctl <- global.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) %>%
-  filter(response=="Control")
-
-global.effs.p.ctl <- rich.p2.ctl %>% left_join(bm.p2.ctl)
-
-global.effs.p.ctl
+s.loss.fitted <- p.all %>% 
+  mutate(Trt_group = trt.y) %>%
+  group_by(Trt_group, trt.y) %>% 
+  summarise(year.y.m =  max(year.y.m),
+            year.y =  max(year.y)) %>%
+  nest(data = c(trt.y, year.y.m, year.y)) %>%
+  mutate(fitted = map(data, ~epred_draws(sloss.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
 
 
-study.rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
+head(s.loss.fitted)
 
-study.bm.p2 <- study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) 
 
-study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2) %>% filter(response == "NPK")
+s.loss.fitted.df  <- s.loss.fitted %>% 
+  unnest(cols = c(fitted)) %>% select(-data) %>%
+  select(-c(.row, .chain, .iteration))
 
-study.effs.p
+View(s.loss.fitted.df)
 
-# Quadrant Plot Figure 2 c)
-fig_2c <- ggplot()+
-  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
-  # study-level effects
-  geom_point(data = study.effs.p, aes(x = r.eff , y = b.eff),colour="#0B775E", alpha=0.2,size=2) +
-  geom_errorbar(data = study.effs.p,aes(x = r.eff, y = b.eff,ymin = b.eff_lower, ymax = b.eff_upper), colour="#0B775E", alpha=0.2, width = 0, size = 0.75) +
-  geom_errorbarh(data = study.effs.p,aes(x = r.eff, y = b.eff,xmin =  r.eff_lower, xmax = r.eff_upper), colour="#0B775E", alpha=0.2, width = 0, size = 0.75) +
-  # overall effects
-  geom_point(data = global.effs.p, aes(x= r.eff,
-                                y=  b.eff ),
-             fill="#0B775E",color="#0B775E",size=8, alpha=0.5)+
-  geom_errorbar(data = global.effs.p,aes(x=r.eff,
-                                  ymin = b.eff_lower, ymax = b.eff_upper),width=0,colour = "#0B775E", size = 2,alpha=0.9) +
-  geom_errorbarh(data = global.effs.p,aes(y=b.eff,
-                                   xmin = r.eff_lower, xmax = r.eff_upper),height=0,colour = "#0B775E", size = 2, alpha=0.9) +
-  geom_point(data = global.effs.p.ctl, aes(x= r.eff,
-                                       y=  b.eff ),
-             fill="black",color="black",size=8, alpha=0.5)+
-  geom_errorbar(data = global.effs.p.ctl, aes(x=r.eff,
-                                         ymin = b.eff_lower, ymax = b.eff_upper),width=0,colour = "black", size = 2,alpha=0.7) +
-  geom_errorbarh(data = global.effs.p.ctl, aes(y=b.eff,
-                                          xmin = r.eff_lower, xmax = r.eff_upper),height=0,colour = "black", size = 2, alpha=0.7) +
-  scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
-  scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
-  annotate("text", x = -2.5, y = 200, label = "+biomass -rich", size=5) +
-  annotate("text", x = 1.5, y = 200, label = "+biomass +rich", size=5) +
-  annotate("text", x = -2.5, y = -200, label = "-biomass -rich", size=5) +
-  annotate("text", x = 1.5, y = -200, label = "-biomass +rich", size=5) +
-  labs(x = 'Rate of change in species richness (species/year)',
-       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
-       title = ' c)') + theme_classic(base_size=16) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.loss.fitted.df, file = 'fitted_s.loss.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.loss.Rdata')
+
+View(s.loss.fitted.df)
+
+s.loss.fitted <- s.loss.fitted.df %>%
+  select(-.draw) %>%
+  group_by(Trt_group, year.y, year.y.m) %>%
+  mutate( P_Estimate = mean(.epred),
+          P_Estimate_lower = quantile(.epred, probs=0.025),
+          P_Estimate_upper = quantile(.epred, probs=0.975) ) %>% 
+  select(-.epred) %>% distinct()
+
+head(s.loss.fitted)
+
+
+fig_2a <- ggplot() + 
+  geom_hline(yintercept = 0,linetype="longdash") +
+  geom_point(data = p.all,
+             aes(y = s.loss.n , x = trt.y, colour = 	"#C0C0C0"),
+             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
+  geom_point(data = s.loss.fitted,
+             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
+  geom_errorbar(data = s.loss.fitted,
+                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+                size = 1, width = 0) +
+  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#B40F20"))  + 
+  ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
+  theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
+                               plot.title=element_text(size=18, hjust=0.5),
+                               strip.background = element_blank(),legend.position="none") +
+  ylim(-20, 0)+
+  labs(x='',
+       y = 'Average total number of species lost',
+       title= 'a) Number of species lost (s.loss)') 
+
+
+fig_2a
+
+#sgain
+
+
+summary(sgain.3_p)
+
+s.gain.fitted <- p.all %>% 
+  mutate(Trt_group = trt.y) %>%
+  group_by(Trt_group, trt.y) %>% 
+  summarise(year.y.m =  max(year.y.m),
+            year.y =  max(year.y)) %>%
+  nest(data = c(trt.y, year.y.m, year.y)) %>%
+  mutate(fitted = map(data, ~epred_draws(sgain.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
+
+head(s.gain.fitted)
+
+s.gain.fitted.df  <- s.gain.fitted %>% 
+  unnest(cols = c(fitted)) %>% select(-data) %>%
+  select(-c(.row, .chain, .iteration))
+
+head(s.gain.fitted.df)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.gain.fitted.df, file = 'fitted_s.gain.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.gain.Rdata')
+
+s.gain.fitted <- s.gain.fitted.df %>%
+  select(-.draw) %>%
+  group_by(Trt_group, year.y, year.y.m) %>%
+  mutate( P_Estimate = mean(.epred),
+          P_Estimate_lower = quantile(.epred, probs=0.025),
+          P_Estimate_upper = quantile(.epred, probs=0.975) ) %>% 
+  select(-.epred) %>% distinct()
+
+head(s.gain.fitted)
+
+
+fig_2b <- ggplot() + 
+  geom_hline(yintercept = 0,linetype="longdash") +
+  geom_point(data = p.all,
+             aes(y = s.gain , x = trt.y, colour = 	"#C0C0C0"), 
+             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
+  geom_point(data = s.gain.fitted,
+             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
+  geom_errorbar(data = s.gain.fitted,
+                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+                size = 1, width = 0) +
+  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#046C9A"))  + 
+  ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
+  theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
+                               plot.title=element_text(size=18, hjust=0.5),
+                               strip.background = element_blank(),legend.position="none") +
+  ylim(0, 20)+
+  labs(x='',
+       y = 'Average total number of species gained',
+       title= 'b) Number of species gained (s.gain)') 
+
+
+fig_2b
+
+
+# SL
+
+s.sl.fitted <- p.all %>% 
+  mutate(Trt_group = trt.y) %>%
+  group_by(Trt_group, trt.y) %>% 
+  summarise(year.y.m =  max(year.y.m),
+            year.y =  max(year.y)) %>%
+  nest(data = c(trt.y, year.y.m, year.y)) %>%
+  mutate(fitted = map(data, ~epred_draws(sl.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
+
+head(s.sl.fitted)
+
+s.sl.fitted.df  <- s.sl.fitted %>% 
+  unnest(cols = c(fitted)) %>% select(-data) %>%
+  select(-c(.row, .chain, .iteration))
+
+head(s.sl.fitted.df)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.sl.fitted.df, file = 'fitted_s.sl.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.sl.Rdata')
+
+s.sl.fitted <- s.sl.fitted.df %>%
+  select(-.draw) %>%
+  group_by(Trt_group, year.y, year.y.m) %>%
+  mutate( P_Estimate = mean(.epred),
+          P_Estimate_lower = quantile(.epred, probs=0.025),
+          P_Estimate_upper = quantile(.epred, probs=0.975) ) %>% 
+  select(-.epred) %>% distinct()
+
+head(s.sl.fitted)
+
+
+fig_2c <- ggplot() + 
+  geom_hline(yintercept = 0,linetype="longdash") +
+  geom_point(data = p.all,
+             aes(y = SL, x = trt.y, colour = 	"#C0C0C0"), 
+             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
+  geom_point(data = s.sl.fitted,
+             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
+  geom_errorbar(data = s.sl.fitted,
+                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+                size = 1, width = 0) +
+  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#B40F20"))  + 
+  ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
+  theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
+                               plot.title=element_text(size=18, hjust=0.5),
+                               strip.background = element_blank(),legend.position="none") +
+  ylim(-250, 250)+
+  labs(x='',
+       y = expression(paste('Average total change in biomass (g/' ,m^2, ')')),
+       title= 'c) Biomass change associated \n with species loss (SL)') 
+
 
 fig_2c
 
 
-# Quadrant plot Figure 2 c) Legend
+#SG
 
-head(study.effs.p)
-study.effs.p$Site <- "Site-Level Effects: NPK"
-global.effs.p$Overall<-"Overall Effects: NPK"
-global.effs.p.ctl$Overall<-"Overall Effects: Control"
+summary(sg.3_p)
 
-study_2c_legend <- ggplot()+
-  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
-  geom_point(data=study.effs.p, aes(x= r.eff , y= b.eff, color=Site), alpha=0.2,size=2) +
-  geom_errorbar(data=study.effs.p,aes(x= r.eff, y= b.eff,ymin = b.eff_lower, ymax = b.eff_upper, color=Site),  alpha=0.2, width = 0, size = 0.75) +
-  geom_errorbarh(data=study.effs.p,aes(x= r.eff, y= b.eff,xmin =  r.eff_lower, xmax =r.eff_upper, color=Site), alpha=0.2, width = 0, size = 0.75) +
-  scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
-  scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
-  labs(x = 'Rate of change in species richness (species/year)',
-       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
-       title = ' C)',  color='',fill='',linetype='') + 
-  scale_color_manual(values = c("#0B775E"))+
-  theme_classic(base_size=18 ) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+s.sg.fitted <- p.all %>% 
+  mutate(Trt_group = trt.y) %>%
+  group_by(Trt_group, trt.y) %>% 
+  summarise(year.y.m =  max(year.y.m),
+            year.y =  max(year.y)) %>%
+  nest(data = c(trt.y, year.y.m, year.y)) %>%
+  mutate(fitted = map(data, ~epred_draws(sg.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
 
-study_2c_legend
+head(s.sg.fitted)
 
-global.effs.p.all <- global.effs.p %>% bind_rows(global.effs.p.ctl)
-head(global.effs.p.all)
+s.sg.fitted.df  <- s.sg.fitted %>% 
+  unnest(cols = c(fitted)) %>% select(-data) %>%
+  select(-c(.row, .chain, .iteration))
 
-overall_2c_legend <- ggplot()+
-  geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
-  geom_point(data = global.effs.p.all, aes(x= r.eff, 
-                                y=  b.eff ,color=Overall),
-             size=8, alpha=0.6)+
-  geom_errorbar(data = global.effs.p,aes(x=r.eff,
-                                  ymin = b.eff_lower, ymax = b.eff_upper,color=Overall),width=0, size = 2,alpha=0.9) +
-  geom_errorbarh(data = global.effs.p.all,aes(y=b.eff,
-                                   xmin = r.eff_lower, xmax = r.eff_upper,color=Overall),height=0, size = 2, alpha=0.9) +
-  scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5)) +
-  scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200)) +
-  labs(x = 'Rate of change in species richness (species/year)',
-       y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
-       title = ' C)',  color='',fill='',linetype='') + 
-  scale_color_manual(values = c("black", "#0B775E"))+
-  theme_classic(base_size=18 ) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
+head(s.sg.fitted.df)
 
-overall_2c_legend
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.sg.fitted.df, file = 'fitted_s.sg.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.sg.Rdata')
 
-# extract legend
-# Sourced from: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
-g_legend<-function(a.gplot){
-  tmp <- ggplot_gtable(ggplot_build(a.gplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)}
+s.sg.fitted <- s.sg.fitted.df %>%
+  select(-.draw) %>%
+  group_by(Trt_group, year.y, year.y.m) %>%
+  mutate( P_Estimate = mean(.epred),
+          P_Estimate_lower = quantile(.epred, probs=0.025),
+          P_Estimate_upper = quantile(.epred, probs=0.975) ) %>% 
+  select(-.epred) %>% distinct()
 
-# extract legends
-sc.leg <- g_legend(study_2c_legend)
-oc.leg <- g_legend(overall_2c_legend)
-# arrange together using grid arrange (patchwork does not work for this)
-fig_2c_legend <- grid.arrange(oc.leg, sc.leg, ncol=2,nrow=1)
+head(s.sg.fitted)
 
 
-
-# Richness & Biomass Regressions
-plot.rich_fitted.npk$Model <- "a) Species richness"
-plot.rich_fitted.ctl$Model <- "a) Species richness"
-plot.rich_fitted.npk <- plot.rich_fitted.npk %>% rename(Treatment = trt) 
-plot.rich_fitted.ctl <- plot.rich_fitted.ctl %>% rename(Treatment = trt) 
-fitted.rich <- bind_rows(plot.rich_fitted.npk,plot.rich_fitted.ctl)
-
-
-fitted.rich$Treatment <- factor(fitted.rich$Treatment , levels=c("NPK","Control"))
-plot.rich_coef2 <- plot.rich_coef2 %>% filter(!is.na(TESlope))
-
-
-fig_2a_r <- ggplot() +
-  facet_wrap(~Model) +
+fig_2d <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
-  geom_point(data = plot.rich_fitted.npk,
-             aes(x = year_trt, y = rich), colour ="#0B775E", alpha=0.2,
-             size = .7, position = position_jitter(width = 0.45) ) +
-  geom_segment(data = plot.rich_coef2 ,
-               aes(x = xmin, 
-                   xend = xmax,
-                   y = (Intercept + TE  + (ISlope+TESlope) * xmin),
-                   yend =  (Intercept + TE + (ISlope+TESlope) * xmax),
-                   group = site_code),
-               color="#0B775E", alpha=0.2,size = .7) +
- # uncertainty in fixed effect
-  geom_ribbon(data = plot.rich_fitted.npk,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              fill="#0B775E",alpha = 0.5) +
-  # fixed effects
-  geom_line(data = fitted.rich,
-            aes(x = year_trt, y = Estimate,color=Treatment),
-            size = 1.5) +
-  geom_ribbon(data = plot.rich_fitted.ctl,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.5) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,12,13)) +
-  labs(x='Year',
-       y = ' Species richness', title= '') +
-  scale_colour_manual(values = c("Control" = "black",
-                                 "NPK" = "#0B775E", drop =FALSE))+
-  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                 strip.background = element_blank(),legend.position="none",
-                                 strip.text = element_text(size=17),
-                     plot.margin= margin(t = 0.1, r = 0.2, b = 0.2, l = 0.2, unit = "cm"),
-                    )
-
-fig_2a_r
-
-# legend for richness & biomass regressions
-plot.rich_fitted.npk$Plot <- "Plot: NPK"
-plot.rich_coef2$Site <- "Site: NPK"
-
-fig_2ab_legend_o <- ggplot() +
-  geom_ribbon(data = plot.rich_fitted.npk,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              fill= "#0B775E",alpha = 0.5) +
-  geom_line(data = fitted.rich,
-            aes(x = year_trt, y = Estimate, color= Treatment),
-            size = 1.5) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
+  geom_point(data = p.all,
+             aes(y = SG , x = trt.y, colour = 	"#C0C0C0"), 
+             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
+  geom_point(data = s.sg.fitted,
+             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
+  geom_errorbar(data = s.sg.fitted,
+                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+                size = 1, width = 0) +
+  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#046C9A"))  + 
+  ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
+  theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
+                               plot.title=element_text(size=18, hjust=0.5),
+                               strip.background = element_blank(),legend.position="none") +
+  ylim(-250, 250)+
   labs(x='',
-       y = ' Species richness', title= '', color='',fill='') +
-  scale_fill_manual(values = c(  "#0B775E" ))+
-  scale_color_manual(values = c( "#0B775E" , "black"))+
-  scale_linetype_manual("",values=c("Site" = 1))+
-  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                 strip.background = element_blank(),
-                                 legend.position="bottom",
-                     plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                     legend.spacing.x = unit(0.25, 'cm'))
+       y = '',
+       title= 'd) Biomass change associated \n with species gain (SG)') 
 
-fig_2ab_legend_o
 
-fig_2ab_legend_s <- ggplot() +
-  #facet_wrap(~Model) +
-  geom_point(data = plot.rich_fitted.npk,
-             aes(x = year_trt, y = rich, fill=Plot), alpha=0.2, col =  "#0B775E",
-             size = .7, position = position_jitter(width = 0.45 )) +
-  geom_segment(data = plot.rich_coef2 ,
-               aes(x = xmin,
-                   xend = xmax,
-                   y = (Intercept + TE  + (ISlope+TESlope) * xmin),
-                   yend =  (Intercept + TE + (ISlope+TESlope) * xmax),
-                   group = site_code, linetype= Site ,color = Site ), col =  "#0B775E",
-                alpha = 0.2, size = .7) +
-  scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
-  labs(x='',
-       y = ' Species richness', title= '', color='',fill='') +
-  scale_fill_manual(values = c(  "#0B775E" ))+
-  scale_color_manual(values = c( "#0B775E" ))+
-  scale_linetype_manual("",values=c("Site: NPK" = 1))+
-  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                 strip.background = element_blank(),
-                                 legend.position="bottom",
-                                 plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
-                                 legend.spacing.x = unit(0.25, 'cm'))
-
-fig_2ab_legend_s
+fig_2d
 
 
 
-# Biomass Regression
-plot.bm_fitted.npk$Model<-"b) Biomass"
-plot.bm_fitted.ctl$Model<-"b) Biomass"
-plot.bm_fitted.npk <- plot.bm_fitted.npk %>% rename(Treatment = trt) 
-plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% rename(Treatment = trt) 
-fitted.bm<-bind_rows(plot.bm_fitted.npk,plot.bm_fitted.ctl)
 
-fitted.bm$Treatment <- factor(fitted.bm$Treatment , levels=c("NPK","Control"))
 
-plot.bm_coef2 <- plot.bm_coef2 %>% filter(!is.na(TESlope))
+summary(cde.3_p)
 
-# note to self:  predicted values instead of coefficients?
-fig_2b_r <- ggplot() +
- # facet_wrap(~site_code) +
+s.cde.fitted <- p.all %>% 
+  mutate(Trt_group = trt.y) %>%
+  group_by(Trt_group, trt.y) %>% 
+  summarise(year.y.m =  max(year.y.m),
+            year.y =  max(year.y)) %>%
+  nest(data = c(trt.y, year.y.m, year.y)) %>%
+  mutate(fitted = map(data, ~epred_draws(cde.3_p, newdata= .x, re_formula = ~(trt.y * year.y.m) ))) 
+
+head(s.cde.fitted)
+
+s.cde.fitted.df  <- s.cde.fitted %>% 
+  unnest(cols = c(fitted)) %>% select(-data) %>%
+  select(-c(.row, .chain, .iteration))
+
+head(s.cde.fitted.df)
+
+setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
+save(s.cde.fitted.df, file = 'fitted_s.cde.Rdata')
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.cde.Rdata')
+
+s.cde.fitted <- s.cde.fitted.df %>%
+  select(-.draw) %>%
+  group_by(Trt_group, year.y, year.y.m) %>%
+  filter(.epred > quantile(.epred, probs=0.025),
+         .epred < quantile(.epred, probs=0.975)) %>% sample_n(1000)  %>%
+  mutate( P_Estimate = mean(.epred),
+          P_Estimate_lower = quantile(.epred, probs=0.025),
+          P_Estimate_upper = quantile(.epred, probs=0.975) ) %>%
+  select(-.epred) %>% distinct()
+
+head(s.cde.fitted)
+
+
+fig_2e <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
-  facet_grid(~Model)+
-  geom_point(data = plot.bm_fitted.npk,
-             aes(x = year_trt, y = strip.mass), color="#0B775E",alpha=0.2,
-             size = .7, position = position_jitter(width = 0.45)) +
-  geom_segment(data = plot.bm_coef2,
-               aes(x = xmin, 
-                   xend = xmax,
-                   y = (Intercept + TE  + (ISlope+TESlope) * xmin),
-                   yend = (Intercept + TE + (ISlope+TESlope) * xmax),
-                   group = site_code),
-               color="#0B775E",alpha=0.2,size = 0.7) +
-  # uncertainy in fixed effect
-  geom_ribbon(data = plot.bm_fitted.npk,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              fill="#0B775E",alpha = 0.5) +
-  # fixed effect
-  geom_line(data = fitted.bm,
-            aes(x = year_trt, y = Estimate, color=Treatment),
-            size = 1.5) +
-  geom_ribbon(data = plot.bm_fitted.ctl,
-              aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              alpha = 0.5) +
-  labs(x='Year',
-       y = expression(paste('Biomass (g/',m^2, ')')), title= '') +
-  scale_colour_manual(values = c("Control" = "black",
-                                 "NPK" = "#0B775E", drop =FALSE))+
-  ylim(0,2000)+
-  scale_x_continuous(breaks=c(0,1,3,6,9,12,13)) +
-  theme_bw(base_size=16) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                                 strip.background = element_blank(),legend.position="none",
-                                 strip.text = element_text(size=17),
-                     plot.margin= margin(t = 0.1, r = 0.2, b =0.2, l = 0.2, unit = "cm"),
-                    )
+  geom_point(data = p.all,
+             aes(y = CDE , x = trt.y, colour = 	"#C0C0C0"), 
+             size = 1, alpha = 0.2, position = position_jitter(width = 0.05, height=0.45)) +
+  geom_point(data = s.cde.fitted,
+             aes(x = trt.y, y = P_Estimate, colour = trt.y), size = 3) +
+  geom_errorbar(data = s.cde.fitted,
+                aes(x = trt.y, ymin = P_Estimate_lower, ymax = P_Estimate_upper, colour = trt.y),
+                size = 1, width = 0) +
+  scale_color_manual(values =  c(	"#C0C0C0" ,"black", "#F98400"))  + 
+  ggtitle((expression(paste(italic(alpha), '-scale', sep = ''))))+
+  theme_bw(base_size=18)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.2, unit = "cm"),
+                               plot.title=element_text(size=18, hjust=0.5),
+                               strip.background = element_blank(),legend.position="none") +
+  ylim(-250, 250)+
+  labs(x='',
+       y = '',
+       title= 'e) Biomass change associated \n with persistent species (PS)') 
 
 
-fig_2b_r
-
-(fig_2a_r + fig_2b_r)
-
-# not needed?
-#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/effs.Rdata')
-
-# produce inset effect plots in upper corners of Fig 2 a) & b)
-
-# again using posterior data from '7_Model_Data_Posteriors.R' (loaded at beginning)
-# load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdata')
-
-fig_2a_e <- ggplot() + 
-  geom_point(data = global.rich.p, aes(x = response, y = eff, color=response),size = 2) +
-  geom_errorbar(data = global.rich.p, aes(x = response, ymin = eff_lower,
-                                   ymax = eff_upper, color=response),
-                width = 0, size = 0.7) +
-  labs(x = '',
-       y='Slope')+
-  geom_hline(yintercept = 0, lty = 2) +
-  scale_y_continuous(breaks=c(0,-0.5)) +
-  scale_color_manual(values = c("#000000","#0B775E")) +
-  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                              plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
-                               strip.background = element_blank(),legend.position="none")
+fig_2e
 
 
-fig_2a_e
+# 10X14 LANDSCAPE
+(fig_2a | fig_2b)/ (fig_2c | fig_2d | fig_2e)
 
 
-fig_2b_e <- ggplot() + 
-  geom_point(data = global.bm.p, aes(x = response, y = eff,color=response),size = 2) +
-  geom_errorbar(data = global.bm.p, aes(x = response,ymin = eff_lower,
-                                 ymax = eff_upper,color=response),
-                width = 0, size = 0.7) +
-  labs(x = '',
-       y='Slope') +
-  geom_hline(yintercept = 0, lty = 2) +
-  scale_y_continuous(breaks=c(0,30)) +
-  scale_color_manual(values = c("#000000","#0B775E")) +
-  theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                              plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
-                              strip.background = element_blank(),legend.position="none")
-fig_2b_e
-
-
-# Put the Figures together to make up Figure 2 a), b) , c) + legends
-
-# extract legend
-# Sourced from: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
-g_legend<-function(a.gplot){
-  tmp <- ggplot_gtable(ggplot_build(a.gplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)}
-
-fig_2ab_leg_o <- g_legend(fig_2ab_legend_o)
-
-fig_2ab_leg_s <- g_legend(fig_2ab_legend_s)
-
-o_2c_leg <- g_legend(overall_2c_legend)
-
-s_2c_leg <- g_legend(study_2c_legend)
-
-# use grid extra to add inset effect plots to regression
-fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 7, xmax = 13.5, 
-                                ymin = 20, ymax = 42)
-
-fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 7, xmax = 13.5, 
-                             ymin = 1100 ,ymax = 2075)
-
-
-# SAVE AS PORTRAIT 10 X 12
-fig_2ab <- ( fig_2a | fig_2b ) / ( fig_2ab_leg_o) / (fig_2ab_leg_s) + plot_layout(heights = c(10, 0.75, 0.75))
-
-fig_2ab
-
-fig_2cc <- ( fig_2c ) / (s_2c_leg) / (o_2c_leg) + plot_layout(heights = c(13,0.75,0.75))
-
-fig_2cc
-
-fig_2 <- (fig_2ab) / (fig_2cc) + plot_layout(heights = c(10,0.75, 0.75,13, 0.75,0.75)) 
-
-fig_2
 
 

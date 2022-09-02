@@ -293,7 +293,7 @@ fig_3e_r <- ggplot() +
   scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(-500,1000)+
   labs(x='Year',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
+       y = expression(paste('Change in biomass (g/' ,m^2, ')')), 
        title= 'e) Biomass change associated \n with persistent species (PS)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#F98400",drop =FALSE))+
@@ -340,7 +340,7 @@ fig_3c_r <- ggplot() +
   ylim(-400,5) +
   labs(x='Year',
        #x = 'Years',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')),
+       y = expression(paste('Change in biomass (g/' ,m^2, ')')),
        title= 'c) Biomass change associated \n with species loss (SL)') +
   scale_colour_manual(values = c("Control" = "black",
                                  "NPK" = "#B40F20", drop =FALSE))+
@@ -389,7 +389,7 @@ fig_3d_r <- ggplot()  +
   scale_x_continuous(breaks=c(1,3,6,9,12,13)) +
   ylim(0,400) +
   labs(x = 'Year',
-       y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
+       y = expression(paste('Change in biomass (g/' ,m^2, ')')), 
        title= 'd) Biomass change associated \n with species gain (SG)',
        color='Treatment') +
   scale_colour_manual(values = c("Control" = "black",
