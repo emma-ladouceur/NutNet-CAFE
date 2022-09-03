@@ -4,6 +4,11 @@ Code Authors: Emma Ladouceur, [Shane A. Blowes](https://github.com/sablowes) & [
  
 Linking changes in species composition and biomass in a globally distributed grassland experiment: [The Nutrient Network](https://nutnet.org/home).
 
+Emma Ladouceur, Shane A. Blowes, Jonathan M. Chase, Adam T. Clark, Magda Garbowski, Juan Alberti, Carlos Alberto Arnillas, Jonathan D. Bakker, Isabel C. Barrio, Siddharth Bharath, Elizabeth T. Borer, Lars A. Brudvig, Marc W. Cadotte, Qingqing Chen, Scott L. Collins, Christopher R. Dickman, Ian Donohue, Guozhen Du, Anne Ebeling, Nico Eisenhauer, Philip A. Fay, Nicole Hagenah, Yann Hautier, Anke Jentsch, Ingibjörg S. Jónsdóttir, Kimberly Komatsu, Andrew MacDougall, Jason P. Martina, Joslin L. Moore , John W. Morgan, Pablo L. Peri, Sally A. Power, Zhengwei Ren, Anita C. Risch, Christiane Roscher, Max A. Schuchardt, Eric W. Seabloom, Carly J. Stevens, G.F. (Ciska) Veen, Risto Virtanen, Glenda M. Wardle, Peter A. Wilfahrt, W. Stanley Harpole. (2022) Linking changes in species composition and biomass in a globally distributed grassland experiment. Ecology Letters. Article DOI: & Data DOI:
+
+#### **Shiny App**: [Location](https://emma-ladouceur.shinyapps.io/nn-cafe-app/) & [Code](https://github.com/emma-ladouceur/NN-CAFE-App)
+
+
 ### Data
 Species level data is not provided. Data openly available to reproduce results includes;
 
@@ -15,6 +20,7 @@ Species level data is not provided. Data openly available to reproduce results i
 
 **Model Objects**  The data listed above are used in statistical models, then model objects are saved and provided. Data is extracted from these model objects and are saved as data objects which are also provided, and then can then be used to produce figures without re-running the models. 
 
+More data produced within workflow to produce figures is also provided but can be derived from these main data sets.
 
 ### **R Scripts** 
 R Script file names- which are listed below, are numbered and listed in the order they should be used. Price equation partitions and statistical models are run on the cluster, which means this workflow can not be perfectly run through continuously on a local machine. However, code from cluster scripts can be used pedagogically or be adapted to run on a local machine, just be aware they take a few hours each and require substantial computation power.
