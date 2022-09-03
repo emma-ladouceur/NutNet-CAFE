@@ -26,7 +26,7 @@ R Script file names- which are listed below, are numbered and listed in the orde
 **3_Data_Prep.R** This preps data for price equation comparisons, which just pairs data into temporal subsets for every site for meaningful comparisons and outputs subsets of the data in pairs
 
 **FOLDER: cluster -> price_pairs**
-These scripts are run on an HPC and not a local machine.
+These scripts are run on an HPC and not a local machine. Uses package [*PriceTools* ](https://github.com/ctkremer/priceTools/) developed by [Colin Kremer](https://scholar.google.com/citations?user=BRbxQwwAAAAJ&hl=en).
 - *Price_Pairs_Wrapper.sh* This is a wrapper script to submit multiple jobs for every subset to the cluster
 - *Price_Pairs_Submit.sh* This is the submit script to submit each job to the cluster
 - *Price_Pairs.R* This is the R script that runs in the cluster iteratively over every subset of data
@@ -34,7 +34,9 @@ These scripts are run on an HPC and not a local machine.
 **4_Data_Prep.R** This workflow uses the data produced by the script 'Price_Pairs.R", which is submitted to the cluster by wrapper submit script, "Price_Pairs_Wrapper.sh" and nested Submit Script "Price_Pairs_Submit.sh". In this script we prune the pairwise comparisons down to only the meaningful temporal pairings that we are interested in.
 
 **FOLDER: cluster -> univariate models, multivariate models**
-- *A submit script ('.sh') to send each R script to the HPC cluster, and an R Script ('.R') for every statistical model, named intuitively after each response*
+Here you will find a *A submit script ('.sh')* to send each R script to the HPC cluster, and an *R Script ('.R')* *for every statistical model, named intuitively after each response*
+- *univariate models* -> models for main analysis, main results reported in Table S2, model specifications in Table S3, fits Figure S6 a)-g).
+- *multivariate models* -> multivariate models explore correlations between responses. Specifications in Table S4, correlations in Table S5, fits in Figure S i)-n)
 
 **5_Model_Data_Extract.R** This workflow pulls data out of *Richness & Biomass* model objects and preps data for visualization in Figure Figure S5 a), b) & c). Models have been run on a cluster and each have an R script and a submit script (.sh) (see folder above). Produces Fig S6 a)-b).
 
