@@ -20,9 +20,9 @@ Species level data is not provided. Data openly available to reproduce results i
 **nutnet_cumulative_time_cover.csv** Price equation partition outputs using per species cover. Used for Figure S#.
 
 **Model Fits**  The data listed above are used in statistical models, then model objects are saved and provided. Data is extracted from these model objects and are saved as data objects which are also provided, and then can then be used to produce figures without re-running the models. 
-- *3* Model fits used in main analyses, anmed after each response
-- *cover* For Figure S4
-- *multi* multivariate models (see more below)
+- *3* -> Model fits used in main analyses, anmed after each response
+- *cover* -> For Figure S4
+- *multi* -> multivariate models (see more below)
 
 More data produced within workflow to produce figures is also provided but can be derived from these main data sets.
 
