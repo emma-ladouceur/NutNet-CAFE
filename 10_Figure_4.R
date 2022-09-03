@@ -29,7 +29,7 @@ meta <- meta %>% group_by(site_code) %>% filter(year_max >= 3) %>%
 
 colnames(meta)
 
-
+# model data from 6_Model_Data_Extract.R
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.loss.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.gain.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.sl.Rdata')
@@ -39,22 +39,23 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitt
 
 head(s.loss.fitted.df)
 
-
+# extract posteriors
 s.loss.fitted <- s.loss.fitted.df %>% mutate(s.loss = .epred) %>% select(-.epred)
 s.gain.fitted <- s.gain.fitted.df %>% mutate(s.gain = .epred) %>% select(-.epred)
 sl.fitted <- s.sl.fitted.df %>% mutate(sl = .epred) %>% select(-.epred)
 sg.fitted <- s.sg.fitted.df %>% mutate(sg = .epred) %>% select(-.epred)
 cde.fitted <- s.cde.fitted.df %>% mutate(cde = .epred) %>% select(-.epred)
 
-
+#fitted
 fitted.effs <- s.loss.fitted %>% left_join(s.gain.fitted) %>%
   left_join(sl.fitted) %>% left_join(sg.fitted) %>%
   left_join(cde.fitted)
 
 head(fitted.effs)
 
+# calculate total effects for each axis of figure 4
 effs_calc <- fitted.effs %>%
-  # add pfitted sampkles together
+  # add fitted samples together
   mutate( 
     sloss.sgain = (s.loss + s.gain),
     sl.sg = (sl + sg),
@@ -64,7 +65,9 @@ head(effs_calc)
 
 
 added.p.effs <- effs_calc %>%
+  # within each treatment
   group_by(Trt_group) %>%
+  # take the mean and 95% credible intervals for each combo of responses
   # sloss control
   mutate( sloss_global = mean(s.loss),
           sloss_lower = quantile(s.loss, probs=0.025),
@@ -86,6 +89,7 @@ added.p.effs <- effs_calc %>%
           sl.sg.cde_lower = quantile(sl.sg.cde, probs=0.025),
           sl.sg.cde_upper = quantile(sl.sg.cde, probs=0.975),
           )  %>%
+  # within 95% quantiles of each response
   filter(s.loss > quantile(s.loss, probs=0.025),
          s.loss < quantile(s.loss, probs=0.975),
          sloss.sgain > quantile(sloss.sgain, probs=0.025),
@@ -96,13 +100,14 @@ added.p.effs <- effs_calc %>%
          sl.sg < quantile(sl.sg, probs=0.975),
          sl.sg.cde > quantile(sl.sg.cde, probs=0.025),
          sl.sg.cde < quantile(sl.sg.cde, probs=0.975),
+         # take 50 samples- this will be uncertainty represented in figure 4
          ) %>% sample_n(50) 
 
 
 
 head(added.p.effs)
 
-# proportion of biomass?
+# ask what is the proportion of biomass gain that comes from gain vs persistent species?
 prop.effs <- added.p.effs %>% 
   select(Trt_group,trt.y ,  year.y.m, year.y, sl, sg, cde) %>%
   filter(trt.y  == "NPK") %>% 
@@ -130,10 +135,12 @@ head(prop.effs)
 
 
 fig_4a <- ggplot() +
+  # set up plot
   geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
   theme_classic(base_size=14 )+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                      strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  # posterior uncertainty samples for treatments (NPK) (thin solid lines)
+  ##############################################
+  # posterior uncertainty samples (50) for treatments (NPK) (thin solid lines)
   # species loss (x-axis) and SL (y-axis)
   geom_segment(data = added.p.effs %>% filter(trt.y == "NPK"), # segment
                aes(x = 0,
@@ -174,6 +181,7 @@ fig_4a <- ggplot() +
              aes(x=0, # point
                                      y= sl.sg.cde),
              colour="#F98400",size=0.1,alpha = 0.4) +
+  ##############################################
   #  Overall effects in Treatments (NPK) (thick solid lines)
   # species loss (x-axis) and SL (y-axis)
   geom_segment(data = added.p.effs %>% filter(trt.y == "NPK") %>%
@@ -220,7 +228,7 @@ fig_4a <- ggplot() +
                                      y=  sl.sg.cde_global ),
              colour="#F98400",size=0.1,alpha = 0.4) +
   ##############################################
-# posterior uncertainty samples for Controls (small dashed lines)
+# posterior uncertainty samples (50) for Controls (small dashed lines)
 # species loss (x-axis) & SL (y-axis)
 geom_segment(data = added.p.effs  %>% filter(trt.y == "Control"),  # segments
              aes(x = 0,
@@ -261,6 +269,7 @@ geom_segment(data = added.p.effs  %>% filter(trt.y == "Control"),  # segments
              aes(x=0, # points
                                      y= sl.sg.cde),
              colour="#F98400",size=0.1,alpha = 0.2) +
+  ##############################################
   # Overall effects in Controls (thick dashed lines)
   # species loss (x-axis) & SL (y-axis)
   geom_segment(data = added.p.effs %>% filter(trt.y == "Control") %>%
@@ -315,7 +324,7 @@ geom_segment(data = added.p.effs  %>% filter(trt.y == "Control"),  # segments
 
 fig_4a
 
-
+##############################################
 # CREATE CUSTOM LEGENDS
 
 colnames(added.p.effs)
@@ -582,7 +591,7 @@ effs_calc_slope <- all.effs %>%
 
 head(effs_calc_slope)
 
-# take mean and quantiles and take 50 samps within probs
+# take mean and CI's then calculate quantiles within 95% prob and take 50 samps within 
 added.p.effs.slope <- effs_calc_slope %>%
   group_by(Treatment) %>%
   mutate( # sloss
@@ -606,6 +615,7 @@ added.p.effs.slope <- effs_calc_slope %>%
           sl.sg.cde_lower_slope = quantile(sl.sg.cde, probs=0.025),
           sl.sg.cde_upper_slope = quantile(sl.sg.cde, probs=0.975)
           )  %>%
+  #quaniles
   filter( # sloss
         sloss > quantile(sloss, probs=0.025),
          sloss < quantile(sloss, probs=0.975),
@@ -621,7 +631,9 @@ added.p.effs.slope <- effs_calc_slope %>%
     # sl + sg + cde
     sl.sg.cde > quantile(sl.sg.cde, probs=0.025),
     sl.sg.cde < quantile(sl.sg.cde, probs=0.975)
-         ) %>% sample_n(50) %>% 
+         ) %>% 
+  # 50 samples
+  sample_n(50) %>% 
   ungroup() %>%
   select(-c(sg, cde, sgain))
 
@@ -629,35 +641,17 @@ added.p.effs.slope <- effs_calc_slope %>%
 View(added.p.effs.slope)
 head(added.p.effs.slope)
 
-# proportion of slope per year
-# prop.slope.effs <- effs_calc_slope %>% 
-#   select(Treatment,  sl, sg, cde) %>%
-#   filter(Treatment  == "NPK") %>% 
-#   mutate(total.bm.gain = (sg + cde)) %>%
-#   mutate(prop.gain.bm = (sg / total.bm.gain) * 100,
-#          prop.ps.bm = (cde / total.bm.gain) * 100) %>%
-#   mutate( # sl
-#     prop.gain.bm_global = mean(prop.gain.bm),
-#     prop.gain.bm_lower = quantile(prop.gain.bm, probs=0.025),
-#     prop.gain.bm_upper = quantile(prop.gain.bm, probs=0.975),
-#     # persistent species
-#     prop.ps.bm_global = mean(prop.ps.bm),
-#     prop.ps.bm_lower = quantile(prop.ps.bm, probs=0.025),
-#     prop.ps.bm_upper = quantile(prop.ps.bm, probs=0.975),
-#     
-#     
-#   ) %>% select(-c(sl, sg, cde, 
-#                   total.bm.gain, prop.gain.bm, prop.ps.bm)) %>%
-#   distinct()
 
-head(prop.slope.effs)
-
+# Fig 4b: Rate of change in species and biomass per year (Slopes)
+#____________________________________
 
 fig_4b <- ggplot() +
+  # set up plot
   geom_vline(xintercept = 0, linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
   theme_classic(base_size=14 )+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                      strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
-  # posterior uncertainty samples for Controls (small dashed lines)
+  ##############################################
+   # posterior uncertainty samples (50) for Controls (small dashed lines)
   # species loss (x-axis) & SL (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "Control"),  # segments
                aes(x = 0,
@@ -698,6 +692,7 @@ fig_4b <- ggplot() +
              aes(x=0, # points
                                            y= sl.sg.cde),
              colour="#F98400",size=0.1,alpha = 0.2) +
+  ##############################################
   # Overall effects in Controls (thick dashed lines) 
   # species loss (x-axis) & SL (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "Control") %>% 
@@ -743,7 +738,8 @@ fig_4b <- ggplot() +
              aes(x=0, # points
                                            y=  sl.sg.cde_global_slope),
              colour="#F98400",size=0.1,alpha = 0.4) +
-  # posterior uncertainty samples for treatments (NPK) (thin solid lines)
+  ##############################################
+  # posterior uncertainty samples (50) for treatments (NPK) (thin solid lines)
   # species loss (x-axis) and SL (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "NPK"), # segment
                aes(x = 0,
@@ -783,6 +779,7 @@ fig_4b <- ggplot() +
              aes(x=0, # point
                                            y= sl.sg.cde ),
              colour="#F98400",size=0.1,alpha = 0.4) +
+  ##############################################
   #  Overall effects in Treatments (NPK) (thick solid lines) 
   # species loss (x-axis) and SL (y-axis)
   geom_segment(data = added.p.effs.slope %>% filter( Treatment == "NPK") %>% 

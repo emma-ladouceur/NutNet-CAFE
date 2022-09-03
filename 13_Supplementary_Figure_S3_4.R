@@ -74,8 +74,7 @@ fig_S3
 
 # Figure S4
 
-
-#plot cover
+# Price equation models with cover as a response, instead of biomass
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/cover/cover.Rdata') # cover.3
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # rich.3i
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/cover/cde_cover.Rdata') # rich.3i
@@ -349,5 +348,5 @@ fig_s4d
 
 (fig_s4a + fig_s4b)/(fig_s4c + fig_s4d)
 
-# New Figure S4
+
 

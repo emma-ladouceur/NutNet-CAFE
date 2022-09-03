@@ -1,4 +1,9 @@
 
+# Authors: Emma Ladouceur & Shane A. Blowes
+# Title:
+# Last Updated May 2022
+
+# Create Figure 2
 
 # packages
 library(tidyverse)
@@ -14,7 +19,7 @@ p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutne
 
 colnames(p.all)
 
-p.all <- p.all %>% group_by(site_code) %>% #filter(max.year >= 3) 
+p.all <- p.all %>% group_by(site_code) %>% 
   filter(year_max >= 3) %>% mutate(year.y == max(year.y))
 
 head(p.all)

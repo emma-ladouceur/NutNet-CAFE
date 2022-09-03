@@ -3,10 +3,7 @@
 # Title:
 # Last Updated April 17, 2021
 
-# 5 Pull Data out of models and prep for visualization
-# models have been run on a cluster and each have an R script and a submit script (.sh)
-# see R scripts for code to run models
-# models are large and take a few hours to run
+# 5 Pull more data out of models and preps for visualization
 
 # load packages
 library(tidyverse)
@@ -15,8 +12,7 @@ library(brms)
 
 # load models
 # model object names follow each model
-#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3_p
-load('~/Desktop/bm.Rdata') # plot.bm.3_p
+load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/bm.Rdata') # plot.bm.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/rich.Rdata') # plot.rich.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3_p
@@ -103,11 +99,6 @@ study_sample_posterior <- study_levels %>%
                                                                 exact = TRUE,
                                                                 subset = floor(runif(n = 1000,
                                                                                      min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
-          # ps.npk.study = purrr::map(data, ~posterior_samples(ps.3_p,
-          #                                                    pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
-          #                                                    exact = TRUE,
-          #                                                    subset = floor(runif(n = 1000,
-          #                                                                         min = 1, max = 2000))) %>% unlist() %>% as.numeric()),
           cde.npk.study = purrr::map(data, ~posterior_samples(cde.3_p,
                                                               pars = paste('r_site_code[', as.character(.x$level), ',trt.yNPK:year.y.m]', sep=''),
                                                               exact = TRUE,
@@ -170,12 +161,6 @@ sgain_study_posterior <- study_sample_posterior  %>%
 
 head(sgain_study_posterior)
 
-# ps_study_posterior <- study_sample_posterior  %>% 
-#   dplyr::select(-data) %>% 
-#   unnest_legacy(ps.ctl.study,ps.npk.study) %>%
-#   mutate( ps.trt.study = (ps.ctl.study + ps.npk.study)) 
-# 
-# head(sg_study_posterior)
 
 # Extract 1000 posterior samples from Fixed Effects (Overall/Population/Global Effects) 
 # richness and biomass
@@ -351,33 +336,6 @@ global.sgain.p <- bind_rows(sgain.p.npk,sgain.p.ctl)
 
 global.sgain.p
 
-# persistent species
-# head(ps.fixed.p)
-# 
-# ps_global_posterior <-  ps.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
-#   mutate(ps.ctl.global = (`b_year.y.m` ),
-#          ps.npk.global= (`b_trt.yNPK:year.y.m` ),
-#          ps.trt.global=(`b_year.y.m` + `b_sigma_trt.yControl`) ) %>%
-#   dplyr::select(-c(`b_year.y.m`,`b_trt.yNPK:year.y.m`))
-# 
-# head(ps_global_posterior)
-# 
-# # take the mean quantiles of the fixed effects posteriors for each treatment
-# ps.p.npk <-  ps_global_posterior %>% 
-#   mutate( response="NPK", eff = mean(ps.trt.global),
-#           eff_lower = quantile(ps.trt.global, probs=0.025),
-#           eff_upper = quantile(ps.trt.global, probs=0.975))  %>%
-#   dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
-# 
-# ps.p.ctl <-  ps_global_posterior %>% 
-#   mutate( response="Control", eff = mean(ps.ctl.global),
-#           eff_lower = quantile(ps.ctl.global, probs=0.025),
-#           eff_upper = quantile(ps.ctl.global, probs=0.975))  %>%
-#   dplyr::select(c(eff,eff_upper,eff_lower,response)) %>% distinct()  
-# # combine them into one data frame
-# global.ps.p <- bind_rows(ps.p.npk,ps.p.ctl)
-# 
-# global.ps.p
 
 # cde or biomass change associated with persistent species
 cde_global_posterior <-  cde.fixed.p %>% dplyr::select(`b_year.y.m`,`b_trt.yNPK:year.y.m`) %>%
@@ -406,8 +364,8 @@ global.cde.p <- bind_rows(cde.p.npk,cde.p.ctl)
 global.cde.p
 
 # use the mean and quantiles for :
-# Inset effect plots in Figure 2 a & b,
-# In Figure 2c for overall effects
+# Inset effect plots in Figure S5 a & b,
+# In Figure S5c for overall effects
 # Inset effect plots in Figure 3 b-f
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/')
 save(global.rich.p, global.bm.p,global.sl.p,global.sg.p,global.cde.p,global.sloss.p,global.sgain.p, file = 'global.p.effs.Rdata')
@@ -471,17 +429,6 @@ sgain.p <- sgain.site.p %>%
 
 head(sgain.p)
 
-# ps.site.p <- ps_study_posterior %>% group_by(site_code) %>%
-#   nest() 
-# 
-# 
-# ps.p <- ps.site.p %>% 
-#   mutate(data = purrr::map(data, ~ mutate(.x,cbind(ps_global_posterior)))) %>%
-#   unnest() %>% mutate(ps.study.trt.effect = (ps.trt.study + ps.trt.global))  %>%
-#   mutate(ps.study.ctl.effect = (ps.ctl.study + ps.ctl.global))
-# 
-# 
-# head(ps.p)
 
 cde.site.p <- cde_study_posterior %>% group_by(site_code) %>%
   nest() 
@@ -610,22 +557,10 @@ study.sgain.p <- bind_rows(study.sgain.p.npk,study.sgain.p.ctl)
 
 head(study.sgain.p)
 
-# study.ps.p.npk <-  ps.p %>% group_by(site_code) %>%
-#   mutate( response="NPK", eff = mean(ps.study.trt.effect),
-#           eff_lower = quantile(ps.study.trt.effect, probs=0.025),
-#           eff_upper = quantile(ps.study.trt.effect, probs=0.975))  %>%
-#   dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
-# 
-# study.ps.p.ctl <-  ps.p %>% group_by(site_code) %>%
-#   mutate( response="Control", eff = mean(ps.study.ctl.effect),
-#           eff_lower = quantile(ps.study.ctl.effect, probs=0.025),
-#           eff_upper = quantile(ps.study.ctl.effect, probs=0.975))  %>%
-#   dplyr::select(c(site_code,eff,eff_upper,eff_lower,response)) %>% distinct()  
-# 
-# study.ps.p <- bind_rows(study.ps.p.npk,study.ps.p.ctl)
+
 
 # we use this in:
-# Figure 2c study level effects
+# Figure S5c study level effects
 setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/')
 save(study.rich.p, study.bm.p,study.sl.p,study.sg.p,study.cde.p,study.sloss.p,study.sgain.p,  file = 'study.p.effs.Rdata')
 
@@ -634,7 +569,7 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p
 head(study.bm.p)
 
 # Use these same data to calculate categories for:
-# Figure 2c, Figure 5, Figure S1,  Figure S7, Table S1
+# Figure S5c, Figure 5, Figure S1,  Figure S7, Table S1
 study.rich.p2 <- study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
 
 study.bm.p2 <- study.bm.p %>% rename(b.eff=eff,b.eff_upper=eff_upper,b.eff_lower=eff_lower) 
@@ -716,15 +651,6 @@ sgain.c <- study.sgain.p %>% select(site_code,eff,response) %>% filter(response 
 
 sgain.eff <- left_join(sgain.t,sgain.c)
 
-# ps.t <- study.ps.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
-#   mutate(ps.trt.rate.p = eff) %>%
-#   select(-response,-eff)
-# 
-# ps.c <- study.ps.p %>% select(site_code,eff,response) %>% filter(response == "Control") %>%
-#   mutate(ps.ctl.rate.p = eff) %>%
-#   select(-response,-eff)
-# 
-# ps.eff <- left_join(ps.t,ps.c)
 
 
 sl.t <- study.sl.p %>% select(site_code,eff,response) %>% filter(response == "NPK") %>%
@@ -767,7 +693,7 @@ all.effs <- left_join(price.eff,sloss.sgain.effs)
 
 head(all.effs)
 
-# For : Figure 5 to plot mean NPK study-level effects
+# For : Figure S10 to plot mean NPK study-level effects
  all.effs <- all.effs %>% left_join(Quads) 
 
 head(all.effs)

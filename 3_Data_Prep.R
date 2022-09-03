@@ -6,6 +6,7 @@
 # Produces datasets: in folder pairs prep data; 428 datasets subset by site and year_trt
 # 3 preps data for price equation comparisons, which just pairs data into temporal subsets for meaningful comparisons
 # and outputs subsets of the data in pairs
+# This shortens analysis time by only making comparisons within sites
 
 # packages
 library(tidyverse)

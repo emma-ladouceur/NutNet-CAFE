@@ -4,7 +4,7 @@
 # Last Updated:  July 13, 2021
 
 # Produces dataset : 'biomass_sp.csv'
-# This script cleans data to living herbaceous species only and calculates per species biomass according to total plot biomass or
+# This script cleans data to living herbaceous species only and estimates per species biomass according to total plot biomass or
 # life form group (graminoid, forb, legume etc.)
 
 # packages

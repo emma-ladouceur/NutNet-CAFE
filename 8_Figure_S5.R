@@ -4,8 +4,8 @@
 # Title:
 # Last Updated April 17, 2021
 
-# 8_ Figure 2
-# This workflow uses data pulled out of models from previous steps and plots Figure 2
+# 8_ Figure S5
+# This workflow uses data pulled out of models from previous steps and plots Figure S5
 
 # packages
 library(tidyverse)
@@ -69,8 +69,8 @@ study.effs.p <- study.rich.p2 %>% left_join(study.bm.p2) %>% filter(response == 
 
 study.effs.p
 
-# Quadrant Plot Figure 2 c)
-fig_2c <- ggplot()+
+# Quadrant Plot Figure S5 c)
+fig_s5c <- ggplot()+
   geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + 
   # study-level effects
   geom_point(data = study.effs.p, aes(x = r.eff , y = b.eff),colour="#0B775E", alpha=0.2,size=2) +
@@ -103,10 +103,10 @@ fig_2c <- ggplot()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")
 
-fig_2c
+fig_s5c
 
 
-# Quadrant plot Figure 2 c) Legend
+# Quadrant plot Figure S5 c) Legend
 
 head(study.effs.p)
 study.effs.p$Site <- "Site-Level Effects: NPK"
@@ -166,7 +166,7 @@ g_legend<-function(a.gplot){
 sc.leg <- g_legend(study_2c_legend)
 oc.leg <- g_legend(overall_2c_legend)
 # arrange together using grid arrange (patchwork does not work for this)
-fig_2c_legend <- grid.arrange(oc.leg, sc.leg, ncol=2,nrow=1)
+fig_s5c_legend <- grid.arrange(oc.leg, sc.leg, ncol=2,nrow=1)
 
 
 
@@ -182,7 +182,7 @@ fitted.rich$Treatment <- factor(fitted.rich$Treatment , levels=c("NPK","Control"
 plot.rich_coef2 <- plot.rich_coef2 %>% filter(!is.na(TESlope))
 
 
-fig_2a_r <- ggplot() +
+fig_s5a_r <- ggplot() +
   facet_wrap(~Model) +
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = plot.rich_fitted.npk,
@@ -217,13 +217,13 @@ fig_2a_r <- ggplot() +
                      plot.margin= margin(t = 0.1, r = 0.2, b = 0.2, l = 0.2, unit = "cm"),
                     )
 
-fig_2a_r
+fig_s5a_r
 
 # legend for richness & biomass regressions
 plot.rich_fitted.npk$Plot <- "Plot: NPK"
 plot.rich_coef2$Site <- "Site: NPK"
 
-fig_2ab_legend_o <- ggplot() +
+fig_s5ab_legend_o <- ggplot() +
   geom_ribbon(data = plot.rich_fitted.npk,
               aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
               fill= "#0B775E",alpha = 0.5) +
@@ -242,9 +242,9 @@ fig_2ab_legend_o <- ggplot() +
                      plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                      legend.spacing.x = unit(0.25, 'cm'))
 
-fig_2ab_legend_o
+fig_s5ab_legend_o
 
-fig_2ab_legend_s <- ggplot() +
+fig_s5ab_legend_s <- ggplot() +
   #facet_wrap(~Model) +
   geom_point(data = plot.rich_fitted.npk,
              aes(x = year_trt, y = rich, fill=Plot), alpha=0.2, col =  "#0B775E",
@@ -268,7 +268,7 @@ fig_2ab_legend_s <- ggplot() +
                                  plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                  legend.spacing.x = unit(0.25, 'cm'))
 
-fig_2ab_legend_s
+fig_s5ab_legend_s
 
 
 
@@ -284,7 +284,7 @@ fitted.bm$Treatment <- factor(fitted.bm$Treatment , levels=c("NPK","Control"))
 plot.bm_coef2 <- plot.bm_coef2 %>% filter(!is.na(TESlope))
 
 # note to self:  predicted values instead of coefficients?
-fig_2b_r <- ggplot() +
+fig_s5b_r <- ggplot() +
  # facet_wrap(~site_code) +
   geom_hline(yintercept = 0,linetype="longdash") +
   facet_grid(~Model)+
@@ -322,9 +322,9 @@ fig_2b_r <- ggplot() +
                     )
 
 
-fig_2b_r
+fig_s5b_r
 
-(fig_2a_r + fig_2b_r)
+(fig_s5a_r + fig_s5b_r)
 
 # not needed?
 #load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/effs.Rdata')
@@ -334,7 +334,7 @@ fig_2b_r
 # again using posterior data from '7_Model_Data_Posteriors.R' (loaded at beginning)
 # load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/global.p.effs.Rdata')
 
-fig_2a_e <- ggplot() + 
+fig_s5a_e <- ggplot() + 
   geom_point(data = global.rich.p, aes(x = response, y = eff, color=response),size = 2) +
   geom_errorbar(data = global.rich.p, aes(x = response, ymin = eff_lower,
                                    ymax = eff_upper, color=response),
@@ -349,10 +349,10 @@ fig_2a_e <- ggplot() +
                                strip.background = element_blank(),legend.position="none")
 
 
-fig_2a_e
+fig_s5a_e
 
 
-fig_2b_e <- ggplot() + 
+fig_s5b_e <- ggplot() + 
   geom_point(data = global.bm.p, aes(x = response, y = eff,color=response),size = 2) +
   geom_errorbar(data = global.bm.p, aes(x = response,ymin = eff_lower,
                                  ymax = eff_upper,color=response),
@@ -365,7 +365,7 @@ fig_2b_e <- ggplot() +
   theme_bw(base_size=12)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                               plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = 0.1, unit = "cm"),
                               strip.background = element_blank(),legend.position="none")
-fig_2b_e
+fig_s5b_e
 
 
 # Put the Figures together to make up Figure 2 a), b) , c) + legends
@@ -378,33 +378,33 @@ g_legend<-function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
-fig_2ab_leg_o <- g_legend(fig_2ab_legend_o)
+fig_s5ab_leg_o <- g_legend(fig_s5ab_legend_o)
 
-fig_2ab_leg_s <- g_legend(fig_2ab_legend_s)
+fig_s5ab_leg_s <- g_legend(fig_s5ab_legend_s)
 
 o_2c_leg <- g_legend(overall_2c_legend)
 
 s_2c_leg <- g_legend(study_2c_legend)
 
 # use grid extra to add inset effect plots to regression
-fig_2a <- fig_2a_r +  annotation_custom(ggplotGrob(fig_2a_e), xmin = 7, xmax = 13.5, 
+fig_s5a <- fig_s5a_r +  annotation_custom(ggplotGrob(fig_s5a_e), xmin = 7, xmax = 13.5, 
                                 ymin = 20, ymax = 42)
 
-fig_2b <- fig_2b_r +  annotation_custom(ggplotGrob(fig_2b_e), xmin = 7, xmax = 13.5, 
+fig_s5b <- fig_s5b_r +  annotation_custom(ggplotGrob(fig_s5b_e), xmin = 7, xmax = 13.5, 
                              ymin = 1100 ,ymax = 2075)
 
 
 # SAVE AS PORTRAIT 10 X 12
-fig_2ab <- ( fig_2a | fig_2b ) / ( fig_2ab_leg_o) / (fig_2ab_leg_s) + plot_layout(heights = c(10, 0.75, 0.75))
+fig_s5ab <- ( fig_s5a | fig_s5b ) / ( fig_s5ab_leg_o) / (fig_s5ab_leg_s) + plot_layout(heights = c(10, 0.75, 0.75))
 
-fig_2ab
+fig_s5ab
 
-fig_2cc <- ( fig_2c ) / (s_2c_leg) / (o_2c_leg) + plot_layout(heights = c(13,0.75,0.75))
+fig_s5cc <- ( fig_s5c ) / (s_2c_leg) / (o_2c_leg) + plot_layout(heights = c(13,0.75,0.75))
 
-fig_2cc
+fig_s5cc
 
-fig_2 <- (fig_2ab) / (fig_2cc) + plot_layout(heights = c(10,0.75, 0.75,13, 0.75,0.75)) 
+fig_s5 <- (fig_s5ab) / (fig_s5cc) + plot_layout(heights = c(10,0.75, 0.75,13, 0.75,0.75)) 
 
-fig_2
+fig_s5
 
 

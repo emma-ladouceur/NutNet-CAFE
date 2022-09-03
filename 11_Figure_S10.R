@@ -1,5 +1,10 @@
 
 
+# Authors: Emma Ladouceur & Shane A. Blowes
+
+# Last Updated May 2022
+
+# Produces Figure S10 a-j
 
 # packages
 library(patchwork)
@@ -12,7 +17,6 @@ library(gridExtra)
 library(grid)
 library("scales")
 library(stringr)
-
 
 
 # data
@@ -28,11 +32,12 @@ head(p.all)
 
 p.all %>% ungroup() %>% select(year_max) %>% distinct() %>% mutate(mean(year_max))
 
+# produced in 7_Model_Data_Posteriors.R
 meta <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
 head(meta)
 
-# models
+# model objects
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sloss.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sgain.Rdata') # sg.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sl.Rdata') # sl.s
@@ -40,7 +45,7 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/sg.Rd
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_fits/3/cde.Rdata') # CDE.s
 
 
-# population fitted values for year = 13 (code in fitted.r)
+# population fitted values for year = 13 8_Figure_2
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.loss.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.gain.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.sl.Rdata')
@@ -108,7 +113,7 @@ s.loss$Quadrant<-factor(s.loss$Quadrant,  levels=c("-biomass +rich", "+biomass +
 
 sloss.ps
 
-fig_5a <- ggplot() +
+fig_s10a <- ggplot() +
   geom_density_ridges(data = s.loss, #density ridges
                       aes(x = NPK.site , 
                           y = Quadrant,
@@ -134,7 +139,7 @@ fig_5a <- ggplot() +
         legend.key = element_blank(),
         legend.position="none")+  scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
-fig_5a
+fig_s10a
 
 
 
@@ -195,7 +200,7 @@ s.gain$Quadrant<-factor(s.gain$Quadrant,  levels=c("-biomass +rich", "+biomass +
 
 sgain.ps
 
-fig_5b <- ggplot() +
+fig_s10b <- ggplot() +
   geom_density_ridges(data = s.gain, #density ridges
                       aes(x = NPK.site , 
                           y = Quadrant,
@@ -222,7 +227,7 @@ fig_5b <- ggplot() +
         axis.text.y = element_blank(),
         legend.position="none")+  scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
-fig_5b
+fig_s10b
 
 
 sl.site.pred <- p.all %>% 
@@ -281,7 +286,7 @@ sl$Quadrant<-factor(sl$Quadrant,  levels=c("-biomass +rich", "+biomass +rich",  
 
 sl
 
-fig_5c <- ggplot() +
+fig_s10c <- ggplot() +
   geom_density_ridges(data = sl, #density ridges
                       aes(x = NPK.site , 
                           y = Quadrant,
@@ -308,7 +313,7 @@ fig_5c <- ggplot() +
         axis.text.y = element_blank(),
         legend.position="none")+  scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
-fig_5c
+fig_s10c
 
 
 
@@ -368,7 +373,7 @@ sg$Quadrant<-factor(sl$Quadrant,  levels=c("-biomass +rich", "+biomass +rich",  
 
 sg
 
-fig_5d <- ggplot() +
+fig_s10d <- ggplot() +
   geom_density_ridges(data = sg, #density ridges
                       aes(x = NPK.site , 
                           y = Quadrant,
@@ -395,7 +400,7 @@ fig_5d <- ggplot() +
         axis.text.y = element_blank(),
         legend.position="none")+  scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
-fig_5d
+fig_s10d
 
 #cde
 cde.site.pred <- p.all %>% 
@@ -456,7 +461,7 @@ cde$Quadrant<-factor(cde$Quadrant,  levels=c("-biomass +rich", "+biomass +rich",
 
 
 
-fig_5e <- ggplot() +
+fig_s10e <- ggplot() +
   geom_density_ridges(data = cde, #density ridges
                       aes(x = NPK.site , 
                           y = Quadrant,
@@ -492,12 +497,12 @@ fig_5e <- ggplot() +
         axis.text.y = element_blank(),
         legend.position="none")+  scale_y_discrete(labels = function(x) str_wrap(x, width = 8))
 
-fig_5e
+fig_s10e
 
 
 
 # LANDSCAPE 10 X 19
-# Figure 5
-fig_5 <- (fig_5a | fig_5b | fig_5c | fig_5d | fig_5e) /
-            (fig_5f | fig_5g | fig_5h | fig_5i | fig_5j )
-fig_5
+# Figure S10
+fig_s10 <- (fig_s10a | fig_s10b | fig_s10c | fig_s10d | fig_s10e) /
+            (fig_s10f | fig_s10g | fig_s10h | fig_s10i | fig_s10j )
+fig_s10

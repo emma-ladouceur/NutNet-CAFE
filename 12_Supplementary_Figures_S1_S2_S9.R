@@ -2,9 +2,9 @@
 # Title:
 # Last Updated April 18, 2021
 
-# 12_Supplementary_Figures.R
-# This workflow make Supplementary Figures S1, S2, & S7
-# Figures S3 a-# found in ###
+# 12_Supplementary_Figures_S1_S2.R
+# This workflow make Supplementary Figures S1, S2, & S9
+
 
 # packages
 library(tidyverse)
@@ -17,7 +17,8 @@ library(viridis)
 # data
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv", sep=",", header=T)
 quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
-comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-06-May-2021.csv", stringsAsFactors = FALSE)
+# not provided
+#comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-06-May-2021.csv", stringsAsFactors = FALSE)
 
 comb_deets <- comb %>% select(site_code, latitude, longitude, continent)
 
@@ -143,7 +144,7 @@ figs2_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Fi
 head(figs2_dat)
 
 fig_s2<-ggplot() +
-  #facet_wrap(~year.max)+
+  facet_wrap(~year.max)+
   geom_point(data = figs2_dat, aes(x = rich.start, y = mass.start),size=1.5, fill="white", shape=1) +
   geom_point(data = figs2_dat, aes(x = rich.end, y = mass.end),size=1.5, colour="white", shape=2) +
   #geom_text_repel(data = figs2_dat, aes(x = rich.start, y = mass.start, label = rownames(figs2_dat) ) ) +
@@ -169,7 +170,7 @@ fig_s2<-ggplot() +
 fig_s2
 
 
-# Figure S7
+# Figure S9
 
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Posteriors/study.p.effs.Rdata')
 
@@ -204,7 +205,7 @@ View(study.effs.p)
 study.effs.p$Quadrant <- factor(study.effs.p$Quadrant, levels= c("-rich +biomass",  "+rich +biomass", "-rich -biomass", "+rich -biomass"))
 
 
-fig_s7 <- ggplot()+
+fig_s9 <- ggplot()+
   facet_wrap(~Quadrant) +
   geom_vline(xintercept = 0,linetype="longdash") + geom_hline(yintercept = 0,linetype="longdash") + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
   geom_point(data= study.effs.p, aes(x= r.eff , y= b.eff), colour="black",alpha=0.2,size=2) +
@@ -216,6 +217,6 @@ fig_s7 <- ggplot()+
        y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
        title = ' ')+ theme_classic(base_size=14) + theme(strip.text = element_text(size=14))
 
-fig_s7
+fig_s9
 
 

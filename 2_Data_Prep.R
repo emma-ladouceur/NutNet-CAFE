@@ -6,8 +6,8 @@
 #  Produces datasets: 'biomass_sp_CAFE.csv', & 'plot.csv'
 # This work flow takes cleaned, filter data (woody non-vasculars removed) per species biomass estimate data and re-calculates measures of species richness
 # this script has 2 main parts
-# 1 produces the final biomass/ species dataset 
-# 2 the plot dataset with measures of species richness across plots and sites
+# 1 produces the final per species biomass/ species dataset 
+# 2 the plot level dataset with measures of species richness and plot level biomass across plots and sites
 
 
 # packages

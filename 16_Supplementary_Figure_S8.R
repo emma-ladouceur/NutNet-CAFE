@@ -1,10 +1,6 @@
 
 
-
-# compare temporal intercepts?
-
-
-
+# Produces Fig S8
 # packages
 library(tidyverse)
 library(brms)
@@ -53,7 +49,7 @@ p.all$year.y<-as.numeric(p.all$year.y)
 
 View(p.all.mm)
 
-
+# load model objects
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.s
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.s
@@ -113,7 +109,7 @@ save(s.loss.mm, file = 'fitted_s.loss_compare.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.loss_compare.Rdata')
 
 
-fig_2a <- ggplot() + 
+fig_s8a <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   # raw points
   geom_point(data = p.all.mm,
@@ -147,7 +143,7 @@ fig_2a <- ggplot() +
        title= 'a) Number of species lost (s.loss)') 
 
 
-fig_2a
+fig_s8a
 
 #sgain
 
@@ -202,7 +198,7 @@ save(s.gain.mm, file = 'fitted_s.gain_compare.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_s.gain_compare.Rdata')
 
 
-fig_2b <- ggplot() + 
+fig_s8b <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   # raw points
   geom_point(data = p.all.mm,
@@ -236,7 +232,7 @@ fig_2b <- ggplot() +
        title= 'b) Number of species gained (s.gain)') 
 
 
-fig_2b
+fig_s8b
 
 
 
@@ -289,7 +285,7 @@ save(s.sl.mm, file = 'fitted_sl_compare.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_sl_compare.Rdata')
 
 
-fig_2c <- ggplot() + 
+fig_s8c <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   # raw points
   geom_point(data = p.all.mm,
@@ -323,7 +319,7 @@ fig_2c <- ggplot() +
        title= 'c) Biomass change associated \n with species loss (SL)') 
 
 
-fig_2c
+fig_s8c
 
 
 
@@ -377,7 +373,7 @@ save(s.sg.mm, file = 'fitted_sg_compare.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_sg_compare.Rdata')
 
 
-fig_2d <- ggplot() + 
+fig_s8d <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   # raw points
   geom_point(data = p.all.mm,
@@ -411,7 +407,7 @@ fig_2d <- ggplot() +
        title= 'd) Biomass change associated \n with species gain (SG)') 
 
 
-fig_2d
+fig_s8d
 
 # cde
 summary(cde.3_p)
@@ -465,7 +461,7 @@ save(s.cde.mm, file = 'fitted_cde_compare.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/fitted_sg_compare.Rdata')
 
 
-fig_2e <- ggplot() + 
+fig_s8e <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   # raw points
   geom_point(data = p.all.mm,
@@ -499,10 +495,10 @@ fig_2e <- ggplot() +
        title= 'e) Biomass change associated \n with persistent species (PS)') 
 
 
-fig_2e
+fig_s8e
 
 
-fig_2_leg <- ggplot() + 
+fig_s8_leg <- ggplot() + 
   geom_hline(yintercept = 0,linetype="longdash") +
   geom_point(data = s.cde.mm,
              aes(x = trt.y , y = P_Estimate, shape = value, group = value), 
@@ -524,7 +520,7 @@ fig_2_leg <- ggplot() +
        title= 'e) Biomass change associated \n with persistent species (PS)') 
 
 
-fig_2_leg
+fig_s8_leg
 
 
 # extract legend
@@ -536,11 +532,11 @@ g_legend <- function(a.gplot){
   return(legend)}
 
 # overall legend
-fig_2_legend <- g_legend(fig_2_leg)
+fig_s8_legend <- g_legend(fig_s8_leg)
 
 
 # 11X14 LANDSCAPE
-(fig_2a | fig_2b)/ (fig_2c | fig_2d | fig_2e) / (fig_2_legend) + plot_layout(heights = c(10, 10, 1))
+(fig_s8a | fig_s8b)/ (fig_s8c | fig_s8d | fig_s8e) / (fig_s8_legend) + plot_layout(heights = c(10, 10, 1))
 
 
 

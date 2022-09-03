@@ -10,6 +10,8 @@
 # see R scripts for code to run models
 # models are large and take a few hours to run
 # this script prepares all data needed for Figure 3 a)-f)
+# produces fig s6 c-n
+# produces table S5
 
 # packages
 library(tidyverse)
@@ -18,7 +20,6 @@ library(bayesplot)
 library(patchwork)
 
 # data
-sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 p.all <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/nutnet_cumulative_time.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
@@ -37,7 +38,6 @@ load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sgain
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sl.Rdata') # sl.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/sg.Rdata') # sg.3_p
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/cde.Rdata') # CDE.3_p
-#load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Fits/3/ps.Rdata') # CDE.3_p
 
 
 # Species Loss model
@@ -48,11 +48,11 @@ summary(sloss.3_p)
 plot(sloss.3_p)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s5c <- pp_check(sloss.3_p) + theme_classic() + 
+fig_s6c <- pp_check(sloss.3_p) + theme_classic() + 
   labs(title = "c)", x= "Species loss (s.loss)", y = "Density") + 
   scale_x_continuous(limits = c(-50, 50)) + theme(legend.position="none")
 
-fig_s5c
+fig_s6c
 
 
 # residuals (this take a minute)
@@ -139,11 +139,11 @@ summary(sgain.3_p)
 plot(sgain.3_p)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s5d <- pp_check(sgain.3_p) + theme_classic() + 
+fig_s6d <- pp_check(sgain.3_p) + theme_classic() + 
   labs( title = "d)", x= "Species gain (s.gain)", y = "") + 
   scale_x_continuous(limits = c(-50, 50)) + theme(legend.position="none")
 
-fig_s5d
+fig_s6d
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -217,104 +217,6 @@ save(sgain.trt_fitted.npk,sgain.trt_fitted.ctl,sgain.trt_coef2,file = 'sgain.mod
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/sgain.mod.dat.Rdata')
 
 
-# persistent species model
-
-#  model summary
-# summary(ps.3_p)
-# # caterpillar plots
-# plot(ps.3_p_sigma)
-# # predicted values vs. observed
-# color_scheme_set("darkgray")
-# fig_s5x <- pp_check(ps.3_p) + theme_classic() + 
-#   labs(x= "Persistent species (p.s)", y = "Density") + 
-#   scale_x_continuous(limits = c(-50, 50))
-# 
-# fig_s5x
-# 
-# # residuals (this take a minute)
-# colnames(p.all)
-# pairs.ps <- p.all %>% filter(!is.na(c.rich))
-# pairs.ps$year.y <- as.factor(pairs.ps$year.y)
-# ps.m <- residuals(ps.3_p_sigma)
-# ps.m <- as.data.frame(ps.m)
-# head(ps.m)
-# ps.plot <- cbind(pairs.ps, ps.m$Estimate)
-# head(ps.plot)
-# 
-# par(mfrow=c(2,2))
-# with(ps.plot, plot(site_code, ps.m$Estimate))
-# with(ps.plot, plot(block, ps.m$Estimate))
-# with(ps.plot, plot(year.y, ps.m$Estimate))
-# with(ps.plot, plot(plot, ps.m$Estimate))
-# 
-# 
-# # fixed effects
-# ps.trt_fitted <- cbind(ps.3_p$data,
-#                           # get fitted values; setting re_formula = NA means we are getting 'fixed' effects
-#                           fitted(ps.3_p_sigma, re_formula = NA)) %>% 
-#   as_tibble() %>% left_join(p.all)
-# 
-# 
-# ps.trt_fitted.npk <- ps.trt_fitted %>% filter(trt.y %in% c('NPK'))
-# ps.trt_fitted.ctl <- ps.trt_fitted  %>% filter(trt.y %in% c('Control'))
-# 
-# ps.trt_fitted
-# 
-# # fixed effect coefficients 
-# ps.trt_fixef <- fixef(ps.3_p)
-# 
-# # predict estimates for each site across a sequence of year.y (comparison plots age)
-# # this takes ~ 5 minutes
-# 
-# head(p.all)
-# 
-# 
-# # coefficients for study-level (random) effects
-# ps.trt_coef <- coef(ps.3_p)
-# 
-# head(ps.trt_coef)
-# 
-# ps.trt_coef2 <-  bind_cols(ps.trt_coef$site_code[,,'Intercept'] %>% # intercept
-#                                 as_tibble() %>% 
-#                                 mutate(Intercept = Estimate,
-#                                        Intercept_lower = Q2.5,
-#                                        Intercept_upper = Q97.5,
-#                                        site_code = rownames(ps.trt_coef$site_code[,,'Intercept'])) %>% 
-#                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-#                              ps.trt_coef$site_code[,,'year.y.m'] %>% # control slope
-#                                 as_tibble() %>% 
-#                                 mutate(ISlope = Estimate,
-#                                        ISlope_lower = Q2.5,
-#                                        ISlope_upper = Q97.5) %>% 
-#                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-#                               ps.trt_coef$site_code[,,'trt.yNPK'] %>%  # treatment
-#                                 as_tibble() %>% 
-#                                 mutate(TE = Estimate,
-#                                        TE_lower = Q2.5,
-#                                        TE_upper = Q97.5) %>% 
-#                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5),
-#                               ps.trt_coef$site_code[,,'trt.yNPK:year.y.m'] %>%  # treatment slope
-#                                 as_tibble() %>% 
-#                                 mutate(TESlope = Estimate,
-#                                        TESlope_lower = Q2.5,
-#                                        TESlope_upper = Q97.5) %>% 
-#                                 select(-Estimate, -Est.Error, -Q2.5, -Q97.5)
-#                           ) %>% 
-#   # join with min and max of the x-values
-#   inner_join(p.all %>% 
-#                group_by(site_code) %>% 
-#                summarise(xmin = min(year.y),
-#                          xmax = max(year.y),
-#                          cxmin = min(year.y.m),
-#                          cxmax = max(year.y.m)),
-#              by = 'site_code') 
-# 
-# 
-# 
-# setwd('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/')
-# save(ps.trt_fitted,ps.trt_fitted.npk,ps.trt_fitted.ctl,ps.trt_coef2,file = 'ps.mod.dat.Rdata')
-# #load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/ps.mod.dat.Rdata')
-
 # SL- biomass change associated with species loss
 
 #  model summary
@@ -325,14 +227,14 @@ plot(sl.3_p)
 # color_scheme_set("darkgray")
 
 summary(p.all)
-fig_s5e <- pp_check(sl.3_p) + theme_classic() + 
+fig_s6e <- pp_check(sl.3_p) + theme_classic() + 
   labs( title = "e)",
     x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with species sloss (SL)'))),
          #expression(paste('Biomass change (g/' ,m^2, ') \n associated with species sloss (SL)')), 
        y = "Density") + 
    scale_x_continuous(limits = c(-1300, 100)) + theme(legend.position="none")
 
-fig_s5e
+fig_s6e
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -419,13 +321,13 @@ summary(sg.3_p)
 plot(sg.3_p)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s5f <- pp_check(sg.3_p) + theme_classic() + 
+fig_s6f <- pp_check(sg.3_p) + theme_classic() + 
   labs(title = "f)",
     x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with species gain (SG)'))),
     y = "") + 
   scale_x_continuous(limits = c(-100, 1300)) + theme(legend.position="none")
 
-fig_s5f
+fig_s6f
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -514,14 +416,14 @@ summary(cde.3_p)
 plot(cde.3_p)
 # predicted values vs. observed
 # color_scheme_set("darkgray")
-fig_s5g <- pp_check(cde.3_p) + theme_classic() + 
+fig_s6g <- pp_check(cde.3_p) + theme_classic() + 
   labs( title = "g)",
     x= expression(paste(atop(paste('Biomass change (g/' ,m^2, ') / year'), 'associated with persistent species (PS)'))),
     y = "") + 
    scale_x_continuous(limits = c(-1000, 1000)) + theme(legend.position="none")
 
 
-fig_s5g
+fig_s6g
 
 # residuals (this take a minute)
 colnames(p.all)
@@ -597,7 +499,7 @@ save(cde_fitted.npk,cde_fitted.ctl,cde_coef2,file = 'cde.mod.dat.Rdata')
 load('~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Model_Extract/cde.mod.dat.Rdata')
 
 
-# Figure S5 a-g with patchwork
+# Figure S6 a-g with patchwork
 
 # extract legend
 # Sourced from: https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
@@ -607,11 +509,11 @@ g_legend<-function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
-fig_5s_legend <- g_legend(fig_s5a)
+fig_6s_legend <- g_legend(fig_s6a)
 
-fig_s5 <- (fig_s5a + theme(legend.position="none")| fig_s5b) / ( fig_s5c | fig_s5d ) / ( fig_s5e | fig_s5f | fig_s5g) / (fig_5s_legend) + plot_layout(heights = c(10,10,10,0.75))
+fig_s6 <- (fig_s6a + theme(legend.position="none")| fig_s6b) / ( fig_s6c | fig_s6d ) / ( fig_s6e | fig_s6f | fig_s6g) / (fig_6s_legend) + plot_layout(heights = c(10,10,10,0.75))
 
-fig_s5
+fig_s6
 
 
 # Multivariate Models
@@ -639,12 +541,12 @@ nnr <- pp_check(sp.multi, resp = 'rich')+ theme_classic() + scale_x_continuous(l
             y = 'Density') +
   theme(legend.position= "none")
 
-fig_5sh_legend <- g_legend(nnb)
+fig_6sh_legend <- g_legend(nnb)
 
 # Figure s5h
-fig_s5h_i <- (nnr  | nnb +  theme(legend.position= "none")) /(fig_5sh_legend) + plot_layout(heights = c(10,0.75))
+fig_s6h_i <- (nnr  | nnb +  theme(legend.position= "none")) /(fig_6sh_legend) + plot_layout(heights = c(10,0.75))
 
-fig_s5h_i
+fig_s6h_i
 
 
 # multivariate price partitions with all responses possible
@@ -685,10 +587,10 @@ cde <- pp_check(pp.multi_all, resp = 'SG')+ theme_classic()+ scale_x_continuous(
   theme(legend.position= "none")
            
                                                                                                                                                                                                                                                                                                                                                                                                                        
-# Figure s5j
-fig_s5j_n <- (sloss | sgain )/( sl | sg | cde) + plot_layout(heights = c(10,10))
+# Figure s6j
+fig_s6j_n <- (sloss | sgain )/( sl | sg | cde) + plot_layout(heights = c(10,10))
 
-fig_s5j_n
+fig_s6j_n
 
 # extract all response correlations for  multivariate model,
 # reported in Supplementary Model Information 1.9
@@ -742,5 +644,5 @@ cor_samp <- cor %>%
 View(cor_samp)
 
 
-write.csv(cor_samp, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S3.csv')
+write.csv(cor_samp, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S5.csv')
 

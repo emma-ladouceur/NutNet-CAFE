@@ -9,6 +9,7 @@
 # see R scripts for code to run models
 # models are large and take a few hours to run
 # this script prepares all data needed for Figure 2 a), b) & c)
+# produces fig s6 a-b
 
 # packages
 library(tidyverse)
@@ -42,10 +43,10 @@ summary(rich.3_p)
 plot(rich.3_p_p)
 # predicted values vs. observed
 color_scheme_set("darkgray")
-fig_s5a <- pp_check(rich.3_p) + theme_classic() + 
+fig_s6a <- pp_check(rich.3_p) + theme_classic() + 
   labs( title = "a)", x= "Species richness", y = "Density") + theme(legend.position="bottom")
 
-fig_s5a
+fig_s6a
 
 # residuals (this take a minute)
 rich.m <- residuals(rich.3_p)
@@ -128,11 +129,11 @@ summary(bm.3_p)
 plot(bm.3_p)
 # predicted values vs. observed
 #color_scheme_set("darkgray")
-fig_s5b <- pp_check(bm.3_p) + theme_classic() + 
+fig_s6b <- pp_check(bm.3_p) + theme_classic() + 
   labs(title = "b)", x = expression(paste('Biomass (g/',m^2, ')')) , y = "") + 
   scale_x_continuous(limits = c(-1000, 2000)) + theme(legend.position="none")
 
-fig_s5b
+fig_s6b
 
 # residuals (this take a minute)
 colnames(plot)
