@@ -12,13 +12,15 @@ library(tidyverse)
 
 
 # Table S1
+plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 # not provided
-#comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-06-May-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+enviro_dat <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/site-worldclim-9-April-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
+comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-06-May-2021.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 # this dataset was pulled from the internet
 # not provided
-#country_codes <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
+country_codes <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/country_codes.csv", stringsAsFactors = FALSE)
 # not provided
-#pis <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/pi-contact-list-8-March-2021.csv", stringsAsFactors = FALSE)
+pis <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/pi-contact-list-8-March-2021.csv", stringsAsFactors = FALSE)
 quads <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/quads.csv", stringsAsFactors = FALSE)
 
 colnames(comb)
@@ -48,13 +50,18 @@ site_info <- prep %>% left_join(pis_prep)
 
 head(site_info)
 
+enviro <- enviro_dat %>% select(site_code, MAP_v2, MAT_v2) %>% 
+  mutate(MAT_v2 = round(MAT_v2,2))
+
 table_s1 <- site_info %>% left_join(quads) %>%
-  filter(!is.na(Quadrant)) %>% select(-X) %>% arrange(site_code) 
+  filter(!is.na(Quadrant)) %>% select(-c(X, Biomass_R)) %>% left_join(enviro) %>% 
+  arrange(site_code) 
 
 
 View(table_s1)
 
 write.csv(table_s1,"~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S1.csv")
+
 
 
 
