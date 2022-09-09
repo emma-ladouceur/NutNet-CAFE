@@ -23,7 +23,7 @@ Species level data is not provided. Data openly available to reproduce results i
 
 **nutnet_cumulative_time_cover.csv** Price equation partition outputs using per species cover as a response. Used for Figure S4.
 
-**FOLDER: Model Fits** The data listed above are used in statistical models, then model objects are produced with *cluster-> univariate, multivariate* script folders saved and provided here. 
+**FOLDER: Model Fits** The data listed above are used in statistical models, then model objects are produced with scripts in *cluster* folder and saved and provided here. 
 - *3* -> Model fits used in main analyses, named after each response
 - *cover* -> For Figure S4
 - *multi* -> multivariate models (see more below)
