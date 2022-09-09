@@ -15,14 +15,20 @@ Species level data is not provided. Data openly available to reproduce results i
 
 **plot.csv** Data used for the plot-level. Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure S5.
 
+**FOLDER: Price Pairs Data** Compressed folder containing data produced by *Price_Pairs* scripts for the following responses:
+- *Biomass* -> used for main analyses
+- *Cover* Used for Figure S4
+
 **nutnet_cumulative_time.csv** Data used for main analysis. Price equation partition outputs using per species biomass estimates.  Includes details about pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with persistent species (PS). These data are needed to run models associated with and to produce Figure 2, 3, & 4.
 
 **nutnet_cumulative_time_cover.csv** Price equation partition outputs using per species cover as a response. Used for Figure S4.
 
-**Model Fits**  The data listed above are used in statistical models, then model objects are saved and provided. Data is extracted from these model objects and are saved as data objects which are also provided, and then can then be used to produce figures without re-running the models. 
+**FOLDER: Model Fits**  The data listed above are used in statistical models, then model objects are saved and provided here. 
 - *3* -> Model fits used in main analyses, named after each response
 - *cover* -> For Figure S4
 - *multi* -> multivariate models (see more below)
+
+**FOLDER: Model Extract** Compressed folder containing data extracted from model objects (Script 5-7) for use in analyses (script 8 on wards)
 
 More data produced within workflow to produce figures is also provided but can be derived from these main data sets.
 
