@@ -15,7 +15,7 @@ Species level data is not provided. Data openly available to reproduce results i
 
 **plot.csv** Data used for the plot-level. Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure S5.
 
-**FOLDER: Price Pairs Data** Compressed folder containing data produced by *Price_Pairs* scripts for the following responses:
+**FOLDER: Price Pairs Data** Compressed folder containing data produced by *cluster -> Price_Pairs* scripts for the following responses:
 - *Biomass* -> used for main analyses
 - *Cover* Used for Figure S4
 
@@ -23,7 +23,7 @@ Species level data is not provided. Data openly available to reproduce results i
 
 **nutnet_cumulative_time_cover.csv** Price equation partition outputs using per species cover as a response. Used for Figure S4.
 
-**FOLDER: Model Fits** The data listed above are used in statistical models, then model objects are saved and provided here. 
+**FOLDER: Model Fits** The data listed above are used in statistical models, then model objects are produced with *cluster-> univariate, multivariate* script folders saved and provided here. 
 - *3* -> Model fits used in main analyses, named after each response
 - *cover* -> For Figure S4
 - *multi* -> multivariate models (see more below)
