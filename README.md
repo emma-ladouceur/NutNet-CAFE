@@ -13,22 +13,22 @@ Approach based on Community Assembly and the Functioning of Ecosystems (CAFE) Ap
 ### Data
 Species level data is not provided. Data openly available to reproduce results includes;
 
-**plot.csv** Data used for the plot-level. Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure S5.
+**plot.csv** Data used for the plot-level, produced by script, '2_Data_Prep.R'. Includes details about sites, blocks, plots, time, treatments, and plot-level measures of species richness and strip level biomass. These data are needed to run models associated with, and to produce Figure S5.
 
-**FOLDER: Price Pairs Data** Compressed folder containing data produced by *cluster -> Price_Pairs* scripts for the following responses:
+**FOLDER: Price Pairs Data** Compressed folder containing data produced by *cluster -> Price_Pairs* scripts, as .rds files. There is a seperate .rds file for every site and year pairwise comparison (e.g., year 0 to year 1) totalling 443 comparisons/datasets. Code makes every possible comparison, so splitting the data in this way massively reduces computation time and filtering/cleaning that needs to be done later. There are two folders here, for the following responses:
 - *Biomass* -> used for main analyses
-- *Cover* Used for Figure S4
+- *Cover* -> Used for Figure S4
 
-**nutnet_cumulative_time.csv** Data used for main analysis. Price equation partition outputs using per species biomass estimates.  Includes details about pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with persistent species (PS). These data are needed to run models associated with and to produce Figure 2, 3, & 4.
+**nutnet_cumulative_time.csv** Data used for main analysis, produced by script, '4_Data_Prep.R'. Price equation partition outputs using per species biomass estimates.  Includes details about pairwise comparisons in terms of sites, blocks, plots, time, and provides plot-level measures of species loss (s.loss), species gain (s.gain), biomass loss associated with species loss (SL), biomass loss associated with  species gain (SG), and biomass loss associated with persistent species (PS). These data are needed to run models associated with and to produce Figure 2, 3, & 4.
 
-**FOLDER: Model Fits** The data listed above are used in statistical models, then model objects are produced with scripts in *cluster* folder and saved and provided here. 
-- *3* -> Model fits used in main analyses, named after each response
-- *cover* -> For Figure S4
-- *multi* -> multivariate models (see more below)
+**FOLDER: Model Fits** The data listed above are used in statistical models, then model objects are produced with scripts in *cluster* folder and saved and provided here as .Rdata files. 
+- *3* -> Model fit .Rdata objects used in main analyses, named after each response
+- *cover* ->  Model fit .Rdata objects for Figure S4
+- *multi* ->  Model fit .Rdata objects for multivariate models (see more below)
 
-**FOLDER: Model Extract** Compressed folder containing data extracted from model objects (Script 5-7) for use in analyses (script 8 on wards)
+**FOLDER: Model Extract** Compressed folder containing data extracted from model objects, produced in Script 5-7, as.Rdata files for use in analyses (script 8_ on wards).
 
-More data produced within workflow to produce figures is also provided but can be derived from these main data sets.
+An extended Table S1 is provided in .csv format, and a couple of other Supplementary Tables.
 
 ### **R Scripts** 
 R Script file names- which are listed below, are numbered and listed in the order they should be used. Price equation partitions and statistical models are run on the cluster, which means this workflow can not be perfectly run through continuously on a local machine. However, code from cluster scripts can be used pedagogically or be adapted to run on a local machine, just be aware they take a few hours each and require substantial computation power.
