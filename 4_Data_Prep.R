@@ -107,8 +107,8 @@ price.pairs.calc <-  price.pairs %>% group_by(site_code) %>%
   summarise(year_min = min(year.x), # min year and  max year for each site
             year_max = max(year.y)) %>% 
   left_join(price.pairs) %>%
-  mutate(s.loss = (x.rich - c.rich), # calculate species loss
-         s.gain = (y.rich - c.rich), # calculate species gain
+  mutate(s.loss = (x.rich - c.rich), # calculate number of species lost between plots
+         s.gain = (y.rich - c.rich), # calculate number of species gained between plots
          s.loss.n = (s.loss * - 1) , # convert species loss to negative
          year.y.m = (year.y - mean(year.y) ) ) # center year
 

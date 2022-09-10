@@ -16,7 +16,7 @@ library(tidyverse)
 # data
 biomass <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
 
-
+head(biomass)
 colnames(biomass)
 View(biomass %>% distinct(site_code, experiment_type, trt))
 
@@ -128,11 +128,18 @@ View(biggest.bm.values)
 # species biomass data for NPK and Control plots for appropriate sites to match price calcs
 write.csv(sp, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv")
 
-View(sp)
+
+# data
+sp <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/biomass_sp_CAFE.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na","NULL"))
+
+head(sp)
+head(biomass)
+
+site_info <- biomass %>% select(id, year, latitude, longitude, elevation)
 
 # 2 plot and site data 
 plot <- sp %>% select(-c(Taxon, max_cover,local_provenance,category.mod,cat.cover,subplot.bm,local_lifeform,local_lifespan,functional_group,category,orig.bm.cat,orig.mass,cat.mass,biomass.sp.cat,biomass.sp.plot,biomass.sp.full,biomass.m.full)) %>%
-  distinct(id, .keep_all = T)
+  distinct(id, .keep_all = T) %>% left_join(site_info)
 
 View(plot)
 
@@ -140,6 +147,7 @@ site.inclusion <- plot %>% distinct(site_code,year_max) %>% filter(year_max >= 3
 # 59 sites will be included in our main analysis
 View(site.inclusion)
 
+# but we keep all data and we filter each time
 write.csv(plot, "~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.csv")
 
 

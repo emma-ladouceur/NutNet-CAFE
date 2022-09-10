@@ -592,7 +592,8 @@ study.effs.p$Biomass_R <- ifelse(study.effs.p$b.eff_lower > 0, 'Biomass Increase
 
 View(study.effs.p)
 
-Quads <- study.effs.p %>% select(site_code, Quadrant,Biomass_R)
+Quads <- study.effs.p %>% select(site_code, Quadrant,Biomass_R) %>%
+  mutate( Quadrant = paste0("'", Quadrant,"'"))
 
 
 head(Quads)

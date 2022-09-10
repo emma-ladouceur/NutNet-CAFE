@@ -100,18 +100,31 @@ plot <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/plot.c
 comb <- read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/comb-by-plot-06-May-2021.csv", stringsAsFactors = FALSE)
 figs2_dat <-read.csv("~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Figure_S2_dat.csv",header=T,fill=TRUE,sep=",",na.strings=c(""," ","NA","NA ","na"))
 
+head(tabs1)
 
-comb_deets <- comb %>% select(site_code,site_name, latitude, longitude, continent)
+head(comb)
+comb_deets <- comb %>% select(site_code, site_name,  continent)
+
 
 nn_plot <-  plot %>% group_by(site_code) %>% filter(year_max >= 3) %>%
   left_join(tabs1, by= "site_code") %>%
   ungroup()  %>% left_join(comb_deets) %>% left_join(figs2_dat) %>%
-  select(site_code,site_name,country, habitat, Quadrant, year_max,  rich.start, rich.end, mass.start,mass.end,latitude,longitude) %>%
-  distinct()
+  select(site_code, site_name, country, habitat, Quadrant, year_max,  rich.start, rich.end, mass.start, mass.end, latitude, longitude, elevation) %>%
+  mutate(elevation = round(elevation, 0)) %>%
+  distinct() %>%
+  mutate( Quadrant = paste0("'", Quadrant,"'"))
 
-View(nn_plot)
+head(nn_plot)
 
 write.csv(nn_plot, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_App.csv')
 
+head(tabs1)
+tab <- tabs1 %>% select(site_code, Experiment.Length, MAP_v2, MAT_v2, Site.Managers)
 
+tab_1_exp <- nn_plot %>% left_join(tab) %>% 
+                   select(site_code, site_name, country, habitat,  Experiment.Length, Quadrant, rich.start, rich.end, mass.start, mass.end,
+                   MAP_v2, MAT_v2, latitude, longitude, elevation, Site.Managers)
 
+View(tab_1_exp)
+
+write.csv(tab_1_exp, '~/GRP GAZP Dropbox/Emma Ladouceur/_Projects/NutNet/Data/Table_S1_expanded.csv')
