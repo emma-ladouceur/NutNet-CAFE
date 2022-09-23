@@ -1,4 +1,4 @@
-# NutNet-CAFE
+# NutNet-CAFE [![DOI](https://zenodo.org/badge/148439104.svg)](https://zenodo.org/badge/latestdoi/148439104)
 
 Code Authors: Emma Ladouceur, [Shane A. Blowes](https://github.com/sablowes) & [Adam T. Clark](https://github.com/adamtclark)
  
